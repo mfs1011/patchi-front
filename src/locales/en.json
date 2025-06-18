@@ -1,0 +1,10 @@
+{
+  "welcome": "Welcome",
+  "totalQuantity": "Total Quantity",
+  "onTime": "On Time",
+  "lateness": "Lateness",
+  "absent": "Absent",
+  "toast": {
+    "signInSuccessfully": "Login successfully!"
+  }
+}

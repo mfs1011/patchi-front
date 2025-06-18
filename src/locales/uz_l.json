@@ -1,0 +1,10 @@
+{
+  "welcome": "Xush kelibsiz",
+  "totalQuantity": "Umumiy miqdor",
+  "onTime": "Vaqtida",
+  "lateness": "Kechikish",
+  "absent": "Yo'q",
+  "toast": {
+    "signInSuccessfully": "Tizimga kirish muvaffaqiyatli amalga oshirildi!"
+  }
+}

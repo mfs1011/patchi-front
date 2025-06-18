@@ -1,0 +1,10 @@
+{
+  "welcome": "Хуш келибсиз",
+  "totalQuantity": "Умумий миқдор",
+  "onTime": "Вақтида",
+  "lateness": "Кечикиш",
+  "absent": "Йўқ",
+  "toast": {
+    "signInSuccessfully": "Тизимга кириш муваффақиятли амалга оширилди!"
+  }
+}
