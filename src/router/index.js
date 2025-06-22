@@ -1,17 +1,20 @@
 import {createRouter, createWebHistory} from "vue-router";
 import { routes } from "./routes.js";
+import {useSidebarStore} from "@/stores/sidebar.js";
 
 export const router = createRouter({
     history: createWebHistory(),
-    routes
+    routes,
 })
 
-// router.beforeEach((to, from, next) => {
-//     NProgress.start()
-// })
-//
-// router.afterEach((to, from, next) => {
-//     NProgress.done()
-// })
+router.beforeEach((to, from, next) => {
+    const store = useSidebarStore()
+    store.startIsRouteLoading()
+    next()
+})
 
+router.afterEach(() => {
+    const store = useSidebarStore()
+    setTimeout(store.endIsRouteLoading, 400)
+})
 export default router

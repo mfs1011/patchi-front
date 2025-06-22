@@ -1,10 +1,28 @@
 {
-  "welcome": "Добро пожаловать",
-  "totalQuantity": "Общее кол-во",
-  "onTime": "Вовремя",
-  "lateness": "Опоздание",
-  "absent": "Отсутствуют",
-  "toast": {
-    "signInSuccessfully": "Авторизация выполнена успешно!"
-  }
+    "dashboard": "Дашборд",
+    "warehouse": "Склад",
+    "administration": "Администратор",
+    "reports": "Отчеты",
+    "logs": "Логи",
+    "logout": "Выход",
+    "forgotPassword": "Забыли пароль?",
+    "labels": {
+        "username": "Имя пользователя",
+        "password": "Пароль"
+    },
+    "placeholders": {
+        "enterUsername": "Введите имя пользователя...",
+        "enterPassword": "Введите пароль..."
+    },
+    "buttons": {
+        "login": "Войти"
+    },
+    "errorMessages": {
+        "usernameRequired": "Имя пользователя обязательно",
+        "passwordRequired": "Пароль обязателен"
+    },
+    "dialog": {
+        "confirm": "Подтвердить",
+        "cancel": "Отмена"
+    }
 }

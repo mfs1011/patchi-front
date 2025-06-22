@@ -1,0 +1,28 @@
+{
+    "dashboard": "Asosiy",
+    "warehouse": "Ombor",
+    "administration": "Administrator",
+    "reports": "Hisobotlar",
+    "logs": "Loglar",
+    "logout": "Chiqish",
+    "forgotPassword": "Parolingizni unutdingizmi?",
+    "labels": {
+        "username": "Username",
+        "password": "Parol"
+    },
+    "placeholders": {
+        "enterUsername": "Username kiriting...",
+        "enterPassword": "Parol kiriting..."
+    },
+    "buttons": {
+        "login": "Kirish"
+    },
+    "errorMessages": {
+        "usernameRequired": "Username kiritish majburiy",
+        "passwordRequired": "Parol kiritish majburiy"
+    },
+    "dialog": {
+        "confirm": "Tasdiqlash",
+        "cancel": "Bekor qilish"
+    }
+}

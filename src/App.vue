@@ -1,12 +1,12 @@
 <script setup>
-
+import ProgressBar from "@/volt/ProgressBar.vue";
+import {useSidebarStore} from "@/stores/sidebar.js";
+const sidebar = useSidebarStore()
 </script>
 
 <template>
-    <ul>
-        <li><router-link to="/">Home</router-link></li>
-        <li><router-link to="/about">About</router-link></li>
-        <li><router-link to="/admin/dashboard">Dashboard</router-link></li>
-    </ul>
-    <router-view/>
+    <div :class="{ 'dark': sidebar.isDark }" class="transition-colors duration-200">
+        <ProgressBar v-if="sidebar.isRouteLoading" mode="indeterminate"  style="height: 4px"/>
+        <router-view />
+    </div>
 </template>

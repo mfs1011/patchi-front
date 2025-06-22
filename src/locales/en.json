@@ -1,10 +1,28 @@
 {
-  "welcome": "Welcome",
-  "totalQuantity": "Total Quantity",
-  "onTime": "On Time",
-  "lateness": "Lateness",
-  "absent": "Absent",
-  "toast": {
-    "signInSuccessfully": "Login successfully!"
-  }
+    "dashboard": "Dashboard",
+    "warehouse": "Warehouse",
+    "administration": "Administration",
+    "reports": "Reports",
+    "logs": "Logs",
+    "logout": "Logout",
+    "forgotPassword": "Forgot your password?",
+    "labels": {
+        "username": "Username",
+        "password": "Password"
+    },
+    "placeholders": {
+        "enterUsername": "Enter username...",
+        "enterPassword": "Enter password..."
+    },
+    "buttons": {
+        "login": "Login"
+    },
+    "errorMessages": {
+        "usernameRequired": "Username is required",
+        "passwordRequired": "Password is required"
+    },
+    "dialog": {
+        "confirm": "Confirm",
+        "cancel": "Cancel"
+    }
 }
