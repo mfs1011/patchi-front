@@ -21,7 +21,7 @@ onMounted(() => {
             </LogoButton>
         </div>
 
-        <Button @click="sidebar.toggle" icon="pi pi-align-justify" size="small" class="text-white ml-auto sm:ml-0"/>
-        <DarkModeSwitcher />
+        <Button @click="sidebar.toggle" icon="pi pi-align-justify" size="small" class="text-white ml-2 sm:ml-0 order-4"/>
+        <DarkModeSwitcher class="sm:order-5"/>
     </div>
 </template>
