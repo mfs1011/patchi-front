@@ -1,6 +1,6 @@
 import MainLayout from "@/layouts/MainLayout.vue";
 import BlankLayout from "@/layouts/BlankLayout.vue";
-import {defineAsyncComponent} from "vue";
+import blankLayout from "@/layouts/BlankLayout.vue";
 
 const ifAuthorized = (to, from, next) => {
     if (localStorage.getItem('accessToken') !== null) {
@@ -38,9 +38,64 @@ export const routes = [
             },
             {
                 path: '/administration',
-                name: 'administration',
                 meta: { requiresAuth: true, roles: []},
-                component: () => import('@/views/Admin.vue')
+                component: blankLayout,
+                children: [
+                    {
+                        path: '',
+                        name: 'administration',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/Admin.vue')
+                    },
+                    {
+                        path: 'users',
+                        name: 'users',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/Users.vue')
+                    },
+                    {
+                        path: 'clients',
+                        name: 'clients',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/Clients.vue')
+                    },
+                    {
+                        path: 'suppliers',
+                        name: 'suppliers',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/Suppliers.vue')
+                    },
+                    {
+                        path: 'products',
+                        name: 'products',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/Products.vue')
+                    },
+                    {
+                        path: 'warehouses',
+                        name: 'warehouses',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/Warehouses.vue')
+                    },
+                    {
+                        path: 'shops',
+                        name: 'shops',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/Shops.vue')
+                    },
+                    {
+                        path: 'categories',
+                        name: 'categories',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/Categories.vue')
+                    },
+                    {
+                        path: 'currency_rates',
+                        name: 'currency_rates',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/CurrencyRates.vue')
+                    },
+                ]
             },
             {
                 path: '/reports',

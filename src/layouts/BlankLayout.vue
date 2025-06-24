@@ -3,12 +3,14 @@ import Loader from "@/components/Loader.vue";
 </script>
 
 <template>
-    <Suspense>
-        <template #default>
-            <router-view />
-        </template>
-        <template #fallback>
-            <Loader />
-        </template>
-    </Suspense>
+    <div class="bg-surface-100 dark:bg-surface-700">
+        <Suspense>
+            <template #default>
+                <router-view />
+            </template>
+            <template #fallback>
+                <Loader />
+            </template>
+        </Suspense>
+    </div>
 </template>

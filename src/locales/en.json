@@ -15,7 +15,14 @@
         "enterPassword": "Enter password..."
     },
     "buttons": {
-        "login": "Login"
+        "login": "Login",
+        "new_user": "New user",
+        "new_category": "New category",
+        "new_client": "New client",
+        "new_supplier": "New supplier",
+        "new_product": "New product",
+        "new_warehouse": "New warehouse",
+        "new_shop": "New shop"
     },
     "errorMessages": {
         "usernameRequired": "Username is required",
@@ -30,5 +37,15 @@
     },
     "authErrorMessage": "Username or password is incorrect",
     "internalErrorMessage": "An error occurred, please try again later",
-    "recoverPassword": "To recover your password, please contact the administrator."
+    "recoverPassword": "To recover your password, please contact the administrator.",
+    "cards": {
+        "users": "Users",
+        "clients": "Clients",
+        "suppliers": "Suppliers",
+        "products": "Products",
+        "warehouses": "Warehouses",
+        "shops": "Shops",
+        "categories": "Categories",
+        "currency_rates": "Currency Rates"
+    }
 }

@@ -51,11 +51,11 @@ const logout = () => {
             </div>
 
             <div class="flex flex-col gap-3 p-4">
-                <RouterButton @click="closeSidebar" class="!w-full" to="/" icon="pi pi-objects-column">{{ t('dashboard') }}</RouterButton>
-                <RouterButton @click="closeSidebar" class="!w-full" to="/warehouse" icon="pi pi-warehouse">{{ t('warehouse') }}</RouterButton>
-                <RouterButton @click="closeSidebar" class="!w-full" to="/administration" icon="pi pi-cog">{{ t('administration') }}</RouterButton>
-                <RouterButton @click="closeSidebar" class="!w-full" to="/reports" icon="pi pi-book">{{ t('reports') }}</RouterButton>
-                <RouterButton @click="closeSidebar" class="!w-full" to="/logs" icon="pi pi-list">{{ t('logs') }}</RouterButton>
+                <RouterButton @click="closeSidebar" exact-active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-white text-primary-contrast" class="!w-full" :to="{ name: 'home' }" icon="pi pi-objects-column">{{ t('dashboard') }}</RouterButton>
+                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-white text-primary-contrast" class="!w-full" :to="{ name: 'warehouse' }" icon="pi pi-warehouse">{{ t('warehouse') }}</RouterButton>
+                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-white text-primary-contrast" class="!w-full" :to="{ name: 'administration' }" icon="pi pi-cog">{{ t('administration') }}</RouterButton>
+                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-white text-primary-contrast" class="!w-full" :to="{ name: 'reports' }" icon="pi pi-book">{{ t('reports') }}</RouterButton>
+                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-white text-primary-contrast" class="!w-full" :to="{ name: 'logs' }" icon="pi pi-list">{{ t('logs') }}</RouterButton>
             </div>
             <div class="flex flex-col gap-2 p-4 border-t border-t-surface-300 dark:border-t-surface-700 grow">
                 <SidebarButton @click="visible = true" icon="pi pi-sign-out" aria-label="Exit" :label="t('logout')" class="justify-start px-3"/>

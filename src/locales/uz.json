@@ -1,7 +1,7 @@
 {
     "dashboard": "Asosiy",
     "warehouse": "Ombor",
-    "administration": "Administrator",
+    "administration": "Administratsiya",
     "reports": "Hisobotlar",
     "logs": "Loglar",
     "logout": "Chiqish",
@@ -15,7 +15,14 @@
         "enterPassword": "Parol kiriting..."
     },
     "buttons": {
-        "login": "Kirish"
+        "login": "Kirish",
+        "new_user": "Yangi foydalanuvchi",
+        "new_category": "Yangi kategoriya",
+        "new_client": "Yangi mijoz",
+        "new_supplier": "Yangi yetkazib beruvchi",
+        "new_product": "Yangi mahsulot",
+        "new_warehouse": "Yangi ombor",
+        "new_shop": "Yangi do‘kon"
     },
     "errorMessages": {
         "usernameRequired": "Username kiritish majburiy",
@@ -30,5 +37,15 @@
     },
     "authErrorMessage": "Username yoki parol noto‘g‘ri",
     "internalErrorMessage": "Xatolik yuz berdi iltimos keyinroq urinib ko'ring",
-    "recoverPassword": "Parolni tiklash uchun administratorga murojaat qiling."
+    "recoverPassword": "Parolni tiklash uchun administratorga murojaat qiling.",
+    "cards": {
+        "users": "Foydalanuvchilar",
+        "clients": "Mijozlari",
+        "suppliers": "Yetkazib beruvchilar",
+        "products": "Mahsulotlar",
+        "warehouses": "Omborlar",
+        "shops": "Do‘konlar",
+        "categories": "Kategoriyalar",
+        "currency_rates": "Valyuta kurslari"
+    }
 }
