@@ -32,7 +32,7 @@ const logout = () => {
 <template>
     <div class="flex flex-col sm:flex-row">
         <div v-if="sidebar.isOpen" @click="sidebar.close" class="fixed inset-0 bg-black/30 z-0 sm:hidden transition-all"></div>
-        <div :class="['flex-col bg-surface-0 dark:bg-surface-800 fixed z-20 flex border-r border-r-surface-300 dark:border-r-surface-700 h-dvh sm:sticky top-0 flex-none transition-all overflow-hidden', sidebar.isOpen ? 'w-60 translate-x-0' : 'sm:w-20.5 -translate-x-full sm:translate-0']">
+        <div :class="['flex-col bg-surface-0 dark:bg-surface-800 fixed z-20 flex border-r border-r-surface-300 dark:border-r-surface-700 h-dvh sm:sticky top-0 flex-none transition-all overflow-hidden', sidebar.isOpen ? 'w-60 translate-x-0' : 'sm:w-20 -translate-x-full sm:translate-0']">
             <div class="px-4 flex items-center h-16 border-b border-b-surface-300 dark:border-b-surface-700 box-border">
                 <svg v-if="sidebar.isOpen" :class="['text-main dark:text-surface-0 h-7 flex-none']" id="Group_22937" data-name="Group 22937" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="182" height="34.499" viewBox="0 0 182 34.499">
                     <defs>

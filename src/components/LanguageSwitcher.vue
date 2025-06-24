@@ -8,9 +8,9 @@ const { locale } = useI18n()
 const sidebar = useSidebarStore()
 
 const langs = computed(() => [
-    { code: "en", name: `🇺🇸${sidebar.isOpen ? ' English' : ''}` },
-    { code: "ru", name: `🇷🇺${sidebar.isOpen ? ' Русский' : ''}` },
-    { code: "uz", name: `🇺🇿${sidebar.isOpen ? " O'zbekcha" : ''}` }
+    { code: "en", name: 'English', flag: 'usa' },
+    { code: "ru", name: 'Русский', flag: 'russia' },
+    { code: "uz", name: 'O\'zbekcha', flag: 'uzbekistan' }
 ])
 
 const selectedLang = computed({
@@ -38,5 +38,29 @@ if (savedLang && savedLang !== locale.value) {
         size="small"
         placeholder="Tilni tanlang"
         :class="[sidebar.isOpen ? 'md:w-38' : 'md:w-14']"
-    />
+    >
+        <template #value="slotProps">
+            <div v-if="slotProps.value" class="flex items-center gap-2">
+                <img
+                    :src="`/${slotProps.value.flag}.svg`"
+                    :alt="slotProps.value.name"
+                    class="h-5"
+                />
+                <div>{{ slotProps.value.name }}</div>
+            </div>
+            <span v-else>
+                    {{ slotProps.placeholder }}
+                </span>
+        </template>
+        <template #option="slotProps">
+            <div class="flex items-center gap-2">
+                <img
+                    :src="`/${slotProps.option.flag}.svg`"
+                    :alt="slotProps.option.name"
+                    class="h-5"
+                />
+                <div>{{ slotProps.option.name }}</div>
+            </div>
+        </template>
+    </Select>
 </template>

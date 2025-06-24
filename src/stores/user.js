@@ -15,7 +15,6 @@ export const useUserStore = defineStore('user', () => {
             localStorage.setItem('refreshToken', data.refreshToken)
             return data
         } catch (error) {
-            console.error(error)
             throw error
         }
     }

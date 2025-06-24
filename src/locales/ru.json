@@ -7,11 +7,11 @@
     "logout": "Выход",
     "forgotPassword": "Забыли пароль?",
     "labels": {
-        "username": "Имя пользователя",
+        "phoneNumber": "Номер телефона",
         "password": "Пароль"
     },
     "placeholders": {
-        "enterUsername": "Введите имя пользователя...",
+        "enterPhoneNumber": "Введите номер телефона...",
         "enterPassword": "Введите пароль..."
     },
     "buttons": {
@@ -19,10 +19,16 @@
     },
     "errorMessages": {
         "usernameRequired": "Имя пользователя обязательно",
-        "passwordRequired": "Пароль обязателен"
+        "passwordRequired": "Пароль обязателен",
+        "phoneNumberRequired": "Номер телефона обязателен",
+        "phoneNumberMustBeExactlyCharacters": "Номер телефона должен содержать ровно {count} символов"
     },
     "dialog": {
         "confirm": "Подтвердить",
-        "cancel": "Отмена"
-    }
+        "cancel": "Отмена",
+        "close": "Закрыть"
+    },
+    "authErrorMessage": "Имя пользователя или пароль указаны неверно",
+    "internalErrorMessage": "Произошла ошибка, пожалуйста, попробуйте позже",
+    "recoverPassword": "Для восстановления пароля обратитесь к администратору."
 }

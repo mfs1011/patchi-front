@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref, watch, watchEffect} from "vue";
+import {computed, ref} from "vue";
 import Button from "@/volt/Button.vue";
 import InputText from "@/volt/InputText.vue";
 import Message from "@/volt/Message.vue";
@@ -13,34 +13,56 @@ import {getDeviceId} from "@/helpers/deviceId.js";
 import {useUserStore} from "@/stores/user.js";
 import {useRouter} from "vue-router";
 import DarkModeSwitcher from "@/components/DarkModeSwitcher.vue";
+import LogoButton from "@/volt/LogoButton.vue";
+import Dialog from "@/volt/Dialog.vue";
+import PhoneInput from "@/components/PhoneInput.vue";
 
 const router = useRouter();
 const { t } = useI18n();
 const userStore = useUserStore()
 const currentImageId = ref(1);
+const isOpenForgotPassword = ref(false);
+const errorKey = ref('')
+const authErrorMessage = computed(() => errorKey.value ? t(errorKey.value) : '');
 const getRandomNumber = () => currentImageId.value = Math.floor(Math.random() * 6) + 1;
 
 getRandomNumber()
 const imageUrl = computed(() => `/auth_image_${currentImageId.value}.webp`);
 const isPassword = ref(true);
+const phoneLength = ref();
 
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
-    username: yup.string().required(t('errorMessages.usernameRequired')),
+    phoneNumber: yup.string().required().length(phoneLength.value, t('errorMessages.phoneNumberMustBeExactlyCharacters', { count: phoneLength.value })),
     password: yup.string().required(t('errorMessages.passwordRequired')),
 }))
 
 const { handleSubmit, errors, isSubmitting } = useForm({
-    validationSchema: schema,
+    validationSchema: schema
 })
 
-const { value: username } = useField('username')
+const { value: phoneNumber } = useField('phoneNumber', undefined, { validateOnValueUpdate: false });
 const { value: password } = useField('password')
 
 const onSubmit = handleSubmit(async values => {
-    await userStore.fetchToken({...values, device: getDeviceId()})
+    try {
+        await userStore.fetchToken({ username: values.phoneNumber.replace(/\D/g, ''), password: values.password, device: getDeviceId() })
 
-    await router.push({ name: 'home' })
+        await router.push({ name: 'home' })
+    } catch (error) {
+        if (error.status === 401) {
+            errorKey.value = 'authErrorMessage'
+            setTimeout(() => {
+                errorKey.value = ''
+            }, 3000)
+        }
+        if (error.status === 500) {
+            errorKey.value = 'internalErrorMessage'
+            setTimeout(() => {
+                errorKey.value = ''
+            }, 3000)
+        }
+    }
 })
 
 
@@ -70,20 +92,11 @@ const onSubmit = handleSubmit(async values => {
                 </template>
                 <template #content>
                     <form @submit.prevent="onSubmit">
-                        <label for="username" class="mb-2 block">{{ t('labels.username') }}</label>
+                        <label for="username" class="mb-2 block">{{ t('labels.phoneNumber') }}</label>
                         <div class="relative">
-                            <i class="pi pi-user absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1" />
-                            <InputText
-                                v-model.trim="username"
-                                id="username"
-                                fluid
-                                :placeholder="t('placeholders.enterUsername')"
-                                pt:root="p-large:ps-10"
-                                size="large"
-                                :class="{ 'p-invalid': errors.username }"
-                            />
+                            <PhoneInput v-model="phoneNumber" v-model:phone-length="phoneLength" />
                         </div>
-                        <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.username }}</Message>
+                        <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.phoneNumber }}</Message>
 
                         <label for="password" class="mb-2 block mt-1">{{ t('labels.password') }}</label>
                         <div class="relative">
@@ -112,8 +125,20 @@ const onSubmit = handleSubmit(async values => {
                                 <p v-show="!isSubmitting">{{ t('buttons.login') }}</p>
                             </div>
                         </Button>
-                        <div class="flex items-center justify-center gap-5 mt-10">
-                            <p class="cursor-pointer underline text-main hover:text-main-hover dark:text-green-hover dark:hover:text-surface-0 transition-colors duration-200">{{ t('forgotPassword') }}</p>
+                        <div class="flex justify-center mt-5">
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ authErrorMessage }}</Message>
+                        </div>
+                        <div class="flex items-center justify-center gap-5 mt-5">
+                            <LogoButton @click="isOpenForgotPassword = true" pt:root="bg-transparent border-none enabled:hover:bg-transparent py-0 rounded enabled:active:bg-transparent enabled:active:text-surface-0">
+                                <p class="cursor-pointer underline text-main hover:text-main-hover dark:text-green-hover dark:hover:text-surface-0 transition-colors duration-200">{{ t('forgotPassword') }}</p>
+                            </LogoButton>
+                            <Dialog v-model:visible="isOpenForgotPassword" modal class="sm:w-130 w-9/10" :closable="false">
+                                <span class="text-surface-500 dark:text-surface-400 block mb-8 sm:whitespace-nowrap">{{ t('recoverPassword') }}</span>
+
+                                <div class="flex justify-end gap-2">
+                                    <Button type="button" :label="t('dialog.close')" @click="isOpenForgotPassword = false" class="px-5"/>
+                                </div>
+                            </Dialog>
                         </div>
                         <div class="mt-5 flex justify-between items-center">
                             <LanguageSwitcher />
