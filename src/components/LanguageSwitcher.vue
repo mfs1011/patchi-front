@@ -37,27 +37,28 @@ if (savedLang && savedLang !== locale.value) {
         optionLabel="name"
         size="small"
         placeholder="Tilni tanlang"
-        :class="[sidebar.isOpen ? 'md:w-38' : 'md:w-14']"
+        :class="[sidebar.isOpen ? 'md:w-38' : 'md:w-12']"
+        :pt:dropdown="`${sidebar.isOpen ? 'w-8' : 'hidden'}`"
     >
         <template #value="slotProps">
-            <div v-if="slotProps.value" class="flex items-center gap-2">
+            <div v-if="slotProps.value" :class="['flex items-center gap-2', !sidebar.isOpen ? 'justify-center': '']">
                 <img
                     :src="`/${slotProps.value.flag}.svg`"
                     :alt="slotProps.value.name"
-                    class="h-5"
+                    class="w-5.5 text-2xl flex-none"
                 />
-                <div>{{ slotProps.value.name }}</div>
+                <div v-if="sidebar.isOpen">{{ slotProps.value.name }}</div>
             </div>
             <span v-else>
-                    {{ slotProps.placeholder }}
-                </span>
+                {{ slotProps.placeholder }}
+            </span>
         </template>
         <template #option="slotProps">
             <div class="flex items-center gap-2">
                 <img
                     :src="`/${slotProps.option.flag}.svg`"
                     :alt="slotProps.option.name"
-                    class="h-5"
+                    class="w-5 flex-none"
                 />
                 <div>{{ slotProps.option.name }}</div>
             </div>

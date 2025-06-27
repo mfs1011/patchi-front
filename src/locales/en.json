@@ -1,28 +1,51 @@
 {
-    "dashboard": "Dashboard",
+    "dashboard": "Home",
     "warehouse": "Warehouse",
+    "shop": "Shop",
     "administration": "Administration",
     "reports": "Reports",
     "logs": "Logs",
     "logout": "Logout",
     "forgotPassword": "Forgot your password?",
+    "noResults": "No results found",
+    "user": {
+        "nominative": "user",
+        "accusative": "user"
+    },
+    "roles": {
+        "admin": "Admin",
+        "seller": "Seller",
+        "director": "Director",
+        "warehouseManager": "Warehouse manager",
+        "partner": "Partner"
+    },
     "labels": {
         "phoneNumber": "Phone number",
-        "password": "Password"
+        "password": "Password",
+        "id": "ID",
+        "name": "Name",
+        "role": "Role"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
-        "enterPassword": "Enter password..."
+        "enterPassword": "Enter password...",
+        "search": {
+            "byNameAndPhone": "Search by name or phone number",
+            "byRole": "Search by role"
+        }
     },
     "buttons": {
         "login": "Login",
-        "new_user": "New user",
-        "new_category": "New category",
-        "new_client": "New client",
-        "new_supplier": "New supplier",
-        "new_product": "New product",
-        "new_warehouse": "New warehouse",
-        "new_shop": "New shop"
+        "newUser": "New user",
+        "newSeller": "New seller",
+        "newCategory": "New category",
+        "newClient": "New client",
+        "newSupplier": "New supplier",
+        "newProduct": "New product",
+        "newWarehouse": "New warehouse",
+        "newShop": "New shop",
+        "newCollection": "New collection",
+        "newColor": "New color"
     },
     "errorMessages": {
         "usernameRequired": "Username is required",
@@ -33,19 +56,34 @@
     "dialog": {
         "confirm": "Confirm",
         "cancel": "Cancel",
-        "close": "Close"
+        "close": "Close",
+        "logoutConfirmation": "Are you sure you want to log out?",
+        "deleteConfirmation": "Are you sure you want to delete {name} with ID {id}?"
     },
     "authErrorMessage": "Username or password is incorrect",
     "internalErrorMessage": "An error occurred, please try again later",
     "recoverPassword": "To recover your password, please contact the administrator.",
     "cards": {
         "users": "Users",
-        "clients": "Clients",
+        "sellers": "Sellers",
+        "clientsB2B": "Clients B2B",
+        "clientsB2C": "Clients B2C",
         "suppliers": "Suppliers",
         "products": "Products",
         "warehouses": "Warehouses",
         "shops": "Shops",
         "categories": "Categories",
-        "currency_rates": "Currency Rates"
+        "currencyRates": "Currency Rates",
+        "colors": "Colors",
+        "kpi": "KPI percent",
+        "paymentType": "Payment type",
+        "collection": "Collection",
+        "productsInStock": "Products",
+        "incomeInvoices": "Incoming",
+        "transferInvoices": "Transfer",
+        "orders": "Orders",
+        "returnInvoices": "Returns",
+        "writeOffInvoices": "Write-offs",
+        "salesReports": "Sales reports"
     }
 }

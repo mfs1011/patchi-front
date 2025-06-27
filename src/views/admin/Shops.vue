@@ -1,29 +1,18 @@
 <script setup>
-import Button from "@/volt/Button.vue";
+import { useI18n } from "vue-i18n";
+import Section from "@/components/UI/Section.vue";
+
+const { t } = useI18n();
 </script>
 
 <template>
-    <div class="flex flex-col gap-4">
-        <div class="flex justify-between">
-            <div class="flex items-center gap-1">
-                <Button
-                    @click="$router.back"
-                    pt:root="bg-transparent dark:bg-transparent text-black dark:text-surface-0 enabled:hover:bg-transparent border-none px-1 py-0"
-                    icon="pi pi-chevron-left"
-                    pt:icon="text-black dark:text-surface-0 hover:scale-120 transition-all"
-                />
-                <span class="text-2xl dark:text-surface-0">{{ $t('cards.shops') }}</span>
-            </div>
-            <div>
-                <Button class="px-5">
-                    {{ $t('buttons.new_shop') }}
-                </Button>
-            </div>
-
-        </div>
-    </div>
+    <Section
+        :add-button-name="t('buttons.newShop')"
+        :section-name="t('cards.shops')"
+        back-route-name="administration"
+    >
+        <template #sectionBody>
+            <p>Body yoziladi</p>
+        </template>
+    </Section>
 </template>
-
-<style scoped>
-
-</style>

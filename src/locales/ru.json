@@ -1,28 +1,51 @@
 {
-    "dashboard": "Дашборд",
+    "dashboard": "Главная",
     "warehouse": "Склад",
+    "shop": "Магазин",
     "administration": "Администратция",
     "reports": "Отчеты",
     "logs": "Логи",
     "logout": "Выход",
     "forgotPassword": "Забыли пароль?",
+    "noResults": "Ничего не найдено",
+    "user": {
+        "nominative": "пользователь",
+        "accusative": "пользователя"
+    },
+    "roles": {
+        "admin": "Администратор",
+        "seller": "Продавец",
+        "director": "Директор",
+        "warehouseManager": "Кладовщик",
+        "partner": "Партнёр"
+    },
     "labels": {
         "phoneNumber": "Номер телефона",
-        "password": "Пароль"
+        "password": "Пароль",
+        "id": "ID",
+        "name": "Имя",
+        "role": "Роль"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
-        "enterPassword": "Введите пароль..."
+        "enterPassword": "Введите пароль...",
+        "search": {
+            "byNameAndPhone": "Поиск по имени или номеру телефона",
+            "byRole": "Поиск по роли"
+        }
     },
     "buttons": {
         "login": "Войти",
-        "new_user": "Новый пользователь",
-        "new_category": "Новая категория",
-        "new_client": "Новый клиент",
-        "new_supplier": "Новый поставщик",
-        "new_product": "Новый продукт",
-        "new_warehouse": "Новый склад",
-        "new_shop": "Новый магазин"
+        "newUser": "Новый пользователь",
+        "newSeller": "Новый продавец",
+        "newCategory": "Новая категория",
+        "newClient": "Новый клиент",
+        "newSupplier": "Новый поставщик",
+        "newProduct": "Новый продукт",
+        "newWarehouse": "Новый склад",
+        "newShop": "Новый магазин",
+        "newCollection": "Новая коллекция",
+        "newColor": "Новый цвет"
     },
     "errorMessages": {
         "usernameRequired": "Имя пользователя обязательно",
@@ -33,19 +56,34 @@
     "dialog": {
         "confirm": "Подтвердить",
         "cancel": "Отмена",
-        "close": "Закрыть"
+        "close": "Закрыть",
+        "logoutConfirmation": "Вы действительно хотите выйти из системы?",
+        "deleteConfirmation": "Вы действительно хотите удалить {name} с ID {id}?"
     },
     "authErrorMessage": "Имя пользователя или пароль указаны неверно",
     "internalErrorMessage": "Произошла ошибка, пожалуйста, попробуйте позже",
     "recoverPassword": "Для восстановления пароля обратитесь к администратору.",
     "cards": {
         "users": "Пользователи",
-        "clients": "Клиенты",
+        "sellers": "Продавцы",
+        "clientsB2B": "Клиенты B2B",
+        "clientsB2C": "Клиенты B2C",
         "suppliers": "Поставщики",
         "products": "Товары",
         "warehouses": "Склады",
         "shops": "Магазины",
         "categories": "Категории",
-        "currency_rates": "Курсы валют"
+        "currencyRates": "Курсы валют",
+        "colors": "Цвета",
+        "kpi": "Процент KPI",
+        "paymentType": "Тип оплаты",
+        "collection": "Коллекция",
+        "productsInStock": "Товары",
+        "incomeInvoices": "Поступления",
+        "transferInvoices": "Перемещение",
+        "orders": "Заказы",
+        "returnInvoices": "Возвраты",
+        "writeOffInvoices": "Списания",
+        "salesReports": "Отчеты о продажах"
     }
 }

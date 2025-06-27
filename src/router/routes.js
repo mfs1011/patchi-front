@@ -32,9 +32,101 @@ export const routes = [
             },
             {
                 path: '/warehouse',
-                name: 'warehouse',
                 meta: { requiresAuth: true, roles: []},
-                component: () => import('@/views/Warehouse.vue')
+                component: blankLayout,
+                children: [
+                    {
+                        path: '',
+                        name: 'warehouse',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/warehouse/Warehouse.vue')
+                    },
+                    {
+                        path: 'products-in-stock',
+                        name: 'warehouse-products-in-stock',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/warehouse/WarehouseProductsInStock.vue')
+                    },
+                    {
+                        path: 'income-invoices',
+                        name: 'warehouse-income-invoices',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/warehouse/WarehouseIncomeInvoice.vue')
+                    },
+                    {
+                        path: 'transfer-invoices',
+                        name: 'warehouse-transfer-invoices',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/warehouse/WarehouseTransferInvoice.vue')
+                    },
+                    {
+                        path: 'orders',
+                        name: 'warehouse-orders',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/warehouse/WarehouseOrders.vue')
+                    },
+                    {
+                        path: 'return-invoices',
+                        name: 'warehouse-return-invoices',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/warehouse/WarehouseReturnInvoice.vue')
+                    },
+                    {
+                        path: 'write-off-invoices',
+                        name: 'warehouse-write-off-invoices',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/warehouse/WarehouseWriteOffInvoice.vue')
+                    },
+                ]
+            },
+            {
+                path: '/shop',
+                meta: { requiresAuth: true, roles: []},
+                component: BlankLayout,
+                children: [
+                    {
+                        path: '',
+                        name: 'shop',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/shop/Shop.vue')
+                    },
+                    {
+                        path: 'products-in-stock',
+                        name: 'shop-products-in-stock',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/shop/ShopProductsInStock.vue')
+                    },
+                    {
+                        path: 'income-invoices',
+                        name: 'shop-income-invoices',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/shop/ShopIncomeInvoice.vue')
+                    },
+                    {
+                        path: 'transfer-invoices',
+                        name: 'shop-transfer-invoices',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/shop/ShopTransferInvoice.vue')
+                    },
+                    {
+                        path: 'orders',
+                        name: 'shop-orders',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/shop/ShopOrders.vue')
+                    },
+                    {
+                        path: 'return-invoices',
+                        name: 'shop-return-invoices',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/shop/ShopReturnInvoice.vue')
+                    },
+                    {
+                        path: 'write-off-invoices',
+                        name: 'shop-write-off-invoices',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/shop/ShopWriteOffInvoice.vue')
+                    },
+                ]
             },
             {
                 path: '/administration',
@@ -54,10 +146,22 @@ export const routes = [
                         component: () => import('@/views/admin/Users.vue')
                     },
                     {
-                        path: 'clients',
-                        name: 'clients',
+                        path: 'sellers',
+                        name: 'sellers',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/Clients.vue')
+                        component: () => import('@/views/admin/Sellers.vue')
+                    },
+                    {
+                        path: 'clients-b2b',
+                        name: 'clients-b2b',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/ClientsB2B.vue')
+                    },
+                    {
+                        path: 'clients-b2c',
+                        name: 'clients-b2c',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/ClientsB2C.vue')
                     },
                     {
                         path: 'suppliers',
@@ -90,18 +194,53 @@ export const routes = [
                         component: () => import('@/views/admin/Categories.vue')
                     },
                     {
-                        path: 'currency_rates',
-                        name: 'currency_rates',
+                        path: 'currency-rates',
+                        name: 'currency-rates',
                         meta: { requiresAuth: true, roles: []},
                         component: () => import('@/views/admin/CurrencyRates.vue')
+                    },
+                    {
+                        path: 'colors',
+                        name: 'colors',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/Colors.vue')
+                    },
+                    {
+                        path: 'kpi',
+                        name: 'kpi',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/KPI.vue')
+                    },
+                    {
+                        path: 'payment-type',
+                        name: 'payment-type',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/PaymentType.vue')
+                    },
+                    {
+                        path: 'collections',
+                        name: 'collections',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/Collections.vue')
                     },
                 ]
             },
             {
                 path: '/reports',
-                name: 'reports',
                 meta: { requiresAuth: true, roles: []},
-                component: () => import('@/views/Reports.vue')
+                component: BlankLayout,
+                children: [
+                    {
+                        path: '',
+                        name: 'reports',
+                        component: () => import('@/views/report/Reports.vue')
+                    },
+                    {
+                        path: 'sales-report',
+                        name: 'sales-report',
+                        component: () => import('@/views/report/SalesReport.vue')
+                    }
+                ]
             },
             {
                 path: '/logs',

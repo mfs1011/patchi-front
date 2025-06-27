@@ -13,9 +13,8 @@ import Button from "@/volt/Button.vue";
                     icon="pi pi-chevron-left"
                     pt:icon="text-black dark:text-surface-0 hover:scale-120 transition-all"
                 />
-                <span class="text-2xl dark:text-surface-0">{{ $t('cards.currency_rates') }}</span>
+                <span class="text-2xl dark:text-surface-0">{{ $t('cards.currencyRates') }}</span>
             </div>
-
         </div>
     </div>
 </template>

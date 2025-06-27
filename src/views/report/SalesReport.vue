@@ -1,15 +1,15 @@
 <script setup>
-import Section from "@/components/UI/Section.vue";
 import { useI18n } from "vue-i18n";
+import Section from "@/components/UI/Section.vue";
 
 const { t } = useI18n();
 </script>
 
 <template>
     <Section
-        :add-button-name="t('buttons.newCategory')"
-        :section-name="t('cards.categories')"
-        back-route-name="administration"
+        :section-name="t('cards.salesReports')"
+        back-route-name="reports"
+        without-add-button
     >
         <template #sectionBody>
             <p>Body yoziladi</p>

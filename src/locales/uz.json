@@ -1,51 +1,104 @@
 {
     "dashboard": "Asosiy",
     "warehouse": "Ombor",
+    "shop": "Do‘kon",
     "administration": "Administratsiya",
     "reports": "Hisobotlar",
     "logs": "Loglar",
     "logout": "Chiqish",
     "forgotPassword": "Parolingizni unutdingizmi?",
+    "noResults": "Hech narsa topilmadi",
+    "user": {
+        "nominative": "foydalanuvchi",
+        "accusative": "foydalanuvchini"
+    },
+    "roles": {
+        "admin": "Administrator",
+        "seller": "Sotuvchi",
+        "director": "Direktor",
+        "warehouseManager": "Ombor mudiri",
+        "partner": "Hamkor"
+    },
     "labels": {
         "phoneNumber": "Telefon raqami",
-        "password": "Parol"
+        "password": "Parol",
+        "id": "ID",
+        "name": "Ism",
+        "role": "Rol",
+        "fullName": "To‘liq ism",
+        "warehouse": "Ombor",
+        "shop": "Do‘kon"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
-        "enterPassword": "Parol kiriting..."
+        "enterPassword": "Parol kiriting...",
+        "fullName": "To‘liq ism kiriting...",
+        "search": {
+            "byNameAndPhone": "Ism yoki telefon raqam orqali qidiruv",
+            "byRole": "Rol bo‘yicha qidiruv"
+        },
+        "select": {
+            "role": "Rol tanlang",
+            "warehouse": "Ombor tanlang",
+            "shop": "Do‘kon tanlang"
+        }
     },
     "buttons": {
         "login": "Kirish",
-        "new_user": "Yangi foydalanuvchi",
-        "new_category": "Yangi kategoriya",
-        "new_client": "Yangi mijoz",
-        "new_supplier": "Yangi yetkazib beruvchi",
-        "new_product": "Yangi mahsulot",
-        "new_warehouse": "Yangi ombor",
-        "new_shop": "Yangi do‘kon"
+        "newUser": "Yangi foydalanuvchi",
+        "newSeller": "Yangi sotuvchi",
+        "newCategory": "Yangi kategoriya",
+        "newClient": "Yangi mijoz",
+        "newSupplier": "Yangi yetkazib beruvchi",
+        "newProduct": "Yangi mahsulot",
+        "newWarehouse": "Yangi ombor",
+        "newShop": "Yangi do‘kon",
+        "newCollection": "Yangi to‘plam",
+        "newColor": "Yangi rang"
     },
     "errorMessages": {
         "usernameRequired": "Username kiritish majburiy",
         "passwordRequired": "Parol kiritish majburiy",
         "phoneNumberRequired": "Telefon raqamini kiritish majburiy",
-        "phoneNumberMustBeExactlyCharacters": "Telefon raqami aniq {count} ta belgidan iborat bo‘lishi kerak"
+        "phoneNumberMustBeExactlyCharacters": "Telefon raqami aniq {count} ta belgidan iborat bo‘lishi kerak",
+        "fullNameMustBeMaxCharacters": "To‘liq ism 30ta belgidan oshmasligi kerak",
+        "roleRequired": "Rol tanlash majburiy",
+        "warehouseRequired": "Ombor tanlash majburiy",
+        "shopRequired": "Do‘kon tanlash majburiy"
     },
     "dialog": {
         "confirm": "Tasdiqlash",
         "cancel": "Bekor qilish",
-        "close": "Yopish"
+        "close": "Yopish",
+        "logoutConfirmation": "Rostdan ham tizimdan chiqmoqchimisiz?",
+        "deleteConfirmation": "Rostdan ham {id} lik {name} o‘chirmoqchimisiz?",
+        "addConfirmation": "{name} qo‘shish",
+        "editConfirmation": "{name} o‘zgartirish"
     },
     "authErrorMessage": "Username yoki parol noto‘g‘ri",
-    "internalErrorMessage": "Xatolik yuz berdi iltimos keyinroq urinib ko'ring",
+    "internalErrorMessage": "Xatolik yuz berdi iltimos keyinroq urinib ko‘ring",
     "recoverPassword": "Parolni tiklash uchun administratorga murojaat qiling.",
     "cards": {
         "users": "Foydalanuvchilar",
-        "clients": "Mijozlari",
-        "suppliers": "Yetkazib beruvchilar",
+        "sellers": "Sotuvchilar",
+        "clientsB2B": "B2B mijozlari",
+        "clientsB2C": "B2C mijozlari",
+        "suppliers": "Ta'minotchilar",
         "products": "Mahsulotlar",
         "warehouses": "Omborlar",
         "shops": "Do‘konlar",
         "categories": "Kategoriyalar",
-        "currency_rates": "Valyuta kurslari"
+        "currencyRates": "Valyuta kurslari",
+        "colors": "Ranglar",
+        "kpi": "KPI foizi",
+        "paymentType": "To‘lov turi",
+        "collection": "To‘plam",
+        "productsInStock": "Mahsulotlar",
+        "incomeInvoices": "Kirim",
+        "transferInvoices": "Ko‘chirish",
+        "orders": "Buyurtmalar",
+        "returnInvoices": "Qaytgan mahsulotlar",
+        "writeOffInvoices": "Chiqarishlar",
+        "salesReports": "Sotuvlar hisobotlari"
     }
 }

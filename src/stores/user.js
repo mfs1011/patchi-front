@@ -4,9 +4,23 @@ import {authorizedClient} from "@/api/axios.js";
 
 export const useUserStore = defineStore('user', () => {
     const state = reactive({
-        accessToken: localStorage.getItem('accessToken'),
-        refreshToken: localStorage.getItem('refreshToken')
+        users: {
+            models: [],
+            totalItems: 0,
+            pagesCount: 0,
+        },
+        user: {},
+        isLoadingUsers: false,
     })
+
+    const pushUser = async userData => {
+        try {
+            const { data } = await authorizedClient.post('/users', userData)
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
 
     const fetchToken = async userData => {
         try {
@@ -19,6 +33,50 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+    const fetchUsers = async (params = { page: 1 }) => {
+        try {
+            state.isLoadingUsers = true
+
+            const { data } = await authorizedClient.get('/users', { params })
+            state.users.models = data['hydra:member']
+            state.users.totalItems = data['hydra:totalItems']
+            state.users.pagesCount = data['pagesCount']
+
+            return data
+        } catch (error) {
+            throw error
+        } finally {
+            state.isLoadingUsers = false
+        }
+    }
+
+    const fetchUser = async id => {
+        try {
+            const { data } = await authorizedClient.get(`/users/${id}`)
+            state.user = data
+
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
+    const deleteUser = async id => {
+        try {
+            await authorizedClient.put(`/users/delete/${id}`, JSON.stringify({}))
+        } catch (error) {
+            throw error
+        }
+    }
+
+    const getAboutMe = async () => {
+        try {
+            await authorizedClient.post(`/users/about_me`, JSON.stringify({}))
+        } catch (error) {
+            throw error
+        }
+    }
+
     const logout = () => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
@@ -26,9 +84,18 @@ export const useUserStore = defineStore('user', () => {
     }
 
     return {
+        pushUser,
         fetchToken,
+        fetchUsers,
+        fetchUser,
+        deleteUser,
         logout,
-        getAccessToken: computed(() => state.accessToken),
-        getRefreshToken: computed(() => state.refreshToken),
+        getAboutMe,
+        getAboutMeFromToken: computed(() => JSON.parse(atob(localStorage.getItem('accessToken').split('.')[1]))),
+        getAccessToken: computed(() => localStorage.getItem('accessToken')),
+        getRefreshToken: computed(() => localStorage.getItem('refreshToken')),
+        getUsers: computed(() => state.users),
+        getUser: computed(() => state.user),
+        getIsLoadingUsers: computed(() => state.isLoadingUsers),
     }
 })

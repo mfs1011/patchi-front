@@ -7,8 +7,8 @@ const { t } = useI18n();
 
 <template>
     <Section
-        :add-button-name="t('buttons.newCategory')"
-        :section-name="t('cards.categories')"
+        :add-button-name="t('buttons.newClient')"
+        :section-name="t('cards.clientsB2B')"
         back-route-name="administration"
     >
         <template #sectionBody>

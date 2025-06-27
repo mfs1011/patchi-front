@@ -4,13 +4,13 @@ import SidebarButton from "@/volt/SidebarButton.vue";
 import Button from "@/volt/Button.vue";
 import Dialog from "@/volt/Dialog.vue";
 import RouterButton from "@/components/UI/RouterButton.vue";
-import {useI18n} from "vue-i18n";
+import { useI18n } from "vue-i18n";
 import Header from "@/components/Header.vue";
-import {useSidebarStore} from "@/stores/sidebar.js";
+import { useSidebarStore } from "@/stores/sidebar.js";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
-import {useUserStore} from "@/stores/user.js";
+import { useUserStore } from "@/stores/user.js";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
-import {ref} from "vue";
+import { ref } from "vue";
 const { t } = useI18n()
 
 const sidebar = useSidebarStore()
@@ -31,8 +31,8 @@ const logout = () => {
 
 <template>
     <div class="flex flex-col sm:flex-row">
-        <div v-if="sidebar.isOpen" @click="sidebar.close" class="fixed inset-0 bg-black/30 z-0 sm:hidden transition-all"></div>
-        <div :class="['flex-col bg-surface-0 dark:bg-surface-800 fixed z-20 flex border-r border-r-surface-300 dark:border-r-surface-700 h-dvh sm:sticky top-0 flex-none transition-all overflow-hidden', sidebar.isOpen ? 'w-60 translate-x-0' : 'sm:w-20 -translate-x-full sm:translate-0']">
+        <div v-if="sidebar.isOpen" @click="sidebar.close" class="fixed inset-0 bg-black/30 z-40 sm:hidden transition-all"></div>
+        <div :class="['flex-col bg-surface-0 dark:bg-surface-800 fixed z-50 flex border-r border-r-surface-300 dark:border-r-surface-700 h-dvh sm:sticky top-0 flex-none transition-all overflow-hidden', sidebar.isOpen ? 'w-60 translate-x-0' : 'sm:w-20 -translate-x-full sm:translate-0']">
             <div class="px-4 flex items-center h-16 border-b border-b-surface-300 dark:border-b-surface-700 box-border">
                 <svg v-if="sidebar.isOpen" :class="['text-main dark:text-surface-0 h-7 flex-none']" id="Group_22937" data-name="Group 22937" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="182" height="34.499" viewBox="0 0 182 34.499">
                     <defs>
@@ -51,18 +51,19 @@ const logout = () => {
             </div>
 
             <div class="flex flex-col gap-3 p-4">
-                <RouterButton @click="closeSidebar" exact-active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-white text-primary-contrast" class="!w-full" :to="{ name: 'home' }" icon="pi pi-objects-column">{{ t('dashboard') }}</RouterButton>
-                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-white text-primary-contrast" class="!w-full" :to="{ name: 'warehouse' }" icon="pi pi-warehouse">{{ t('warehouse') }}</RouterButton>
-                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-white text-primary-contrast" class="!w-full" :to="{ name: 'administration' }" icon="pi pi-cog">{{ t('administration') }}</RouterButton>
-                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-white text-primary-contrast" class="!w-full" :to="{ name: 'reports' }" icon="pi pi-book">{{ t('reports') }}</RouterButton>
-                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-white text-primary-contrast" class="!w-full" :to="{ name: 'logs' }" icon="pi pi-list">{{ t('logs') }}</RouterButton>
+                <RouterButton @click="closeSidebar" exact-active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'home' }" icon="pi pi-home">{{ t('dashboard') }}</RouterButton>
+                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'warehouse' }" icon="pi pi-warehouse">{{ t('warehouse') }}</RouterButton>
+                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'shop' }" icon="pi pi-shop">{{ t('shop') }}</RouterButton>
+                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'administration' }" icon="pi pi-cog">{{ t('administration') }}</RouterButton>
+                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'reports' }" icon="pi pi-book">{{ t('reports') }}</RouterButton>
+                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'logs' }" icon="pi pi-list">{{ t('logs') }}</RouterButton>
             </div>
             <div class="flex flex-col gap-2 p-4 border-t border-t-surface-300 dark:border-t-surface-700 grow">
                 <SidebarButton @click="visible = true" icon="pi pi-sign-out" aria-label="Exit" :label="t('logout')" class="justify-start px-3"/>
                 <LanguageSwitcher class="mt-auto"/>
 
-                <Dialog v-model:visible="visible" modal :header="t('logout')" class="sm:w-100 w-9/10">
-                    <span class="text-surface-500 dark:text-surface-400 block mb-8">Rostdan ham tizimdan chiqmoqchimisiz?</span>
+                <Dialog v-model:visible="visible" modal :closable="false" class="sm:w-100 w-9/10">
+                    <span class="text-surface-500 dark:text-surface-400 block mb-8">{{ t('dialog.logoutConfirmation') }}</span>
 
                     <div class="flex justify-end gap-2">
                         <SecondaryButton type="button" :label="t('dialog.cancel')" @click="visible = false" />
@@ -74,7 +75,7 @@ const logout = () => {
         <div class="grow min-h-dvh flex flex-col">
             <Header />
 
-            <div class="p-4 bg-surface-100 dark:bg-surface-700 grow">
+            <div class="bg-surface-100 dark:bg-surface-700 grow flex flex-col" :class="{'p-2 sm:p-4': $route.name !== 'home'}">
                 <Suspense>
                     <template #default>
                         <router-view />

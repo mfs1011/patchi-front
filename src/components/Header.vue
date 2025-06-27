@@ -14,7 +14,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="sticky box-border top-0 bg-white dark:bg-surface-800 h-16 p-4 flex items-center border-b border-b-surface-300 dark:border-b-surface-700">
+    <div class="sticky box-border top-0 z-20 bg-white dark:bg-surface-800 h-16 p-4 flex items-center border-b border-b-surface-300 dark:border-b-surface-700">
         <div class="sm:hidden flex items-center h-13 box-border">
             <LogoButton class="bg-white border-none hover:bg-transparent hover:fill-white w-fit justify-start">
                 <svg :class="['text-main dark:text-surface-0 h-6 flex-none']" id="Group_22937" data-name="Group 22937" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="34.499" viewBox="0 0 182 34.499">
