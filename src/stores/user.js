@@ -7,7 +7,6 @@ export const useUserStore = defineStore('user', () => {
         users: {
             models: [],
             totalItems: 0,
-            pagesCount: 0,
         },
         user: {},
         isLoadingUsers: false,
@@ -38,9 +37,8 @@ export const useUserStore = defineStore('user', () => {
             state.isLoadingUsers = true
 
             const { data } = await authorizedClient.get('/users', { params })
-            state.users.models = data['hydra:member']
-            state.users.totalItems = data['hydra:totalItems']
-            state.users.pagesCount = data['pagesCount']
+            state.users.models = data['member']
+            state.users.totalItems = data['totalItems']
 
             return data
         } catch (error) {
