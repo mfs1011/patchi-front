@@ -1,6 +1,5 @@
 import MainLayout from "@/layouts/MainLayout.vue";
 import BlankLayout from "@/layouts/BlankLayout.vue";
-import blankLayout from "@/layouts/BlankLayout.vue";
 
 const ifAuthorized = (to, from, next) => {
     if (localStorage.getItem('accessToken') !== null) {
@@ -28,12 +27,12 @@ export const routes = [
                 path: '',
                 name: 'home',
                 meta: { requiresAuth: true, roles: []},
-                component: () => import('@/views/Home.vue')
+                component: () => import('@/views/Home.vue'),
             },
             {
                 path: '/warehouse',
                 meta: { requiresAuth: true, roles: []},
-                component: blankLayout,
+                component: BlankLayout,
                 children: [
                     {
                         path: '',
@@ -97,12 +96,6 @@ export const routes = [
                         component: () => import('@/views/shop/ShopProductsInStock.vue')
                     },
                     {
-                        path: 'income-invoices',
-                        name: 'shop-income-invoices',
-                        meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/shop/ShopIncomeInvoice.vue')
-                    },
-                    {
                         path: 'transfer-invoices',
                         name: 'shop-transfer-invoices',
                         meta: { requiresAuth: true, roles: []},
@@ -131,7 +124,7 @@ export const routes = [
             {
                 path: '/administration',
                 meta: { requiresAuth: true, roles: []},
-                component: blankLayout,
+                component: BlankLayout,
                 children: [
                     {
                         path: '',
@@ -141,9 +134,28 @@ export const routes = [
                     },
                     {
                         path: 'users',
-                        name: 'users',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/Users.vue')
+                        component: BlankLayout,
+                        children: [
+                            {
+                                path: '',
+                                name: 'users',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/user/Users.vue'),
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-user',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/user/UserAdd.vue'),
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-user',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/user/UserEdit.vue'),
+                            }
+                        ]
                     },
                     {
                         path: 'sellers',

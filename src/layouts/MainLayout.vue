@@ -30,10 +30,10 @@ const logout = () => {
 </script>
 
 <template>
-    <div class="flex flex-col sm:flex-row">
+    <div class="flex flex-col sm:flex-row grow">
         <div v-if="sidebar.isOpen" @click="sidebar.close" class="fixed inset-0 bg-black/30 z-40 sm:hidden transition-all"></div>
-        <div :class="['flex-col bg-surface-0 dark:bg-surface-800 fixed z-50 flex border-r border-r-surface-300 dark:border-r-surface-700 h-dvh sm:sticky top-0 flex-none transition-all overflow-hidden', sidebar.isOpen ? 'w-60 translate-x-0' : 'sm:w-20 -translate-x-full sm:translate-0']">
-            <div class="px-4 flex items-center h-16 border-b border-b-surface-300 dark:border-b-surface-700 box-border">
+        <div :class="['flex-col bg-surface-0 dark:bg-surface-800 fixed z-50 flex border-r border-r-surface-300 dark:border-r-surface-600/50 h-dvh sm:sticky top-0 flex-none transition-all overflow-hidden', sidebar.isOpen ? 'w-60 translate-x-0' : 'sm:w-20 -translate-x-full sm:translate-0']">
+            <div class="px-4 flex items-center h-16 border-b border-b-surface-300 dark:border-b-surface-600/50 box-border">
                 <svg v-if="sidebar.isOpen" :class="['text-main dark:text-surface-0 h-7 flex-none']" id="Group_22937" data-name="Group 22937" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="182" height="34.499" viewBox="0 0 182 34.499">
                     <defs>
                         <clipPath id="clip-path">
@@ -58,11 +58,11 @@ const logout = () => {
                 <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'reports' }" icon="pi pi-book">{{ t('reports') }}</RouterButton>
                 <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'logs' }" icon="pi pi-list">{{ t('logs') }}</RouterButton>
             </div>
-            <div class="flex flex-col gap-2 p-4 border-t border-t-surface-300 dark:border-t-surface-700 grow">
+            <div class="flex flex-col gap-2 p-4 border-t border-t-surface-300 dark:border-t-surface-600/50 grow">
                 <SidebarButton @click="visible = true" icon="pi pi-sign-out" aria-label="Exit" :label="t('logout')" class="justify-start px-3"/>
                 <LanguageSwitcher class="mt-auto"/>
 
-                <Dialog v-model:visible="visible" modal :closable="false" class="sm:w-100 w-9/10">
+                <Dialog v-model:visible="visible" modal :closable="false" class="sm:w-120 w-9/10">
                     <span class="text-surface-500 dark:text-surface-400 block mb-8">{{ t('dialog.logoutConfirmation') }}</span>
 
                     <div class="flex justify-end gap-2">
@@ -72,7 +72,7 @@ const logout = () => {
                 </Dialog>
             </div>
         </div>
-        <div class="grow min-h-dvh flex flex-col">
+        <div class="grow min-h-dvh flex flex-col sm:overflow-x-auto">
             <Header />
 
             <div class="bg-surface-100 dark:bg-surface-700 grow flex flex-col" :class="{'p-2 sm:p-4': $route.name !== 'home'}">

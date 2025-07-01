@@ -1,23 +1,37 @@
 <script setup>
 import Button from "@/volt/Button.vue";
-import {onMounted} from "vue";
+import {computed, onMounted} from "vue";
 import LogoButton from "@/volt/LogoButton.vue";
 import {useSidebarStore} from "@/stores/sidebar.js";
 import DarkModeSwitcher from "@/components/DarkModeSwitcher.vue";
+import {useUserStore} from "@/stores/user.js";
+import {useI18n} from "vue-i18n";
 const sidebar = useSidebarStore()
+const userStore = useUserStore()
+
+const { t } = useI18n()
 
 onMounted(() => {
     if (window.innerWidth <= 640) {
         sidebar.close()
     }
 })
+
+const PRETTY_ROLE_NAMES = computed(() => ({
+    ROLE_ADMIN: t('roles.admin'),
+    ROLE_WAREHOUSE_MANAGER: t('roles.warehouseManager'),
+    ROLE_SELLER: t('roles.seller'),
+    ROLE_DIRECTOR: t('roles.director'),
+    ROLE_PARTNER: t('roles.partner'),
+}))
+
 </script>
 
 <template>
-    <div class="sticky box-border top-0 z-20 bg-white dark:bg-surface-800 h-16 p-4 flex items-center border-b border-b-surface-300 dark:border-b-surface-700">
+    <div class="sticky box-border top-0 z-20 bg-surface-0 dark:bg-surface-800 h-16 p-4 flex items-center border-b border-b-surface-300 dark:border-b-surface-600/50">
         <div class="sm:hidden flex items-center h-13 box-border">
-            <LogoButton class="bg-white border-none hover:bg-transparent hover:fill-white w-fit justify-start">
-                <svg :class="['text-main dark:text-surface-0 h-6 flex-none']" id="Group_22937" data-name="Group 22937" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="34.499" viewBox="0 0 182 34.499">
+            <LogoButton class="bg-surface-0 border-none hover:bg-transparent hover:fill-white w-fit justify-start">
+                <svg :class="['text-green-hover dark:text-surface-0 h-6 flex-none']" id="Group_22937" data-name="Group 22937" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="34.499" viewBox="0 0 182 34.499">
                     <defs>
                         <clipPath id="clip-path">
                             <rect id="Rectangle_888" data-name="Rectangle 888" width="182" height="34.499" fill="none"/>
@@ -33,5 +47,16 @@ onMounted(() => {
 
         <Button @click="sidebar.toggle" icon="pi pi-align-justify" size="small" class="text-white ml-2 sm:ml-0 order-4"/>
         <DarkModeSwitcher class="sm:order-5"/>
+
+        <div class="hidden order-5 dark:text-surface-0 px-5 border-l border-surface-300 dark:border-surface-600 ml-5 sm:flex items-center gap-5">
+            <div class="text-right">
+                <p class="capitalize">{{ userStore.getAboutMeFromToken.name}}</p>
+                <p class="capitalize">{{ PRETTY_ROLE_NAMES[userStore.getAboutMeFromToken.role] }}</p>
+            </div>
+
+            <LogoButton class="cursor-pointer">
+                <i class="pi pi-user text-2xl dark:text-green text-main"></i>
+            </LogoButton>
+        </div>
     </div>
 </template>

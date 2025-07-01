@@ -14,8 +14,8 @@ export const useRoleStore = defineStore('role',() => {
         try {
             const { data } = await authorizedClient.get('/roles')
 
-            state.roles.models = data['member']
-            state.roles.totalItems = data['totalItems']
+            state.roles.models = data.member
+            state.roles.totalItems = data.totalItems
 
             return data
         } catch (error) {

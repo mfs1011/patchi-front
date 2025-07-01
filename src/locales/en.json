@@ -13,7 +13,7 @@
         "accusative": "user"
     },
     "roles": {
-        "admin": "Admin",
+        "admin": "Administrator",
         "seller": "Seller",
         "director": "Director",
         "warehouseManager": "Warehouse manager",
@@ -45,7 +45,8 @@
         "newWarehouse": "New warehouse",
         "newShop": "New shop",
         "newCollection": "New collection",
-        "newColor": "New color"
+        "newColor": "New color",
+        "filters": "Filters"
     },
     "errorMessages": {
         "usernameRequired": "Username is required",
@@ -57,11 +58,13 @@
         "confirm": "Confirm",
         "cancel": "Cancel",
         "close": "Close",
+        "clear": "Clear",
         "logoutConfirmation": "Are you sure you want to log out?",
         "deleteConfirmation": "Are you sure you want to delete {name} with ID {id}?"
     },
-    "authErrorMessage": "Username or password is incorrect",
-    "internalErrorMessage": "An error occurred, please try again later",
+    "authErrorMessage": "Username or password is incorrect.",
+    "authForbiddenErrorMessage": "Your account is awaiting administrator approval.",
+    "internalErrorMessage": "An error occurred, please try again later.",
     "recoverPassword": "To recover your password, please contact the administrator.",
     "cards": {
         "users": "Users",

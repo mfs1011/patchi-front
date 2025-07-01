@@ -13,8 +13,8 @@ export const useLocationStore = defineStore('location', () => {
     const fetchLocations = async (params = { page: 1 }) => {
         try {
             const { data } = await authorizedClient.get('/locations', { params });
-            state.locations.models = data['hydra:member']
-            state.locations.totalItems = data['hydra:totalItems']
+            state.locations.models = data.member
+            state.locations.totalItems = data.totalItems
 
             return data
         } catch (error) {

@@ -7,7 +7,6 @@ const { t } = useI18n();
 
 const cards = computed(() => [
     { id: 1, name: t('cards.productsInStock'), image: 'WarehouseQuantity.png', routeName: 'shop-products-in-stock' },
-    { id: 2, name: t('cards.incomeInvoices'), image: 'IncomeInvoice.png', routeName: 'shop-income-invoices' },
     { id: 3, name: t('cards.transferInvoices'), image: 'TransferInvoice.png', routeName: 'shop-transfer-invoices' },
     { id: 4, name: t('cards.orders'), image: 'Order.png', routeName: 'shop-orders' },
     { id: 5, name: t('cards.returnInvoices'), image: 'Return.png', routeName: 'shop-return-invoices' },

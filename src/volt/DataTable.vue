@@ -21,7 +21,7 @@
                 </SecondaryButton>
                 <div class="items-center justify-center gap-2 hidden sm:flex">
                     <SecondaryButton v-for="pageLink of pageLinks" :key="pageLink" :text="page + 1 !== pageLink" rounded @click="() => changePageCallback(pageLink - 1)" :class="['shrink-0 min-w-10 h-10', { 'bg-main! text-surface-0!': page + 1 === pageLink }]"
-                        >{{ pageLink }}
+                    >{{ pageLink }}
                     </SecondaryButton>
                 </div>
                 <SecondaryButton text rounded @click="nextPageCallback" :disabled="page === pageCount! - 1">
@@ -60,10 +60,10 @@ interface Props extends /* @vue-ignore */ DataTableProps {}
 defineProps<Props>();
 
 const theme = ref<DataTablePassThroughOptions>({
-    root: `relative p-flex-scrollable:flex p-flex-scrollable:flex-col p-flex-scrollable:h-full rounded-md overflow-hidden`,
+    root: `relative p-flex-scrollable:flex p-flex-scrollable:flex-col p-flex-scrollable:h-full rounded-md overflow-hidden whitespace-nowrap`,
     tableContainer: `p-scrollable:relative p-flex-scrollable:flex p-flex-scrollable:flex-col p-flex-scrollable:flex-1 p-flex-scrollable:h-full`,
-    header: `py-3 px-4 border-b border-surface-200 dark:border-surface-700
-        bg-surface-0 dark:bg-surface-900
+    header: `py-3 px-4 border-b border-surface-200 dark:border-surface-600/50
+        bg-surface-100 dark:bg-surface-900
         text-surface-700 dark:text-surface-0`,
     table: `border-spacing-0 w-full border-separate`,
     thead: `p-scrollable:bg-surface-0 dark:p-scrollable:bg-surface-900 p-scrollable:top-0 p-scrollable:z-10`,
@@ -71,25 +71,25 @@ const theme = ref<DataTablePassThroughOptions>({
         p-frozen:sticky p-frozen:z-10`,
     bodyRow: `bg-surface-0 dark:bg-surface-800 text-surface-700 dark:text-surface-0 p-selectable:cursor-pointer p-selected:bg-highlight!`,
     tfoot: `p-scrollable:bg-surface-0 dark:p-scrollable:bg-surface-900 p-scrollable:bottom-0 p-scrollable:z-10`,
-    footer: `py-3 px-4 border-b border-surface-200 dark:border-surface-700
+    footer: `py-3 px-4 border-b border-surface-200 dark:border-surface-600/50
         bg-surface-0 dark:bg-surface-900
         text-surface-700 dark:text-surface-0`,
-    mask: `bg-black/50 text-surface-200 absolute z-10 flex items-center justify-center w-full h-full backdrop-blu-`,
+    mask: `bg-black/50 text-surface-200 absolute z-10 flex items-center justify-center w-full h-full backdrop-blur`,
     column: {
         root: ``,
         headerCell: `group py-3 px-4 font-normal text-start transition-colors duration-200
-            border-b border-surface-200 dark:border-surface-700
-            bg-surface-300 dark:bg-surface-900
+            border-b border-surface-300 dark:border-surface-600/50
+            bg-surface-100 dark:bg-surface-900
             text-surface-700 dark:text-surface-0
             p-sortable:cursor-pointer p-sortable:select-none p-sortable:focus-visible:outline p-sortable:focus-visible:outline-1 p-sortable:focus-visible:-outline-offset-1 p-sortable:focus-visible:outline-primary
-            p-sortable:not-p-sorted:hover:bg-surface-100 p-sortable:not-p-sorted:hover:text-surface-800 
+            p-sortable:not-p-sorted:hover:bg-surface-100 p-sortable:not-p-sorted:hover:text-surface-800
             dark:p-sortable:not-p-sorted:hover:bg-surface-800 dark:p-sortable:not-p-sorted:hover:text-surface-0
             p-sorted:bg-highlight
             p-frozen:sticky p-frozen:bg-surface-0 dark:p-frozen:bg-surface-900 p-frozen:z-10
         `,
         columnHeaderContent: `flex items-center gap-2`,
         columnTitle: `font-semibold`,
-        bodyCell: `text-start py-3 px-4 border-b border-surface-200 dark:border-surface-700
+        bodyCell: `text-start py-3 px-4 border-b border-surface-300 dark:border-surface-600/50
             p-frozen:sticky p-frozen:bg-surface-0 dark:p-frozen:bg-surface-900`,
         bodyCellContent: ``,
         footerCell: `text-start py-3 px-4 border-b border-surface-200 dark:border-surface-800

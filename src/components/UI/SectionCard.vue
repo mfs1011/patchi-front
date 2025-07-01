@@ -15,7 +15,7 @@ defineProps({
         class="h-fit"
     >
         <Card
-            pt:root="h-full rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group hover:bg-surface-200 dark:hover:bg-surface-900 transition-all"
+            pt:root="h-full rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group hover:bg-surface-100 dark:hover:bg-surface-900 transition-all"
             pt:body="p-0 h-full"
             pt:content="sm:p-6"
             pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"

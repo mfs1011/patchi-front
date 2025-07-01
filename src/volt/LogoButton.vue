@@ -22,9 +22,9 @@ defineProps<Props>();
 
 const theme = ref<ButtonPassThroughOptions>({
     root: `inline-flex cursor-pointer select-none items-center justify-center overflow-hidden relative
-        px-2 py-2 gap-2 rounded-md disabled:pointer-events-none disabled:opacity-60 transition-colors duration-200
-        bg-primary dark:bg-transparent enabled:hover:bg-primary-emphasis enabled:hover:bg-green-hover enabled:active:bg-primary-emphasis-alt text-primary-contrast
-        border border-primary dark:border-green dark:hover-bg-transparent enabled:hover:border-green-hover enabled:active:border-primary-emphasis-alt
+        px-2 py-2 gap-2 rounded-full disabled:pointer-events-none disabled:opacity-60 transition-colors duration-200
+        bg-transparent dark:bg-transparent enabled:hover:bg-primary-transparent enabled:hover:bg-transparent enabled:active:bg-primary-emphasis-alt text-primary-contrast
+        border border-primary dark:border-green dark:hover-bg-transparent enabled:active:border-transparent
         focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-primary
         p-vertical:flex-col p-fluid:w-full p-fluid:p-icon-only:w-9
         p-icon-only:w-9 p-icon-only:px-0 p-icon-only:gap-0

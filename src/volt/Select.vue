@@ -39,7 +39,7 @@ defineProps<Props>();
 const theme = ref<SelectPassThroughOptions>({
     root: `inline-flex cursor-pointer relative select-none rounded-md p-fluid:flex
         bg-surface-0 dark:bg-surface-800
-        border border-surface-300 hover:border-surface-400 dark:border-surface-700 dark:hover:border-surface-600
+        border border-surface-300 hover:border-surface-400 dark:border-surface-600/50 dark:hover:border-surface-600
         p-focus:border-primary
         p-filled:bg-surface-50 dark:p-filled:bg-surface-800
         p-invalid:border-red-400 dark:p-invalid:border-red-300
@@ -57,7 +57,7 @@ const theme = ref<SelectPassThroughOptions>({
     dropdown: `flex items-center justify-center shrink-0 bg-transparent
         text-surface-400 w-7.5 rounded-e-md`,
     overlay: `absolute top-0 left-0 rounded-md p-portal-self:min-w-full
-        dark:bg-surface-900 bg-surface-0
+        dark:bg-surface-700 bg-surface-0
         border border-surface-200 dark:border-surface-700
         text-surface-700 dark:text-surface-0
         shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1),0_2px_4px_-2px_rgba(0,0,0,0.1)]`,
