@@ -1,5 +1,4 @@
 <script setup>
-import Button from "@/volt/Button.vue";
 import Section from "@/components/UI/Section.vue";
 import { useI18n } from "vue-i18n";
 

@@ -1,0 +1,335 @@
+<script setup>
+import Button from "@/volt/Button.vue";
+import DataTable from "@/volt/DataTable.vue";
+import Breadcrumb from "@/volt/Breadcrumb.vue";
+import Column from "primevue/column";
+import { computed, ref, watch } from "vue";
+import { useUserStore } from "@/stores/user.js";
+import { useI18n } from "vue-i18n";
+import { useRoute, useRouter } from "vue-router";
+import Select from "@/volt/Select.vue";
+import InputText from "@/volt/InputText.vue";
+import useDebouncedRef from "@/composables/useDebouncedRef.js";
+import { useRoleStore } from "@/stores/role.js";
+import NoData from "@/components/UI/NoData.vue";
+import Loader from "@/components/Loader.vue";
+import Section from "@/components/UI/Section.vue";
+import { formatPhoneByCountry } from "@/helpers/phoneFormat.js";
+import Card from "@/volt/Card.vue";
+import PaginatorComponent from "@/components/PaginatorComponent.vue";
+
+const route = useRoute();
+const router = useRouter();
+const { t } = useI18n();
+const userStore = useUserStore();
+const roleStore = useRoleStore();
+
+// Refs
+const visible = ref({
+    addAndEdit: false,
+    edit: false,
+    deleteVisible: false,
+});
+const isDeleteLoading = ref(false);
+const currentUserId = ref();
+const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
+const filters = ref({
+    page: parseInt(route.query.page) || 1,
+    itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
+    role: parseInt(route.query.role) || null,
+});
+
+// Computed
+const PRETTY_ROLE_NAMES = computed(() => ({
+    ROLE_ADMIN: t("roles.admin"),
+    ROLE_WAREHOUSE_MANAGER: t("roles.warehouseManager"),
+    ROLE_SELLER: t("roles.seller"),
+    ROLE_DIRECTOR: t("roles.director"),
+    ROLE_PARTNER: t("roles.partner"),
+}));
+
+const getRolesList = computed(() =>
+    roleStore.getRoles.models.map(({ id, name }) => ({
+        id,
+        name: PRETTY_ROLE_NAMES.value[name],
+    })),
+);
+
+// Watchers
+watch(
+    [() => debouncedFilter.value, () => filters.value],
+    async () => {
+        const queryFilter = {
+            page: filters.value.page,
+            "items-per-page": filters.value.itemsPerPage,
+        };
+
+        if (debouncedFilter.value !== null) {
+            queryFilter.name = debouncedFilter.value;
+        }
+
+        if (debouncedFilter.value === "") {
+            delete queryFilter.name;
+        }
+
+        if (filters.value.role !== null) {
+            queryFilter.role = filters.value.role;
+        } else {
+            delete queryFilter.role;
+        }
+
+        await updateQuery(queryFilter);
+
+        await userStore.fetchUsers(route.query);
+    },
+    { immediate: true, deep: true },
+);
+
+// Functions
+async function updateQuery(newParams) {
+    await router.push({
+        query: {
+            ...newParams,
+        },
+    });
+}
+
+// const editAction = async user => {
+//     await userStore.fetchUser(user.id);
+//     isAddModal.value = false;
+//     visible.value.addAndEdit = true
+//
+//     fullName.value = userStore.getUser.name
+//     phoneNumber.value = userStore.getUser.username
+//     password.value = ''
+//     role.value = userStore.getUser.role.id
+//     // todo bir nechta location tanlash imkoni bormi yoki yo'q? Bu yaratguncha ham selectga tegishli
+//     // warehouse bo'lsa bir nechtalik select, seller bo'lsa bittalik select
+//
+//     // warehouse.value = userStore.getUser.locations.filter(location => location.isWarehouse)
+//     // shop.value = userStore.getUser
+// }
+
+const deleteAction = (id) => {
+    currentUserId.value = id;
+    visible.value.deleteVisible = true;
+};
+
+const deleteUser = async () => {
+    isDeleteLoading.value = true;
+    await userStore.deleteUser(currentUserId.value);
+    await userStore.fetchUsers(route.query);
+    isDeleteLoading.value = false;
+    visible.value.deleteVisible = false;
+};
+
+const hasAccessDelete = (data) =>
+    userStore.getAboutMeFromToken.id !== data.id && data.id !== 1;
+
+const isVisibleSectionHeader = ref(false);
+const home = ref({
+    icon: "pi pi-slash",
+    label: t("administration"),
+    route: "/administration",
+});
+const items = computed(() => [{ label: t("cards.users") }]);
+
+const changePage = (page) => {
+    console.log(page);
+    filters.value.page = page;
+};
+</script>
+
+<template>
+    <Breadcrumb
+        :home="home"
+        :model="items"
+        class="mb-2 sm:mb-4 rounded-md border border-surface-300 dark:border-surface-600/50"
+    >
+        <template #item="{ item, props }">
+            <router-link
+                v-if="item.route"
+                v-slot="{ href, navigate }"
+                :to="item.route"
+                custom
+                class="group"
+            >
+                <a :href="href" v-bind="props.action" @click="navigate">
+                    <span
+                        class="text-surface-700 dark:text-surface-0 group-hover:text-main dark:group-hover:text-green transition-all"
+                        >{{ item.label }}</span
+                    >
+                </a>
+            </router-link>
+            <a
+                v-else
+                :href="item.url"
+                :target="item.target"
+                v-bind="props.action"
+            >
+                <span class="text-main dark:text-green font-semibold">{{
+                    item.label
+                }}</span>
+            </a>
+        </template>
+        <template #separator>
+            <span class="text-primary">/</span>
+        </template>
+    </Breadcrumb>
+
+    <Section
+        :section-name="t('cards.users')"
+        back-route-name="administration"
+        without-buttons
+    >
+        <template #buttons>
+            <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end">
+                <Button
+                    @click="isVisibleSectionHeader = !isVisibleSectionHeader"
+                    class="px-2 sm:px-5 whitespace-nowrap"
+                    :icon="isVisibleSectionHeader ? 'pi pi-filter' : 'pi pi-filter-slash'"
+                    :label="t('buttons.filters')"
+                />
+                <Button
+                    @click="router.push({ name: 'add-user' })"
+                    class="px-2 sm:px-5 whitespace-nowrap"
+                    >{{ t("buttons.newUser") }}</Button
+                >
+            </div>
+            <div class="sm:hidden flex grow gap-2 sm:gap-4">
+                <Button
+                    size="small"
+                    @click="isVisibleSectionHeader = !isVisibleSectionHeader"
+                    class="w-full px-2 sm:px-5 whitespace-nowrap"
+                    :icon="isVisibleSectionHeader ? 'pi pi-filter' : 'pi pi-filter-slash'"
+                    :label="t('buttons.filters')"
+                />
+                <Button
+                    @click="router.push({ name: 'add-user' })"
+                    class="w-full px-2 sm:px-5 whitespace-nowrap"
+                    >{{ t("buttons.newUser") }}</Button
+                >
+            </div>
+        </template>
+
+        <template #sectionHeader>
+            <div
+                :class="{
+                    'h-0 border-transparent -my-1 sm:-my-2': !isVisibleSectionHeader,
+                    'py-2 sm:py-4 h-fit border-surface-300 dark:border-surface-600/50 border': isVisibleSectionHeader
+                }"
+                class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
+            >
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
+                    <label class="relative min-w-50 max-w-full w-full">
+                        <i class="pi pi-search absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1"/>
+                        <InputText
+                            pt:root="dark:bg-surface-800 ps-10"
+                            v-model="debouncedFilter"
+                            class="w-full"
+                            :placeholder="
+                                t('placeholders.search.byNameAndPhone')
+                            "
+                        />
+                    </label>
+                    <Select
+                        v-model="filters.role"
+                        :options="getRolesList"
+                        option-label="name"
+                        option-value="id"
+                        :placeholder="t('placeholders.search.byRole')"
+                        showClear
+                        class="min-w-50 max-w-full w-full"
+                    />
+                </div>
+            </div>
+        </template>
+        <template #sectionBody>
+            <!-- FILTERS OF TABLE ITEMS -->
+            <Loader v-if="userStore.getIsLoadingUsers" class="my-auto" />
+
+            <NoData v-else-if="!userStore.getUsers.totalItems" class="text-surface-400 mx-auto my-auto">
+                <p class="text-xl font-normal">{{ t("noResults") }}</p>
+            </NoData>
+
+            <!-- TABLE OF USERS -->
+            <Card
+                v-else
+                pt:root="overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
+                pt:body="p-0"
+                pt:content="p-2 sm:p-4"
+                pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
+            >
+                <template #content>
+                    <DataTable
+                        ref="data-table"
+                        :value="userStore.getUsers.models"
+                        :total-records="userStore.getUsers.totalItems"
+                        :rows="filters.itemsPerPage"
+                        scrollable
+                        pt:footer="border-none dark:bg-surface-800"
+                        pt:root="border border-surface-300 dark:border-surface-600/50"
+                        :loading="userStore.getIsLoadingUsers"
+                    >
+                        <Column field="id" :header="t('labels.id')"></Column>
+                        <Column
+                            field="name"
+                            :header="t('labels.name')"
+                        ></Column>
+                        <Column
+                            field="username"
+                            :header="t('labels.phoneNumber')"
+                        >
+                            <template #body="{ data }">
+                                <p>{{ formatPhoneByCountry(data.username) }}</p>
+                            </template>
+                        </Column>
+                        <Column
+                            field="role"
+                            :header="t('labels.role')"
+                        >
+                            <template #body="{ data }">
+                                <p>{{ PRETTY_ROLE_NAMES[data.role.name] }}</p>
+                            </template>
+                        </Column>
+                        <Column field="id" class="flex justify-end">
+                            <template #header>
+                                <p class="font-semibold">Actions</p>
+                            </template>
+                            <template #body="{ data }">
+                                <div class="flex items-center gap-2">
+                                    <Button
+                                        @click="router.push({
+                                            name: 'edit-user',
+                                            params: { id: data.id },
+                                        })"
+                                        icon="pi pi-pencil"
+                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
+                                        size="small"
+                                    />
+                                    <Button
+                                        v-if="hasAccessDelete(data)"
+                                        @click="deleteAction(data.id)"
+                                        icon="pi pi-trash"
+                                        pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
+                                        size="small"
+                                    />
+                                </div>
+                            </template>
+                        </Column>
+
+                        <template #footer>
+                            <div class="flex flex-wrap items-center justify-end gap-5">
+                                <PaginatorComponent
+                                    v-model="filters.page"
+                                    v-model:items-per-page="filters.itemsPerPage"
+                                    :total-items="userStore.getUsers.totalItems"
+                                />
+                            </div>
+                        </template>
+                    </DataTable>
+                </template>
+            </Card>
+        </template>
+    </Section>
+</template>

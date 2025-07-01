@@ -13,10 +13,15 @@ defineProps({
     addButtonName: {
         type: String,
     },
-    withoutAddButton: {
+    visibleHeader: {
         type: Boolean,
         default: false,
-    }
+    },
+    withoutButtons: {
+        type: Boolean,
+        default: false,
+    },
+
 })
 
 defineEmits(["on-click-add"]);
@@ -29,10 +34,15 @@ defineEmits(["on-click-add"]);
             :addButtonName
             :sectionName
             :backRouteName
+            :withoutButtons
             @on-click-add="val => $emit('on-click-add', val)"
-            :withoutAddButton
-        />
+        >
+            <template #buttons>
+                <slot name="buttons"/>
+            </template>
+        </SectionHeader>
 
+        <slot name="sectionHeader" />
         <slot name="sectionBody" />
     </div>
 </template>

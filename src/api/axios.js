@@ -8,6 +8,13 @@ export const authorizedClient = axios.create({
     },
     baseURL: import.meta.env.VITE_APP_API_URL + '/api',
 })
+export const unAuthorizedClient = axios.create({
+    headers: {
+        'Content-Type': 'application/ld+json',
+        'Accept': 'application/ld+json',
+    },
+    baseURL: import.meta.env.VITE_APP_API_URL + '/api',
+})
 
 // 1. Request interceptor — loading start
 authorizedClient.interceptors.request.use((config) => {

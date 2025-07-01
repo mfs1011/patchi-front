@@ -50,18 +50,21 @@ const onSubmit = handleSubmit(async values => {
 
         await router.push({ name: 'home' })
     } catch (error) {
-        if (error.status === 401) {
-            errorKey.value = 'authErrorMessage'
-            setTimeout(() => {
-                errorKey.value = ''
-            }, 3000)
+        switch (error.status) {
+            case 401:
+                errorKey.value = 'authErrorMessage'
+                break;
+            case 403:
+                errorKey.value = 'authForbiddenErrorMessage'
+                break;
+            case 500:
+                errorKey.value = 'internalErrorMessage'
+                break;
         }
-        if (error.status === 500) {
-            errorKey.value = 'internalErrorMessage'
-            setTimeout(() => {
-                errorKey.value = ''
-            }, 3000)
-        }
+
+        setTimeout(() => {
+            errorKey.value = ''
+        }, 3000)
     }
 })
 
@@ -71,7 +74,7 @@ const onSubmit = handleSubmit(async values => {
 <template>
     <div class="min-h-dvh flex bg-surface-100 dark:bg-surface-700">
         <div class="w-0 h-dvh lg:w-1/2 transition-all">
-            <img :src="imageUrl" class="object-cover h-full">
+            <img :src="imageUrl" class="object-cover h-full" alt="auth-image">
         </div>
         <div class="sm:max-w-120 w-full mx-auto my-auto">
             <AuthCard class="h-dvh sm:h-auto flex flex-col justify-center">
@@ -126,11 +129,11 @@ const onSubmit = handleSubmit(async values => {
                             </div>
                         </Button>
                         <div class="flex justify-center mt-5">
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ authErrorMessage }}</Message>
+                            <Message class="h-5 text-center" size="small" severity="error" variant="simple">{{ authErrorMessage }}</Message>
                         </div>
                         <div class="flex items-center justify-center gap-5 mt-5">
                             <LogoButton @click="isOpenForgotPassword = true" pt:root="bg-transparent border-none enabled:hover:bg-transparent py-0 rounded enabled:active:bg-transparent enabled:active:text-surface-0">
-                                <p class="cursor-pointer underline text-main hover:text-main-hover dark:text-green-hover dark:hover:text-surface-0 transition-colors duration-200">{{ t('forgotPassword') }}</p>
+                                <p class="cursor-pointer underline text-main hover:text-main-hover dark:text-green dark:hover:text-surface-0 transition-colors duration-200">{{ t('forgotPassword') }}</p>
                             </LogoButton>
                             <Dialog v-model:visible="isOpenForgotPassword" modal class="sm:w-130 w-9/10" :closable="false">
                                 <span class="text-surface-500 dark:text-surface-400 block mb-8 sm:whitespace-nowrap">{{ t('recoverPassword') }}</span>
@@ -150,7 +153,3 @@ const onSubmit = handleSubmit(async values => {
         </div>
     </div>
 </template>
-
-<style scoped>
-
-</style>

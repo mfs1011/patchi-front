@@ -45,7 +45,8 @@
         "newWarehouse": "Новый склад",
         "newShop": "Новый магазин",
         "newCollection": "Новая коллекция",
-        "newColor": "Новый цвет"
+        "newColor": "Новый цвет",
+        "filters": "Филтры"
     },
     "errorMessages": {
         "usernameRequired": "Имя пользователя обязательно",
@@ -57,11 +58,13 @@
         "confirm": "Подтвердить",
         "cancel": "Отмена",
         "close": "Закрыть",
+        "clear": "Очистить",
         "logoutConfirmation": "Вы действительно хотите выйти из системы?",
         "deleteConfirmation": "Вы действительно хотите удалить {name} с ID {id}?"
     },
-    "authErrorMessage": "Имя пользователя или пароль указаны неверно",
-    "internalErrorMessage": "Произошла ошибка, пожалуйста, попробуйте позже",
+    "authErrorMessage": "Имя пользователя или пароль указаны неверно.",
+    "internalErrorMessage": "Произошла ошибка, пожалуйста, попробуйте позже.",
+    "authForbiddenErrorMessage": "Ваша учетная запись ожидает подтверждения администратора.",
     "recoverPassword": "Для восстановления пароля обратитесь к администратору.",
     "cards": {
         "users": "Пользователи",

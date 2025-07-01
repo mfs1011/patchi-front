@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {computed, reactive} from "vue";
-import {authorizedClient} from "@/api/axios.js";
+import {authorizedClient, unAuthorizedClient} from "@/api/axios.js";
 
 export const useUserStore = defineStore('user', () => {
     const state = reactive({
@@ -23,7 +23,7 @@ export const useUserStore = defineStore('user', () => {
 
     const fetchToken = async userData => {
         try {
-            const { data } = await authorizedClient.post('/users/auth', userData)
+            const { data } = await unAuthorizedClient.post('/users/auth', userData)
             localStorage.setItem('accessToken', data.accessToken)
             localStorage.setItem('refreshToken', data.refreshToken)
             return data
@@ -37,8 +37,8 @@ export const useUserStore = defineStore('user', () => {
             state.isLoadingUsers = true
 
             const { data } = await authorizedClient.get('/users', { params })
-            state.users.models = data['member']
-            state.users.totalItems = data['totalItems']
+            state.users.models = data.member
+            state.users.totalItems = data.totalItems
 
             return data
         } catch (error) {

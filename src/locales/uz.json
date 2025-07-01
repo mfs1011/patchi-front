@@ -54,10 +54,12 @@
         "newWarehouse": "Yangi ombor",
         "newShop": "Yangi do‘kon",
         "newCollection": "Yangi to‘plam",
-        "newColor": "Yangi rang"
+        "newColor": "Yangi rang",
+        "filters": "Filterlar"
     },
     "errorMessages": {
         "usernameRequired": "Username kiritish majburiy",
+        "fullNameRequired": "To‘liq ism kiritish majburiy",
         "passwordRequired": "Parol kiritish majburiy",
         "phoneNumberRequired": "Telefon raqamini kiritish majburiy",
         "phoneNumberMustBeExactlyCharacters": "Telefon raqami aniq {count} ta belgidan iborat bo‘lishi kerak",
@@ -70,6 +72,7 @@
         "confirm": "Tasdiqlash",
         "cancel": "Bekor qilish",
         "close": "Yopish",
+        "clear": "Tozalash",
         "logoutConfirmation": "Rostdan ham tizimdan chiqmoqchimisiz?",
         "deleteConfirmation": "Rostdan ham {id} lik {name} o‘chirmoqchimisiz?",
         "addConfirmation": "{name} qo‘shish",
@@ -77,6 +80,7 @@
     },
     "authErrorMessage": "Username yoki parol noto‘g‘ri",
     "internalErrorMessage": "Xatolik yuz berdi iltimos keyinroq urinib ko‘ring",
+    "authForbiddenErrorMessage": "Hisobingiz administrator tasdig'ini kutmoqda.",
     "recoverPassword": "Parolni tiklash uchun administratorga murojaat qiling.",
     "cards": {
         "users": "Foydalanuvchilar",
@@ -97,8 +101,18 @@
         "incomeInvoices": "Kirim",
         "transferInvoices": "Ko‘chirish",
         "orders": "Buyurtmalar",
-        "returnInvoices": "Qaytgan mahsulotlar",
+        "returnInvoices": "Qaytarilganlar",
         "writeOffInvoices": "Chiqarishlar",
         "salesReports": "Sotuvlar hisobotlari"
+    },
+    "sections": {
+        "users": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        }
+    },
+    "pagination": {
+        "showing": "Ko'rsatmoqda",
+        "of": "dan"
     }
 }
