@@ -52,7 +52,7 @@ const getRolesList = computed(() =>
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
     fullName: yup.string().required(t('errorMessages.fullNameRequired')).max(30 , t('errorMessages.fullNameMustBeMaxCharacters', { count: 30 })),
-    phoneNumber: yup.string().required().length(phoneLength.value, t('errorMessages.phoneNumberMustBeExactlyCharacters', { count: phoneLength.value })),
+    phoneNumber: yup.string().required().min(6, t('passwordMinLength')).length(phoneLength.value, t('errorMessages.phoneNumberMustBeExactlyCharacters', { count: phoneLength.value })),
     password: yup.string().required(t('errorMessages.passwordRequired')),
     role: yup.number().required(t('errorMessages.roleRequired')),
     warehouse: yup.array().when('role', {

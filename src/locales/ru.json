@@ -8,9 +8,16 @@
     "logout": "Выход",
     "forgotPassword": "Забыли пароль?",
     "noResults": "Ничего не найдено",
+    "actions": "Действия",
+    "active": "Актив",
+    "archive": "Архив",
     "user": {
         "nominative": "пользователь",
         "accusative": "пользователя"
+    },
+    "seller": {
+        "nominative": "продавец",
+        "accusative": "продавца"
     },
     "roles": {
         "admin": "Администратор",
@@ -24,12 +31,15 @@
         "password": "Пароль",
         "id": "ID",
         "name": "Имя",
-        "role": "Роль"
+        "role": "Роль",
+        "warehouse": "Склад",
+        "shop": "Магазин"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
         "enterPassword": "Введите пароль...",
         "search": {
+            "byName": "Поиск по имени",
             "byNameAndPhone": "Поиск по имени или номеру телефона",
             "byRole": "Поиск по роли"
         }
@@ -52,7 +62,8 @@
         "usernameRequired": "Имя пользователя обязательно",
         "passwordRequired": "Пароль обязателен",
         "phoneNumberRequired": "Номер телефона обязателен",
-        "phoneNumberMustBeExactlyCharacters": "Номер телефона должен содержать ровно {count} символов"
+        "phoneNumberMustBeExactlyCharacters": "Неверный формат номера телефона",
+        "passwordMinLength": "Пароль должен содержать не менее 6 символов"
     },
     "dialog": {
         "confirm": "Подтвердить",
@@ -87,6 +98,7 @@
         "orders": "Заказы",
         "returnInvoices": "Возвраты",
         "writeOffInvoices": "Списания",
-        "salesReports": "Отчеты о продажах"
+        "salesReports": "Отчеты о продажах",
+        "kits": "Подборки"
     }
 }
