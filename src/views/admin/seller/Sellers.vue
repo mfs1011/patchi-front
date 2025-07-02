@@ -41,7 +41,7 @@ const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
-    itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
+    itemsPerPage: parseInt(route.query["items-per-page"]) || 3,
     location: parseInt(route.query.location) || null,
     isDelete: route.query['is-delete'] || false,
 });
@@ -140,8 +140,26 @@ const restoreSeller = async () => {
     visible.value.restoreVisible = false;
 };
 
+const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
+const eventSource = ref(null)
+
+function connectMercure() {
+    const url = new URL(mercureUrl)
+    url.searchParams.append('topic', '')
+    eventSource.value = new EventSource(url)
+
+    eventSource.value.addEventListener('message', async (event) => {
+
+        if (JSON.parse(event.data).eventId === 10) {
+            await sellerStore.fetchSellers(route.query);
+        }
+    })
+}
+
 onMounted(() => {
     locationStore.fetchLocations()
+    connectMercure()
+
 })
 </script>
 
