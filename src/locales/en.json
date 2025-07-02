@@ -8,9 +8,16 @@
     "logout": "Logout",
     "forgotPassword": "Forgot your password?",
     "noResults": "No results found",
+    "actions": "Actions",
+    "active": "Active",
+    "archive": "Archive",
     "user": {
         "nominative": "user",
         "accusative": "user"
+    },
+    "seller": {
+        "nominative": "seller",
+        "accusative": "seller"
     },
     "roles": {
         "admin": "Administrator",
@@ -24,12 +31,15 @@
         "password": "Password",
         "id": "ID",
         "name": "Name",
-        "role": "Role"
+        "role": "Role",
+        "warehouse": "Warehouse",
+        "shop": "Shop"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
         "enterPassword": "Enter password...",
         "search": {
+            "byName": "Search by name",
             "byNameAndPhone": "Search by name or phone number",
             "byRole": "Search by role"
         }
@@ -52,7 +62,8 @@
         "usernameRequired": "Username is required",
         "passwordRequired": "Password is required",
         "phoneNumberRequired": "Phone number is required",
-        "phoneNumberMustBeExactlyCharacters": "Phone number must be exactly {count} characters"
+        "phoneNumberMustBeExactlyCharacters": "Invalid phone number format",
+        "passwordMinLength": "Password must be at least 6 characters long"
     },
     "dialog": {
         "confirm": "Confirm",
@@ -87,6 +98,7 @@
         "orders": "Orders",
         "returnInvoices": "Returns",
         "writeOffInvoices": "Write-offs",
-        "salesReports": "Sales reports"
+        "salesReports": "Sales reports",
+        "kits": "Collections"
     }
 }

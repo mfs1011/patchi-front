@@ -1,67 +1,86 @@
 <script setup>
-import Button from "@/volt/Button.vue";
-import Dialog from "@/volt/Dialog.vue";
-import DataTable from "@/volt/DataTable.vue";
-import Breadcrumb from "@/volt/Breadcrumb.vue";
-import Column from "primevue/column";
-import {computed, onMounted, ref, watch} from "vue";
-import { useUserStore } from "@/stores/user.js";
-import { useI18n } from "vue-i18n";
-import { useRoute, useRouter } from "vue-router";
-import Select from "@/volt/Select.vue";
-import InputText from "@/volt/InputText.vue";
-import useDebouncedRef from "@/composables/useDebouncedRef.js";
-import { useRoleStore } from "@/stores/role.js";
-import NoData from "@/components/UI/NoData.vue";
-import Loader from "@/components/Loader.vue";
 import Section from "@/components/UI/Section.vue";
-import { formatPhoneByCountry } from "@/helpers/phoneFormat.js";
+import { useI18n } from "vue-i18n";
+import Breadcrumb from "@/volt/Breadcrumb.vue";
+import {computed, onMounted, ref, watch} from "vue";
+import Button from "@/volt/Button.vue";
+import Select from "@/volt/Select.vue";
+import SelectButton from "@/volt/SelectButton.vue";
+import InputText from "@/volt/InputText.vue";
+import {formatPhoneByCountry} from "@/helpers/phoneFormat.js";
+import NoData from "@/components/UI/NoData.vue";
 import Card from "@/volt/Card.vue";
 import PaginatorComponent from "@/components/PaginatorComponent.vue";
+import DataTable from "@/volt/DataTable.vue";
+import Column from "primevue/column";
+import Loader from "@/components/Loader.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
+import Dialog from "@/volt/Dialog.vue";
+import useDebouncedRef from "@/composables/useDebouncedRef.js";
+import {useRoute, useRouter} from "vue-router";
+import {useSellerStore} from "@/stores/seller.js";
+import {useLocationStore} from "@/stores/location.js";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
-const userStore = useUserStore();
-const roleStore = useRoleStore();
 
-// Refs
+const sellerStore = useSellerStore()
+const locationStore = useLocationStore()
+
+// refs
 const visible = ref({
     deleteVisible: false,
+    restoreVisible: false,
 });
+
+const isVisibleSectionHeader = ref(false);
 const isDeleteLoading = ref(false);
-const currentUserId = ref();
+const currentSellerId = ref();
 const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
+
 const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
-    role: parseInt(route.query.role) || null,
+    location: parseInt(route.query.location) || null,
+    isDelete: route.query['is-delete'] || false,
 });
 
-// Computed
-const PRETTY_ROLE_NAMES = computed(() => ({
-    ROLE_ADMIN: t("roles.admin"),
-    ROLE_WAREHOUSE_MANAGER: t("roles.warehouseManager"),
-    ROLE_SELLER: t("roles.seller"),
-    ROLE_DIRECTOR: t("roles.director"),
-    ROLE_PARTNER: t("roles.partner"),
+const archiveOrActive = computed({
+    get() {
+        const isDeleted = route.query['is-delete']
+        return (isDeleted === 'true' || isDeleted === true)
+            ? t('archive')
+            : t('active')
+    },
+    set(val) {
+        const query = { ...route.query }
+        query['is-delete'] = val === t('archive')
+        router.replace({ query })
+    }
+})
+
+// computed
+const home = computed(() => ({
+    icon: "pi pi-slash",
+    label: t("administration"),
+    route: "/administration",
 }));
+const items = computed(() => [{ label: t("cards.sellers") }]);
+const options = computed(() => [t('active'), t('archive')]);
+// watchers
 
-const getRolesList = computed(() =>
-    roleStore.getRoles.models.map(({ id, name }) => ({
-        id,
-        name: PRETTY_ROLE_NAMES.value[name],
-    })),
-);
+watch(archiveOrActive, (newVal) => {
+    filters.value.isDelete = newVal !== t('active')
+})
 
-// Watchers
 watch(
     [() => debouncedFilter.value, () => filters.value],
     async () => {
         const queryFilter = {
             page: filters.value.page,
             "items-per-page": filters.value.itemsPerPage,
+            "is-delete": filters.value.isDelete
         };
 
         if (debouncedFilter.value !== null) {
@@ -72,15 +91,16 @@ watch(
             delete queryFilter.name;
         }
 
-        if (filters.value.role !== null) {
-            queryFilter.role = filters.value.role;
+
+        if (filters.value.location !== null) {
+            queryFilter.location = filters.value.location;
         } else {
-            delete queryFilter.role;
+            delete queryFilter.location;
         }
 
         await updateQuery(queryFilter);
 
-        await userStore.fetchUsers(route.query);
+        await sellerStore.fetchSellers(route.query);
     },
     { immediate: true, deep: true },
 );
@@ -94,54 +114,34 @@ async function updateQuery(newParams) {
     });
 }
 
-// const editAction = async user => {
-//     await userStore.fetchUser(user.id);
-//     isAddModal.value = false;
-//     visible.value.addAndEdit = true
-//
-//     fullName.value = userStore.getUser.name
-//     phoneNumber.value = userStore.getUser.username
-//     password.value = ''
-//     role.value = userStore.getUser.role.id
-//     // todo bir nechta location tanlash imkoni bormi yoki yo'q? Bu yaratguncha ham selectga tegishli
-//     // warehouse bo'lsa bir nechtalik select, seller bo'lsa bittalik select
-//
-//     // warehouse.value = userStore.getUser.locations.filter(location => location.isWarehouse)
-//     // shop.value = userStore.getUser
-// }
-
 const deleteAction = (id) => {
-    currentUserId.value = id;
+    currentSellerId.value = id;
     visible.value.deleteVisible = true;
-    console.log(visible.value.deleteVisible, currentUserId.value)
 };
 
-const deleteUser = async () => {
+const restoreAction = (id) => {
+    currentSellerId.value = id;
+    visible.value.restoreVisible = true;
+};
+
+const deleteSeller = async () => {
     isDeleteLoading.value = true;
-    await userStore.deleteUser(currentUserId.value);
-    await userStore.fetchUsers(route.query);
+    await sellerStore.deleteSeller(currentSellerId.value);
+    await sellerStore.fetchSellers(route.query);
     isDeleteLoading.value = false;
     visible.value.deleteVisible = false;
 };
 
-const hasAccessDelete = (data) =>
-    userStore.getAboutMeFromToken.id !== data.id && data.id !== 1;
-
-const isVisibleSectionHeader = ref(false);
-const home = computed(() => ({
-    icon: "pi pi-slash",
-    label: t("administration"),
-    route: "/administration",
-}));
-const items = computed(() => [{ label: t("cards.users") }]);
-
-const changePage = (page) => {
-    console.log(page);
-    filters.value.page = page;
+const restoreSeller = async () => {
+    isDeleteLoading.value = true;
+    await sellerStore.restoreSeller(currentSellerId.value);
+    await sellerStore.fetchSellers(route.query);
+    isDeleteLoading.value = false;
+    visible.value.restoreVisible = false;
 };
 
 onMounted(() => {
-    roleStore.fetchRoles()
+    locationStore.fetchLocations()
 })
 </script>
 
@@ -165,12 +165,7 @@ onMounted(() => {
                     </span>
                 </a>
             </router-link>
-            <a
-                v-else
-                :href="item.url"
-                :target="item.target"
-                v-bind="props.action"
-            >
+            <a v-else :href="item.url" :target="item.target" v-bind="props.action">
                 <span class="text-main dark:text-green font-semibold">{{ item.label }}</span>
             </a>
         </template>
@@ -180,9 +175,9 @@ onMounted(() => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('cards.users')"
+        :add-button-name="t('buttons.newSeller')"
+        :section-name="t('cards.sellers')"
         back-route-name="administration"
-        without-buttons
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end">
@@ -193,10 +188,11 @@ onMounted(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    @click="router.push({ name: 'add-user' })"
+                    @click="router.push({ name: 'add-seller' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
-                    >{{ t("buttons.newUser") }}</Button
                 >
+                    {{ t("buttons.newSeller") }}
+                </Button>
             </div>
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
                 <Button
@@ -209,8 +205,9 @@ onMounted(() => {
                 <Button
                     @click="router.push({ name: 'add-user' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
-                    >{{ t("buttons.newUser") }}</Button
                 >
+                    {{ t("buttons.newSeller") }}
+                </Button>
             </div>
         </template>
 
@@ -222,35 +219,42 @@ onMounted(() => {
                 }"
                 class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
             >
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
-                    <label class="relative min-w-50 max-w-full w-full">
-                        <i class="pi pi-search absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1"/>
-                        <InputText
-                            pt:root="dark:bg-surface-800 ps-10"
-                            v-model="debouncedFilter"
+                <div class="grid grid-cols-2 max-[450px]:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
+                    <div>
+                        <label class="relative max-w-full w-full">
+                            <i class="pi pi-search absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1"/>
+                            <InputText
+                                pt:root="dark:bg-surface-800 ps-10"
+                                v-model="debouncedFilter"
+                                class="w-full"
+                                :placeholder="t('placeholders.search.byName')"
+                            />
+                        </label>
+                    </div>
+                    <div>
+                        <Select
+                            v-model="filters.location"
+                            :options="locationStore.getLocations.models"
+                            option-label="name"
+                            option-value="id"
+                            :placeholder="t('placeholders.search.byShop')"
+                            showClear
                             class="w-full"
-                            :placeholder="
-                                t('placeholders.search.byNameAndPhone')
-                            "
                         />
-                    </label>
-                    <Select
-                        v-model="filters.role"
-                        :options="getRolesList"
-                        option-label="name"
-                        option-value="id"
-                        :placeholder="t('placeholders.search.byRole')"
-                        showClear
-                        class="min-w-50 max-w-full w-full"
-                    />
+                    </div>
+
+                    <div class="flex justify-end col-span-2 md:col-span-2 lg:col-span-1 xl:col-span-2">
+                        <SelectButton v-model="archiveOrActive" :options="options" />
+                    </div>
                 </div>
             </div>
         </template>
+
         <template #sectionBody>
             <!-- FILTERS OF TABLE ITEMS -->
-            <Loader v-if="userStore.getIsLoadingUsers" class="my-auto" />
+            <Loader v-if="sellerStore.getIsLoadingSellers" class="my-auto" />
 
-            <NoData v-else-if="!userStore.getUsers.totalItems" class="text-surface-400 mx-auto my-auto">
+            <NoData v-else-if="!sellerStore.getSellers.totalItems" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
 
@@ -265,33 +269,24 @@ onMounted(() => {
                 <template #content>
                     <DataTable
                         ref="data-table"
-                        :value="userStore.getUsers.models"
-                        :total-records="userStore.getUsers.totalItems"
+                        :value="sellerStore.getSellers.models"
+                        :total-records="sellerStore.getSellers.totalItems"
                         :rows="filters.itemsPerPage"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
                         pt:root="border border-surface-300 dark:border-surface-600/50"
-                        :loading="userStore.getIsLoadingUsers"
+                        :loading="sellerStore.getIsLoadingSellers"
                     >
                         <Column field="id" :header="t('labels.id')"></Column>
-                        <Column
-                            field="name"
-                            :header="t('labels.name')"
-                        ></Column>
-                        <Column
-                            field="username"
-                            :header="t('labels.phoneNumber')"
-                        >
+                        <Column field="name" :header="t('labels.name')"></Column>
+                        <Column field="telephone" :header="t('labels.phoneNumber')">
                             <template #body="{ data }">
-                                <p>{{ formatPhoneByCountry(data.username) }}</p>
+                                <p>{{ formatPhoneByCountry(data.telephone) }}</p>
                             </template>
                         </Column>
-                        <Column
-                            field="role"
-                            :header="t('labels.role')"
-                        >
+                        <Column field="location" :header="t('labels.shop')">
                             <template #body="{ data }">
-                                <p>{{ PRETTY_ROLE_NAMES[data.role.name] }}</p>
+                                <p>{{ data.location.name }}</p>
                             </template>
                         </Column>
                         <Column field="id" class="flex justify-end">
@@ -299,10 +294,10 @@ onMounted(() => {
                                 <p class="font-semibold">{{ t('actions') }}</p>
                             </template>
                             <template #body="{ data }">
-                                <div class="flex items-center gap-2">
+                                <div v-if="route.query['is-delete'] === 'false'" class="flex items-center gap-2">
                                     <Button
                                         @click="router.push({
-                                            name: 'edit-user',
+                                            name: 'edit-seller',
                                             params: { id: data.id },
                                         })"
                                         icon="pi pi-pencil"
@@ -310,10 +305,17 @@ onMounted(() => {
                                         size="small"
                                     />
                                     <Button
-                                        v-if="hasAccessDelete(data)"
                                         @click="deleteAction(data.id)"
                                         icon="pi pi-trash"
                                         pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
+                                        size="small"
+                                    />
+                                </div>
+                                <div v-else class="flex items-center gap-2">
+                                    <Button
+                                        @click="restoreAction(data.id)"
+                                        icon="pi pi-replay"
+                                        pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
                                         size="small"
                                     />
                                 </div>
@@ -325,13 +327,13 @@ onMounted(() => {
                                 <PaginatorComponent
                                     v-model="filters.page"
                                     v-model:items-per-page="filters.itemsPerPage"
-                                    :total-items="userStore.getUsers.totalItems"
+                                    :total-items="sellerStore.getSellers.totalItems"
                                 />
                             </div>
                         </template>
                     </DataTable>
 
-                    <!-- DELETE USER DIALOG -->
+                    <!-- DELETE SELLER DIALOG -->
                     <Dialog
                         v-model:visible="visible.deleteVisible"
                         modal
@@ -340,16 +342,50 @@ onMounted(() => {
                         pt:root="px-2"
                     >
                         <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                            {{ t('dialog.deleteConfirmation', { name: t('user.accusative'), id: currentUserId }) }}
+                            {{ t('dialog.deleteConfirmation', { name: t('seller.accusative'), id: currentSellerId }) }}
                         </span>
 
                         <template #footer>
                             <div class="flex justify-end gap-2">
-                                <SecondaryButton type="button" :label="t('dialog.cancel')" @click="visible.deleteVisible = false" />
+                                <SecondaryButton
+                                    type="button"
+                                    :label="t('dialog.cancel')"
+                                    @click="visible.deleteVisible = false"
+                                />
                                 <Button
                                     type="button"
                                     :label="t('dialog.confirm')"
-                                    @click="deleteUser"
+                                    @click="deleteSeller"
+                                    :loading="isDeleteLoading"
+                                    class="px-5"
+                                />
+                            </div>
+                        </template>
+                    </Dialog>
+
+                    <!-- RECOVER SELLER DIALOG -->
+                    <Dialog
+                        v-model:visible="visible.restoreVisible"
+                        modal
+                        :closable="false"
+                        class="sm:min-w-100 sm:w-fit w-9/10"
+                        pt:root="px-2"
+                    >
+                        <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                            {{ t('dialog.recoverConfirmation', { name: t('seller.accusative'), id: currentSellerId }) }}
+                        </span>
+
+                        <template #footer>
+                            <div class="flex justify-end gap-2">
+                                <SecondaryButton
+                                    type="button"
+                                    :label="t('dialog.cancel')"
+                                    @click="visible.restoreVisible = false"
+                                />
+                                <Button
+                                    type="button"
+                                    :label="t('dialog.confirm')"
+                                    @click="restoreSeller"
                                     :loading="isDeleteLoading"
                                     class="px-5"
                                 />

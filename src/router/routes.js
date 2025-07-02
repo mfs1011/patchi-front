@@ -47,6 +47,12 @@ export const routes = [
                         component: () => import('@/views/warehouse/WarehouseProductsInStock.vue')
                     },
                     {
+                        path: 'warehouse-kits',
+                        name: 'warehouse-kits',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/warehouse/WarehouseKits.vue')
+                    },
+                    {
                         path: 'income-invoices',
                         name: 'warehouse-income-invoices',
                         meta: { requiresAuth: true, roles: []},
@@ -94,6 +100,12 @@ export const routes = [
                         name: 'shop-products-in-stock',
                         meta: { requiresAuth: true, roles: []},
                         component: () => import('@/views/shop/ShopProductsInStock.vue')
+                    },
+                    {
+                        path: 'shop-kits',
+                        name: 'shop-kits',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/shop/ShopKits.vue')
                     },
                     {
                         path: 'transfer-invoices',
@@ -159,9 +171,28 @@ export const routes = [
                     },
                     {
                         path: 'sellers',
-                        name: 'sellers',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/Sellers.vue')
+                        component: BlankLayout,
+                        children: [
+                            {
+                                path: '',
+                                name: 'sellers',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/seller/Sellers.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-seller',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/seller/SellerAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-seller',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/seller/SellerEdit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'clients-b2b',

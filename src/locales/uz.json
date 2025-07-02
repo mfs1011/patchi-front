@@ -8,9 +8,16 @@
     "logout": "Chiqish",
     "forgotPassword": "Parolingizni unutdingizmi?",
     "noResults": "Hech narsa topilmadi",
+    "actions": "Amallar",
+    "active": "Aktiv",
+    "archive": "Arxiv",
     "user": {
         "nominative": "foydalanuvchi",
         "accusative": "foydalanuvchini"
+    },
+    "seller": {
+        "nominative": "sotuvchi",
+        "accusative": "sotuvchini"
     },
     "roles": {
         "admin": "Administrator",
@@ -34,8 +41,11 @@
         "enterPassword": "Parol kiriting...",
         "fullName": "To‘liq ism kiriting...",
         "search": {
+            "byName": "Ism bo‘yicha qidiruv",
             "byNameAndPhone": "Ism yoki telefon raqam orqali qidiruv",
-            "byRole": "Rol bo‘yicha qidiruv"
+            "byRole": "Rol bo‘yicha qidiruv",
+            "byWarehouse": "Ombor bo‘yicha qidiruv",
+            "byShop": "Do‘kon bo‘yicha qidiruv"
         },
         "select": {
             "role": "Rol tanlang",
@@ -62,7 +72,8 @@
         "fullNameRequired": "To‘liq ism kiritish majburiy",
         "passwordRequired": "Parol kiritish majburiy",
         "phoneNumberRequired": "Telefon raqamini kiritish majburiy",
-        "phoneNumberMustBeExactlyCharacters": "Telefon raqami aniq {count} ta belgidan iborat bo‘lishi kerak",
+        "phoneNumberMustBeExactlyCharacters": "Telefon formati noto‘g‘ri",
+        "passwordMinLength": "Parol kamida 6ta belgidan iborat bo’lishi kerak",
         "fullNameMustBeMaxCharacters": "To‘liq ism 30ta belgidan oshmasligi kerak",
         "roleRequired": "Rol tanlash majburiy",
         "warehouseRequired": "Ombor tanlash majburiy",
@@ -76,7 +87,8 @@
         "logoutConfirmation": "Rostdan ham tizimdan chiqmoqchimisiz?",
         "deleteConfirmation": "Rostdan ham {id} lik {name} o‘chirmoqchimisiz?",
         "addConfirmation": "{name} qo‘shish",
-        "editConfirmation": "{name} o‘zgartirish"
+        "editConfirmation": "{name} o‘zgartirish",
+        "recoverConfirmation": "Rostdan ham {id} lik {name} tiklamoqchimisiz?"
     },
     "authErrorMessage": "Username yoki parol noto‘g‘ri",
     "internalErrorMessage": "Xatolik yuz berdi iltimos keyinroq urinib ko‘ring",
@@ -103,10 +115,15 @@
         "orders": "Buyurtmalar",
         "returnInvoices": "Qaytarilganlar",
         "writeOffInvoices": "Chiqarishlar",
-        "salesReports": "Sotuvlar hisobotlari"
+        "salesReports": "Sotuvlar hisobotlari",
+        "kits": "To‘plamlar"
     },
     "sections": {
         "users": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "sellers": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
         }
