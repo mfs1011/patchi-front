@@ -55,10 +55,8 @@ const onSubmit = handleSubmit(async values => {
 
     try {
         const response = await sellerStore.pushSeller(payload)
-
         resetForm()
-
-        await router.push({ name: "sellers" })
+        router.back()
 
         return response;
     } catch (error) {
