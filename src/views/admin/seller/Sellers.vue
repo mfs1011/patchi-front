@@ -2,7 +2,7 @@
 import Section from "@/components/UI/Section.vue";
 import { useI18n } from "vue-i18n";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import Button from "@/volt/Button.vue";
 import Select from "@/volt/Select.vue";
 import SelectButton from "@/volt/SelectButton.vue";
@@ -41,7 +41,7 @@ const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
-    itemsPerPage: parseInt(route.query["items-per-page"]) || 3,
+    itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
     location: parseInt(route.query.location) || null,
     isDelete: route.query['is-delete'] || false,
 });
@@ -160,6 +160,12 @@ onMounted(() => {
     locationStore.fetchLocations()
     connectMercure()
 
+})
+
+onBeforeUnmount(() => {
+    if (eventSource.value) {
+        eventSource.value.close()
+    }
 })
 </script>
 
