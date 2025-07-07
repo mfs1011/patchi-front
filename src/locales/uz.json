@@ -109,14 +109,16 @@
         "kpi": "KPI foizi",
         "paymentType": "To‘lov turi",
         "collection": "To‘plam",
-        "productsInStock": "Mahsulotlar",
+        "productsInWarehouse": "Ombordagi mahsulotlar",
+        "productsInShop": "Do‘kondagi mahsulotlar",
         "incomeInvoices": "Kirim",
         "transferInvoices": "Ko‘chirish",
         "orders": "Buyurtmalar",
         "returnInvoices": "Qaytarilganlar",
         "writeOffInvoices": "Chiqarishlar",
         "salesReports": "Sotuvlar hisobotlari",
-        "kits": "To‘plamlar"
+        "kitsInWarehouse": "Ombordagi to‘plamlar",
+        "kitsInShop": "Do‘kondagi to‘plamlar"
     },
     "sections": {
         "users": {

@@ -23,11 +23,11 @@ const sellerStore = useSellerStore();
 const locationStore = useLocationStore();
 const router = useRouter();
 
-const home = ref({
+const home = computed(() => ({
     icon: 'pi pi-home',
     label: t('administration'),
     route: '/administration'
-});
+}));
 
 const items = computed(() => [{ label: t('cards.sellers'), route: { name: 'sellers'} }, { label: t('sections.sellers.add') }]);
 

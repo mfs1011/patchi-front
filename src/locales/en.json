@@ -92,13 +92,15 @@
         "kpi": "KPI percent",
         "paymentType": "Payment type",
         "collection": "Collection",
-        "productsInStock": "Products",
+        "productsInWarehouse": "Products in warehouse",
+        "productsInShop": "Products in shop",
         "incomeInvoices": "Incoming",
         "transferInvoices": "Transfer",
         "orders": "Orders",
         "returnInvoices": "Returns",
         "writeOffInvoices": "Write-offs",
         "salesReports": "Sales reports",
-        "kits": "Collections"
+        "kitsInWarehouse": "Compositions in warehouse",
+        "kitsInShop": "Compositions in shop"
     }
 }
