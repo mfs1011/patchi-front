@@ -4,7 +4,7 @@ import Dialog from "@/volt/Dialog.vue";
 import DataTable from "@/volt/DataTable.vue";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Column from "primevue/column";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onBeforeMount, onMounted, ref, watch} from "vue";
 import { useUserStore } from "@/stores/user.js";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
@@ -94,22 +94,6 @@ async function updateQuery(newParams) {
     });
 }
 
-// const editAction = async user => {
-//     await userStore.fetchUser(user.id);
-//     isAddModal.value = false;
-//     visible.value.addAndEdit = true
-//
-//     fullName.value = userStore.getUser.name
-//     phoneNumber.value = userStore.getUser.username
-//     password.value = ''
-//     role.value = userStore.getUser.role.id
-//     // todo bir nechta location tanlash imkoni bormi yoki yo'q? Bu yaratguncha ham selectga tegishli
-//     // warehouse bo'lsa bir nechtalik select, seller bo'lsa bittalik select
-//
-//     // warehouse.value = userStore.getUser.locations.filter(location => location.isWarehouse)
-//     // shop.value = userStore.getUser
-// }
-
 const deleteAction = (id) => {
     currentUserId.value = id;
     visible.value.deleteVisible = true;
@@ -135,13 +119,35 @@ const home = computed(() => ({
 }));
 const items = computed(() => [{ label: t("cards.users") }]);
 
-const changePage = (page) => {
-    console.log(page);
-    filters.value.page = page;
-};
+const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
+const eventSource = ref(null)
+
+function connectMercure() {
+    const url = new URL(mercureUrl)
+    url.searchParams.append('topic', '')
+    eventSource.value = new EventSource(url)
+
+    eventSource.value.addEventListener('message', async (event) => {
+
+        if (JSON.parse(event.data).eventId === 1) {
+            await userStore.fetchUsers(route.query);
+        }
+
+        if (JSON.parse(event.data).eventId === 11) {
+            await userStore.fetchUsers(route.query);
+        }
+    })
+}
 
 onMounted(() => {
     roleStore.fetchRoles()
+    connectMercure()
+})
+
+onBeforeMount(() => {
+    if (eventSource.value) {
+        eventSource.value.close()
+    }
 })
 </script>
 

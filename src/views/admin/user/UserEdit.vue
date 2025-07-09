@@ -1,6 +1,6 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, useTemplateRef, watch} from "vue";
 import { useI18n } from "vue-i18n";
 import Section from "@/components/UI/Section.vue";
 import PhoneInput from "@/components/PhoneInput.vue";
@@ -15,8 +15,10 @@ import * as yup from "yup";
 import {useRoleStore} from "@/stores/role.js";
 import {useLocationStore} from "@/stores/location.js";
 import {useUserStore} from "@/stores/user.js";
-import {useRoute, useRouter} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import MultiSelect from "@/volt/MultiSelect.vue";
+import Dialog from "@/volt/Dialog.vue";
+import Loader from "@/components/Loader.vue";
 
 const { t } = useI18n();
 const roleStore = useRoleStore();
@@ -31,8 +33,13 @@ const home = ref({
     route: '/administration'
 });
 
-const visible = ref(false);
 const phoneLength = ref();
+const phoneInput = useTemplateRef('phoneInput');
+const pendingNavigation = ref();
+const showLeaveDialog = ref(false);
+const isEdited = ref(false);
+const isConfirmLoading = ref(false);
+const isLoading = ref(false);
 
 const items = computed(() => [{ label: t('cards.users'), route: { name: 'users'} }, { label: t('sections.users.edit') }]);
 
@@ -55,7 +62,11 @@ const getRolesList = computed(() =>
 const schema = computed(() => yup.object({
     fullName: yup.string().required(t('errorMessages.fullNameRequired')).max(30 , t('errorMessages.fullNameMustBeMaxCharacters', { count: 30 })),
     phoneNumber: yup.string().required().length(phoneLength.value, t('errorMessages.phoneNumberMustBeExactlyCharacters', { count: phoneLength.value })),
-    password: yup.string().required(t('errorMessages.passwordRequired')),
+    password: yup.string().test(
+        'min-if-filled',
+        t('errorMessages.passwordMinLength'),
+        value => !value || value.length >= 6
+    ),
     role: yup.number().required(t('errorMessages.roleRequired')),
     warehouse: yup.array().when('role', {
         is: 2,
@@ -70,7 +81,11 @@ const schema = computed(() => yup.object({
 }))
 
 const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
-    validationSchema: schema
+    validationSchema: schema,
+    initialValues: {
+        warehouse: [],
+        password: ''
+    }
 })
 
 const { value: fullName } = useField('fullName');
@@ -89,66 +104,116 @@ const onSubmit = handleSubmit(async values => {
         locations: []
     };
 
-    if (role.value === 2 || role.value === 3) {
+    if (role.value === 2) {
+        payload.locations = values.warehouse.map(warehouseId => ({
+            location: `/api/locations/${warehouseId}`
+        }))
+    }
+
+    if (role.value === 3) {
         payload.locations = [
             {
-                location: `/api/locations/${values.warehouse || values.shop}`
+                location: `/api/locations/${values.shop}`
             }
         ]
     }
 
     try {
-        const response = await userStore.pushUser(payload)
-
-        resetForm()
+        isConfirmLoading.value = true
+        const response = await userStore.editUser(payload, userStore.getUser.id)
+        isEdited.value = true
 
         await router.push({ name: "users" })
+        resetForm()
+
 
         return response;
     } catch (error) {
         throw error
+    } finally {
+        isConfirmLoading.value = false
     }
+})
+
+const isChangedWarehouse = computed(() => {
+    const initialIds = userStore.getUser.locations.map(item => item.id)
+    const selectedIds = warehouse.value
+
+    const added = selectedIds.filter(id => !initialIds.includes(id))
+    const removed = initialIds.filter(id => !selectedIds.includes(id))
+
+    return added.length > 0 || removed.length > 0
+})
+
+const isChanged = computed(() => {
+    if (fullName.value !== userStore.getUser.name) return true
+    if (phoneNumber.value?.replace(/\D/g, '') !== userStore.getUser.username) return true
+    if (role.value !== userStore.getUser.role?.id) return true
+    if (password.value.trim() !== '') return true
+    if (userStore.getUser.locations.length && userStore.getUser.locations[0].isWarehouse) {
+        if (isChangedWarehouse.value) return true
+    } else {
+        if(userStore.getUser.locations[0]?.id !== shop.value) return true
+    }
+
+    return false
 })
 
 // Lifecycle hooks
 onMounted(async () => {
+    isLoading.value = true
+
     await Promise.allSettled([
         roleStore.fetchRoles(),
         userStore.fetchUser(route.params.id),
     ])
 
     await locationStore.fetchLocations({ isWarehouse: userStore.getUser.role.name === 'ROLE_WAREHOUSE_MANAGER' })
+    isLoading.value = false
 
     fullName.value = await userStore.getUser.name
-    phoneNumber.value = {
-        code: `+${await userStore.getUser.username.slice(0, 3)}`,
-        phone: await userStore.getUser.username.split('998')[1]
-    }
+    phoneInput.value.setPhone(await userStore.getUser.username.slice(0, 3), await userStore.getUser.username.slice(3))
     role.value = await roleStore.getRoles.models.find(role => role.name === userStore.getUser.role.name).id
 
     if (userStore.getUser.role.name === 'ROLE_WAREHOUSE_MANAGER') {
-        console.log('ROLE_WAREHOUSE_MANAGER')
         warehouse.value = userStore.getUser.locations.map(location => location.id)
     }
 
     if (userStore.getUser.role.name === 'ROLE_SELLER') {
-        console.log('ROLE_SELLER')
         shop.value = userStore.getUser.locations.map(location => location.id)[0]
     }
 
-    console.log(warehouse.value, shop.value)
+    // console.log(warehouse.value, shop.value)
 })
 
-// watch(role, async (newValue) => {
-//     switch (newValue) {
-//         case 2:
-//             await locationStore.fetchLocations({ isWarehouse: true })
-//             break;
-//         case 3:
-//             await locationStore.fetchLocations({ isWarehouse: false })
-//             break;
-//     }
-// })
+watch(role, async (newValue) => {
+    switch (newValue) {
+        case 2:
+            await locationStore.fetchLocations({ isWarehouse: true })
+            break;
+        case 3:
+            await locationStore.fetchLocations({ isWarehouse: false })
+            break;
+    }
+})
+
+onBeforeRouteLeave((to, from, next) => {
+    if (isChanged.value && !isEdited.value) {
+        showLeaveDialog.value = true
+        pendingNavigation.value = next
+    } else {
+        next()
+    }
+})
+
+const confirmLeave = () => {
+    showLeaveDialog.value = false
+    isEdited.value = false
+    if (pendingNavigation.value) {
+        pendingNavigation.value()
+    }
+}
+
 </script>
 
 <template>
@@ -179,7 +244,9 @@ onMounted(async () => {
         without-buttons
     >
         <template #sectionBody>
+            <Loader v-if="isLoading"/>
             <Card
+                v-else
                 pt:root="sm:w-fit overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
@@ -200,15 +267,14 @@ onMounted(async () => {
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.fullName }}</Message>
                         </label>
 
-                        {{phoneNumber}}
                         <label class="mb-2 block">
                             <span>{{ t('labels.phoneNumber') }}</span><span class="text-red-500"> *</span>
-                            <PhoneInput v-model="phoneNumber" v-model:phone-length="phoneLength" />
+                            <PhoneInput ref="phoneInput" v-model="phoneNumber" v-model:phone-length="phoneLength" />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.phoneNumber }}</Message>
                         </label>
 
                         <label class="mb-2 block mt-1">
-                            <span>{{ t('labels.password') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.password') }}</span>
                             <InputText
                                 v-model.trim="password"
                                 id="password"
@@ -271,12 +337,36 @@ onMounted(async () => {
 
 
                         <div class="flex justify-end gap-2 mt-5">
-                            <SecondaryButton type="button" :label="t('dialog.cancel')" @click="visible.addAndEdit = false" />
-                            <Button type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting"/>
+                            <Button type="submit" :label="t('dialog.confirm')" class="px-5" :disabled="!isChanged" :loading="isSubmitting"/>
                         </div>
                     </form>
                 </template>
             </Card>
+            <!-- CANCEL CHANGES BEFORE LEAVE CURRENT ROUTE DIALOG -->
+            <Dialog
+                v-model:visible="showLeaveDialog"
+                modal
+                :closable="false"
+                class="sm:min-w-100 sm:w-fit w-9/10"
+                pt:root="px-2"
+            >
+            <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                {{ t('dialog.leaveFromEditMessage') }}
+            </span>
+
+                <template #footer>
+                    <div class="flex justify-end gap-2">
+                        <SecondaryButton type="button" :label="t('dialog.cancel')" @click="showLeaveDialog = false" />
+                        <Button
+                            type="button"
+                            :label="t('dialog.confirm')"
+                            @click="confirmLeave"
+                            class="px-5"
+                            :loading="isConfirmLoading"
+                        />
+                    </div>
+                </template>
+            </Dialog>
         </template>
     </Section>
 </template>

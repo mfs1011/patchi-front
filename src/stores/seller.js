@@ -21,6 +21,15 @@ export const useSellerStore = defineStore('seller', () => {
         }
     }
 
+    const putSeller = async (sellerData, id) => {
+        try {
+            const { data } = await authorizedClient.put(`/sellers/${id}`, sellerData)
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
     const fetchSellers = async (params = { page: 1 }) => {
         try {
             state.isLoadingSellers = true
@@ -66,6 +75,7 @@ export const useSellerStore = defineStore('seller', () => {
 
     return {
         pushSeller,
+        putSeller,
         fetchSellers,
         fetchSeller,
         deleteSeller,

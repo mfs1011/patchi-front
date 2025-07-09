@@ -30,7 +30,7 @@ const masksByCountry = {
 const phone = ref('')
 
 const currentMask = computed(() => {
-    const country = masksByCountry[selectedCountryCode.value.code]
+    const country = masksByCountry[selectedCountryCode.value?.code]
     return country?.mask || '(99) 999 9999'
 })
 
@@ -39,19 +39,27 @@ const currentExampleNumber = computed(() => {
     return country?.example || '90 123-45-67'
 })
 
-const phoneLength = computed(() => `${currentMask.value} ${selectedCountryCode.value.code}`.length)
+const phoneLength = computed(() => `${currentMask.value} ${selectedCountryCode.value?.code}`.length)
 
 const emits = defineEmits(['update:modelValue', 'update:phoneLength'])
 defineProps(['modelValue', 'phoneLength'])
 
 watchEffect(() => {
-    emits('update:modelValue', `${selectedCountryCode.value.code} ${phone.value}`)
+    emits('update:modelValue', `${selectedCountryCode.value?.code} ${phone.value}`)
     emits('update:phoneLength', phoneLength.value)
 })
+
+const setPhone = (code, number) => {
+    selectedCountryCode.value = countryCodes.find(countryCode => countryCode.code.includes(code))
+    phone.value = number
+}
+
+defineExpose({ setPhone })
 </script>
 
 <template>
     <div class="flex items-center">
+        {{}}
         <Select
             v-model="selectedCountryCode"
             :options="countryCodes"
@@ -60,8 +68,8 @@ watchEffect(() => {
             size="large"
             class="w-50"
             pt:root="w-44 rounded-e-none"
-            pt:label="dark:bg-surface-950 rounded-s-md"
-            pt:dropdown="dark:bg-surface-950 rounded-e-none"
+            pt:label="dark:bg-surface-700 rounded-s-md"
+            pt:dropdown="dark:bg-surface-700 rounded-e-none"
         >
             <template #value="slotProps">
                 <div v-if="slotProps.value" class="flex items-center gap-2">
