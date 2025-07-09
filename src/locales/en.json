@@ -80,8 +80,8 @@
     "cards": {
         "users": "Users",
         "sellers": "Sellers",
-        "clientsB2B": "Clients B2B",
-        "clientsB2C": "Clients B2C",
+        "clientsB2B": "Corporate Clients",
+        "clientsB2C": "Boutique Clients",
         "suppliers": "Suppliers",
         "products": "Products",
         "warehouses": "Warehouses",
