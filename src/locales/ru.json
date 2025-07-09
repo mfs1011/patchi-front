@@ -80,8 +80,8 @@
     "cards": {
         "users": "Пользователи",
         "sellers": "Продавцы",
-        "clientsB2B": "Клиенты B2B",
-        "clientsB2C": "Клиенты B2C",
+        "clientsB2B": "Корпоративные клиенты",
+        "clientsB2C": "Клиенты бутиков",
         "suppliers": "Поставщики",
         "products": "Товары на магазине",
         "warehouses": "Склады",
