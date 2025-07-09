@@ -98,8 +98,8 @@
     "cards": {
         "users": "Foydalanuvchilar",
         "sellers": "Sotuvchilar",
-        "clientsB2B": "B2B mijozlari",
-        "clientsB2C": "B2C mijozlari",
+        "clientsB2B": "Korporativ mijozlari",
+        "clientsB2C": "Butik mijozlari",
         "suppliers": "Ta'minotchilar",
         "products": "Mahsulotlar",
         "warehouses": "Omborlar",
