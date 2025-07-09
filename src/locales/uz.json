@@ -85,10 +85,11 @@
         "close": "Yopish",
         "clear": "Tozalash",
         "logoutConfirmation": "Rostdan ham tizimdan chiqmoqchimisiz?",
-        "deleteConfirmation": "Rostdan ham {id} lik {name} o‘chirmoqchimisiz?",
+        "deleteConfirmation": "Rostdan ham {id} id'lik {name} o‘chirmoqchimisiz?",
         "addConfirmation": "{name} qo‘shish",
         "editConfirmation": "{name} o‘zgartirish",
-        "recoverConfirmation": "Rostdan ham {id} lik {name} tiklamoqchimisiz?"
+        "recoverConfirmation": "Rostdan ham {id} lik {name} tiklamoqchimisiz?",
+        "leaveFromEditMessage": "Siz kiritgan o'zgarishlar yo'qoladi. Chiqishni istaysizmi?"
     },
     "authErrorMessage": "Username yoki parol noto‘g‘ri",
     "internalErrorMessage": "Xatolik yuz berdi iltimos keyinroq urinib ko‘ring",
@@ -109,14 +110,16 @@
         "kpi": "KPI foizi",
         "paymentType": "To‘lov turi",
         "collection": "To‘plam",
-        "productsInStock": "Mahsulotlar",
+        "productsInWarehouse": "Ombordagi mahsulotlar",
+        "productsInShop": "Do‘kondagi mahsulotlar",
         "incomeInvoices": "Kirim",
         "transferInvoices": "Ko‘chirish",
         "orders": "Buyurtmalar",
         "returnInvoices": "Qaytarilganlar",
         "writeOffInvoices": "Chiqarishlar",
         "salesReports": "Sotuvlar hisobotlari",
-        "kits": "To‘plamlar"
+        "kitsInWarehouse": "Ombordagi kompozitsiyalar",
+        "kitsInShop": "Do‘kondagi to‘plamlar"
     },
     "sections": {
         "users": {

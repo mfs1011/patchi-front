@@ -16,11 +16,14 @@ export const unAuthorizedClient = axios.create({
     baseURL: import.meta.env.VITE_APP_API_URL + '/api',
 })
 
-// 1. Request interceptor — loading start
 authorizedClient.interceptors.request.use((config) => {
     const sidebar = useSidebarStore();
     sidebar.startIsRouteLoading();
     config.headers.Authorization = `Bearer ${localStorage.getItem('accessToken')}`
+
+    if (config.method === 'patch') {
+        config.headers['Content-Type'] = 'application/merge-patch+json'
+    }
 
     return config;
 }, (error) => {
@@ -29,7 +32,6 @@ authorizedClient.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
-// 2. Response interceptor — loading stop
 authorizedClient.interceptors.response.use((response) => {
     const sidebar = useSidebarStore();
     sidebar.endIsRouteLoading();
@@ -40,4 +42,3 @@ authorizedClient.interceptors.response.use((response) => {
     return Promise.reject(error);
 });
 
-// Boshqa instance yaratiish ham mumkin yuqoridagidaqa

@@ -20,6 +20,7 @@ import useDebouncedRef from "@/composables/useDebouncedRef.js";
 import {useRoute, useRouter} from "vue-router";
 import {useSellerStore} from "@/stores/seller.js";
 import {useLocationStore} from "@/stores/location.js";
+import axios from "axios";
 
 const route = useRoute();
 const router = useRouter();
@@ -153,13 +154,23 @@ function connectMercure() {
         if (JSON.parse(event.data).eventId === 10) {
             await sellerStore.fetchSellers(route.query);
         }
+
+        if (JSON.parse(event.data).eventId === 100) {
+            await sellerStore.fetchSellers(route.query);
+        }
     })
 }
 
 onMounted(() => {
     locationStore.fetchLocations()
     connectMercure()
-
+    axios.get('http://localhost:8555/api/organizations?page=1', {
+        headers: {
+            'Accept': 'application/ld+json',
+            'Content-Type': 'application/ld+json',
+            'Accept-Language': 'uz'
+        }
+    }).then(res => console.log(res))
 })
 
 onBeforeUnmount(() => {

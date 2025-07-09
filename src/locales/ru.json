@@ -83,7 +83,7 @@
         "clientsB2B": "Клиенты B2B",
         "clientsB2C": "Клиенты B2C",
         "suppliers": "Поставщики",
-        "products": "Товары",
+        "products": "Товары на магазине",
         "warehouses": "Склады",
         "shops": "Магазины",
         "categories": "Категории",
@@ -92,13 +92,15 @@
         "kpi": "Процент KPI",
         "paymentType": "Тип оплаты",
         "collection": "Коллекция",
-        "productsInStock": "Товары",
+        "productsInWarehouse": "Товары на складе",
+        "productsInShop": "Товары в магазине",
         "incomeInvoices": "Поступления",
         "transferInvoices": "Перемещение",
         "orders": "Заказы",
         "returnInvoices": "Возвраты",
         "writeOffInvoices": "Списания",
         "salesReports": "Отчеты о продажах",
-        "kits": "Подборки"
+        "kitsInWarehouse": "Композиции на складе",
+        "kitsInShop": "Композиции в магазине"
     }
 }

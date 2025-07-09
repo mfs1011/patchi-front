@@ -8,13 +8,24 @@ export const useUserStore = defineStore('user', () => {
             models: [],
             totalItems: 0,
         },
-        user: {},
+        user: {
+            locations: []
+        },
         isLoadingUsers: false,
     })
 
     const pushUser = async userData => {
         try {
             const { data } = await authorizedClient.post('/users', userData)
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
+    const editUser = async (userData, id) => {
+        try {
+            const { data } = await authorizedClient.put(`/users/${id}`, userData)
             return data
         } catch (error) {
             throw error
@@ -83,6 +94,7 @@ export const useUserStore = defineStore('user', () => {
 
     return {
         pushUser,
+        editUser,
         fetchToken,
         fetchUsers,
         fetchUser,
