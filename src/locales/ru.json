@@ -121,6 +121,8 @@
         "collection": "Коллекция",
         "productsInWarehouse": "Товары на складе",
         "productsInShop": "Товары в магазине",
+        "warehouseContent": "Состав склада",
+        "marketContent": "Состав магазина",
         "incomeInvoices": "Поступления",
         "transferInvoices": "Перемещение",
         "orders": "Заказы",
@@ -128,7 +130,8 @@
         "writeOffInvoices": "Списания",
         "salesReports": "Отчеты о продажах",
         "kitsInWarehouse": "Композиции на складе",
-        "kitsInShop": "Композиции в магазине"
+        "kitsInShop": "Композиции в магазине",
+        "kits": "Композиции"
     },
     "sections": {
         "users": {

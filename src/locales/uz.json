@@ -121,6 +121,8 @@
         "collection": "To‘plam",
         "productsInWarehouse": "Ombordagi mahsulotlar",
         "productsInShop": "Do‘kondagi mahsulotlar",
+        "warehouseContent": "Ombor tarkibi",
+        "marketContent": "Do'kon tarkibi",
         "incomeInvoices": "Kirim",
         "transferInvoices": "Ko‘chirish",
         "orders": "Buyurtmalar",
@@ -128,7 +130,8 @@
         "writeOffInvoices": "Chiqarishlar",
         "salesReports": "Sotuvlar hisobotlari",
         "kitsInWarehouse": "Ombordagi kompozitsiyalar",
-        "kitsInShop": "Do‘kondagi to‘plamlar"
+        "kitsInShop": "Do‘kondagi kompozitsiyalar",
+        "kits": "Kompozitsiyalar"
     },
     "sections": {
         "users": {

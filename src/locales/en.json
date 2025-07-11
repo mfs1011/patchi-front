@@ -121,6 +121,8 @@
         "collection": "Collection",
         "productsInWarehouse": "Products in warehouse",
         "productsInShop": "Products in shop",
+        "warehouseContent": "Warehouse content",
+        "marketContent": "Shop content",
         "incomeInvoices": "Incoming",
         "transferInvoices": "Transfer",
         "orders": "Orders",
@@ -128,7 +130,8 @@
         "writeOffInvoices": "Write-offs",
         "salesReports": "Sales reports",
         "kitsInWarehouse": "Compositions in warehouse",
-        "kitsInShop": "Compositions in shop"
+        "kitsInShop": "Compositions in shop",
+        "kits": "Compositions"
     },
     "sections": {
         "users": {
