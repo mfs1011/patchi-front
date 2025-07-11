@@ -1,26 +1,26 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import Message from "@/volt/Message.vue";
 import Button from "@/volt/Button.vue";
-import Select from "@/volt/Select.vue";
+import Textarea from "@/volt/Textarea.vue";
 import Card from "@/volt/Card.vue";
 import InputText from "@/volt/InputText.vue";
 import PhoneInput from "@/components/PhoneInput.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {useField, useForm} from "vee-validate";
 import * as yup from "yup";
-import {useSellerStore} from "@/stores/seller.js";
 import {useRouter} from "vue-router";
-import {useLocationStore} from "@/stores/location.js";
+import {useCustomerStore} from "@/stores/customer.js";
+import {useToast} from "primevue/usetoast";
 
 const { t } = useI18n()
+const toast = useToast()
 
 const phoneLength = ref();
-const sellerStore = useSellerStore();
-const locationStore = useLocationStore();
+const customerStore = useCustomerStore();
 const router = useRouter();
 
 const home = computed(() => ({
@@ -29,13 +29,13 @@ const home = computed(() => ({
     route: '/administration'
 }));
 
-const items = computed(() => [{ label: t('cards.sellers'), route: { name: 'sellers'} }, { label: t('sections.sellers.add') }]);
+const items = computed(() => [{ label: t('cards.clientsB2B'), route: { name: 'clients-b2b'} }, { label: t('sections.clientsB2B.add') }]);
 
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
-    name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    name: yup.string().required(t('errorMessages.nameRequired')),
     telephone: yup.string().required().length(phoneLength.value, t('errorMessages.phoneNumberMustBeExactlyCharacters', { count: phoneLength.value })),
-    shop: yup.number().required(t('errorMessages.shopRequired'))
+    comment: yup.string().max(255, t('errorMessages.maxCharacter', { count: 255 })).notRequired()
 }))
 
 const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
@@ -44,28 +44,26 @@ const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
 
 const { value: name } = useField('name');
 const { value: telephone } = useField('telephone', undefined, { validateOnValueUpdate: false });
-const { value: shop } = useField('shop')
+const { value: comment } = useField('comment')
 
 const onSubmit = handleSubmit(async values => {
     const payload = {
         name: values.name,
         telephone: values.telephone.replace(/\D/g, ''),
-        location: `/api/locations/${values.shop}`
+        comment: values.comment,
+        isB2B: true
     };
 
     try {
-        const response = await sellerStore.pushSeller(payload)
+        const response = await customerStore.pushCustomer(payload)
         resetForm()
         router.back()
 
+        toast.add({ severity: 'success', summary: t('toast.created', { name: 'Mijoz' }), life: 3000 })
         return response;
     } catch (error) {
         throw error
     }
-})
-
-onMounted(() => {
-    locationStore.fetchLocations({ page: 1, isWarehouse: false })
 })
 </script>
 
@@ -110,10 +108,9 @@ onMounted(() => {
                             <InputText
                                 v-model.trim="name"
                                 fluid
-                                :placeholder="t('placeholders.fullName')"
+                                :placeholder="t('placeholders.name')"
                                 size="large"
                                 :class="{ 'p-invalid': errors.name }"
-                                autocomplete
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.name }}</Message>
                         </label>
@@ -124,21 +121,20 @@ onMounted(() => {
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.telephone }}</Message>
                         </label>
 
-                        <div>
-                            <p>{{ t('labels.shop') }}<span class="text-red-500"> *</span></p>
+                        <label class="block">
+                            <span>{{ t('labels.comment') }}</span>
 
-                            <Select
-                                v-model="shop"
-                                :options="locationStore.getLocations.models"
-                                option-label="name"
-                                option-value="id"
-                                :placeholder="t('placeholders.select.shop')"
-                                showClear
+                            <Textarea
+                                v-model="comment"
+                                rows="5"
+                                class="resize-none"
                                 size="large"
-                                pt:root="w-full dark:bg-surface-700"
+                                fluid
+                                :class="{ 'p-invalid': errors.comment }"
+                                :placeholder="t('placeholders.comment')"
                             />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.shop }}</Message>
-                        </div>
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.comment }}</Message>
+                        </label>
 
                         <div class="flex justify-end gap-2 mt-5">
                             <SecondaryButton type="button" :label="t('dialog.clear')" @click="resetForm" />

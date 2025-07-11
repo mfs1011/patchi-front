@@ -7,6 +7,7 @@ import { createPinia } from "pinia";
 import i18n from "@/locales/i18n.js";
 import PrimeVue from 'primevue/config';
 import {useDarkModeStore} from "@/stores/darkMode.js";
+import ToastService from 'primevue/toastservice';
 
 createApp(App)
     .use(PrimeVue, {
@@ -15,6 +16,7 @@ createApp(App)
     .use(createPinia())
     .use(router)
     .use(i18n)
+    .use(ToastService)
     .mount('#app')
 
 const darkModeStore = useDarkModeStore()
