@@ -19,6 +19,10 @@
         "nominative": "sotuvchi",
         "accusative": "sotuvchini"
     },
+    "client": {
+        "nominative": "mijoz",
+        "accusative": "mijozni"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Sotuvchi",
@@ -34,12 +38,15 @@
         "role": "Rol",
         "fullName": "To‘liq ism",
         "warehouse": "Ombor",
-        "shop": "Do‘kon"
+        "shop": "Do‘kon",
+        "comment": "Izoh"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
         "enterPassword": "Parol kiriting...",
         "fullName": "To‘liq ism kiriting...",
+        "name": "Ism kiriting...",
+        "comment": "Izoh kiriting...",
         "search": {
             "byName": "Ism bo‘yicha qidiruv",
             "byNameAndPhone": "Ism yoki telefon raqam orqali qidiruv",
@@ -69,6 +76,7 @@
     },
     "errorMessages": {
         "usernameRequired": "Username kiritish majburiy",
+        "nameRequired": "Ism kiritish majburiy",
         "fullNameRequired": "To‘liq ism kiritish majburiy",
         "passwordRequired": "Parol kiritish majburiy",
         "phoneNumberRequired": "Telefon raqamini kiritish majburiy",
@@ -77,7 +85,8 @@
         "fullNameMustBeMaxCharacters": "To‘liq ism 30ta belgidan oshmasligi kerak",
         "roleRequired": "Rol tanlash majburiy",
         "warehouseRequired": "Ombor tanlash majburiy",
-        "shopRequired": "Do‘kon tanlash majburiy"
+        "shopRequired": "Do‘kon tanlash majburiy",
+        "maxCharacter": "Eng ko‘pi bilan {count} ta belgidan iborat bo‘lishi kerak"
     },
     "dialog": {
         "confirm": "Tasdiqlash",
@@ -129,10 +138,24 @@
         "sellers": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
+        },
+        "clientsB2B": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "clientsB2C": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
         }
     },
     "pagination": {
         "showing": "Ko'rsatmoqda",
         "of": "dan"
+    },
+    "toast": {
+        "success": "Muvaffaqiyat!",
+        "created": "{name} muvaffaqiyatli yaratildi!",
+        "edited": "{name} muvaffaqiyatli o‘zgartirildi!",
+        "deleted": "{name} muvaffaqiyatli o‘chirildi!"
     }
 }

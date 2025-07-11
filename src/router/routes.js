@@ -195,16 +195,52 @@ export const routes = [
                         ]
                     },
                     {
-                        path: 'clients-b2b',
-                        name: 'clients-b2b',
+                        path: 'corporate-clients',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/ClientsB2B.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'clients-b2b',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/clientsB2B/ClientsB2B.vue'),
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-client-b2b',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/clientsB2B/ClientsB2BAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-client-b2b',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/clientsB2B/ClientsB2BEdit.vue')
+                            },
+                        ]
                     },
                     {
-                        path: 'clients-b2c',
-                        name: 'clients-b2c',
+                        path: 'boutique-clients',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/ClientsB2C.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'clients-b2c',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/clientsB2C/ClientsB2C.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-client-b2c',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/clientsB2C/ClientsB2CAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-client-b2c',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/clientsB2C/ClientsB2CEdit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'suppliers',

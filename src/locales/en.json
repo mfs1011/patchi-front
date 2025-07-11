@@ -19,6 +19,10 @@
         "nominative": "seller",
         "accusative": "seller"
     },
+    "client": {
+        "nominative": "client",
+        "accusative": "client"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
@@ -33,15 +37,27 @@
         "name": "Name",
         "role": "Role",
         "warehouse": "Warehouse",
-        "shop": "Shop"
+        "shop": "Shop",
+        "fullName": "Full name",
+        "comment": "Comment"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
         "enterPassword": "Enter password...",
+        "fullName": "Enter full name...",
+        "name": "Enter name...",
+        "comment": "Enter comment...",
         "search": {
             "byName": "Search by name",
             "byNameAndPhone": "Search by name or phone number",
-            "byRole": "Search by role"
+            "byRole": "Search by role",
+            "byWarehouse": "Search by warehouse",
+            "byShop": "Search by shop"
+        },
+        "select": {
+            "role": "Select role",
+            "warehouse": "Select warehouse",
+            "shop": "Select shop"
         }
     },
     "buttons": {
@@ -60,10 +76,17 @@
     },
     "errorMessages": {
         "usernameRequired": "Username is required",
+        "nameRequired": "Name is required",
+        "fullNameRequired": "Full name is required",
         "passwordRequired": "Password is required",
         "phoneNumberRequired": "Phone number is required",
         "phoneNumberMustBeExactlyCharacters": "Invalid phone number format",
-        "passwordMinLength": "Password must be at least 6 characters long"
+        "passwordMinLength": "Password must be at least 6 characters long",
+        "fullNameMustBeMaxCharacters": "Full name must not exceed 30 characters",
+        "roleRequired": "Role is required",
+        "warehouseRequired": "Warehouse selection is required",
+        "shopRequired": "Shop selection is required",
+        "maxCharacter": "Must be no more than {count} characters"
     },
     "dialog": {
         "confirm": "Confirm",
@@ -71,7 +94,11 @@
         "close": "Close",
         "clear": "Clear",
         "logoutConfirmation": "Are you sure you want to log out?",
-        "deleteConfirmation": "Are you sure you want to delete {name} with ID {id}?"
+        "deleteConfirmation": "Are you sure you want to delete {name} with ID {id}?",
+        "addConfirmation": "Add {name}",
+        "editConfirmation": "Edit {name}",
+        "recoverConfirmation": "Are you sure you want to recover {name} with ID {id}?",
+        "leaveFromEditMessage": "Your unsaved changes will be lost. Do you really want to leave?"
     },
     "authErrorMessage": "Username or password is incorrect.",
     "authForbiddenErrorMessage": "Your account is awaiting administrator approval.",
@@ -102,5 +129,33 @@
         "salesReports": "Sales reports",
         "kitsInWarehouse": "Compositions in warehouse",
         "kitsInShop": "Compositions in shop"
+    },
+    "sections": {
+        "users": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "sellers": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "clientsB2B": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "clientsB2C": {
+            "add": "Add",
+            "edit": "Edit"
+        }
+    },
+    "pagination": {
+        "showing": "Showing",
+        "of": "of"
+    },
+    "toast": {
+        "success": "Success!",
+        "created": "{name} successfully created!",
+        "edited": "{name} successfully updated!",
+        "deleted": "{name} successfully deleted!"
     }
 }
