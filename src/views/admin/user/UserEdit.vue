@@ -1,6 +1,6 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {computed, onMounted, ref, useTemplateRef, watch} from "vue";
+import {computed, nextTick, onMounted, ref, useTemplateRef, watch} from "vue";
 import { useI18n } from "vue-i18n";
 import Section from "@/components/UI/Section.vue";
 import PhoneInput from "@/components/PhoneInput.vue";
@@ -98,11 +98,14 @@ const { value: shop } = useField('shop')
 const onSubmit = handleSubmit(async values => {
     const payload = {
         username: values.phoneNumber.replace(/\D/g, ''),
-        password: values.password,
         name: values.fullName,
         role: `/api/roles/${values.role}`,
         locations: []
     };
+
+    if (password.value) {
+        payload.password = password.value
+    }
 
     if (role.value === 2) {
         payload.locations = values.warehouse.map(warehouseId => ({
@@ -166,9 +169,9 @@ onMounted(async () => {
     await Promise.allSettled([
         roleStore.fetchRoles(),
         userStore.fetchUser(route.params.id),
+        locationStore.fetchLocations({ isWarehouse: userStore.getUser?.role?.name === 'ROLE_WAREHOUSE_MANAGER' })
     ])
 
-    await locationStore.fetchLocations({ isWarehouse: userStore.getUser.role.name === 'ROLE_WAREHOUSE_MANAGER' })
     isLoading.value = false
 
     fullName.value = await userStore.getUser.name
