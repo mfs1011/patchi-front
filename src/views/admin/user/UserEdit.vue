@@ -169,7 +169,6 @@ onMounted(async () => {
     await Promise.allSettled([
         roleStore.fetchRoles(),
         userStore.fetchUser(route.params.id),
-        locationStore.fetchLocations({ isWarehouse: userStore.getUser?.role?.name === 'ROLE_WAREHOUSE_MANAGER' })
     ])
 
     isLoading.value = false
