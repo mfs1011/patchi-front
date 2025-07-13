@@ -7,7 +7,7 @@ import Column from "primevue/column";
 import {computed, onBeforeMount, onMounted, ref, watch} from "vue";
 import { useUserStore } from "@/stores/user.js";
 import { useI18n } from "vue-i18n";
-import { useRoute, useRouter } from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import Select from "@/volt/Select.vue";
 import InputText from "@/volt/InputText.vue";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
@@ -59,6 +59,7 @@ const getRolesList = computed(() =>
 watch(
     [() => debouncedFilter.value, () => filters.value],
     async () => {
+        console.log(debouncedFilter.value, 'test')
         const queryFilter = {
             page: filters.value.page,
             "items-per-page": filters.value.itemsPerPage,
@@ -97,13 +98,11 @@ async function updateQuery(newParams) {
 const deleteAction = (id) => {
     currentUserId.value = id;
     visible.value.deleteVisible = true;
-    console.log(visible.value.deleteVisible, currentUserId.value)
 };
 
 const deleteUser = async () => {
     isDeleteLoading.value = true;
     await userStore.deleteUser(currentUserId.value);
-    await userStore.fetchUsers(route.query);
     isDeleteLoading.value = false;
     visible.value.deleteVisible = false;
 };
@@ -128,23 +127,22 @@ function connectMercure() {
     eventSource.value = new EventSource(url)
 
     eventSource.value.addEventListener('message', async (event) => {
+        const eventDataId = JSON.parse(event.data).eventId
 
-        if (JSON.parse(event.data).eventId === 1) {
-            await userStore.fetchUsers(route.query);
-        }
-
-        if (JSON.parse(event.data).eventId === 11) {
+        if (eventDataId === 1 || eventDataId === 11) {
             await userStore.fetchUsers(route.query);
         }
     })
 }
 
 onMounted(() => {
-    roleStore.fetchRoles()
+    if (!roleStore.getRoles.models.length) {
+        roleStore.fetchRoles()
+    }
     connectMercure()
 })
 
-onBeforeMount(() => {
+onBeforeRouteLeave(() => {
     if (eventSource.value) {
         eventSource.value.close()
     }

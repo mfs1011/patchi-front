@@ -25,7 +25,7 @@ export const useUserStore = defineStore('user', () => {
 
     const editUser = async (userData, id) => {
         try {
-            const { data } = await authorizedClient.put(`/users/${id}`, userData)
+            const { data } = await authorizedClient.patch(`/users/${id}`, userData)
             return data
         } catch (error) {
             throw error

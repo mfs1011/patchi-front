@@ -116,7 +116,9 @@ const onSubmit = handleSubmit(async values => {
 
 // Lifecycle hooks
 onMounted(() => {
-    roleStore.fetchRoles()
+    if (!roleStore.getRoles.models.length) {
+        roleStore.fetchRoles()
+    }
 })
 
 watch(role, async (newValue) => {
