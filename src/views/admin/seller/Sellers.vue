@@ -36,6 +36,7 @@ const visible = ref({
 
 const isVisibleSectionHeader = ref(false);
 const isDeleteLoading = ref(false);
+const skipNextFetch = ref(false);
 const currentSellerId = ref();
 const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
 
@@ -77,6 +78,11 @@ watch(archiveOrActive, (newVal) => {
 watch(
     [() => debouncedFilter.value, () => filters.value],
     async () => {
+        if (skipNextFetch.value) {
+            skipNextFetch.value = false
+            return
+        }
+
         const queryFilter = {
             page: filters.value.page,
             "items-per-page": filters.value.itemsPerPage,
@@ -152,16 +158,20 @@ function connectMercure() {
 
         if (JSON.parse(event.data).eventId === 10) {
             await sellerStore.fetchSellers(route.query);
+            skipNextFetch.value = true
         }
 
         if (JSON.parse(event.data).eventId === 100) {
             await sellerStore.fetchSellers(route.query);
+            skipNextFetch.value = true
         }
     })
 }
 
 onMounted(() => {
-    locationStore.fetchLocations()
+    if(!locationStore.getLocations.models.length) {
+        locationStore.fetchLocations()
+    }
     connectMercure()
 })
 

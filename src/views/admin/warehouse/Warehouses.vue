@@ -1,12 +1,6 @@
 <script setup>
-import Section from "@/components/UI/Section.vue";
 import { useI18n } from "vue-i18n";
-import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {useRoute, useRouter} from "vue-router";
-import {useCustomerStore} from "@/stores/customer.js";
-import {useLocationStore} from "@/stores/location.js";
-import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import useDebouncedRef from "@/composables/useDebouncedRef.js";
+import Section from "@/components/UI/Section.vue";
 import {formatPhoneByCountry} from "@/helpers/phoneFormat.js";
 import NoData from "@/components/UI/NoData.vue";
 import Dialog from "@/volt/Dialog.vue";
@@ -19,12 +13,17 @@ import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import InputText from "@/volt/InputText.vue";
 import SelectButton from "@/volt/SelectButton.vue";
+import Breadcrumb from "@/volt/Breadcrumb.vue";
+import {useRoute, useRouter} from "vue-router";
+import {useCustomerStore} from "@/stores/customer.js";
+import {useLocationStore} from "@/stores/location.js";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import useDebouncedRef from "@/composables/useDebouncedRef.js";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 
-const customerStore = useCustomerStore()
 const locationStore = useLocationStore()
 
 // refs
@@ -64,7 +63,7 @@ const home = computed(() => ({
     label: t("administration"),
     route: "/administration",
 }));
-const items = computed(() => [{ label: t("cards.clientsB2C") }]);
+const items = computed(() => [{ label: t("cards.warehouses") }]);
 const options = computed(() => [t('active'), t('archive')]);
 // watchers
 
@@ -91,7 +90,7 @@ watch(
 
         await updateQuery(queryFilter);
 
-        await customerStore.fetchCustomers(route.query, false);
+        await locationStore.fetchLocations({ ...route.query, isWarehouse: true});
     },
     { immediate: true, deep: true },
 );
@@ -115,18 +114,18 @@ const restoreAction = (id) => {
     visible.value.restoreVisible = true;
 };
 
-const deleteCustomer = async () => {
+const deleteLocation = async () => {
     isDeleteLoading.value = true;
-    await customerStore.deleteCustomer(currentCustomerId.value);
-    await customerStore.fetchCustomers(route.query, false);
+    await locationStore.deleteLocation(currentCustomerId.value);
+    await locationStore.fetchLocations({ ...route.query, isWarehouse: true});
     isDeleteLoading.value = false;
     visible.value.deleteVisible = false;
 };
 
-const restoreCustomer = async () => {
+const restoreLocation = async () => {
     isDeleteLoading.value = true;
-    await customerStore.restoreCustomer(currentCustomerId.value);
-    await customerStore.fetchCustomers(route.query, false);
+    await locationStore.restoreLocation(currentCustomerId.value);
+    await locationStore.fetchLocations({ ...route.query, isWarehouse: true});
     isDeleteLoading.value = false;
     visible.value.restoreVisible = false;
 };
@@ -141,18 +140,17 @@ function connectMercure() {
 
     eventSource.value.addEventListener('message', async (event) => {
 
-        if (JSON.parse(event.data).eventId === 5) {
-            await customerStore.fetchCustomers(route.query, false);
+        if (JSON.parse(event.data).eventId === 8) {
+            await locationStore.fetchLocations({ ...route.query, isWarehouse: true});
         }
 
-        if (JSON.parse(event.data).eventId === 55) {
-            await customerStore.fetchCustomers(route.query, false);
+        if (JSON.parse(event.data).eventId === 88) {
+            await locationStore.fetchLocations({ ...route.query, isWarehouse: true});
         }
     })
 }
 
 onMounted(() => {
-    locationStore.fetchLocations()
     connectMercure()
 })
 
@@ -191,9 +189,10 @@ onBeforeUnmount(() => {
             <span class="text-primary">/</span>
         </template>
     </Breadcrumb>
+
     <Section
-        :add-button-name="t('buttons.newClient')"
-        :section-name="t('cards.clientsB2C')"
+        :add-button-name="t('buttons.newWarehouse')"
+        :section-name="t('cards.warehouses')"
         back-route-name="administration"
     >
         <template #buttons>
@@ -205,10 +204,10 @@ onBeforeUnmount(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    @click="router.push({ name: 'add-client-b2c' })"
+                    @click="router.push({ name: 'add-warehouse' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >
-                    {{ t("buttons.newClient") }}
+                    {{ t("buttons.newWarehouse") }}
                 </Button>
             </div>
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
@@ -220,10 +219,10 @@ onBeforeUnmount(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    @click="router.push({ name: 'add-client-b2c' })"
+                    @click="router.push({ name: 'add-warehouse' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >
-                    {{ t("buttons.newClient") }}
+                    {{ t("buttons.newWarehouse") }}
                 </Button>
             </div>
         </template>
@@ -258,9 +257,9 @@ onBeforeUnmount(() => {
 
         <template #sectionBody>
             <!-- FILTERS OF TABLE ITEMS -->
-            <Loader v-if="customerStore.getIsLoadingCustomers" class="my-auto" />
+            <Loader v-if="locationStore.getIsLoadingLocation" class="my-auto" />
 
-            <NoData v-else-if="!customerStore.getCustomers.totalItems" class="text-surface-400 mx-auto my-auto">
+            <NoData v-else-if="!locationStore.getLocations.totalItems" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
 
@@ -275,26 +274,16 @@ onBeforeUnmount(() => {
                 <template #content>
                     <DataTable
                         ref="data-table"
-                        :value="customerStore.getCustomers.models"
-                        :total-records="customerStore.getCustomers.totalItems"
+                        :value="locationStore.getLocations.models"
+                        :total-records="locationStore.getLocations.totalItems"
                         :rows="filters.itemsPerPage"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
                         pt:root="border border-surface-300 dark:border-surface-600/50"
-                        :loading="customerStore.getIsLoadingCustomers"
+                        :loading="locationStore.getIsLoadingLocation"
                     >
                         <Column field="id" :header="t('labels.id')"></Column>
-                        <Column field="name" :header="t('labels.name')"></Column>
-                        <Column field="telephone" :header="t('labels.phoneNumber')">
-                            <template #body="{ data }">
-                                <p>{{ formatPhoneByCountry(data.telephone) }}</p>
-                            </template>
-                        </Column>
-                        <Column field="comment" :header="t('labels.comment')">
-                            <template #body="{ data }">
-                                <p>{{ data.comment }}</p>
-                            </template>
-                        </Column>
+                        <Column field="name" :header="t('labels.warehouseName')"></Column>
                         <Column field="id" class="flex justify-end">
                             <template #header>
                                 <p class="font-semibold">{{ t('actions') }}</p>
@@ -303,7 +292,7 @@ onBeforeUnmount(() => {
                                 <div v-if="route.query['is-delete'] === 'false'" class="flex items-center gap-2">
                                     <Button
                                         @click="router.push({
-                                        name: 'edit-client-b2c',
+                                        name: 'edit-warehouse',
                                         params: { id: data.id },
                                     })"
                                         icon="pi pi-pencil"
@@ -333,7 +322,7 @@ onBeforeUnmount(() => {
                                 <PaginatorComponent
                                     v-model="filters.page"
                                     v-model:items-per-page="filters.itemsPerPage"
-                                    :total-items="customerStore.getCustomers.totalItems"
+                                    :total-items="locationStore.getLocations.totalItems"
                                 />
                             </div>
                         </template>
@@ -349,7 +338,7 @@ onBeforeUnmount(() => {
                 pt:root="px-2"
             >
                     <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.deleteConfirmation', { name: t('client.accusative'), id: currentCustomerId }) }}
+                        {{ t('dialog.deleteConfirmation', { name: t('warehouses.accusative'), id: currentCustomerId }) }}
                     </span>
 
                 <template #footer>
@@ -362,7 +351,7 @@ onBeforeUnmount(() => {
                         <Button
                             type="button"
                             :label="t('dialog.confirm')"
-                            @click="deleteCustomer"
+                            @click="deleteLocation"
                             :loading="isDeleteLoading"
                             class="px-5"
                         />
@@ -379,7 +368,7 @@ onBeforeUnmount(() => {
                 pt:root="px-2"
             >
                     <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.recoverConfirmation', { name: t('client.accusative'), id: currentCustomerId }) }}
+                        {{ t('dialog.recoverConfirmation', { name: t('warehouses.accusative'), id: currentCustomerId }) }}
                     </span>
 
                 <template #footer>
@@ -392,7 +381,7 @@ onBeforeUnmount(() => {
                         <Button
                             type="button"
                             :label="t('dialog.confirm')"
-                            @click="restoreCustomer"
+                            @click="restoreLocation"
                             :loading="isDeleteLoading"
                             class="px-5"
                         />
