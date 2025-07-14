@@ -92,6 +92,14 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
+    const restoreUser = async id => {
+        try {
+            await authorizedClient.put(`/users/restore/${id}`, JSON.stringify({}))
+        } catch (error) {
+            throw error
+        }
+    }
+
     const logout = () => {
         localStorage.removeItem('patchi_accessToken');
         localStorage.removeItem('patchi_refreshToken');
@@ -105,6 +113,7 @@ export const useUserStore = defineStore('user', () => {
         fetchUsers,
         fetchUser,
         deleteUser,
+        restoreUser,
         logout,
         fetchAboutMe,
         getAboutMe: computed(() => state.me),

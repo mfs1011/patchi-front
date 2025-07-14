@@ -400,7 +400,7 @@ onBeforeUnmount(() => {
                         </template>
                     </Dialog>
 
-                    <!-- RECOVER SELLER DIALOG -->
+                    <!-- RESTORE SELLER DIALOG -->
                     <Dialog
                         v-model:visible="visible.restoreVisible"
                         modal

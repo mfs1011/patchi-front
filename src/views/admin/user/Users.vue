@@ -32,6 +32,7 @@ const roleStore = useRoleStore();
 // Refs
 const visible = ref({
     deleteVisible: false,
+    restoreVisible: false,
 });
 const isDeleteLoading = ref(false);
 const currentUserId = ref();
@@ -119,6 +120,18 @@ async function updateQuery(newParams) {
         },
     });
 }
+
+const restoreAction = (id) => {
+    currentUserId.value = id;
+    visible.value.restoreVisible = true;
+};
+
+const restoreUser = async () => {
+    isDeleteLoading.value = true;
+    await userStore.restoreUser(currentUserId.value);
+    isDeleteLoading.value = false;
+    visible.value.restoreVisible = false;
+};
 
 const deleteAction = (id) => {
     currentUserId.value = id;
@@ -423,6 +436,36 @@ onBeforeRouteLeave(() => {
                                     type="button"
                                     :label="t('dialog.confirm')"
                                     @click="deleteUser"
+                                    :loading="isDeleteLoading"
+                                    class="px-5"
+                                />
+                            </div>
+                        </template>
+                    </Dialog>
+
+                    <!-- RESTORE USER DIALOG -->
+                    <Dialog
+                        v-model:visible="visible.restoreVisible"
+                        modal
+                        :closable="false"
+                        class="sm:min-w-100 sm:w-fit w-9/10"
+                        pt:root="px-2"
+                    >
+                        <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                            {{ t('dialog.recoverConfirmation', { name: t('user.accusative'), id: currentUserId }) }}
+                        </span>
+
+                        <template #footer>
+                            <div class="flex justify-end gap-2">
+                                <SecondaryButton
+                                    type="button"
+                                    :label="t('dialog.cancel')"
+                                    @click="visible.restoreVisible = false"
+                                />
+                                <Button
+                                    type="button"
+                                    :label="t('dialog.confirm')"
+                                    @click="restoreUser"
                                     :loading="isDeleteLoading"
                                     class="px-5"
                                 />
