@@ -17,8 +17,10 @@ import {useRoleStore} from "@/stores/role.js";
 import {useLocationStore} from "@/stores/location.js";
 import {useUserStore} from "@/stores/user.js";
 import {useRouter} from "vue-router";
+import {useToast} from "primevue/usetoast";
 
 const { t } = useI18n();
+const toast = useToast();
 const roleStore = useRoleStore();
 const router = useRouter();
 const locationStore = useLocationStore();
@@ -104,6 +106,7 @@ const onSubmit = handleSubmit(async values => {
     try {
         const response = await userStore.pushUser(payload)
 
+        toast.add({ severity: 'success', summary: t('toast.created', { name: t('user.nominativeCapitalize') }), life: 3000 })
         resetForm()
 
         await router.push({ name: "users" })

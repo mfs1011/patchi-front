@@ -4,7 +4,7 @@ import Dialog from "@/volt/Dialog.vue";
 import DataTable from "@/volt/DataTable.vue";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Column from "primevue/column";
-import {computed, onBeforeMount, onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import { useUserStore } from "@/stores/user.js";
 import { useI18n } from "vue-i18n";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
@@ -13,16 +13,19 @@ import InputText from "@/volt/InputText.vue";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
 import { useRoleStore } from "@/stores/role.js";
 import NoData from "@/components/UI/NoData.vue";
-import Loader from "@/components/Loader.vue";
+import Skeleton from "@/volt/Skeleton.vue";
 import Section from "@/components/UI/Section.vue";
 import { formatPhoneByCountry } from "@/helpers/phoneFormat.js";
 import Card from "@/volt/Card.vue";
 import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
+import SelectButton from "@/volt/SelectButton.vue";
+import {useToast} from "primevue/usetoast";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const toast = useToast()
 const userStore = useUserStore();
 const roleStore = useRoleStore();
 
@@ -37,6 +40,7 @@ const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
     role: parseInt(route.query.role) || null,
+    isDelete: route.query['is-delete'] || false,
 });
 
 // Computed
@@ -55,14 +59,35 @@ const getRolesList = computed(() =>
     })),
 );
 
+const options = computed(() => [t('active'), t('archive')]);
+
+const archiveOrActive = computed({
+    get() {
+        const isDeleted = route.query['is-delete']
+        return (isDeleted === 'true' || isDeleted === true)
+            ? t('archive')
+            : t('active')
+    },
+    set(val) {
+        const query = { ...route.query }
+        query['is-delete'] = val === t('archive')
+        router.replace({ query })
+    }
+})
+
 // Watchers
+
+watch(archiveOrActive, (newVal) => {
+    filters.value.isDelete = newVal !== t('active')
+})
+
 watch(
     [() => debouncedFilter.value, () => filters.value],
     async () => {
-        console.log(debouncedFilter.value, 'test')
         const queryFilter = {
             page: filters.value.page,
             "items-per-page": filters.value.itemsPerPage,
+            "is-delete": filters.value.isDelete
         };
 
         if (debouncedFilter.value !== null) {
@@ -103,6 +128,7 @@ const deleteAction = (id) => {
 const deleteUser = async () => {
     isDeleteLoading.value = true;
     await userStore.deleteUser(currentUserId.value);
+    toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('user.nominativeCapitalize') }), life: 3000 })
     isDeleteLoading.value = false;
     visible.value.deleteVisible = false;
 };
@@ -247,20 +273,23 @@ onBeforeRouteLeave(() => {
                         showClear
                         class="min-w-50 max-w-full w-full"
                     />
+
+                    <div class="flex justify-end col-span-2 md:col-span-2 lg:col-span-1 xl:col-span-2">
+                        <SelectButton v-model="archiveOrActive" :options="options" />
+                    </div>
                 </div>
             </div>
         </template>
         <template #sectionBody>
             <!-- FILTERS OF TABLE ITEMS -->
-            <Loader v-if="userStore.getIsLoadingUsers" class="my-auto" />
+<!--            <Loader v-if="userStore.getIsLoadingUsers" class="my-auto" />-->
 
-            <NoData v-else-if="!userStore.getUsers.totalItems" class="text-surface-400 mx-auto my-auto">
+            <NoData v-if="!userStore.getUsers.totalItems && !userStore.getIsLoadingUsers" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
 
             <!-- TABLE OF USERS -->
             <Card
-                v-else
                 pt:root="overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
@@ -269,25 +298,35 @@ onBeforeRouteLeave(() => {
                 <template #content>
                     <DataTable
                         ref="data-table"
-                        :value="userStore.getUsers.models"
+                        :value="userStore.getIsLoadingUsers ?  Array(10).fill({}) : userStore.getUsers.models"
                         :total-records="userStore.getUsers.totalItems"
                         :rows="filters.itemsPerPage"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
                         pt:root="border border-surface-300 dark:border-surface-600/50"
-                        :loading="userStore.getIsLoadingUsers"
                     >
-                        <Column field="id" :header="t('labels.id')"></Column>
+                        <Column field="id" :header="t('labels.id')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="userStore.getIsLoadingUsers"/>
+                                <p v-else>{{ data.id }}</p>
+                            </template>
+                        </Column>
                         <Column
                             field="name"
                             :header="t('labels.name')"
-                        ></Column>
+                        >
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="userStore.getIsLoadingUsers"/>
+                                <p v-else>{{ data.name }}</p>
+                            </template>
+                        </Column>
                         <Column
                             field="username"
                             :header="t('labels.phoneNumber')"
                         >
                             <template #body="{ data }">
-                                <p>{{ formatPhoneByCountry(data.username) }}</p>
+                                <Skeleton height="2rem" v-if="userStore.getIsLoadingUsers"/>
+                                <p v-else>{{ formatPhoneByCountry(data.username) }}</p>
                             </template>
                         </Column>
                         <Column
@@ -295,7 +334,22 @@ onBeforeRouteLeave(() => {
                             :header="t('labels.role')"
                         >
                             <template #body="{ data }">
-                                <p>{{ PRETTY_ROLE_NAMES[data.role.name] }}</p>
+                                <Skeleton height="2rem" v-if="userStore.getIsLoadingUsers"/>
+                                <p v-else>{{ PRETTY_ROLE_NAMES[data.role.name] }}</p>
+                            </template>
+                        </Column>
+                        <Column
+                            field="locations"
+                            :header="t('labels.locations')"
+                        >
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="userStore.getIsLoadingUsers"/>
+                                <div v-else>
+                                    <div class="flex gap-2" v-if="data.locations.length">
+                                        <p class="bg-surface-100 dark:bg-surface-900 w-fit px-3 py-0.5 rounded" v-for="location of data.locations" :key="location.id">{{ location.name }}</p>
+                                    </div>
+                                    <p v-else>-</p>
+                                </div>
                             </template>
                         </Column>
                         <Column field="id" class="flex justify-end">
@@ -303,29 +357,44 @@ onBeforeRouteLeave(() => {
                                 <p class="font-semibold">{{ t('actions') }}</p>
                             </template>
                             <template #body="{ data }">
-                                <div class="flex items-center gap-2">
-                                    <Button
-                                        @click="router.push({
+                                <Skeleton height="2rem" v-if="userStore.getIsLoadingUsers"/>
+                                <div v-else>
+                                    <div v-if="route.query['is-delete'] === 'false'" class="flex items-center gap-2">
+                                        <Button
+                                            @click="router.push({
                                             name: 'edit-user',
                                             params: { id: data.id },
                                         })"
-                                        icon="pi pi-pencil"
-                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
-                                        size="small"
-                                    />
-                                    <Button
-                                        v-if="hasAccessDelete(data)"
-                                        @click="deleteAction(data.id)"
-                                        icon="pi pi-trash"
-                                        pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
-                                        size="small"
-                                    />
+                                            icon="pi pi-pencil"
+                                            pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
+                                            size="small"
+                                        />
+                                        <Button
+                                            v-if="hasAccessDelete(data)"
+                                            @click="deleteAction(data.id)"
+                                            icon="pi pi-trash"
+                                            pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
+                                            size="small"
+                                        />
+                                    </div>
+                                    <div v-else class="flex items-center gap-2">
+                                        <Button
+                                            @click="restoreAction(data.id)"
+                                            icon="pi pi-replay"
+                                            pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                                            size="small"
+                                        />
+                                    </div>
                                 </div>
                             </template>
                         </Column>
 
                         <template #footer>
-                            <div class="flex flex-wrap items-center justify-end gap-5">
+                            <div v-if="userStore.getIsLoadingUsers" class="flex justify-between">
+                                <Skeleton height="2rem" width="10rem" />
+                                <Skeleton height="2rem" width="5rem"/>
+                            </div>
+                            <div v-else class="flex flex-wrap items-center justify-end gap-5">
                                 <PaginatorComponent
                                     v-model="filters.page"
                                     v-model:items-per-page="filters.itemsPerPage"

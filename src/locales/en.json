@@ -13,15 +13,21 @@
     "archive": "Archive",
     "user": {
         "nominative": "user",
-        "accusative": "user"
+        "nominativeCapitalize": "User",
+        "accusative": "user",
+        "accusativeCapitalize": "User"
     },
     "seller": {
         "nominative": "seller",
-        "accusative": "seller"
+        "nominativeCapitalize": "Seller",
+        "accusative": "seller",
+        "accusativeCapitalize": "Seller"
     },
     "client": {
         "nominative": "client",
-        "accusative": "client"
+        "nominativeCapitalize": "Client",
+        "accusative": "client",
+        "accusativeCapitalize": "Client"
     },
     "roles": {
         "admin": "Administrator",
@@ -39,7 +45,10 @@
         "warehouse": "Warehouse",
         "shop": "Shop",
         "fullName": "Full name",
-        "comment": "Comment"
+        "comment": "Comment",
+        "shopName": "Shop name",
+        "warehouseName": "Warehouse name",
+        "locations": "Location"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",

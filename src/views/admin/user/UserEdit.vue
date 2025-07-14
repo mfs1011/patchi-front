@@ -1,6 +1,6 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {computed, nextTick, onMounted, ref, useTemplateRef, watch} from "vue";
+import {computed, onMounted, ref, useTemplateRef, watch} from "vue";
 import { useI18n } from "vue-i18n";
 import Section from "@/components/UI/Section.vue";
 import PhoneInput from "@/components/PhoneInput.vue";
@@ -19,7 +19,9 @@ import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import MultiSelect from "@/volt/MultiSelect.vue";
 import Dialog from "@/volt/Dialog.vue";
 import Loader from "@/components/Loader.vue";
+import {useToast} from "primevue/usetoast";
 
+const toast = useToast();
 const { t } = useI18n();
 const roleStore = useRoleStore();
 const router = useRouter();
@@ -125,6 +127,8 @@ const onSubmit = handleSubmit(async values => {
         isConfirmLoading.value = true
         const response = await userStore.editUser(payload, userStore.getUser.id)
         isEdited.value = true
+
+        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('user.nominativeCapitalize') }), life: 3000 })
 
         await router.push({ name: "users" })
         resetForm()
