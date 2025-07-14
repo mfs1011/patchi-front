@@ -2,7 +2,7 @@ import MainLayout from "@/layouts/MainLayout.vue";
 import BlankLayout from "@/layouts/BlankLayout.vue";
 
 const ifAuthorized = (to, from, next) => {
-    if (localStorage.getItem('accessToken') !== null) {
+    if (localStorage.getItem('patchi_accessToken') !== null) {
         next()
     } else {
         next({ name: 'login' })
@@ -10,7 +10,7 @@ const ifAuthorized = (to, from, next) => {
 }
 
 const ifNotAuthorized = (to, from, next) => {
-    if (localStorage.getItem('accessToken') === null) {
+    if (localStorage.getItem('patchi_accessToken') === null) {
         next()
     } else {
         next({ name: 'home' })
@@ -256,15 +256,51 @@ export const routes = [
                     },
                     {
                         path: 'warehouses',
-                        name: 'warehouses',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/Warehouses.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'warehouses',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/warehouse/Warehouses.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-warehouse',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/warehouse/WarehousesAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-warehouse',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/warehouse/WarehousesEdit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'shops',
-                        name: 'shops',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/Shops.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'shops',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/shop/Shops.vue'),
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-shop',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/shop/ShopsAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-shop',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/shop/ShopsEdit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'categories',

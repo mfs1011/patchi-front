@@ -19,7 +19,7 @@ export const unAuthorizedClient = axios.create({
 authorizedClient.interceptors.request.use((config) => {
     const sidebar = useSidebarStore();
     sidebar.startIsRouteLoading();
-    config.headers.Authorization = `Bearer ${localStorage.getItem('accessToken')}`
+    config.headers.Authorization = `Bearer ${localStorage.getItem('patchi_accessToken')}`
 
     if (config.method === 'patch') {
         config.headers['Content-Type'] = 'application/merge-patch+json'
