@@ -11,6 +11,9 @@ export const useUserStore = defineStore('user', () => {
         user: {
             locations: []
         },
+        me: {
+            locations: []
+        },
         isLoadingUsers: false,
     })
 
@@ -35,8 +38,19 @@ export const useUserStore = defineStore('user', () => {
     const fetchToken = async userData => {
         try {
             const { data } = await unAuthorizedClient.post('/users/auth', userData)
-            localStorage.setItem('accessToken', data.accessToken)
-            localStorage.setItem('refreshToken', data.refreshToken)
+            localStorage.setItem('patchi_accessToken', data.accessToken)
+            localStorage.setItem('patchi_refreshToken', data.refreshToken)
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
+    const fetchAboutMe = async () => {
+        try {
+            const { data } = await authorizedClient.post('/users/about_me', {})
+            state.me = data;
+
             return data
         } catch (error) {
             throw error
@@ -78,17 +92,9 @@ export const useUserStore = defineStore('user', () => {
         }
     }
 
-    const getAboutMe = async () => {
-        try {
-            await authorizedClient.post(`/users/about_me`, JSON.stringify({}))
-        } catch (error) {
-            throw error
-        }
-    }
-
     const logout = () => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('patchi_accessToken');
+        localStorage.removeItem('patchi_refreshToken');
         location.reload()
     }
 
@@ -100,10 +106,11 @@ export const useUserStore = defineStore('user', () => {
         fetchUser,
         deleteUser,
         logout,
-        getAboutMe,
-        getAboutMeFromToken: computed(() => JSON.parse(atob(localStorage.getItem('accessToken').split('.')[1]))),
-        getAccessToken: computed(() => localStorage.getItem('accessToken')),
-        getRefreshToken: computed(() => localStorage.getItem('refreshToken')),
+        fetchAboutMe,
+        getAboutMe: computed(() => state.me),
+        getAboutMeFromToken: computed(() => JSON.parse(atob(localStorage.getItem('patchi_accessToken').split('.')[1]))),
+        getAccessToken: computed(() => localStorage.getItem('patchi_accessToken')),
+        getRefreshToken: computed(() => localStorage.getItem('patchi_refreshToken')),
         getUsers: computed(() => state.users),
         getUser: computed(() => state.user),
         getIsLoadingUsers: computed(() => state.isLoadingUsers),

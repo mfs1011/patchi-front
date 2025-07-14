@@ -287,9 +287,9 @@ onBeforeRouteLeave(() => {
             <NoData v-if="!userStore.getUsers.totalItems && !userStore.getIsLoadingUsers" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
-
             <!-- TABLE OF USERS -->
             <Card
+                v-if="userStore.getIsLoadingUsers || userStore.getUsers.totalItems > 0"
                 pt:root="overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
