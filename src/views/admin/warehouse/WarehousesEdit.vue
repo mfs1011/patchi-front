@@ -1,11 +1,9 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import PhoneInput from "@/components/PhoneInput.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, onMounted, ref, useTemplateRef} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
-import Textarea from "@/volt/Textarea.vue";
 import Message from "@/volt/Message.vue";
 import Card from "@/volt/Card.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
@@ -15,14 +13,13 @@ import * as yup from "yup";
 import {useField, useForm} from "vee-validate";
 import Dialog from "@/volt/Dialog.vue";
 import Loader from "@/components/Loader.vue";
-import {useCustomerStore} from "@/stores/customer.js";
 import {useToast} from "primevue/usetoast";
+import {useLocationStore} from "@/stores/location.js";
 
 const { t } = useI18n()
 const toast = useToast()
 
-const phoneLength = ref();
-const customerStore = useCustomerStore();
+const locationStore = useLocationStore();
 const router = useRouter()
 const route = useRoute()
 const isLoading = ref(false)
@@ -30,7 +27,6 @@ const showLeaveDialog = ref(false)
 const isEdited = ref(false)
 const pendingNavigation = ref(false)
 const isConfirmLoading = ref(false)
-const phoneInput = useTemplateRef('phoneInput')
 
 const home = ref({
     icon: 'pi pi-home',
@@ -38,13 +34,11 @@ const home = ref({
     route: '/administration'
 });
 
-const items = computed(() => [{ label: t('cards.clientsB2C'), route: { name: 'clients-b2c'} }, { label: t('sections.clientsB2C.edit') }]);
+const items = computed(() => [{ label: t('cards.warehouses'), route: { name: 'warehouses'} }, { label: t('sections.warehouses.edit') }]);
 
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
     name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
-    telephone: yup.string().required().length(phoneLength.value, t('errorMessages.phoneNumberMustBeExactlyCharacters', { count: phoneLength.value })),
-    comment: yup.string().max(255, t('errorMessages.maxCharacter', { count: 255 })).notRequired()
 }))
 
 const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
@@ -52,24 +46,20 @@ const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
 })
 
 const { value: name } = useField('name');
-const { value: telephone } = useField('telephone', undefined, { validateOnValueUpdate: false });
-const { value: comment } = useField('comment');
 
 const onSubmit = handleSubmit(async values => {
     const payload = {
-        name: values.name,
-        telephone: values.telephone.replace(/\D/g, ''),
-        comment: values.comment
+        name: values.name
     };
 
     try {
-        const response = await customerStore.putCustomer(payload, route.params.id)
+        const response = await locationStore.putLocation(payload, route.params.id)
         isEdited.value = true
 
         resetForm()
         router.back()
 
-        toast.add({ severity: 'success', summary: t('toast.edited', { name: 'Mijoz' }), life: 3000 })
+        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('warehouse') }), life: 3000 })
         return response;
     } catch (error) {
         throw error
@@ -79,20 +69,14 @@ const onSubmit = handleSubmit(async values => {
 onMounted(async () => {
     isLoading.value = true
 
-    await customerStore.fetchCustomer(route.params.id)
+    await locationStore.fetchLocation(route.params.id)
 
     isLoading.value = false
 
-    name.value = customerStore.getCustomer.name
-    phoneInput.value.setPhone(await customerStore.getCustomer.telephone.slice(0, 3), await customerStore.getCustomer.telephone.slice(3))
-    comment.value = customerStore.getCustomer.comment
+    name.value = locationStore.getLocation.name
 })
 
-const isChanged = computed(() => {
-    if (name.value !== customerStore.getCustomer.name) return true
-    if (telephone.value?.replace(/\D/g, '') !== customerStore.getCustomer.telephone) return true
-    return customerStore.getCustomer.comment !== comment.value;
-})
+const isChanged = computed(() => name.value !== locationStore.getLocation.name)
 
 
 onBeforeRouteLeave((to, from, next) => {
@@ -136,8 +120,8 @@ const confirmLeave = () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.sellers.edit')"
-        back-route-name="clients-b2c"
+        :section-name="t('sections.warehouses.edit')"
+        back-route-name="warehouses"
         without-buttons
     >
         <template #sectionBody>
@@ -152,36 +136,15 @@ const confirmLeave = () => {
                 <template #content>
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-fit gap-2 sm:gap-4">
                         <label class="block">
-                            <span>{{ t('labels.name') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.warehouseName') }}</span><span class="text-red-500"> *</span>
                             <InputText
                                 v-model.trim="name"
                                 fluid
-                                :placeholder="t('placeholders.fullName')"
+                                :placeholder="t('placeholders.warehouseName')"
                                 size="large"
                                 :class="{ 'p-invalid': errors.name }"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.fullName }}</Message>
-                        </label>
-
-                        <label class="block">
-                            <span>{{ t('labels.phoneNumber') }}</span><span class="text-red-500"> *</span>
-                            <PhoneInput ref="phoneInput" v-model="telephone" v-model:phone-length="phoneLength" />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.telephone }}</Message>
-                        </label>
-
-                        <label class="block">
-                            <span>{{ t('labels.comment') }}</span>
-
-                            <Textarea
-                                v-model="comment"
-                                rows="5"
-                                class="resize-none"
-                                size="large"
-                                fluid
-                                :class="{ 'p-invalid': errors.comment }"
-                                :placeholder="t('placeholders.comment')"
-                            />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.comment }}</Message>
                         </label>
 
                         <div class="flex justify-end gap-2 mt-5">

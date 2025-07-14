@@ -23,11 +23,11 @@ const phoneLength = ref();
 const customerStore = useCustomerStore();
 const router = useRouter();
 
-const home = computed(() => ({
+const home = ref({
     icon: 'pi pi-home',
     label: t('administration'),
     route: '/administration'
-}));
+});
 
 const items = computed(() => [{ label: t('cards.clientsB2C'), route: { name: 'clients-b2c'} }, { label: t('sections.clientsB2C.add') }]);
 
@@ -91,7 +91,7 @@ const onSubmit = handleSubmit(async values => {
 
     <Section
         :section-name="t('sections.sellers.add')"
-        back-route-name="users"
+        back-route-name="clients-b2c"
         without-buttons
     >
         <template #sectionBody>
