@@ -13,15 +13,33 @@
     "archive": "Arxiv",
     "user": {
         "nominative": "foydalanuvchi",
-        "accusative": "foydalanuvchini"
+        "nominativeCapitalize": "Foydalanuvchi",
+        "accusative": "foydalanuvchini",
+        "accusativeCapitalize": "Foydalanuvchini"
     },
     "seller": {
         "nominative": "sotuvchi",
-        "accusative": "sotuvchini"
+        "nominativeCapitalize": "Sotuvchi",
+        "accusative": "sotuvchini",
+        "accusativeCapitalize": "Sotuvchini"
     },
     "client": {
         "nominative": "mijoz",
-        "accusative": "mijozni"
+        "nominativeCapitalize": "Mijoz",
+        "accusative": "mijozni",
+        "accusativeCapitalize": "Mijozni"
+    },
+    "shops": {
+        "nominative": "do‘kon",
+        "nominativeCapitalize": "Do‘kon",
+        "accusative": "do‘konni",
+        "accusativeCapitalize": "Do‘konni"
+    },
+    "warehouses": {
+        "nominative": "ombor",
+        "nominativeCapitalize": "Ombor",
+        "accusative": "omborni",
+        "accusativeCapitalize": "Omborni"
     },
     "roles": {
         "admin": "Administrator",
@@ -39,7 +57,10 @@
         "fullName": "To‘liq ism",
         "warehouse": "Ombor",
         "shop": "Do‘kon",
-        "comment": "Izoh"
+        "shopName": "Do‘kon nomi",
+        "warehouseName": "Ombor nomi",
+        "comment": "Izoh",
+        "locations": "Joylashuvi"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
@@ -58,7 +79,9 @@
             "role": "Rol tanlang",
             "warehouse": "Ombor tanlang",
             "shop": "Do‘kon tanlang"
-        }
+        },
+        "shopName": "Do‘kon nomini kiriting",
+        "warehouseName": "Ombor nomini kiriting"
     },
     "buttons": {
         "login": "Kirish",
@@ -147,6 +170,14 @@
             "edit": "O‘zgartirish"
         },
         "clientsB2C": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "shops": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "warehouses": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
         }

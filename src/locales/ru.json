@@ -13,15 +13,21 @@
     "archive": "Архив",
     "user": {
         "nominative": "пользователь",
-        "accusative": "пользователя"
+        "nominativeCapitalize": "Пользователь",
+        "accusative": "пользователя",
+        "accusativeCapitalize": "Пользователя"
     },
     "seller": {
         "nominative": "продавец",
-        "accusative": "продавца"
+        "nominativeCapitalize": "Продавец",
+        "accusative": "продавца",
+        "accusativeCapitalize": "Продавца"
     },
     "client": {
         "nominative": "клиент",
-        "accusative": "клиента"
+        "nominativeCapitalize": "Клиент",
+        "accusative": "клиента",
+        "accusativeCapitalize": "Клиента"
     },
     "roles": {
         "admin": "Администратор",
@@ -39,7 +45,10 @@
         "warehouse": "Склад",
         "shop": "Магазин",
         "fullName": "Полное имя",
-        "comment": "Комментарий"
+        "comment": "Комментарий",
+        "shopName": "Имя магазина",
+        "warehouseName": "Имя склада",
+        "locations": "Локатция"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
