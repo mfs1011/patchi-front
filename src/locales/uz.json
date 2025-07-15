@@ -41,11 +41,23 @@
         "accusative": "do‘konni",
         "accusativeCapitalize": "Do‘konni"
     },
+    "shop_name": {
+        "nominative": "do‘kon nomi",
+        "nominativeCapitalize": "Do‘kon nomi",
+        "accusative": "do‘konni nomi",
+        "accusativeCapitalize": "Do‘konni nomi"
+    },
     "warehouses": {
         "nominative": "ombor",
         "nominativeCapitalize": "Ombor",
         "accusative": "omborni",
         "accusativeCapitalize": "Omborni"
+    },
+    "warehouse_name": {
+        "nominative": "ombor nomi",
+        "nominativeCapitalize": "Ombor nomi",
+        "accusative": "ombor nomini",
+        "accusativeCapitalize": "Ombor nomini"
     },
     "roles": {
         "admin": "Administrator",
@@ -196,6 +208,7 @@
         "edited": "{name} muvaffaqiyatli o‘zgartirildi!",
         "deleted": "{name} muvaffaqiyatli o‘chirildi!",
         "restored": "{name} muvaffaqiyatli tiklandi!",
-        "already_exists_error": "{field} allaqachon mavjud"
+        "already_exists_error": "{field} allaqachon mavjud",
+        "already_exists_error_named": "Bunday nomli \"{name}\" allaqachon mavjud"
     }
 }

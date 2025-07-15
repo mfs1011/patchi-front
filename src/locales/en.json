@@ -41,11 +41,23 @@
         "accusative": "shop",
         "accusativeCapitalize": "Shop"
     },
+    "shop_name": {
+        "nominative": "shop name",
+        "nominativeCapitalize": "Shop name",
+        "accusative": "shop name",
+        "accusativeCapitalize": "Shop name"
+    },
     "warehouses": {
         "nominative": "warehouse",
         "nominativeCapitalize": "Warehouse",
         "accusative": "warehouse",
         "accusativeCapitalize": "Warehouse"
+    },
+    "warehouse_name": {
+        "nominative": "warehouse name",
+        "nominativeCapitalize": "Warehouse name",
+        "accusative": "warehouse name",
+        "accusativeCapitalize": "Warehouse name"
     },
     "roles": {
         "admin": "Administrator",
@@ -196,6 +208,7 @@
         "edited": "{name} successfully updated!",
         "deleted": "{name} successfully deleted!",
         "restored": "{name} successfully restored!",
-        "already_exists_error": "{field} already exists"
+        "already_exists_error": "{field} already exists",
+        "already_exists_error_named": "\"{name}\" with this name already exists"
     }
 }

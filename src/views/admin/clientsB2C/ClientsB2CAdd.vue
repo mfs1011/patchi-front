@@ -33,7 +33,7 @@ const items = computed(() => [{ label: t('cards.clientsB2C'), route: { name: 'cl
 
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
-    name: yup.string().required(t('errorMessages.nameRequired')),
+    name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     telephone: yup.string().required().length(phoneLength.value, t('errorMessages.phoneNumberMustBeExactlyCharacters', { count: phoneLength.value })),
     comment: yup.string().max(255, t('errorMessages.maxCharacter', { count: 255 })).notRequired()
 }))

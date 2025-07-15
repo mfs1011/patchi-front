@@ -259,7 +259,8 @@ const confirmLeave = () => {
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-fit gap-2 sm:gap-4">
                         <label class="block">
                             <span>{{ t('labels.fullName') }}</span><span class="text-red-500"> *</span>
-                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <InputText
                                 v-show="!isLoading"
                                 v-model.trim="fullName"
@@ -275,7 +276,8 @@ const confirmLeave = () => {
                         <label class="mb-2 block">
                             <span>{{ t('labels.phoneNumber') }}</span><span class="text-red-500"> *</span>
 
-                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <PhoneInput v-show="!isLoading" ref="phoneInput" v-model="phoneNumber" v-model:phone-length="phoneLength" />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.phoneNumber }}</Message>
                         </label>
@@ -283,7 +285,8 @@ const confirmLeave = () => {
                         <label class="mb-2 block mt-1">
                             <span>{{ t('labels.password') }}</span>
 
-                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <InputText
                                 v-show="!isLoading"
                                 v-model.trim="password"
@@ -300,7 +303,8 @@ const confirmLeave = () => {
                         <div class="mb-2 mt-1">
                             <p>{{ t('labels.role') }}<span class="text-red-500"> *</span></p>
 
-                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <Select
                                 v-show="!isLoading"
                                 v-model="role"
@@ -317,7 +321,8 @@ const confirmLeave = () => {
                         <div v-if="role === 2" class="mb-2 mt-1">
                             <p>{{ t('labels.warehouse') }}<span class="text-red-500"> *</span></p>
 
-                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading || !locationStore.getLocations.models.length"/>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading || !locationStore.getLocations.models.length"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading || !locationStore.getLocations.models.length"/>
                             <MultiSelect
                                 v-else
                                 v-model="warehouse"
@@ -336,7 +341,8 @@ const confirmLeave = () => {
                         <div v-if="role === 3" class="mb-2 mt-1">
                             <p>{{ t('labels.shop') }}</p>
 
-                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <Select
                                 v-show="!isLoading"
                                 v-model="shop"

@@ -14,7 +14,7 @@ import {useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
 import {useLocationStore} from "@/stores/location.js";
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 
 const locationStore = useLocationStore();
@@ -30,7 +30,7 @@ const items = computed(() => [{ label: t('cards.warehouses'), route: { name: 'wa
 
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
-    name: yup.string().required(t('errorMessages.nameRequired')),
+    name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
 }))
 
 const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
@@ -50,10 +50,10 @@ const onSubmit = handleSubmit(async values => {
         resetForm()
         router.back()
 
-        toast.add({ severity: 'success', summary: t('toast.created', { name: t('warehouses') }), life: 3000 })
+        toast.add({ severity: 'success', summary: t('toast.created', { name: t('warehouses.nominativeCapitalize') }), life: 3000 })
         return response;
     } catch (error) {
-        throw error
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error_named', { name: locale.value === 'uz' ? t('warehouse_name.nominative') : t('warehouse_name.nominativeCapitalize') }), life: 3000 })
     }
 })
 </script>
