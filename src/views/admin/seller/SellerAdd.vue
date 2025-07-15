@@ -15,8 +15,10 @@ import * as yup from "yup";
 import {useSellerStore} from "@/stores/seller.js";
 import {useRouter} from "vue-router";
 import {useLocationStore} from "@/stores/location.js";
+import {useToast} from "primevue/usetoast";
 
 const { t } = useI18n()
+const toast = useToast()
 
 const phoneLength = ref();
 const sellerStore = useSellerStore();
@@ -55,6 +57,8 @@ const onSubmit = handleSubmit(async values => {
 
     try {
         const response = await sellerStore.pushSeller(payload)
+
+        toast.add({ severity: 'success', summary: t('toast.created', { name: t('user.nominativeCapitalize') }), life: 3000 })
         resetForm()
         router.back()
 

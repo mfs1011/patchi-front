@@ -2,7 +2,7 @@
 import Section from "@/components/UI/Section.vue";
 import { useI18n } from "vue-i18n";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import Button from "@/volt/Button.vue";
 import Select from "@/volt/Select.vue";
 import SelectButton from "@/volt/SelectButton.vue";
@@ -13,17 +13,19 @@ import Card from "@/volt/Card.vue";
 import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import DataTable from "@/volt/DataTable.vue";
 import Column from "primevue/column";
-import Loader from "@/components/Loader.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import Dialog from "@/volt/Dialog.vue";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
-import {useRoute, useRouter} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import {useSellerStore} from "@/stores/seller.js";
 import {useLocationStore} from "@/stores/location.js";
+import Skeleton from "@/volt/Skeleton.vue";
+import {useToast} from "primevue/usetoast";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const toast = useToast();
 
 const sellerStore = useSellerStore()
 const locationStore = useLocationStore()
@@ -36,7 +38,6 @@ const visible = ref({
 
 const isVisibleSectionHeader = ref(false);
 const isDeleteLoading = ref(false);
-const skipNextFetch = ref(false);
 const currentSellerId = ref();
 const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
 
@@ -78,10 +79,6 @@ watch(archiveOrActive, (newVal) => {
 watch(
     [() => debouncedFilter.value, () => filters.value],
     async () => {
-        if (skipNextFetch.value) {
-            skipNextFetch.value = false
-            return
-        }
 
         const queryFilter = {
             page: filters.value.page,
@@ -133,17 +130,17 @@ const restoreAction = (id) => {
 const deleteSeller = async () => {
     isDeleteLoading.value = true;
     await sellerStore.deleteSeller(currentSellerId.value);
-    await sellerStore.fetchSellers(route.query);
     isDeleteLoading.value = false;
     visible.value.deleteVisible = false;
+    toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('seller.nominativeCapitalize') }), life: 3000 })
 };
 
 const restoreSeller = async () => {
     isDeleteLoading.value = true;
     await sellerStore.restoreSeller(currentSellerId.value);
-    await sellerStore.fetchSellers(route.query);
     isDeleteLoading.value = false;
     visible.value.restoreVisible = false;
+    toast.add({ severity: 'success', summary: t('toast.restored', { name: t('seller.nominativeCapitalize') }), life: 3000 })
 };
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
@@ -155,15 +152,10 @@ function connectMercure() {
     eventSource.value = new EventSource(url)
 
     eventSource.value.addEventListener('message', async (event) => {
+        const eventDataId = JSON.parse(event.data).eventId
 
-        if (JSON.parse(event.data).eventId === 10) {
+        if (eventDataId === 10 || eventDataId === 100) {
             await sellerStore.fetchSellers(route.query);
-            skipNextFetch.value = true
-        }
-
-        if (JSON.parse(event.data).eventId === 100) {
-            await sellerStore.fetchSellers(route.query);
-            skipNextFetch.value = true
         }
     })
 }
@@ -175,7 +167,7 @@ onMounted(() => {
     connectMercure()
 })
 
-onBeforeUnmount(() => {
+onBeforeRouteLeave(() => {
     if (eventSource.value) {
         eventSource.value.close()
     }
@@ -289,15 +281,14 @@ onBeforeUnmount(() => {
 
         <template #sectionBody>
             <!-- FILTERS OF TABLE ITEMS -->
-            <Loader v-if="sellerStore.getIsLoadingSellers" class="my-auto" />
 
-            <NoData v-else-if="!sellerStore.getSellers.totalItems" class="text-surface-400 mx-auto my-auto">
+            <NoData v-if="!sellerStore.getSellers.totalItems && !sellerStore.getIsLoadingSellers" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
 
             <!-- TABLE OF USERS -->
             <Card
-                v-else
+                v-if="sellerStore.getIsLoadingSellers || sellerStore.getSellers.totalItems > 0"
                 pt:root="overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
@@ -306,24 +297,35 @@ onBeforeUnmount(() => {
                 <template #content>
                     <DataTable
                         ref="data-table"
-                        :value="sellerStore.getSellers.models"
+                        :value="sellerStore.getIsLoadingSellers ?  Array(10).fill({}) : sellerStore.getSellers.models"
                         :total-records="sellerStore.getSellers.totalItems"
                         :rows="filters.itemsPerPage"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
                         pt:root="border border-surface-300 dark:border-surface-600/50"
-                        :loading="sellerStore.getIsLoadingSellers"
                     >
-                        <Column field="id" :header="t('labels.id')"></Column>
-                        <Column field="name" :header="t('labels.name')"></Column>
+                        <Column field="id" :header="t('labels.id')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="sellerStore.getIsLoadingSellers"/>
+                                <p v-else>{{ data.id }}</p>
+                            </template>
+                        </Column>
+                        <Column field="name" :header="t('labels.name')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="sellerStore.getIsLoadingSellers"/>
+                                <p v-else>{{ data.name }}</p>
+                            </template>
+                        </Column>
                         <Column field="telephone" :header="t('labels.phoneNumber')">
                             <template #body="{ data }">
-                                <p>{{ formatPhoneByCountry(data.telephone) }}</p>
+                                <Skeleton height="2rem" v-if="sellerStore.getIsLoadingSellers"/>
+                                <p v-else>{{ formatPhoneByCountry(data.telephone) }}</p>
                             </template>
                         </Column>
                         <Column field="location" :header="t('labels.shop')">
                             <template #body="{ data }">
-                                <p>{{ data.location.name }}</p>
+                                <Skeleton height="2rem" v-if="sellerStore.getIsLoadingSellers"/>
+                                <p v-else>{{ data.location.name }}</p>
                             </template>
                         </Column>
                         <Column field="id" class="flex justify-end">
@@ -331,36 +333,43 @@ onBeforeUnmount(() => {
                                 <p class="font-semibold">{{ t('actions') }}</p>
                             </template>
                             <template #body="{ data }">
-                                <div v-if="route.query['is-delete'] === 'false'" class="flex items-center gap-2">
-                                    <Button
-                                        @click="router.push({
+                                <Skeleton height="2rem" v-if="sellerStore.getIsLoadingSellers"/>
+                                <div v-else>
+                                    <div v-if="route.query['is-delete'] === 'false'" class="flex items-center gap-2">
+                                        <Button
+                                            @click="router.push({
                                             name: 'edit-seller',
                                             params: { id: data.id },
                                         })"
-                                        icon="pi pi-pencil"
-                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
-                                        size="small"
-                                    />
-                                    <Button
-                                        @click="deleteAction(data.id)"
-                                        icon="pi pi-trash"
-                                        pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
-                                        size="small"
-                                    />
-                                </div>
-                                <div v-else class="flex items-center gap-2">
-                                    <Button
-                                        @click="restoreAction(data.id)"
-                                        icon="pi pi-replay"
-                                        pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
-                                        size="small"
-                                    />
+                                            icon="pi pi-pencil"
+                                            pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
+                                            size="small"
+                                        />
+                                        <Button
+                                            @click="deleteAction(data.id)"
+                                            icon="pi pi-trash"
+                                            pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
+                                            size="small"
+                                        />
+                                    </div>
+                                    <div v-else class="flex items-center gap-2">
+                                        <Button
+                                            @click="restoreAction(data.id)"
+                                            icon="pi pi-replay"
+                                            pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                                            size="small"
+                                        />
+                                    </div>
                                 </div>
                             </template>
                         </Column>
 
                         <template #footer>
-                            <div class="flex flex-wrap items-center justify-end gap-5">
+                            <div v-if="sellerStore.getIsLoadingSellers" class="flex justify-between">
+                                <Skeleton height="2rem" width="10rem" />
+                                <Skeleton height="2rem" width="5rem"/>
+                            </div>
+                            <div v-else class="flex flex-wrap items-center justify-end gap-5">
                                 <PaginatorComponent
                                     v-model="filters.page"
                                     v-model:items-per-page="filters.itemsPerPage"

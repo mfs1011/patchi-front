@@ -296,7 +296,6 @@ onBeforeRouteLeave(() => {
         </template>
         <template #sectionBody>
             <!-- FILTERS OF TABLE ITEMS -->
-<!--            <Loader v-if="userStore.getIsLoadingUsers" class="my-auto" />-->
 
             <NoData v-if="!userStore.getUsers.totalItems && !userStore.getIsLoadingUsers" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>

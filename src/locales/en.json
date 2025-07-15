@@ -92,6 +92,7 @@
         "phoneNumberMustBeExactlyCharacters": "Invalid phone number format",
         "passwordMinLength": "Password must be at least 6 characters long",
         "fullNameMustBeMaxCharacters": "Full name must not exceed 30 characters",
+        "nameMustBeMaxCharacters": "Name must not exceed 30 characters",
         "roleRequired": "Role is required",
         "warehouseRequired": "Warehouse selection is required",
         "shopRequired": "Shop selection is required",

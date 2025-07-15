@@ -106,6 +106,7 @@
         "phoneNumberMustBeExactlyCharacters": "Telefon formati noto‘g‘ri",
         "passwordMinLength": "Parol kamida 6ta belgidan iborat bo’lishi kerak",
         "fullNameMustBeMaxCharacters": "To‘liq ism 30ta belgidan oshmasligi kerak",
+        "nameMustBeMaxCharacters": "Ism 30ta belgidan oshmasligi kerak",
         "roleRequired": "Rol tanlash majburiy",
         "warehouseRequired": "Ombor tanlash majburiy",
         "shopRequired": "Do‘kon tanlash majburiy",
