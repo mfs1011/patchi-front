@@ -23,6 +23,12 @@
         "accusative": "sotuvchini",
         "accusativeCapitalize": "Sotuvchini"
     },
+    "categories": {
+        "nominative": "kategoriya",
+        "nominativeCapitalize": "Kategoriya",
+        "accusative": "kategoriyani",
+        "accusativeCapitalize": "Kategoriyani"
+    },
     "client": {
         "nominative": "mijoz",
         "nominativeCapitalize": "Mijoz",
@@ -65,6 +71,12 @@
         "accusative": "ombor nomini",
         "accusativeCapitalize": "Ombor nomini"
     },
+    "category_name": {
+        "nominative": "kategoriya nomi",
+        "nominativeCapitalize": "Kategoriya nomi",
+        "accusative": "kategoriya nomini",
+        "accusativeCapitalize": "Kategoriya nomini"
+    },
     "color_name": {
         "nominative": "rang nomi",
         "nominativeCapitalize": "Rang nomi",
@@ -98,7 +110,10 @@
         "comment": "Izoh",
         "locations": "Joylashuvi",
         "supplierName": "Ta'minotchi nomi",
-        "colorName": "Rang nomi"
+        "colorName": "Rang nomi",
+        "categoryType": "Kategoriya turi",
+        "categoryName": "Kategoriya nomi",
+        "unit": "Birlik"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
@@ -112,17 +127,22 @@
             "byNameAndPhone": "Ism yoki telefon raqam orqali qidiruv",
             "byRole": "Rol bo‘yicha qidiruv",
             "byWarehouse": "Ombor bo‘yicha qidiruv",
-            "byShop": "Do‘kon bo‘yicha qidiruv"
+            "byShop": "Do‘kon bo‘yicha qidiruv",
+            "byUnit": "Birlik bo‘yicha qidiruv",
+            "byCategoryType": "Kategoriya turi bo‘yicha qidiruv"
         },
         "select": {
             "role": "Rol tanlang",
             "warehouse": "Ombor tanlang",
-            "shop": "Do‘kon tanlang"
+            "shop": "Do‘kon tanlang",
+            "categoryType": "Kategoriya turini tanlang",
+            "unit": "Birlikni tanlang"
         },
         "shopName": "Do‘kon nomini kiriting...",
         "warehouseName": "Ombor nomini kiriting...",
         "supplierName": "Ta'minotchi nomini kiriting...",
-        "colorName": "Rang nomini kiriting..."
+        "colorName": "Rang nomini kiriting...",
+        "categoryName": "Kategoriya nomini kiriting..."
     },
     "buttons": {
         "login": "Kirish",
@@ -141,6 +161,9 @@
     "errorMessages": {
         "usernameRequired": "Username kiritish majburiy",
         "supplierRequired": "Ta'minochi kiritish majburiy",
+        "categoryTypeRequired": "Kategoriya turini kiritish majburiy",
+        "categoryNameRequired": "Kategoriya nomini kiritish majburiy",
+        "unitRequired": "Birlik kiritish majburiy",
         "nameRequired": "Ism kiritish majburiy",
         "colorNameRequired": "Rang nomini kiritish majburiy",
         "fullNameRequired": "To‘liq ism kiritish majburiy",
@@ -227,6 +250,10 @@
             "edit": "O‘zgartirish"
         },
         "colors": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "categories": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
         }

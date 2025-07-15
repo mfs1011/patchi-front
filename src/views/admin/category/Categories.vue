@@ -13,18 +13,23 @@ import InputText from "@/volt/InputText.vue";
 import SelectButton from "@/volt/SelectButton.vue";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
-import {useLocationStore} from "@/stores/location.js";
 import {computed, onMounted, ref, watch} from "vue";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
 import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
+import {useCategoryStore} from "@/stores/category.js";
+import Select from "@/volt/Select.vue";
+import {useCategoryTypeStore} from "@/stores/categoryType.js";
+import {useUnitStore} from "@/stores/unit.js";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const toast = useToast();
 
-const locationStore = useLocationStore()
+const categoryStore = useCategoryStore()
+const categoryTypeStore = useCategoryTypeStore()
+const unitStore = useUnitStore()
 
 // refs
 const visible = ref({
@@ -34,14 +39,15 @@ const visible = ref({
 
 const isVisibleSectionHeader = ref(false);
 const isDeleteLoading = ref(false);
-const currentCustomerId = ref();
+const currentCategoryId = ref();
 const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
     isDelete: route.query['is-delete'] || false,
-    isWarehouse: true
+    categoryType: route.query['categoryType'] || null,
+    unit: route.query['unit'] || null
 });
 
 const archiveOrActive = computed({
@@ -64,7 +70,7 @@ const home = computed(() => ({
     label: t("administration"),
     route: "/administration",
 }));
-const items = computed(() => [{ label: t("cards.warehouses") }]);
+const items = computed(() => [{ label: t("cards.categories") }]);
 const options = computed(() => [t('active'), t('archive')]);
 // watchers
 
@@ -79,7 +85,6 @@ watch(
             page: filters.value.page,
             "items-per-page": filters.value.itemsPerPage,
             "is-delete": filters.value.isDelete,
-            isWarehouse: filters.value.isWarehouse
         };
 
         if (debouncedFilter.value !== null) {
@@ -90,9 +95,17 @@ watch(
             delete queryFilter.name;
         }
 
+        if (filters.value.unit !== null) {
+            queryFilter.unit = filters.value.unit
+        }
+
+        if (filters.value.categoryType !== null) {
+            queryFilter.categoryType = filters.value.categoryType;
+        }
+
         await updateQuery(queryFilter);
 
-        await locationStore.fetchLocations(route.query);
+        await categoryStore.fetchCategories(route.query);
     },
     { immediate: true, deep: true },
 );
@@ -107,29 +120,29 @@ async function updateQuery(newParams) {
 }
 
 const deleteAction = (id) => {
-    currentCustomerId.value = id;
+    currentCategoryId.value = id;
     visible.value.deleteVisible = true;
 };
 
 const restoreAction = (id) => {
-    currentCustomerId.value = id;
+    currentCategoryId.value = id;
     visible.value.restoreVisible = true;
 };
 
 const deleteLocation = async () => {
     isDeleteLoading.value = true;
-    await locationStore.deleteLocation(currentCustomerId.value);
-    toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('warehouses.nominativeCapitalize') }), life: 3000 })
+    await categoryStore.deleteCategory(currentCategoryId.value);
+    toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('categories.nominativeCapitalize') }), life: 3000 })
     isDeleteLoading.value = false;
     visible.value.deleteVisible = false;
 };
 
 const restoreLocation = async () => {
     isDeleteLoading.value = true;
-    await locationStore.restoreLocation(currentCustomerId.value);
+    await categoryStore.restoreCategory(currentCategoryId.value);
     isDeleteLoading.value = false;
     visible.value.restoreVisible = false;
-    toast.add({ severity: 'success', summary: t('toast.restored', { name: t('warehouses.nominativeCapitalize') }), life: 3000 })
+    toast.add({ severity: 'success', summary: t('toast.restored', { name: t('categories.nominativeCapitalize') }), life: 3000 })
 };
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
@@ -143,13 +156,21 @@ function connectMercure() {
     eventSource.value.addEventListener('message', async (event) => {
         const eventDataId = JSON.parse(event.data).eventId
 
-        if (eventDataId === 8) {
-            await locationStore.fetchLocations(route.query);
+        if (eventDataId === 2) {
+            await categoryStore.fetchCategories(route.query);
         }
     })
 }
 
 onMounted(() => {
+    if (!categoryTypeStore.getCategoryTypes.models.length) {
+        categoryTypeStore.fetchCategoryTypes()
+    }
+
+    if (!unitStore.getUnits.models.length) {
+        unitStore.fetchUnits()
+    }
+
     connectMercure()
 })
 
@@ -190,8 +211,8 @@ onBeforeRouteLeave(() => {
     </Breadcrumb>
 
     <Section
-        :add-button-name="t('buttons.newWarehouse')"
-        :section-name="t('cards.warehouses')"
+        :add-button-name="t('buttons.newCategory')"
+        :section-name="t('cards.categories')"
         back-route-name="administration"
     >
         <template #buttons>
@@ -203,10 +224,10 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    @click="router.push({ name: 'add-warehouse' })"
+                    @click="router.push({ name: 'add-category' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >
-                    {{ t("buttons.newWarehouse") }}
+                    {{ t("buttons.newCategory") }}
                 </Button>
             </div>
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
@@ -221,7 +242,7 @@ onBeforeRouteLeave(() => {
                     @click="router.push({ name: 'add-warehouse' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >
-                    {{ t("buttons.newWarehouse") }}
+                    {{ t("buttons.newCategory") }}
                 </Button>
             </div>
         </template>
@@ -229,13 +250,13 @@ onBeforeRouteLeave(() => {
         <template #sectionHeader>
             <div
                 :class="{
-                'h-0 border-transparent -my-1 sm:-my-2': !isVisibleSectionHeader,
-                'py-2 sm:py-4 h-fit border-surface-300 dark:border-surface-600/50 border': isVisibleSectionHeader
-            }"
+                    'h-0 border-transparent -my-1 sm:-my-2': !isVisibleSectionHeader,
+                    'py-2 sm:py-4 h-fit border-surface-300 dark:border-surface-600/50 border': isVisibleSectionHeader
+                }"
                 class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
             >
-                <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-2 sm:gap-y-4 sm:gap-x-0 items-center">
-                    <div class="col-span-2 sm:col-span-1">
+                <div class="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
+                    <div>
                         <label class="relative max-w-full w-full">
                             <i class="pi pi-search absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1"/>
                             <InputText
@@ -246,8 +267,30 @@ onBeforeRouteLeave(() => {
                             />
                         </label>
                     </div>
+                    <div>
+                        <Select
+                            v-model="filters.categoryType"
+                            :options="categoryTypeStore.getCategoryTypes.models"
+                            option-label="name"
+                            option-value="id"
+                            :placeholder="t('placeholders.search.byCategoryType')"
+                            showClear
+                            class="w-full"
+                        />
+                    </div>
+                    <div>
+                        <Select
+                            v-model="filters.unit"
+                            :options="unitStore.getUnits.models"
+                            option-label="name"
+                            option-value="id"
+                            :placeholder="t('placeholders.search.byUnit')"
+                            showClear
+                            class="w-full"
+                        />
+                    </div>
 
-                    <div class="flex justify-end col-span-2 md:col-span-1 lg:col-span-1 xl:col-span-2">
+                    <div class="flex justify-end col-span-1 md:col-span-1 lg:col-span-3 xl:col-span-1">
                         <SelectButton v-model="archiveOrActive" :options="options" />
                     </div>
                 </div>
@@ -257,13 +300,13 @@ onBeforeRouteLeave(() => {
         <template #sectionBody>
             <!-- FILTERS OF TABLE ITEMS -->
 
-            <NoData v-if="!locationStore.getLocations.totalItems && !locationStore.getIsLoadingLocation" class="text-surface-400 mx-auto my-auto">
+            <NoData v-if="!categoryStore.getCategories.totalItems && !categoryStore.getIsLoadingCategory" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
 
             <!-- TABLE OF USERS -->
             <Card
-                v-if="locationStore.getIsLoadingLocation || locationStore.getLocations.totalItems > 0"
+                v-if="categoryStore.getIsLoadingCategory || categoryStore.getCategories.totalItems > 0"
                 pt:root="overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
@@ -272,8 +315,8 @@ onBeforeRouteLeave(() => {
                 <template #content>
                     <DataTable
                         ref="data-table"
-                        :value="locationStore.getIsLoadingLocation ?  Array(10).fill({}) : locationStore.getLocations.models"
-                        :total-records="locationStore.getLocations.totalItems"
+                        :value="categoryStore.getIsLoadingCategory ?  Array(10).fill({}) : categoryStore.getCategories.models"
+                        :total-records="categoryStore.getCategories.totalItems"
                         :rows="filters.itemsPerPage"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
@@ -281,14 +324,26 @@ onBeforeRouteLeave(() => {
                     >
                         <Column field="id" :header="t('labels.id')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="locationStore.getIsLoadingLocation"/>
+                                <Skeleton height="2rem" v-if="categoryStore.getIsLoadingCategory"/>
                                 <p v-else>{{ data.id }}</p>
                             </template>
                         </Column>
                         <Column field="name" :header="t('labels.warehouseName')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="locationStore.getIsLoadingLocation"/>
+                                <Skeleton height="2rem" v-if="categoryStore.getIsLoadingCategory"/>
                                 <p v-else>{{ data.name }}</p>
+                            </template>
+                        </Column>
+                        <Column field="categoryType" :header="t('labels.categoryType')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="categoryStore.getIsLoadingCategory"/>
+                                <p v-else>{{ data.categoryType.name }}</p>
+                            </template>
+                        </Column>
+                        <Column field="unit" :header="t('labels.unit')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="categoryStore.getIsLoadingCategory"/>
+                                <p v-else>{{ data.unit.name }}</p>
                             </template>
                         </Column>
                         <Column field="id" class="flex justify-end">
@@ -296,13 +351,13 @@ onBeforeRouteLeave(() => {
                                 <p class="font-semibold">{{ t('actions') }}</p>
                             </template>
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="locationStore.getIsLoadingLocation"/>
+                                <Skeleton height="2rem" v-if="categoryStore.getIsLoadingCategory"/>
 
                                 <div v-else>
                                     <div v-if="route.query['is-delete'] === 'false'" class="flex items-center gap-2">
                                         <Button
                                             @click="router.push({
-                                            name: 'edit-warehouse',
+                                            name: 'edit-category',
                                             params: { id: data.id },
                                         })"
                                             icon="pi pi-pencil"
@@ -329,7 +384,7 @@ onBeforeRouteLeave(() => {
                         </Column>
 
                         <template #footer>
-                            <div v-if="locationStore.getIsLoadingLocation" class="flex justify-between">
+                            <div v-if="categoryStore.getIsLoadingCategory" class="flex justify-between">
                                 <Skeleton height="2rem" width="10rem" />
                                 <Skeleton height="2rem" width="5rem"/>
                             </div>
@@ -337,7 +392,7 @@ onBeforeRouteLeave(() => {
                                 <PaginatorComponent
                                     v-model="filters.page"
                                     v-model:items-per-page="filters.itemsPerPage"
-                                    :total-items="locationStore.getLocations.totalItems"
+                                    :total-items="categoryStore.getCategories.totalItems"
                                 />
                             </div>
                         </template>
@@ -353,7 +408,7 @@ onBeforeRouteLeave(() => {
                 pt:root="px-2"
             >
                     <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.deleteConfirmation', { name: t('warehouses.accusative'), id: currentCustomerId }) }}
+                        {{ t('dialog.deleteConfirmation', { name: t('warehouses.accusative'), id: currentCategoryId }) }}
                     </span>
 
                 <template #footer>
@@ -383,7 +438,7 @@ onBeforeRouteLeave(() => {
                 pt:root="px-2"
             >
                     <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.recoverConfirmation', { name: t('warehouses.accusative'), id: currentCustomerId }) }}
+                        {{ t('dialog.recoverConfirmation', { name: t('warehouses.accusative'), id: currentCategoryId }) }}
                     </span>
 
                 <template #footer>
