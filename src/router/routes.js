@@ -244,9 +244,27 @@ export const routes = [
                     },
                     {
                         path: 'suppliers',
-                        name: 'suppliers',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/Suppliers.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'suppliers',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/supplier/Suppliers.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-suppliers',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/supplier/SuppliersAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-suppliers',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/supplier/SuppliersEdit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'products',

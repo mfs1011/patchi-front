@@ -59,6 +59,12 @@
         "accusative": "имя склада",
         "accusativeCapitalize": "Имя склада"
     },
+    "supplier": {
+        "nominative": "поставщик",
+        "nominativeCapitalize": "Поставщик",
+        "accusative": "поставщика",
+        "accusativeCapitalize": "Поставщика"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",
@@ -78,7 +84,8 @@
         "comment": "Комментарий",
         "shopName": "Имя магазина",
         "warehouseName": "Имя склада",
-        "locations": "Локация"
+        "locations": "Локация",
+        "supplierName": "Имя поставщика"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -99,7 +106,8 @@
             "role": "Выберите роль",
             "warehouse": "Выберите склад",
             "shop": "Выберите магазин"
-        }
+        },
+        "supplierName": "Введите имя поставщика"
     },
     "buttons": {
         "login": "Войти",
@@ -118,6 +126,7 @@
     "errorMessages": {
         "usernameRequired": "Имя пользователя обязательно",
         "nameRequired": "Имя обязательно",
+        "supplierRequired": "Поставщик обязателен",
         "fullNameRequired": "Полное имя обязательно",
         "passwordRequired": "Пароль обязателен",
         "phoneNumberRequired": "Номер телефона обязателен",
@@ -197,6 +206,10 @@
             "edit": "Изменить"
         },
         "warehouses": {
+            "add": "Добавить",
+            "edit": "Изменить"
+        },
+        "suppliers": {
             "add": "Добавить",
             "edit": "Изменить"
         }

@@ -1,9 +1,11 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
+import PhoneInput from "@/components/PhoneInput.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, useTemplateRef} from "vue";
 import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
+import Textarea from "@/volt/Textarea.vue";
 import Message from "@/volt/Message.vue";
 import Card from "@/volt/Card.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
@@ -12,14 +14,16 @@ import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import * as yup from "yup";
 import {useField, useForm} from "vee-validate";
 import Dialog from "@/volt/Dialog.vue";
+import {useCustomerStore} from "@/stores/customer.js";
 import {useToast} from "primevue/usetoast";
-import {useLocationStore} from "@/stores/location.js";
 import Skeleton from "@/volt/Skeleton.vue";
+import {useSupplierStore} from "@/stores/supplier.js";
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const toast = useToast()
 
-const locationStore = useLocationStore();
+const phoneLength = ref();
+const supplierStore = useSupplierStore();
 const router = useRouter()
 const route = useRoute()
 const isLoading = ref(false)
@@ -27,6 +31,7 @@ const showLeaveDialog = ref(false)
 const isEdited = ref(false)
 const pendingNavigation = ref(false)
 const isConfirmLoading = ref(false)
+const phoneInput = useTemplateRef('phoneInput')
 
 const home = ref({
     icon: 'pi pi-home',
@@ -34,11 +39,12 @@ const home = ref({
     route: '/administration'
 });
 
-const items = computed(() => [{ label: t('cards.shops'), route: { name: 'shops'} }, { label: t('sections.shops.edit') }]);
+const items = computed(() => [{ label: t('cards.suppliers'), route: { name: 'suppliers'} }, { label: t('sections.suppliers.edit') }]);
 
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
-    name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    name: yup.string().required(t('errorMessages.supplierRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    telephone: yup.string().required().length(phoneLength.value, t('errorMessages.phoneNumberMustBeExactlyCharacters', { count: phoneLength.value })),
 }))
 
 const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
@@ -46,37 +52,44 @@ const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
 })
 
 const { value: name } = useField('name');
+const { value: telephone } = useField('telephone', undefined, { validateOnValueUpdate: false });
 
 const onSubmit = handleSubmit(async values => {
     const payload = {
-        name: values.name
+        name: values.name,
+        telephone: values.telephone.replace(/\D/g, ''),
     };
 
     try {
-        const response = await locationStore.putLocation(payload, route.params.id)
+        const response = await supplierStore.putSupplier(payload, route.params.id)
         isEdited.value = true
+
+        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('supplier.nominativeCapitalize') }), life: 3000 })
 
         resetForm()
         router.back()
 
-        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('shops.nominativeCapitalize') }), life: 3000 })
         return response;
     } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.already_exists_error_named', { name: locale.value === 'uz' ? t('shop_name.nominative') : t('shop_name.nominativeCapitalize') }), life: 3000 })
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('phone.nominativeCapitalize') }), life: 3000 })
     }
 })
 
 onMounted(async () => {
     isLoading.value = true
 
-    await locationStore.fetchLocation(route.params.id)
+    await supplierStore.fetchSupplier(route.params.id)
 
     isLoading.value = false
 
-    name.value = locationStore.getLocation.name
+    name.value = supplierStore.getSupplier.name
+    phoneInput.value.setPhone(await supplierStore.getSupplier.telephone.slice(0, 3), await supplierStore.getSupplier.telephone.slice(3))
 })
 
-const isChanged = computed(() => name.value !== locationStore.getLocation.name)
+const isChanged = computed(() => {
+    if (name.value !== supplierStore.getSupplier.name) return true
+    if (telephone.value?.replace(/\D/g, '') !== supplierStore.getSupplier.telephone) return true
+})
 
 
 onBeforeRouteLeave((to, from, next) => {
@@ -120,8 +133,8 @@ const confirmLeave = () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.shops.edit')"
-        back-route-name="shops"
+        :section-name="t('sections.sellers.edit')"
+        back-route-name="clients-b2b"
         without-buttons
     >
         <template #sectionBody>
@@ -134,23 +147,30 @@ const confirmLeave = () => {
                 <template #content>
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-fit gap-2 sm:gap-4">
                         <label class="block">
-                            <span>{{ t('labels.shopName') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.name') }}</span><span class="text-red-500"> *</span>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
-                            <Skeleton class="hidden sm:block" height="3.1rem" width="20.6rem" v-if="isLoading"/>
-
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <InputText
                                 v-show="!isLoading"
                                 v-model.trim="name"
                                 fluid
-                                :placeholder="t('placeholders.shopName')"
+                                :placeholder="t('placeholders.fullName')"
                                 size="large"
                                 :class="{ 'p-invalid': errors.name }"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.fullName }}</Message>
                         </label>
 
+                        <label class="block">
+                            <span>{{ t('labels.phoneNumber') }}</span><span class="text-red-500"> *</span>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <PhoneInput v-show="!isLoading" ref="phoneInput" v-model="telephone" v-model:phone-length="phoneLength" />
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.telephone }}</Message>
+                        </label>
+
                         <div class="flex justify-end gap-2 mt-5">
-                            <Skeleton height="2.7rem" width="6.5rem" v-if="isLoading"/>
+                            <Skeleton height="2.7rem" width="7.6rem" v-if="isLoading"/>
                             <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged"/>
                         </div>
                     </form>

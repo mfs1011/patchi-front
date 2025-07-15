@@ -144,7 +144,7 @@ function connectMercure() {
     eventSource.value.addEventListener('message', async (event) => {
         const eventDataId = JSON.parse(event.data).eventId
 
-        if (eventDataId === 8 || eventDataId === 88) {
+        if (eventDataId === 8) {
             await locationStore.fetchLocations(route.query);
         }
     })
