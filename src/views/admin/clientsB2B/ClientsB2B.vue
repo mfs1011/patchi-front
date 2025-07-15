@@ -144,7 +144,7 @@ function connectMercure() {
     eventSource.value.addEventListener('message', async (event) => {
         const eventDataId = JSON.parse(event.data).eventId
 
-        if (eventDataId === 5 || eventDataId === 55) {
+        if (eventDataId === 5) {
             await customerStore.fetchCustomers(route.query);
         }
     })

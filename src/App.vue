@@ -18,7 +18,7 @@ function connectMercure() {
     eventSource.value.addEventListener('message', async (event) => {
         const eventDataId = JSON.parse(event.data).eventId
 
-        if (eventDataId === 1 || eventDataId === 11) {
+        if (eventDataId === 1) {
             await userStore.fetchAboutMe();
 
             if(userStore.getAboutMe.deletedAt) {

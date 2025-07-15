@@ -12,7 +12,6 @@ import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import * as yup from "yup";
 import {useField, useForm} from "vee-validate";
 import Dialog from "@/volt/Dialog.vue";
-import Loader from "@/components/Loader.vue";
 import {useToast} from "primevue/usetoast";
 import {useLocationStore} from "@/stores/location.js";
 import Skeleton from "@/volt/Skeleton.vue";
