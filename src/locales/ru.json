@@ -38,14 +38,26 @@
     "shops": {
         "nominative": "магазин",
         "nominativeCapitalize": "Магазин",
-        "accusative": "магазин",
-        "accusativeCapitalize": "Магазин"
+        "accusative": "магазина",
+        "accusativeCapitalize": "Магазина"
+    },
+    "shop_name": {
+        "nominative": "имя магазин",
+        "nominativeCapitalize": "Имя магазин",
+        "accusative": "имя магазина",
+        "accusativeCapitalize": "Имя магазина"
     },
     "warehouses": {
         "nominative": "склад",
         "nominativeCapitalize": "Склад",
         "accusative": "склад",
         "accusativeCapitalize": "Склад"
+    },
+    "warehouse_name": {
+        "nominative": "имя склада",
+        "nominativeCapitalize": "Имя склада",
+        "accusative": "имя склада",
+        "accusativeCapitalize": "Имя склада"
     },
     "roles": {
         "admin": "Администратор",
@@ -199,6 +211,7 @@
         "edited": "{name} успешно изменен!",
         "deleted": "{name} успешно удален!",
         "restored": "{name} успешно восстановлен!",
-        "already_exists_error": "{field} уже существует"
+        "already_exists_error": "{field} уже существует",
+        "already_exists_error_named": "\"{name}\" с таким именем уже существует"
     }
 }

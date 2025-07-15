@@ -157,7 +157,8 @@ const confirmLeave = () => {
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-fit gap-2 sm:gap-4">
                         <label class="block">
                             <span>{{ t('labels.name') }}</span><span class="text-red-500"> *</span>
-                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <InputText
                                 v-show="!isLoading"
                                 v-model.trim="name"
@@ -172,14 +173,16 @@ const confirmLeave = () => {
 
                         <label class="block">
                             <span>{{ t('labels.phoneNumber') }}</span><span class="text-red-500"> *</span>
-                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <PhoneInput v-show="!isLoading" ref="phoneInput" v-model="telephone" v-model:phone-length="phoneLength" />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.telephone }}</Message>
                         </label>
 
                         <div>
                             <p>{{ t('labels.shop') }}<span class="text-red-500"> *</span></p>
-                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <Select
                                 v-show="!isLoading"
                                 v-model="shop"

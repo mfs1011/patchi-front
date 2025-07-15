@@ -32,6 +32,8 @@ export const useLocationStore = defineStore('location', () => {
 
     const fetchLocations = async (params = { page: 1 }) => {
         try {
+            state.isLoadingLocations = true
+
             const { data } = await authorizedClient.get('/locations', { params });
             state.locations.models = data.member
             state.locations.totalItems = data.totalItems
@@ -40,6 +42,8 @@ export const useLocationStore = defineStore('location', () => {
         } catch (error) {
             console.error(error)
             throw error
+        } finally {
+            state.isLoadingLocations = false
         }
     }
 
