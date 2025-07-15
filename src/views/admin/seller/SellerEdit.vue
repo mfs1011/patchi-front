@@ -143,7 +143,7 @@ const confirmLeave = () => {
 
     <Section
         :section-name="t('sections.sellers.edit')"
-        back-route-name="users"
+        back-route-name="sellers"
         without-buttons
     >
         <template #sectionBody>

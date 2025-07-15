@@ -41,6 +41,12 @@
         "accusative": "shop",
         "accusativeCapitalize": "Shop"
     },
+    "colors": {
+        "nominative": "color",
+        "nominativeCapitalize": "Color",
+        "accusative": "color",
+        "accusativeCapitalize": "Color"
+    },
     "shop_name": {
         "nominative": "shop name",
         "nominativeCapitalize": "Shop name",
@@ -58,6 +64,12 @@
         "nominativeCapitalize": "Warehouse name",
         "accusative": "warehouse name",
         "accusativeCapitalize": "Warehouse name"
+    },
+    "color_name": {
+        "nominative": "color name",
+        "nominativeCapitalize": "Color name",
+        "accusative": "color name",
+        "accusativeCapitalize": "Color name"
     },
     "supplier": {
         "nominative": "supplier",
@@ -85,7 +97,8 @@
         "shopName": "Shop name",
         "warehouseName": "Warehouse name",
         "locations": "Location",
-        "supplierName": "Supplier name"
+        "supplierName": "Supplier name",
+        "colorName": "Color name"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
@@ -93,10 +106,11 @@
         "fullName": "Enter full name...",
         "name": "Enter name...",
         "comment": "Enter comment...",
-        "shopName": "Enter shop name",
-        "warehouseName": "Enter warehouse name",
+        "shopName": "Enter shop name...",
+        "warehouseName": "Enter warehouse name...",
         "search": {
             "byName": "Search by name",
+            "byTitle": "Search by name",
             "byNameAndPhone": "Search by name or phone number",
             "byRole": "Search by role",
             "byWarehouse": "Search by warehouse",
@@ -107,7 +121,8 @@
             "warehouse": "Select warehouse",
             "shop": "Select shop"
         },
-        "supplierName": "Enter supplier name"
+        "supplierName": "Enter supplier name...",
+        "colorName": "Enter color name..."
     },
     "buttons": {
         "login": "Login",
@@ -126,6 +141,7 @@
     "errorMessages": {
         "usernameRequired": "Username is required",
         "nameRequired": "Name is required",
+        "colorNameRequired": "Color name is required",
         "supplierRequired": "Supplier is required",
         "fullNameRequired": "Full name is required",
         "passwordRequired": "Password is required",
@@ -207,6 +223,10 @@
             "edit": "Edit"
         },
         "suppliers": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "colors": {
             "add": "Add",
             "edit": "Edit"
         }

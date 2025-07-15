@@ -91,7 +91,7 @@ const onSubmit = handleSubmit(async values => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.sellers.add')"
+        :section-name="t('sections.clientsB2B.add')"
         back-route-name="clients-b2b"
         without-buttons
     >

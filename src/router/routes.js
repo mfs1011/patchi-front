@@ -334,9 +334,21 @@ export const routes = [
                     },
                     {
                         path: 'colors',
-                        name: 'colors',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/Colors.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'colors',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/color/Colors.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-color',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/color/ColorsAdd.vue')
+                            }
+                        ]
                     },
                     {
                         path: 'kpi',
