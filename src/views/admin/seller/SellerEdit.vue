@@ -16,7 +16,6 @@ import * as yup from "yup";
 import {useSellerStore} from "@/stores/seller.js";
 import {useField, useForm} from "vee-validate";
 import Dialog from "@/volt/Dialog.vue";
-import Loader from "@/components/Loader.vue";
 import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
 
@@ -76,7 +75,7 @@ const onSubmit = handleSubmit(async values => {
 
         return response;
     } catch (error) {
-        throw error
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('phone.nominativeCapitalize') }), life: 3000 })
     }
 })
 

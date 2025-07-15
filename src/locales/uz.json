@@ -29,6 +29,12 @@
         "accusative": "mijozni",
         "accusativeCapitalize": "Mijozni"
     },
+    "phone": {
+        "nominative": "telefon raqami",
+        "nominativeCapitalize": "Telefon raqami",
+        "accusative": "telefon raqamini",
+        "accusativeCapitalize": "Telefon raqamini"
+    },
     "shops": {
         "nominative": "do‘kon",
         "nominativeCapitalize": "Do‘kon",
@@ -189,6 +195,7 @@
         "created": "{name} muvaffaqiyatli yaratildi!",
         "edited": "{name} muvaffaqiyatli o‘zgartirildi!",
         "deleted": "{name} muvaffaqiyatli o‘chirildi!",
-        "restored": "{name} muvaffaqiyatli tiklandi!"
+        "restored": "{name} muvaffaqiyatli tiklandi!",
+        "already_exists_error": "{field} allaqachon mavjud"
     }
 }

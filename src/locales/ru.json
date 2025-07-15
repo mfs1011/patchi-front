@@ -29,6 +29,24 @@
         "accusative": "клиента",
         "accusativeCapitalize": "Клиента"
     },
+    "phone": {
+        "nominative": "номер телефона",
+        "nominativeCapitalize": "Номер телефона",
+        "accusative": "номер телефона",
+        "accusativeCapitalize": "Номер телефона"
+    },
+    "shops": {
+        "nominative": "магазин",
+        "nominativeCapitalize": "Магазин",
+        "accusative": "магазин",
+        "accusativeCapitalize": "Магазин"
+    },
+    "warehouses": {
+        "nominative": "склад",
+        "nominativeCapitalize": "Склад",
+        "accusative": "склад",
+        "accusativeCapitalize": "Склад"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",
@@ -48,7 +66,7 @@
         "comment": "Комментарий",
         "shopName": "Имя магазина",
         "warehouseName": "Имя склада",
-        "locations": "Локатция"
+        "locations": "Локация"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -56,6 +74,8 @@
         "fullName": "Введите полное имя...",
         "name": "Введите имя...",
         "comment": "Введите комментарий...",
+        "shopName": "Введите имя магазина",
+        "warehouseName": "Введите имя склада",
         "search": {
             "byName": "Поиск по имени",
             "byNameAndPhone": "Поиск по имени или номеру телефона",
@@ -81,7 +101,7 @@
         "newShop": "Новый магазин",
         "newCollection": "Новая коллекция",
         "newColor": "Новый цвет",
-        "filters": "Филтры"
+        "filters": "Фильтры"
     },
     "errorMessages": {
         "usernameRequired": "Имя пользователя обязательно",
@@ -120,7 +140,7 @@
         "clientsB2B": "Корпоративные клиенты",
         "clientsB2C": "Клиенты бутиков",
         "suppliers": "Поставщики",
-        "products": "Товары на магазине",
+        "products": "Товары",
         "warehouses": "Склады",
         "shops": "Магазины",
         "categories": "Категории",
@@ -156,6 +176,14 @@
         "clientsB2C": {
             "add": "Добавить",
             "edit": "Изменить"
+        },
+        "shops": {
+            "add": "Добавить",
+            "edit": "Изменить"
+        },
+        "warehouses": {
+            "add": "Добавить",
+            "edit": "Изменить"
         }
     },
     "pagination": {
@@ -166,6 +194,8 @@
         "success": "Успешно!",
         "created": "{name} успешно создан!",
         "edited": "{name} успешно изменен!",
-        "restored": "{name} успешно восстановлен!"
+        "deleted": "{name} успешно удален!",
+        "restored": "{name} успешно восстановлен!",
+        "already_exists_error": "{field} уже существует"
     }
 }

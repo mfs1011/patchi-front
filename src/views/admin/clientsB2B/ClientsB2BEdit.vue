@@ -14,9 +14,9 @@ import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import * as yup from "yup";
 import {useField, useForm} from "vee-validate";
 import Dialog from "@/volt/Dialog.vue";
-import Loader from "@/components/Loader.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useToast} from "primevue/usetoast";
+import Skeleton from "@/volt/Skeleton.vue";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -66,13 +66,14 @@ const onSubmit = handleSubmit(async values => {
         const response = await customerStore.putCustomer(payload, route.params.id)
         isEdited.value = true
 
+        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('client.nominativeCapitalize') }), life: 3000 })
+
         resetForm()
         router.back()
 
-        toast.add({ severity: 'success', summary: t('toast.edited', { name: 'Mijoz' }), life: 3000 })
         return response;
     } catch (error) {
-        throw error
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('phone.nominativeCapitalize') }), life: 3000 })
     }
 })
 
@@ -141,9 +142,7 @@ const confirmLeave = () => {
         without-buttons
     >
         <template #sectionBody>
-            <Loader v-if="isLoading"/>
             <Card
-                v-show="!isLoading"
                 pt:root="sm:w-fit overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
@@ -153,7 +152,9 @@ const confirmLeave = () => {
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-fit gap-2 sm:gap-4">
                         <label class="block">
                             <span>{{ t('labels.name') }}</span><span class="text-red-500"> *</span>
+                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <InputText
+                                v-show="!isLoading"
                                 v-model.trim="name"
                                 fluid
                                 :placeholder="t('placeholders.fullName')"
@@ -165,14 +166,17 @@ const confirmLeave = () => {
 
                         <label class="block">
                             <span>{{ t('labels.phoneNumber') }}</span><span class="text-red-500"> *</span>
-                            <PhoneInput ref="phoneInput" v-model="telephone" v-model:phone-length="phoneLength" />
+                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <PhoneInput v-show="!isLoading" ref="phoneInput" v-model="telephone" v-model:phone-length="phoneLength" />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.telephone }}</Message>
                         </label>
 
                         <label class="block">
                             <span>{{ t('labels.comment') }}</span>
 
+                            <Skeleton height="10rem" width="26.8rem" v-if="isLoading"/>
                             <Textarea
+                                v-show="!isLoading"
                                 v-model="comment"
                                 rows="5"
                                 class="resize-none"
@@ -185,7 +189,8 @@ const confirmLeave = () => {
                         </label>
 
                         <div class="flex justify-end gap-2 mt-5">
-                            <Button type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged"/>
+                            <Skeleton height="2.7rem" width="7.6rem" v-if="isLoading"/>
+                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged"/>
                         </div>
                     </form>
                 </template>
