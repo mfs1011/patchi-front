@@ -322,9 +322,27 @@ export const routes = [
                     },
                     {
                         path: 'categories',
-                        name: 'categories',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/Categories.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'categories',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/category/Categories.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-category',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/category/CategoriesAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-category',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/category/CategoriesEdit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'currency-rates',

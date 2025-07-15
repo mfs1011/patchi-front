@@ -23,6 +23,12 @@
         "accusative": "продавца",
         "accusativeCapitalize": "Продавца"
     },
+    "categories": {
+        "nominative": "категория",
+        "nominativeCapitalize": "Категория",
+        "accusative": "категорию",
+        "accusativeCapitalize": "Категорию"
+    },
     "client": {
         "nominative": "клиент",
         "nominativeCapitalize": "Клиент",
@@ -65,6 +71,12 @@
         "accusative": "имя склада",
         "accusativeCapitalize": "Имя склада"
     },
+    "category_name": {
+        "nominative": "название категории",
+        "nominativeCapitalize": "Название категории",
+        "accusative": "название категории",
+        "accusativeCapitalize": "Название категории"
+    },
     "color_name": {
         "nominative": "название цвета",
         "nominativeCapitalize": "Название цвета",
@@ -98,7 +110,10 @@
         "warehouseName": "Имя склада",
         "locations": "Локация",
         "supplierName": "Имя поставщика",
-        "colorName": "Название цвета"
+        "colorName": "Название цвета",
+        "categoryType": "Тип категории",
+        "categoryName": "Название категории",
+        "unit": "Единица"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -114,15 +129,20 @@
             "byNameAndPhone": "Поиск по имени или номеру телефона",
             "byRole": "Поиск по роли",
             "byWarehouse": "Поиск по складу",
-            "byShop": "Поиск по магазину"
+            "byShop": "Поиск по магазину",
+            "byUnit": "Поиск по единицу",
+            "byCategoryType": "Поиск по типу категории"
         },
         "select": {
             "role": "Выберите роль",
             "warehouse": "Выберите склад",
-            "shop": "Выберите магазин"
+            "shop": "Выберите магазин",
+            "categoryType": "Выберите тип категории",
+            "unit": "Выберите единицу"
         },
         "supplierName": "Введите имя поставщика...",
-        "colorName": "Введите название цвета..."
+        "colorName": "Введите название цвета...",
+        "categoryName": "Введите название категории..."
     },
     "buttons": {
         "login": "Войти",
@@ -141,6 +161,9 @@
     "errorMessages": {
         "usernameRequired": "Имя пользователя обязательно",
         "nameRequired": "Имя обязательно",
+        "categoryTypeRequired": "Тип категории обязательно",
+        "categoryNameRequired": "Название категории обязательно",
+        "unitRequired": "Единица обязательно",
         "colorNameRequired": "Название цвета обязательно",
         "supplierRequired": "Поставщик обязателен",
         "fullNameRequired": "Полное имя обязательно",
@@ -230,6 +253,10 @@
             "edit": "Изменить"
         },
         "colors": {
+            "add": "Добавить",
+            "edit": "Изменить"
+        },
+        "categories": {
             "add": "Добавить",
             "edit": "Изменить"
         }

@@ -23,6 +23,12 @@
         "accusative": "seller",
         "accusativeCapitalize": "Seller"
     },
+    "categories": {
+        "nominative": "category",
+        "nominativeCapitalize": "Category",
+        "accusative": "category",
+        "accusativeCapitalize": "Category"
+    },
     "client": {
         "nominative": "client",
         "nominativeCapitalize": "Client",
@@ -65,6 +71,12 @@
         "accusative": "warehouse name",
         "accusativeCapitalize": "Warehouse name"
     },
+    "category_name": {
+        "nominative": "category name",
+        "nominativeCapitalize": "Category name",
+        "accusative": "category name",
+        "accusativeCapitalize": "Category name"
+    },
     "color_name": {
         "nominative": "color name",
         "nominativeCapitalize": "Color name",
@@ -98,7 +110,10 @@
         "warehouseName": "Warehouse name",
         "locations": "Location",
         "supplierName": "Supplier name",
-        "colorName": "Color name"
+        "colorName": "Color name",
+        "categoryType": "Category type",
+        "categoryName": "Category name",
+        "unit": "Unit"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
@@ -114,15 +129,20 @@
             "byNameAndPhone": "Search by name or phone number",
             "byRole": "Search by role",
             "byWarehouse": "Search by warehouse",
-            "byShop": "Search by shop"
+            "byShop": "Search by shop",
+            "byUnit": "Search by unit",
+            "byCategoryType": "Search by category type"
         },
         "select": {
             "role": "Select role",
             "warehouse": "Select warehouse",
-            "shop": "Select shop"
+            "shop": "Select shop",
+            "categoryType": "Select category type",
+            "unit": "Select unit"
         },
         "supplierName": "Enter supplier name...",
-        "colorName": "Enter color name..."
+        "colorName": "Enter color name...",
+        "categoryName": "Enter category name..."
     },
     "buttons": {
         "login": "Login",
@@ -141,6 +161,9 @@
     "errorMessages": {
         "usernameRequired": "Username is required",
         "nameRequired": "Name is required",
+        "categoryTypeRequired": "Category type is required",
+        "categoryNameRequired": "Category name is required",
+        "unitRequired": "Unit is required",
         "colorNameRequired": "Color name is required",
         "supplierRequired": "Supplier is required",
         "fullNameRequired": "Full name is required",
@@ -230,6 +253,10 @@
             "edit": "Edit"
         },
         "colors": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "categories": {
             "add": "Add",
             "edit": "Edit"
         }
