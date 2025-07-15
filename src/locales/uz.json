@@ -59,6 +59,12 @@
         "accusative": "ombor nomini",
         "accusativeCapitalize": "Ombor nomini"
     },
+    "supplier": {
+        "nominative": "ta'minotchi",
+        "nominativeCapitalize": "Ta'minotchi",
+        "accusative": "ta'minotchini",
+        "accusativeCapitalize": "Ta'minotchini"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Sotuvchi",
@@ -78,7 +84,8 @@
         "shopName": "Do‘kon nomi",
         "warehouseName": "Ombor nomi",
         "comment": "Izoh",
-        "locations": "Joylashuvi"
+        "locations": "Joylashuvi",
+        "supplierName": "Ta'minotchi nomi"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
@@ -99,7 +106,8 @@
             "shop": "Do‘kon tanlang"
         },
         "shopName": "Do‘kon nomini kiriting",
-        "warehouseName": "Ombor nomini kiriting"
+        "warehouseName": "Ombor nomini kiriting",
+        "supplierName": "Ta'minotchi nomini kiriting"
     },
     "buttons": {
         "login": "Kirish",
@@ -117,6 +125,7 @@
     },
     "errorMessages": {
         "usernameRequired": "Username kiritish majburiy",
+        "supplierRequired": "Ta'minochi kiritish majburiy",
         "nameRequired": "Ism kiritish majburiy",
         "fullNameRequired": "To‘liq ism kiritish majburiy",
         "passwordRequired": "Parol kiritish majburiy",
@@ -194,6 +203,10 @@
             "edit": "O‘zgartirish"
         },
         "warehouses": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "suppliers": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
         }

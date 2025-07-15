@@ -59,6 +59,12 @@
         "accusative": "warehouse name",
         "accusativeCapitalize": "Warehouse name"
     },
+    "supplier": {
+        "nominative": "supplier",
+        "nominativeCapitalize": "Supplier",
+        "accusative": "supplier",
+        "accusativeCapitalize": "Supplier"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
@@ -78,7 +84,8 @@
         "comment": "Comment",
         "shopName": "Shop name",
         "warehouseName": "Warehouse name",
-        "locations": "Location"
+        "locations": "Location",
+        "supplierName": "Supplier name"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
@@ -99,7 +106,8 @@
             "role": "Select role",
             "warehouse": "Select warehouse",
             "shop": "Select shop"
-        }
+        },
+        "supplierName": "Enter supplier name"
     },
     "buttons": {
         "login": "Login",
@@ -118,6 +126,7 @@
     "errorMessages": {
         "usernameRequired": "Username is required",
         "nameRequired": "Name is required",
+        "supplierRequired": "Supplier is required",
         "fullNameRequired": "Full name is required",
         "passwordRequired": "Password is required",
         "phoneNumberRequired": "Phone number is required",
@@ -194,6 +203,10 @@
             "edit": "Edit"
         },
         "warehouses": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "suppliers": {
             "add": "Add",
             "edit": "Edit"
         }
