@@ -17,7 +17,10 @@ import {useSellerStore} from "@/stores/seller.js";
 import {useField, useForm} from "vee-validate";
 import Dialog from "@/volt/Dialog.vue";
 import Loader from "@/components/Loader.vue";
+import {useToast} from "primevue/usetoast";
+import Skeleton from "@/volt/Skeleton.vue";
 
+const toast = useToast();
 const { t } = useI18n()
 
 const phoneLength = ref();
@@ -65,6 +68,8 @@ const onSubmit = handleSubmit(async values => {
     try {
         const response = await sellerStore.putSeller(payload, route.params.id)
         isEdited.value = true
+
+        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('seller.nominativeCapitalize') }), life: 3000 })
 
         resetForm()
         router.back()
@@ -143,9 +148,7 @@ const confirmLeave = () => {
         without-buttons
     >
         <template #sectionBody>
-            <Loader v-if="isLoading"/>
             <Card
-                v-show="!isLoading"
                 pt:root="sm:w-fit overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
@@ -155,7 +158,9 @@ const confirmLeave = () => {
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-fit gap-2 sm:gap-4">
                         <label class="block">
                             <span>{{ t('labels.name') }}</span><span class="text-red-500"> *</span>
+                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <InputText
+                                v-show="!isLoading"
                                 v-model.trim="name"
                                 fluid
                                 :placeholder="t('placeholders.fullName')"
@@ -168,14 +173,16 @@ const confirmLeave = () => {
 
                         <label class="block">
                             <span>{{ t('labels.phoneNumber') }}</span><span class="text-red-500"> *</span>
-                            <PhoneInput ref="phoneInput" v-model="telephone" v-model:phone-length="phoneLength" />
+                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <PhoneInput v-show="!isLoading" ref="phoneInput" v-model="telephone" v-model:phone-length="phoneLength" />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.telephone }}</Message>
                         </label>
 
                         <div>
                             <p>{{ t('labels.shop') }}<span class="text-red-500"> *</span></p>
-
+                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <Select
+                                v-show="!isLoading"
                                 v-model="shop"
                                 :options="locationStore.getLocations.models"
                                 option-label="name"
@@ -189,7 +196,8 @@ const confirmLeave = () => {
                         </div>
 
                         <div class="flex justify-end gap-2 mt-5">
-                            <Button type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged"/>
+                            <Skeleton height="2.7rem" width="6.5rem" v-if="isLoading"/>
+                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged"/>
                         </div>
                     </form>
                 </template>
@@ -222,7 +230,3 @@ const confirmLeave = () => {
         </template>
     </Section>
 </template>
-
-<style scoped>
-
-</style>

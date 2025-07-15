@@ -20,6 +20,7 @@ import MultiSelect from "@/volt/MultiSelect.vue";
 import Dialog from "@/volt/Dialog.vue";
 import Loader from "@/components/Loader.vue";
 import {useToast} from "primevue/usetoast";
+import Skeleton from "@/volt/Skeleton.vue";
 
 const toast = useToast();
 const { t } = useI18n();
@@ -130,8 +131,8 @@ const onSubmit = handleSubmit(async values => {
 
         toast.add({ severity: 'success', summary: t('toast.edited', { name: t('user.nominativeCapitalize') }), life: 3000 })
 
-        await router.push({ name: "users" })
         resetForm()
+        router.back()
 
 
         return response;
@@ -250,9 +251,7 @@ const confirmLeave = () => {
         without-buttons
     >
         <template #sectionBody>
-            <Loader v-if="isLoading"/>
             <Card
-                v-else
                 pt:root="sm:w-fit overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
@@ -262,7 +261,9 @@ const confirmLeave = () => {
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-fit gap-2 sm:gap-4">
                         <label class="block">
                             <span>{{ t('labels.fullName') }}</span><span class="text-red-500"> *</span>
+                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <InputText
+                                v-show="!isLoading"
                                 v-model.trim="fullName"
                                 fluid
                                 :placeholder="t('placeholders.fullName')"
@@ -275,13 +276,18 @@ const confirmLeave = () => {
 
                         <label class="mb-2 block">
                             <span>{{ t('labels.phoneNumber') }}</span><span class="text-red-500"> *</span>
-                            <PhoneInput ref="phoneInput" v-model="phoneNumber" v-model:phone-length="phoneLength" />
+
+                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <PhoneInput v-show="!isLoading" ref="phoneInput" v-model="phoneNumber" v-model:phone-length="phoneLength" />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.phoneNumber }}</Message>
                         </label>
 
                         <label class="mb-2 block mt-1">
                             <span>{{ t('labels.password') }}</span>
+
+                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <InputText
+                                v-show="!isLoading"
                                 v-model.trim="password"
                                 id="password"
                                 fluid
@@ -296,7 +302,9 @@ const confirmLeave = () => {
                         <div class="mb-2 mt-1">
                             <p>{{ t('labels.role') }}<span class="text-red-500"> *</span></p>
 
+                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <Select
+                                v-show="!isLoading"
                                 v-model="role"
                                 :options="getRolesList"
                                 option-label="name"
@@ -311,7 +319,9 @@ const confirmLeave = () => {
                         <div v-if="role === 2" class="mb-2 mt-1">
                             <p>{{ t('labels.warehouse') }}<span class="text-red-500"> *</span></p>
 
+                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading || !locationStore.getLocations.models.length"/>
                             <MultiSelect
+                                v-else
                                 v-model="warehouse"
                                 :options="locationStore.getLocations.models"
                                 :maxSelectedLabels="3"
@@ -328,7 +338,9 @@ const confirmLeave = () => {
                         <div v-if="role === 3" class="mb-2 mt-1">
                             <p>{{ t('labels.shop') }}</p>
 
+                            <Skeleton height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <Select
+                                v-show="!isLoading"
                                 v-model="shop"
                                 :options="locationStore.getLocations.models"
                                 option-label="name"
@@ -343,7 +355,8 @@ const confirmLeave = () => {
 
 
                         <div class="flex justify-end gap-2 mt-5">
-                            <Button type="submit" :label="t('dialog.confirm')" class="px-5" :disabled="!isChanged" :loading="isSubmitting"/>
+                            <Skeleton height="2.7rem" width="6.5rem" v-if="isLoading"/>
+                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :disabled="!isChanged" :loading="isSubmitting"/>
                         </div>
                     </form>
                 </template>

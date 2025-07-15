@@ -131,6 +131,7 @@ const restoreUser = async () => {
     await userStore.restoreUser(currentUserId.value);
     isDeleteLoading.value = false;
     visible.value.restoreVisible = false;
+    toast.add({ severity: 'success', summary: t('toast.restored', { name: t('user.nominativeCapitalize') }), life: 3000 })
 };
 
 const deleteAction = (id) => {
@@ -295,7 +296,6 @@ onBeforeRouteLeave(() => {
         </template>
         <template #sectionBody>
             <!-- FILTERS OF TABLE ITEMS -->
-<!--            <Loader v-if="userStore.getIsLoadingUsers" class="my-auto" />-->
 
             <NoData v-if="!userStore.getUsers.totalItems && !userStore.getIsLoadingUsers" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
