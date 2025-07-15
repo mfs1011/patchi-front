@@ -41,6 +41,12 @@
         "accusative": "do‘konni",
         "accusativeCapitalize": "Do‘konni"
     },
+    "colors": {
+        "nominative": "rang",
+        "nominativeCapitalize": "Rang",
+        "accusative": "rangni",
+        "accusativeCapitalize": "Rangni"
+    },
     "shop_name": {
         "nominative": "do‘kon nomi",
         "nominativeCapitalize": "Do‘kon nomi",
@@ -58,6 +64,12 @@
         "nominativeCapitalize": "Ombor nomi",
         "accusative": "ombor nomini",
         "accusativeCapitalize": "Ombor nomini"
+    },
+    "color_name": {
+        "nominative": "rang nomi",
+        "nominativeCapitalize": "Rang nomi",
+        "accusative": "rang nomini",
+        "accusativeCapitalize": "Rang nomini"
     },
     "supplier": {
         "nominative": "ta'minotchi",
@@ -85,7 +97,8 @@
         "warehouseName": "Ombor nomi",
         "comment": "Izoh",
         "locations": "Joylashuvi",
-        "supplierName": "Ta'minotchi nomi"
+        "supplierName": "Ta'minotchi nomi",
+        "colorName": "Rang nomi"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
@@ -95,6 +108,7 @@
         "comment": "Izoh kiriting...",
         "search": {
             "byName": "Ism bo‘yicha qidiruv",
+            "byTitle": "Nomi bo‘yicha qidiruv",
             "byNameAndPhone": "Ism yoki telefon raqam orqali qidiruv",
             "byRole": "Rol bo‘yicha qidiruv",
             "byWarehouse": "Ombor bo‘yicha qidiruv",
@@ -105,9 +119,10 @@
             "warehouse": "Ombor tanlang",
             "shop": "Do‘kon tanlang"
         },
-        "shopName": "Do‘kon nomini kiriting",
-        "warehouseName": "Ombor nomini kiriting",
-        "supplierName": "Ta'minotchi nomini kiriting"
+        "shopName": "Do‘kon nomini kiriting...",
+        "warehouseName": "Ombor nomini kiriting...",
+        "supplierName": "Ta'minotchi nomini kiriting...",
+        "colorName": "Rang nomini kiriting..."
     },
     "buttons": {
         "login": "Kirish",
@@ -127,6 +142,7 @@
         "usernameRequired": "Username kiritish majburiy",
         "supplierRequired": "Ta'minochi kiritish majburiy",
         "nameRequired": "Ism kiritish majburiy",
+        "colorNameRequired": "Rang nomini kiritish majburiy",
         "fullNameRequired": "To‘liq ism kiritish majburiy",
         "passwordRequired": "Parol kiritish majburiy",
         "phoneNumberRequired": "Telefon raqamini kiritish majburiy",
@@ -210,6 +226,10 @@
             "edit": "O‘zgartirish"
         },
         "suppliers": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "colors": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
         }

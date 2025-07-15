@@ -97,7 +97,7 @@ onMounted(() => {
 
     <Section
         :section-name="t('sections.sellers.add')"
-        back-route-name="users"
+        back-route-name="sellers"
         without-buttons
     >
         <template #sectionBody>

@@ -41,6 +41,12 @@
         "accusative": "магазина",
         "accusativeCapitalize": "Магазина"
     },
+    "colors": {
+        "nominative": "цвет",
+        "nominativeCapitalize": "Цвет",
+        "accusative": "цвета",
+        "accusativeCapitalize": "Цвета"
+    },
     "shop_name": {
         "nominative": "имя магазин",
         "nominativeCapitalize": "Имя магазин",
@@ -58,6 +64,12 @@
         "nominativeCapitalize": "Имя склада",
         "accusative": "имя склада",
         "accusativeCapitalize": "Имя склада"
+    },
+    "color_name": {
+        "nominative": "название цвета",
+        "nominativeCapitalize": "Название цвета",
+        "accusative": "название цвета",
+        "accusativeCapitalize": "Название цвета"
     },
     "supplier": {
         "nominative": "поставщик",
@@ -85,7 +97,8 @@
         "shopName": "Имя магазина",
         "warehouseName": "Имя склада",
         "locations": "Локация",
-        "supplierName": "Имя поставщика"
+        "supplierName": "Имя поставщика",
+        "colorName": "Название цвета"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -93,10 +106,11 @@
         "fullName": "Введите полное имя...",
         "name": "Введите имя...",
         "comment": "Введите комментарий...",
-        "shopName": "Введите имя магазина",
-        "warehouseName": "Введите имя склада",
+        "shopName": "Введите имя магазина...",
+        "warehouseName": "Введите имя склада...",
         "search": {
             "byName": "Поиск по имени",
+            "byTitle": "Поиск по названию",
             "byNameAndPhone": "Поиск по имени или номеру телефона",
             "byRole": "Поиск по роли",
             "byWarehouse": "Поиск по складу",
@@ -107,7 +121,8 @@
             "warehouse": "Выберите склад",
             "shop": "Выберите магазин"
         },
-        "supplierName": "Введите имя поставщика"
+        "supplierName": "Введите имя поставщика...",
+        "colorName": "Введите название цвета..."
     },
     "buttons": {
         "login": "Войти",
@@ -126,6 +141,7 @@
     "errorMessages": {
         "usernameRequired": "Имя пользователя обязательно",
         "nameRequired": "Имя обязательно",
+        "colorNameRequired": "Название цвета обязательно",
         "supplierRequired": "Поставщик обязателен",
         "fullNameRequired": "Полное имя обязательно",
         "passwordRequired": "Пароль обязателен",
@@ -210,6 +226,10 @@
             "edit": "Изменить"
         },
         "suppliers": {
+            "add": "Добавить",
+            "edit": "Изменить"
+        },
+        "colors": {
             "add": "Добавить",
             "edit": "Изменить"
         }

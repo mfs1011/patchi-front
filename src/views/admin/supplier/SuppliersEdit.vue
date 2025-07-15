@@ -133,8 +133,8 @@ const confirmLeave = () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.sellers.edit')"
-        back-route-name="clients-b2b"
+        :section-name="t('sections.suppliers.edit')"
+        back-route-name="suppliers"
         without-buttons
     >
         <template #sectionBody>
