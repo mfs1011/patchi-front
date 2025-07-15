@@ -18,7 +18,6 @@ import {useUserStore} from "@/stores/user.js";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import MultiSelect from "@/volt/MultiSelect.vue";
 import Dialog from "@/volt/Dialog.vue";
-import Loader from "@/components/Loader.vue";
 import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
 
@@ -134,10 +133,9 @@ const onSubmit = handleSubmit(async values => {
         resetForm()
         router.back()
 
-
         return response;
     } catch (error) {
-        throw error
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('phone.nominativeCapitalize') }), life: 3000 })
     } finally {
         isConfirmLoading.value = false
     }

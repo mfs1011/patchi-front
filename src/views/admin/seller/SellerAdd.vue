@@ -64,7 +64,7 @@ const onSubmit = handleSubmit(async values => {
 
         return response;
     } catch (error) {
-        throw error
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('phone.nominativeCapitalize') }), life: 3000 })
     }
 })
 

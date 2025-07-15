@@ -29,6 +29,24 @@
         "accusative": "client",
         "accusativeCapitalize": "Client"
     },
+    "phone": {
+        "nominative": "phone number",
+        "nominativeCapitalize": "Phone number",
+        "accusative": "phone number",
+        "accusativeCapitalize": "Phone number"
+    },
+    "shops": {
+        "nominative": "shop",
+        "nominativeCapitalize": "Shop",
+        "accusative": "shop",
+        "accusativeCapitalize": "Shop"
+    },
+    "warehouses": {
+        "nominative": "warehouse",
+        "nominativeCapitalize": "Warehouse",
+        "accusative": "warehouse",
+        "accusativeCapitalize": "Warehouse"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
@@ -56,6 +74,8 @@
         "fullName": "Enter full name...",
         "name": "Enter name...",
         "comment": "Enter comment...",
+        "shopName": "Enter shop name",
+        "warehouseName": "Enter warehouse name",
         "search": {
             "byName": "Search by name",
             "byNameAndPhone": "Search by name or phone number",
@@ -111,8 +131,8 @@
         "leaveFromEditMessage": "Your unsaved changes will be lost. Do you really want to leave?"
     },
     "authErrorMessage": "Username or password is incorrect.",
-    "authForbiddenErrorMessage": "Your account is awaiting administrator approval.",
     "internalErrorMessage": "An error occurred, please try again later.",
+    "authForbiddenErrorMessage": "Your account is awaiting administrator approval.",
     "recoverPassword": "To recover your password, please contact the administrator.",
     "cards": {
         "users": "Users",
@@ -159,6 +179,14 @@
         "clientsB2C": {
             "add": "Add",
             "edit": "Edit"
+        },
+        "shops": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "warehouses": {
+            "add": "Add",
+            "edit": "Edit"
         }
     },
     "pagination": {
@@ -170,6 +198,7 @@
         "created": "{name} successfully created!",
         "edited": "{name} successfully updated!",
         "deleted": "{name} successfully deleted!",
-        "restored": "{name} successfully restored!"
+        "restored": "{name} successfully restored!",
+        "already_exists_error": "{field} already exists"
     }
 }

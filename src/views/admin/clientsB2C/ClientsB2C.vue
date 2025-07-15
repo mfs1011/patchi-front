@@ -2,16 +2,15 @@
 import Section from "@/components/UI/Section.vue";
 import { useI18n } from "vue-i18n";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {useRoute, useRouter} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useLocationStore} from "@/stores/location.js";
-import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
 import {formatPhoneByCountry} from "@/helpers/phoneFormat.js";
 import NoData from "@/components/UI/NoData.vue";
 import Dialog from "@/volt/Dialog.vue";
 import Button from "@/volt/Button.vue";
-import Loader from "@/components/Loader.vue";
 import Card from "@/volt/Card.vue";
 import DataTable from "@/volt/DataTable.vue";
 import Column from "primevue/column";
@@ -19,10 +18,13 @@ import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import InputText from "@/volt/InputText.vue";
 import SelectButton from "@/volt/SelectButton.vue";
+import {useToast} from "primevue/usetoast";
+import Skeleton from "@/volt/Skeleton.vue";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const toast = useToast();
 
 const customerStore = useCustomerStore()
 const locationStore = useLocationStore()
@@ -118,7 +120,7 @@ const restoreAction = (id) => {
 const deleteCustomer = async () => {
     isDeleteLoading.value = true;
     await customerStore.deleteCustomer(currentCustomerId.value);
-    await customerStore.fetchCustomers(route.query, false);
+    toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('client.nominativeCapitalize') }), life: 3000 })
     isDeleteLoading.value = false;
     visible.value.deleteVisible = false;
 };
@@ -126,9 +128,9 @@ const deleteCustomer = async () => {
 const restoreCustomer = async () => {
     isDeleteLoading.value = true;
     await customerStore.restoreCustomer(currentCustomerId.value);
-    await customerStore.fetchCustomers(route.query, false);
     isDeleteLoading.value = false;
     visible.value.restoreVisible = false;
+    toast.add({ severity: 'success', summary: t('toast.restored', { name: t('client.nominativeCapitalize') }), life: 3000 })
 };
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
@@ -156,7 +158,7 @@ onMounted(() => {
     connectMercure()
 })
 
-onBeforeUnmount(() => {
+onBeforeRouteLeave(() => {
     if (eventSource.value) {
         eventSource.value.close()
     }
@@ -258,15 +260,14 @@ onBeforeUnmount(() => {
 
         <template #sectionBody>
             <!-- FILTERS OF TABLE ITEMS -->
-            <Loader v-if="customerStore.getIsLoadingCustomers" class="my-auto" />
 
-            <NoData v-else-if="!customerStore.getCustomers.totalItems" class="text-surface-400 mx-auto my-auto">
+            <NoData v-if="!customerStore.getCustomers.totalItems && !customerStore.getIsLoadingCustomers" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
 
             <!-- TABLE OF USERS -->
             <Card
-                v-else
+                v-if="customerStore.getIsLoadingCustomers || customerStore.getCustomers.totalItems > 0"
                 pt:root="overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
@@ -275,24 +276,35 @@ onBeforeUnmount(() => {
                 <template #content>
                     <DataTable
                         ref="data-table"
-                        :value="customerStore.getCustomers.models"
+                        :value="customerStore.getIsLoadingCustomers ?  Array(10).fill({}) : customerStore.getCustomers.models"
                         :total-records="customerStore.getCustomers.totalItems"
                         :rows="filters.itemsPerPage"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
                         pt:root="border border-surface-300 dark:border-surface-600/50"
-                        :loading="customerStore.getIsLoadingCustomers"
                     >
-                        <Column field="id" :header="t('labels.id')"></Column>
-                        <Column field="name" :header="t('labels.name')"></Column>
+                        <Column field="id" :header="t('labels.id')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="customerStore.getIsLoadingCustomers"/>
+                                <p v-else>{{ data.id }}</p>
+                            </template>
+                        </Column>
+                        <Column field="name" :header="t('labels.name')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="customerStore.getIsLoadingCustomers"/>
+                                <p v-else>{{ data.name }}</p>
+                            </template>
+                        </Column>
                         <Column field="telephone" :header="t('labels.phoneNumber')">
                             <template #body="{ data }">
-                                <p>{{ formatPhoneByCountry(data.telephone) }}</p>
+                                <Skeleton height="2rem" v-if="customerStore.getIsLoadingCustomers"/>
+                                <p v-else>{{ formatPhoneByCountry(data.telephone) }}</p>
                             </template>
                         </Column>
                         <Column field="comment" :header="t('labels.comment')">
                             <template #body="{ data }">
-                                <p>{{ data.comment }}</p>
+                                <Skeleton height="2rem" v-if="customerStore.getIsLoadingCustomers"/>
+                                <p v-else>{{ data.comment }}</p>
                             </template>
                         </Column>
                         <Column field="id" class="flex justify-end">
@@ -300,36 +312,43 @@ onBeforeUnmount(() => {
                                 <p class="font-semibold">{{ t('actions') }}</p>
                             </template>
                             <template #body="{ data }">
-                                <div v-if="route.query['is-delete'] === 'false'" class="flex items-center gap-2">
-                                    <Button
-                                        @click="router.push({
-                                        name: 'edit-client-b2c',
-                                        params: { id: data.id },
-                                    })"
-                                        icon="pi pi-pencil"
-                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
-                                        size="small"
-                                    />
-                                    <Button
-                                        @click="deleteAction(data.id)"
-                                        icon="pi pi-trash"
-                                        pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
-                                        size="small"
-                                    />
-                                </div>
-                                <div v-else class="flex items-center gap-2">
-                                    <Button
-                                        @click="restoreAction(data.id)"
-                                        icon="pi pi-replay"
-                                        pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
-                                        size="small"
-                                    />
+                                <Skeleton height="2rem" v-if="customerStore.getIsLoadingCustomers"/>
+                                <div v-else>
+                                    <div v-if="route.query['is-delete'] === 'false'" class="flex items-center gap-2">
+                                        <Button
+                                            @click="router.push({
+                                                name: 'edit-client-b2c',
+                                                params: { id: data.id },
+                                            })"
+                                            icon="pi pi-pencil"
+                                            pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
+                                            size="small"
+                                        />
+                                        <Button
+                                            @click="deleteAction(data.id)"
+                                            icon="pi pi-trash"
+                                            pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
+                                            size="small"
+                                        />
+                                    </div>
+                                    <div v-else class="flex items-center gap-2">
+                                        <Button
+                                            @click="restoreAction(data.id)"
+                                            icon="pi pi-replay"
+                                            pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                                            size="small"
+                                        />
+                                    </div>
                                 </div>
                             </template>
                         </Column>
 
                         <template #footer>
-                            <div class="flex flex-wrap items-center justify-end gap-5">
+                            <div v-if="customerStore.getIsLoadingCustomers" class="flex justify-between">
+                                <Skeleton height="2rem" width="10rem" />
+                                <Skeleton height="2rem" width="5rem"/>
+                            </div>
+                            <div v-else class="flex flex-wrap items-center justify-end gap-5">
                                 <PaginatorComponent
                                     v-model="filters.page"
                                     v-model:items-per-page="filters.itemsPerPage"

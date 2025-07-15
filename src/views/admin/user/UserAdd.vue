@@ -105,15 +105,14 @@ const onSubmit = handleSubmit(async values => {
 
     try {
         const response = await userStore.pushUser(payload)
-
         toast.add({ severity: 'success', summary: t('toast.created', { name: t('user.nominativeCapitalize') }), life: 3000 })
-        resetForm()
 
-        await router.push({ name: "users" })
+        router.back()
+        resetForm()
 
         return response;
     } catch (error) {
-        throw error
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('phone.nominativeCapitalize') }), life: 3000 })
     }
 })
 
