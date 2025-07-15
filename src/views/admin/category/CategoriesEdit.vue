@@ -158,7 +158,7 @@ const confirmLeave = () => {
                         <label class="block">
                             <span>{{ t('labels.warehouseName') }}</span><span class="text-red-500"> *</span>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
-                            <Skeleton class="hidden sm:block" height="3.1rem" width="22.8rem" v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="20.8rem" v-if="isLoading"/>
 
                             <InputText
                                 v-show="!isLoading"
@@ -174,7 +174,7 @@ const confirmLeave = () => {
                             <p class="inline">{{ t('labels.categoryType') }}</p><span class="text-red-500"> *</span>
 
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
-                            <Skeleton class="hidden sm:block" height="3.1rem" width="22.8rem" v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="20.8rem" v-if="isLoading"/>
 
                             <Select
                                 v-show="!isLoading"
@@ -194,7 +194,7 @@ const confirmLeave = () => {
                             <p class="inline">{{ t('labels.unit') }}</p><span class="text-red-500"> *</span>
 
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
-                            <Skeleton class="hidden sm:block" height="3.1rem" width="22.8rem" v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="20.8rem" v-if="isLoading"/>
 
                             <Select
                                 v-show="!isLoading"
