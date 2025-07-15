@@ -131,6 +131,7 @@ const restoreUser = async () => {
     await userStore.restoreUser(currentUserId.value);
     isDeleteLoading.value = false;
     visible.value.restoreVisible = false;
+    toast.add({ severity: 'success', summary: t('toast.restored', { name: t('user.nominativeCapitalize') }), life: 3000 })
 };
 
 const deleteAction = (id) => {

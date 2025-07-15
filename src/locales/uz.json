@@ -187,6 +187,7 @@
         "success": "Muvaffaqiyat!",
         "created": "{name} muvaffaqiyatli yaratildi!",
         "edited": "{name} muvaffaqiyatli o‘zgartirildi!",
-        "deleted": "{name} muvaffaqiyatli o‘chirildi!"
+        "deleted": "{name} muvaffaqiyatli o‘chirildi!",
+        "restored": "{name} muvaffaqiyatli tiklandi!"
     }
 }

@@ -165,6 +165,7 @@
         "success": "Success!",
         "created": "{name} successfully created!",
         "edited": "{name} successfully updated!",
-        "deleted": "{name} successfully deleted!"
+        "deleted": "{name} successfully deleted!",
+        "restored": "{name} successfully restored!"
     }
 }
