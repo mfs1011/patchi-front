@@ -92,7 +92,7 @@ onMounted(async () => {
 
     name.value = sellerStore.getSeller.name
     phoneInput.value.setPhone(await sellerStore.getSeller.telephone.slice(0, 3), await sellerStore.getSeller.telephone.slice(3))
-    shop.value = 3
+    shop.value = sellerStore.getSeller.location.id
 })
 
 const isChanged = computed(() => {
