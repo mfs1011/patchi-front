@@ -76,6 +76,7 @@ const options = computed(() => [t('active'), t('archive')]);
 
 watch(archiveOrActive, (newVal) => {
     filters.value.isDelete = newVal !== t('active')
+    filters.value.page = 1
 })
 
 watch(
