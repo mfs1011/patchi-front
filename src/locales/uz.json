@@ -136,7 +136,9 @@
         "wholesalePrice": "Ulgurji narx",
         "assembly": "To‘plam",
         "title": "Nom",
-        "minQty": "Eng kam miqdor"
+        "minQty": "Eng kam miqdor",
+        "photoPreview": "Rasm ko‘rinishi",
+        "changePhoto": "Rasmni o‘zgartirish"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",

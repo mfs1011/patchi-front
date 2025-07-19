@@ -412,7 +412,7 @@ const confirmLeave = () => {
                             <Message class="min:h-5" size="small" severity="error" variant="simple">{{ errors.photo }}</Message>
                         </label>
 
-                        <div class="col-span-1 rounded">
+                        <div v-if="productStore.getProduct.photo?.contentUrl || isLoading" class="col-span-1 rounded">
                             <span>{{ t('labels.photoPreview') }}</span>
 
                             <Skeleton class="sm:hidden" height="20rem"  v-if="isLoading"/>
