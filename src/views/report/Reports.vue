@@ -6,7 +6,7 @@ import SectionCards from "@/components/SectionCards.vue";
 const { t } = useI18n();
 
 const cards = computed(() => [
-    { id: 1, name: t('cards.inventory'), image: 'SalesReport.png', routeName: 'inventory' },
+    { id: 1, name: t('cards.inventory'), image: 'SalesReport.png', routeName: 'inventories' },
 ])
 
 </script>

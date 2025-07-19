@@ -1,4 +1,6 @@
 {
+    "1": "Waiting",
+    "2": "Confirmed",
     "dashboard": "Home",
     "warehouse": "Warehouse",
     "shop": "Shop",
@@ -113,6 +115,10 @@
         "colorName": "Color name",
         "categoryType": "Category type",
         "categoryName": "Category name",
+        "status": "Status",
+        "dateFrom": "Date from",
+        "dateTo": "Date to",
+        "responsible": "Responsible",
         "unit": "Unit"
     },
     "placeholders": {
@@ -222,7 +228,8 @@
         "kitsInWarehouse": "Compositions in warehouse",
         "kitsInShop": "Compositions in shop",
         "kits": "Compositions",
-        "inventory": "Inventory"
+        "inventory": "Inventory",
+        "inventories": "Inventories"
     },
     "sections": {
         "users": {
@@ -254,6 +261,10 @@
             "edit": "Edit"
         },
         "colors": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "inventories": {
             "add": "Add",
             "edit": "Edit"
         },

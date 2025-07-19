@@ -1,4 +1,6 @@
 {
+    "1": "Ожидающий",
+    "2": "Подтвержденный",
     "dashboard": "Главная",
     "warehouse": "Склад",
     "shop": "Магазин",
@@ -113,6 +115,10 @@
         "colorName": "Название цвета",
         "categoryType": "Тип категории",
         "categoryName": "Название категории",
+        "status": "Статус",
+        "dateFrom": "Дата с",
+        "dateTo": "До даты",
+        "responsible": "Ответственный",
         "unit": "Единица"
     },
     "placeholders": {
@@ -222,7 +228,8 @@
         "kitsInWarehouse": "Композиции на складе",
         "kitsInShop": "Композиции в магазине",
         "kits": "Композиции",
-        "inventory": "Инвентарь"
+        "inventory": "Инвентарь",
+        "inventories": "Инвентари"
     },
     "sections": {
         "users": {
@@ -254,6 +261,10 @@
             "edit": "Изменить"
         },
         "colors": {
+            "add": "Добавить",
+            "edit": "Изменить"
+        },
+        "inventories": {
             "add": "Добавить",
             "edit": "Изменить"
         },
