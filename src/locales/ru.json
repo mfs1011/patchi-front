@@ -1,4 +1,6 @@
 {
+    "1": "Ожидающий",
+    "2": "Подтвержденный",
     "dashboard": "Главная",
     "warehouse": "Склад",
     "shop": "Магазин",
@@ -119,6 +121,10 @@
         "colorName": "Название цвета",
         "categoryType": "Тип категории",
         "categoryName": "Название категории",
+        "status": "Статус",
+        "dateFrom": "Дата с",
+        "dateTo": "До даты",
+        "responsible": "Ответственный",
         "unit": "Единица",
         "photo": "Фото",
         "category": "Категория",
@@ -250,6 +256,8 @@
         "collection": "Коллекция",
         "productsInWarehouse": "Товары на складе",
         "productsInShop": "Товары в магазине",
+        "warehouseContent": "Состав склада",
+        "marketContent": "Состав магазина",
         "incomeInvoices": "Поступления",
         "transferInvoices": "Перемещение",
         "orders": "Заказы",
@@ -258,6 +266,9 @@
         "salesReports": "Отчеты о продажах",
         "kitsInWarehouse": "Композиции на складе",
         "kitsInShop": "Композиции в магазине",
+        "kits": "Композиции",
+        "inventory": "Инвентарь",
+        "inventories": "Инвентари",
         "expiryDateNotificationDay": "День уведомления о сроке годности"
     },
     "sections": {
@@ -290,6 +301,10 @@
             "edit": "Изменить"
         },
         "colors": {
+            "add": "Добавить",
+            "edit": "Изменить"
+        },
+        "inventories": {
             "add": "Добавить",
             "edit": "Изменить"
         },

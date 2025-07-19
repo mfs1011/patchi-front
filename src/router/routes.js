@@ -423,10 +423,16 @@ export const routes = [
                         component: () => import('@/views/report/Reports.vue')
                     },
                     {
-                        path: 'sales-report',
-                        name: 'sales-report',
-                        component: () => import('@/views/report/SalesReport.vue')
-                    }
+                        path: 'inventories',
+                        name: 'inventories',
+                        component: () => import('@/views/report/inventory/Inventories.vue')
+                    },
+                    {
+                        path: 'edit/:id',
+                        name: 'edit-inventory',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/report/inventory/InventoryEdit.vue')
+                    },
                 ]
             },
             {

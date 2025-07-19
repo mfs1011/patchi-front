@@ -1,4 +1,6 @@
 {
+    "1": "Kutuvda",
+    "2": "Tasdiqlangan",
     "dashboard": "Asosiy",
     "warehouse": "Ombor",
     "shop": "Do‘kon",
@@ -119,6 +121,10 @@
         "colorName": "Rang nomi",
         "categoryType": "Kategoriya turi",
         "categoryName": "Kategoriya nomi",
+        "status": "Holati",
+        "dateFrom": "Sanadan",
+        "dateTo": "Sanagacha",
+        "responsible": "Mas'ul",
         "unit": "Birlik",
         "photo": "Rasm",
         "category": "Kategoryiya",
@@ -250,13 +256,18 @@
         "collection": "To‘plam",
         "productsInWarehouse": "Ombordagi mahsulotlar",
         "productsInShop": "Do‘kondagi mahsulotlar",
+        "warehouseContent": "Ombor tarkibi",
+        "marketContent": "Do'kon tarkibi",
         "incomeInvoices": "Kirim",
         "transferInvoices": "Ko‘chirish",
         "orders": "Buyurtmalar",
         "returnInvoices": "Qaytarilganlar",
         "writeOffInvoices": "Chiqarishlar",
         "salesReports": "Sotuvlar hisobotlari",
-        "kitsInWarehouse": "Ombordagi kompozitsiyalar",
+        "kitsInWarehouse": "Ombordagi to‘plamlar",
+        "kits": "Kompozitsiyalar",
+        "inventory": "Inventarizatsiya",
+        "inventories": "Inventarizatsiyalar",
         "kitsInShop": "Do‘kondagi to‘plamlar",
         "expiryDateNotificationDay": "Yaroqlilik muddati eslatma kuni"
     },
@@ -290,6 +301,10 @@
             "edit": "O‘zgartirish"
         },
         "colors": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "inventories": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
         },
