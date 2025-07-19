@@ -399,9 +399,9 @@ export const routes = [
                         component: () => import('@/views/report/Reports.vue')
                     },
                     {
-                        path: 'sales-report',
-                        name: 'sales-report',
-                        component: () => import('@/views/report/SalesReport.vue')
+                        path: 'inventory',
+                        name: 'inventory',
+                        component: () => import('@/views/report/Inventory.vue')
                     }
                 ]
             },

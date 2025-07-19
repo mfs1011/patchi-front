@@ -221,7 +221,8 @@
         "salesReports": "Отчеты о продажах",
         "kitsInWarehouse": "Композиции на складе",
         "kitsInShop": "Композиции в магазине",
-        "kits": "Композиции"
+        "kits": "Композиции",
+        "inventory": "Инвентарь"
     },
     "sections": {
         "users": {

@@ -221,7 +221,8 @@
         "salesReports": "Sales reports",
         "kitsInWarehouse": "Compositions in warehouse",
         "kitsInShop": "Compositions in shop",
-        "kits": "Compositions"
+        "kits": "Compositions",
+        "inventory": "Inventory"
     },
     "sections": {
         "users": {

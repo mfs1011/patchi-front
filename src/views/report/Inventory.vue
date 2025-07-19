@@ -7,7 +7,7 @@ const { t } = useI18n();
 
 <template>
     <Section
-        :section-name="t('cards.salesReports')"
+        :section-name="t('cards.inventory')"
         back-route-name="reports"
         without-add-button
     >

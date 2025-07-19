@@ -221,7 +221,8 @@
         "salesReports": "Sotuvlar hisobotlari",
         "kitsInWarehouse": "Ombordagi kompozitsiyalar",
         "kitsInShop": "Do‘kondagi kompozitsiyalar",
-        "kits": "Kompozitsiyalar"
+        "kits": "Kompozitsiyalar",
+        "inventory": "Inventarizatsiya"
     },
     "sections": {
         "users": {
