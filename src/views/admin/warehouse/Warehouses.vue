@@ -18,6 +18,7 @@ import {computed, onMounted, ref, watch} from "vue";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
 import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
+import updateQuery from "@/helpers/updateQuery.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -91,21 +92,12 @@ watch(
             delete queryFilter.name;
         }
 
-        await updateQuery(queryFilter);
+        await updateQuery(router, queryFilter);
 
         await locationStore.fetchLocations(route.query);
     },
     { immediate: true, deep: true },
 );
-
-// Functions
-async function updateQuery(newParams) {
-    await router.push({
-        query: {
-            ...newParams,
-        },
-    });
-}
 
 const deleteAction = (id) => {
     currentCustomerId.value = id;

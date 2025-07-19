@@ -21,6 +21,7 @@ import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import SelectButton from "@/volt/SelectButton.vue";
 import {useToast} from "primevue/usetoast";
+import updateQuery from "@/helpers/updateQuery.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -106,21 +107,12 @@ watch(
             delete queryFilter.role;
         }
 
-        await updateQuery(queryFilter);
+        await updateQuery(router, queryFilter);
 
         await userStore.fetchUsers(route.query);
     },
     { immediate: true, deep: true },
 );
-
-// Functions
-async function updateQuery(newParams) {
-    await router.push({
-        query: {
-            ...newParams,
-        },
-    });
-}
 
 const restoreAction = (id) => {
     currentUserId.value = id;

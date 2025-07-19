@@ -1,5 +1,6 @@
 <template>
     <Select
+        ref="selectRef"
         unstyled
         :pt="theme"
         :ptOptions="{
@@ -16,7 +17,7 @@
             <SearchIcon class="text-surface-400" />
         </template>
         <template #clearicon="{ clearCallback }">
-            <TimesIcon @click="clearCallback" class="text-surface-400 absolute top-1/2 -mt-2 end-10" />
+            <TimesIcon @click="handleClear(clearCallback as any)" class="text-surface-400 absolute top-1/2 -mt-2 end-10" />
         </template>
         <template v-for="(_, slotName) in $slots" v-slot:[slotName]="slotProps">
             <slot :name="slotName" v-bind="slotProps ?? {}" />
@@ -32,9 +33,17 @@ import TimesIcon from '@primevue/icons/times';
 import Select, { type SelectPassThroughOptions, type SelectProps } from 'primevue/select';
 import { ref } from 'vue';
 import { ptViewMerge } from './utils';
+import type { SelectMethods } from 'primevue/select';
 
 interface Props extends /* @vue-ignore */ SelectProps {}
 defineProps<Props>();
+
+const selectRef = ref<SelectMethods | null>(null);
+
+function handleClear(clearCallback: () => void) {
+    clearCallback();
+    selectRef.value?.hide(); // Dropdownga show bo'lishni bloklaydi
+}
 
 const theme = ref<SelectPassThroughOptions>({
     root: `inline-flex cursor-pointer relative select-none rounded-md p-fluid:flex

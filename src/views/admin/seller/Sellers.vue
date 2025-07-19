@@ -21,6 +21,7 @@ import {useSellerStore} from "@/stores/seller.js";
 import {useLocationStore} from "@/stores/location.js";
 import Skeleton from "@/volt/Skeleton.vue";
 import {useToast} from "primevue/usetoast";
+import updateQuery from "@/helpers/updateQuery.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -102,21 +103,12 @@ watch(
             delete queryFilter.location;
         }
 
-        await updateQuery(queryFilter);
+        await updateQuery(router, queryFilter);
 
         await sellerStore.fetchSellers(route.query);
     },
     { immediate: true, deep: true },
 );
-
-// Functions
-async function updateQuery(newParams) {
-    await router.push({
-        query: {
-            ...newParams,
-        },
-    });
-}
 
 const deleteAction = (id) => {
     currentSellerId.value = id;
@@ -339,9 +331,9 @@ onBeforeRouteLeave(() => {
                                     <div v-if="route.query['is-delete'] === 'false'" class="flex items-center gap-2">
                                         <Button
                                             @click="router.push({
-                                            name: 'edit-seller',
-                                            params: { id: data.id },
-                                        })"
+                                                name: 'edit-seller',
+                                                params: { id: data.id },
+                                            })"
                                             icon="pi pi-pencil"
                                             pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
                                             size="small"
