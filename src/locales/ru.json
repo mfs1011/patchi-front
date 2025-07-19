@@ -136,7 +136,9 @@
         "wholesalePrice": "Оптовая цена",
         "assembly": "Сборка",
         "title": "Название",
-        "minQty": "Минимальное количество"
+        "minQty": "Минимальное количество",
+        "photoPreview": "Предпросмотр изображения",
+        "changePhoto": "Изменить фото"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",

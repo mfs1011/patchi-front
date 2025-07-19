@@ -136,7 +136,9 @@
         "status": "Status",
         "dateFrom": "Date from",
         "dateTo": "Date to",
-        "responsible": "Responsible"
+        "responsible": "Responsible",
+        "photoPreview": "Photo preview",
+        "changePhoto": "Change photo"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
