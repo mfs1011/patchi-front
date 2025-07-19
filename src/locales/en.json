@@ -89,6 +89,12 @@
         "accusative": "supplier",
         "accusativeCapitalize": "Supplier"
     },
+    "products": {
+        "nominative": "product",
+        "nominativeCapitalize": "Product",
+        "accusative": "product",
+        "accusativeCapitalize": "Product"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
@@ -113,7 +119,18 @@
         "colorName": "Color name",
         "categoryType": "Category type",
         "categoryName": "Category name",
-        "unit": "Unit"
+        "unit": "Unit",
+        "photo": "Photo",
+        "category": "Category",
+        "type": "Type",
+        "code": "Code",
+        "qr": "QR code",
+        "costPrice": "Cost price",
+        "retailPrice": "Retail price",
+        "wholesalePrice": "Wholesale price",
+        "assembly": "Assembly",
+        "title": "Title",
+        "minQty": "Minimum quantity"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
@@ -131,18 +148,30 @@
             "byWarehouse": "Search by warehouse",
             "byShop": "Search by shop",
             "byUnit": "Search by unit",
-            "byCategoryType": "Search by category type"
+            "byCategoryType": "Search by category type",
+            "byCode": "Search by code",
+            "byQr": "Search by QR code",
+            "byCategory": "Search by category",
+            "byAssembly": "Search by collection"
         },
         "select": {
             "role": "Select role",
             "warehouse": "Select warehouse",
             "shop": "Select shop",
             "categoryType": "Select category type",
-            "unit": "Select unit"
+            "unit": "Select unit",
+            "category": "Select category",
+            "assembly": "Select assembly"
         },
         "supplierName": "Enter supplier name...",
         "colorName": "Enter color name...",
-        "categoryName": "Enter category name..."
+        "categoryName": "Enter category name...",
+        "qr": "Enter QR code...",
+        "code": "Enter code...",
+        "title": "Enter title...",
+        "wholesalePrice": "Enter wholesale price...",
+        "retailPrice": "Enter retail price...",
+        "minQty": "Enter minimum quantity..."
     },
     "buttons": {
         "login": "Login",
@@ -167,6 +196,14 @@
         "colorNameRequired": "Color name is required",
         "supplierRequired": "Supplier is required",
         "fullNameRequired": "Full name is required",
+        "qrRequired": "QR code is required",
+        "codeRequired": "Code is required",
+        "titleRequired": "Title is required",
+        "categoryRequired": "Category is required",
+        "wholesalePriceRequired": "Wholesale price is required",
+        "retailPriceRequired": "Retail price is required",
+        "minQtyRequired": "Minimum quantity is required",
+        "photoRequired": "Photo is required",
         "passwordRequired": "Password is required",
         "phoneNumberRequired": "Phone number is required",
         "phoneNumberMustBeExactlyCharacters": "Invalid phone number format",
@@ -176,7 +213,9 @@
         "roleRequired": "Role is required",
         "warehouseRequired": "Warehouse selection is required",
         "shopRequired": "Shop selection is required",
-        "maxCharacter": "Must be no more than {count} characters"
+        "maxCharacter": "Must be no more than {count} characters",
+        "maxSizePhoto": "The image size must not exceed {size} MB",
+        "availablePhotoFormat": "Allowed image formats: {formats}"
     },
     "dialog": {
         "confirm": "Confirm",
@@ -218,7 +257,8 @@
         "writeOffInvoices": "Write-offs",
         "salesReports": "Sales reports",
         "kitsInWarehouse": "Compositions in warehouse",
-        "kitsInShop": "Compositions in shop"
+        "kitsInShop": "Compositions in shop",
+        "expiryDateNotificationDay": "Expiry Date Notification Day"
     },
     "sections": {
         "users": {
@@ -256,6 +296,10 @@
         "categories": {
             "add": "Add",
             "edit": "Edit"
+        },
+        "products": {
+            "add": "Add",
+            "edit": "Edit"
         }
     },
     "pagination": {
@@ -269,6 +313,9 @@
         "deleted": "{name} successfully deleted!",
         "restored": "{name} successfully restored!",
         "already_exists_error": "{field} already exists",
-        "already_exists_error_named": "\"{name}\" with this name already exists"
-    }
+        "already_exists_error_named": "\"{name}\" with this name already exists",
+        "cannot_delete_product_in_stock": "Cannot delete a product that is in stock"
+    },
+    "choosePhoto": "Choose a photo",
+    "changePhoto": "Change photo"
 }

@@ -268,9 +268,27 @@ export const routes = [
                     },
                     {
                         path: 'products',
-                        name: 'products',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/Products.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'products',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/product/Products.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-product',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/product/ProductsAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-product',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/product/ProductsEdit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'warehouses',
@@ -385,6 +403,12 @@ export const routes = [
                         name: 'collections',
                         meta: { requiresAuth: true, roles: []},
                         component: () => import('@/views/admin/Collections.vue')
+                    },
+                    {
+                        path: 'expiry-date-notification-day',
+                        name: 'expiry-date-notification-day',
+                        meta: { requiresAuth: true, roles: []},
+                        component: () => import('@/views/admin/ExpiryDateNotificationDay.vue')
                     },
                 ]
             },

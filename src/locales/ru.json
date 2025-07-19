@@ -89,6 +89,12 @@
         "accusative": "поставщика",
         "accusativeCapitalize": "Поставщика"
     },
+    "products": {
+        "nominative": "продукт",
+        "nominativeCapitalize": "Продукт",
+        "accusative": "продукта",
+        "accusativeCapitalize": "Продукта"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",
@@ -113,7 +119,18 @@
         "colorName": "Название цвета",
         "categoryType": "Тип категории",
         "categoryName": "Название категории",
-        "unit": "Единица"
+        "unit": "Единица",
+        "photo": "Фото",
+        "category": "Категория",
+        "type": "Тип",
+        "code": "Код",
+        "qr": "QR код",
+        "costPrice": "Себестоимость",
+        "retailPrice": "Розничная цена",
+        "wholesalePrice": "Оптовая цена",
+        "assembly": "Сборка",
+        "title": "Название",
+        "minQty": "Минимальное количество"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -131,18 +148,30 @@
             "byWarehouse": "Поиск по складу",
             "byShop": "Поиск по магазину",
             "byUnit": "Поиск по единицу",
-            "byCategoryType": "Поиск по типу категории"
+            "byCategoryType": "Поиск по типу категории",
+            "byCode": "Поиск по коду",
+            "byQr": "Поиск по QR-коду",
+            "byCategory": "Поиск по категории",
+            "byAssembly": "Поиск по коллекции"
         },
         "select": {
             "role": "Выберите роль",
             "warehouse": "Выберите склад",
             "shop": "Выберите магазин",
             "categoryType": "Выберите тип категории",
-            "unit": "Выберите единицу"
+            "unit": "Выберите единицу",
+            "category": "Выберите категорию",
+            "assembly": "Выберите комплект"
         },
         "supplierName": "Введите имя поставщика...",
         "colorName": "Введите название цвета...",
-        "categoryName": "Введите название категории..."
+        "categoryName": "Введите название категории...",
+        "qr": "Введите QR-код...",
+        "code": "Введите код...",
+        "title": "Введите название...",
+        "wholesalePrice": "Введите оптовую цену...",
+        "retailPrice": "Введите розничную цену...",
+        "minQty": "Введите минимальное количество..."
     },
     "buttons": {
         "login": "Войти",
@@ -167,6 +196,14 @@
         "colorNameRequired": "Название цвета обязательно",
         "supplierRequired": "Поставщик обязателен",
         "fullNameRequired": "Полное имя обязательно",
+        "qrRequired": "QR-код обязателен",
+        "codeRequired": "Код обязателен",
+        "titleRequired": "Название обязательно",
+        "categoryRequired": "Категория обязательна",
+        "wholesalePriceRequired": "Оптовая цена обязательна",
+        "retailPriceRequired": "Розничная цена обязательна",
+        "minQtyRequired": "Минимальное количество обязательно",
+        "photoRequired": "Изображение обязательно",
         "passwordRequired": "Пароль обязателен",
         "phoneNumberRequired": "Номер телефона обязателен",
         "phoneNumberMustBeExactlyCharacters": "Неверный формат номера телефона",
@@ -176,7 +213,9 @@
         "roleRequired": "Выбор роли обязателен",
         "warehouseRequired": "Выбор склада обязателен",
         "shopRequired": "Выбор магазина обязателен",
-        "maxCharacter": "Не более {count} символов"
+        "maxCharacter": "Не более {count} символов",
+        "maxSizePhoto": "Размер изображения не должен превышать {size} МБ",
+        "availablePhotoFormat": "Допустимые форматы изображений: {formats}"
     },
     "dialog": {
         "confirm": "Подтвердить",
@@ -218,7 +257,8 @@
         "writeOffInvoices": "Списания",
         "salesReports": "Отчеты о продажах",
         "kitsInWarehouse": "Композиции на складе",
-        "kitsInShop": "Композиции в магазине"
+        "kitsInShop": "Композиции в магазине",
+        "expiryDateNotificationDay": "День уведомления о сроке годности"
     },
     "sections": {
         "users": {
@@ -256,6 +296,10 @@
         "categories": {
             "add": "Добавить",
             "edit": "Изменить"
+        },
+        "products": {
+            "add": "Добавить",
+            "edit": "Изменить"
         }
     },
     "pagination": {
@@ -269,6 +313,9 @@
         "deleted": "{name} успешно удален!",
         "restored": "{name} успешно восстановлен!",
         "already_exists_error": "{field} уже существует",
-        "already_exists_error_named": "\"{name}\" с таким именем уже существует"
-    }
+        "already_exists_error_named": "\"{name}\" с таким именем уже существует",
+        "cannot_delete_product_in_stock": "Невозможно удалить товар, который есть на складе"
+    },
+    "choosePhoto": "Выберите фото",
+    "changePhoto": "Изменить фото"
 }

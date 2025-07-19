@@ -21,6 +21,7 @@ import {useCategoryStore} from "@/stores/category.js";
 import Select from "@/volt/Select.vue";
 import {useCategoryTypeStore} from "@/stores/categoryType.js";
 import {useUnitStore} from "@/stores/unit.js";
+import updateQuery from "@/helpers/updateQuery.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -104,21 +105,12 @@ watch(
             queryFilter.categoryType = filters.value.categoryType;
         }
 
-        await updateQuery(queryFilter);
+        await updateQuery(router, queryFilter);
 
         await categoryStore.fetchCategories(route.query);
     },
     { immediate: true, deep: true },
 );
-
-// Functions
-async function updateQuery(newParams) {
-    await router.push({
-        query: {
-            ...newParams,
-        },
-    });
-}
 
 const deleteAction = (id) => {
     currentCategoryId.value = id;

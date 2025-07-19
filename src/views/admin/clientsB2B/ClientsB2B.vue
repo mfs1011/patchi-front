@@ -20,6 +20,7 @@ import Breadcrumb from "@/volt/Breadcrumb.vue";
 import InputText from "@/volt/InputText.vue";
 import Skeleton from "@/volt/Skeleton.vue";
 import {useToast} from "primevue/usetoast";
+import updateQuery from "@/helpers/updateQuery.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -92,21 +93,12 @@ watch(
             delete queryFilter.name;
         }
 
-        await updateQuery(queryFilter);
+        await updateQuery(router, queryFilter);
 
         await customerStore.fetchCustomers(route.query);
     },
     { immediate: true, deep: true },
 );
-
-// Functions
-async function updateQuery(newParams) {
-    await router.push({
-        query: {
-            ...newParams,
-        },
-    });
-}
 
 const deleteAction = (id) => {
     currentCustomerId.value = id;

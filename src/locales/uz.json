@@ -89,6 +89,12 @@
         "accusative": "ta'minotchini",
         "accusativeCapitalize": "Ta'minotchini"
     },
+    "products": {
+        "nominative": "mahsulot",
+        "nominativeCapitalize": "Mahsulot",
+        "accusative": "mahsulotni",
+        "accusativeCapitalize": "Mahsulotni"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Sotuvchi",
@@ -113,7 +119,18 @@
         "colorName": "Rang nomi",
         "categoryType": "Kategoriya turi",
         "categoryName": "Kategoriya nomi",
-        "unit": "Birlik"
+        "unit": "Birlik",
+        "photo": "Rasm",
+        "category": "Kategoryiya",
+        "type": "Tur",
+        "code": "Kod",
+        "qr": "QR kod",
+        "costPrice": "Tannarx",
+        "retailPrice": "Chakana narx",
+        "wholesalePrice": "Ulgurji narx",
+        "assembly": "To‘plam",
+        "title": "Nom",
+        "minQty": "Eng kam miqdor"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
@@ -129,20 +146,32 @@
             "byWarehouse": "Ombor bo‘yicha qidiruv",
             "byShop": "Do‘kon bo‘yicha qidiruv",
             "byUnit": "Birlik bo‘yicha qidiruv",
-            "byCategoryType": "Kategoriya turi bo‘yicha qidiruv"
+            "byCategoryType": "Kategoriya turi bo‘yicha qidiruv",
+            "byCode": "Kodi bo‘yicha qidiruv",
+            "byQr": "QR kodi bo‘yicha qidiruv",
+            "byCategory": "Kategoriyasi bo‘yicha qidiruv",
+            "byAssembly": "To‘plam bo‘yicha qidiruv"
         },
         "select": {
             "role": "Rol tanlang",
             "warehouse": "Ombor tanlang",
             "shop": "Do‘kon tanlang",
             "categoryType": "Kategoriya turini tanlang",
-            "unit": "Birlikni tanlang"
+            "unit": "Birlikni tanlang",
+            "category": "Kategoriyani tanlang",
+            "assembly": "To‘plamni tanlang"
         },
         "shopName": "Do‘kon nomini kiriting...",
         "warehouseName": "Ombor nomini kiriting...",
         "supplierName": "Ta'minotchi nomini kiriting...",
         "colorName": "Rang nomini kiriting...",
-        "categoryName": "Kategoriya nomini kiriting..."
+        "categoryName": "Kategoriya nomini kiriting...",
+        "qr": "QR kodni kiriting...",
+        "code": "Kodni kiriting...",
+        "title": "Kodni kiriting...",
+        "wholesalePrice": "Ulgurji narxni kiriting...",
+        "retailPrice": "Chakana narxni kiriting...",
+        "minQty": "Eng kam miqdor kiriting..."
     },
     "buttons": {
         "login": "Kirish",
@@ -167,6 +196,14 @@
         "nameRequired": "Ism kiritish majburiy",
         "colorNameRequired": "Rang nomini kiritish majburiy",
         "fullNameRequired": "To‘liq ism kiritish majburiy",
+        "qrRequired": "QR kod kiritish majburiy",
+        "codeRequired": "Kod kiritish majburiy",
+        "titleRequired": "Nom kiritish majburiy",
+        "categoryRequired": "Kategoriya kiritish majburiy",
+        "wholesalePriceRequired": "Ulgurji narxni kiritish majburiy",
+        "retailPriceRequired": "Chakana narxni kiritish majburiy",
+        "minQtyRequired": "Minimal miqdorni kiritish majburiy",
+        "photoRequired": "Rasm kiritish majburiy",
         "passwordRequired": "Parol kiritish majburiy",
         "phoneNumberRequired": "Telefon raqamini kiritish majburiy",
         "phoneNumberMustBeExactlyCharacters": "Telefon formati noto‘g‘ri",
@@ -176,7 +213,9 @@
         "roleRequired": "Rol tanlash majburiy",
         "warehouseRequired": "Ombor tanlash majburiy",
         "shopRequired": "Do‘kon tanlash majburiy",
-        "maxCharacter": "Eng ko‘pi bilan {count} ta belgidan iborat bo‘lishi kerak"
+        "maxCharacter": "Eng ko‘pi bilan {count} ta belgidan iborat bo‘lishi kerak",
+        "maxSizePhoto": "Rasm hajmi {size} MB dan oshmasligi kerak",
+        "availablePhotoFormat": "Yuklanadigan rasm formati faqat quyidagilardan biri bo‘lishi kerak: {formats}"
     },
     "dialog": {
         "confirm": "Tasdiqlash",
@@ -218,7 +257,8 @@
         "writeOffInvoices": "Chiqarishlar",
         "salesReports": "Sotuvlar hisobotlari",
         "kitsInWarehouse": "Ombordagi kompozitsiyalar",
-        "kitsInShop": "Do‘kondagi to‘plamlar"
+        "kitsInShop": "Do‘kondagi to‘plamlar",
+        "expiryDateNotificationDay": "Yaroqlilik muddati eslatma kuni"
     },
     "sections": {
         "users": {
@@ -256,6 +296,10 @@
         "categories": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
+        },
+        "products": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
         }
     },
     "pagination": {
@@ -269,6 +313,9 @@
         "deleted": "{name} muvaffaqiyatli o‘chirildi!",
         "restored": "{name} muvaffaqiyatli tiklandi!",
         "already_exists_error": "{field} allaqachon mavjud",
-        "already_exists_error_named": "Bunday nomli \"{name}\" allaqachon mavjud"
-    }
+        "already_exists_error_named": "Bunday nomli \"{name}\" allaqachon mavjud",
+        "cannot_delete_product_in_stock": "Omborda mavjud mahsulotni o'chirib bo'lmaydi"
+    },
+    "choosePhoto": "Rasm tanlang",
+    "changePhoto": "Rasmni o'zgartirish"
 }
