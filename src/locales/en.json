@@ -124,6 +124,8 @@
         "unit": "Unit",
         "photo": "Photo",
         "category": "Category",
+        "kg": "kg",
+        "pcs": "pcs",
         "type": "Type",
         "code": "Code",
         "qr": "QR code",

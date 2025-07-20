@@ -420,7 +420,7 @@ onBeforeRouteLeave(() => {
                         <Column field="unit" :header="t('labels.unit')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.category.unit.name }}</p>
+                                <p v-else>{{ t(`labels.${data.category.unit.name}`) }}</p>
                             </template>
                         </Column>
                         <Column field="code" :header="t('labels.code')">
@@ -451,6 +451,12 @@ onBeforeRouteLeave(() => {
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
                                 <p v-else>{{ data.wholesalePrice ? `${data.wholesalePrice}$` : '-' }}</p>
+                            </template>
+                        </Column>
+                        <Column field="wholesalePrice" :header="t('labels.minQty')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <p v-else>{{ data.minQty ? `${data.minQty}` : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="actions" :header="t('actions')">

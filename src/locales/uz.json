@@ -129,6 +129,8 @@
         "photo": "Rasm",
         "category": "Kategoryiya",
         "type": "Tur",
+        "kg": "kg",
+        "pcs": "dona",
         "code": "Kod",
         "qr": "QR kod",
         "costPrice": "Tannarx",
