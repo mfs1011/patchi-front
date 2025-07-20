@@ -321,7 +321,7 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ data.id }}</p>
                             </template>
                         </Column>
-                        <Column field="name" :header="t('labels.warehouseName')">
+                        <Column field="name" :header="t('labels.categoryName')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="categoryStore.getIsLoadingCategory"/>
                                 <p v-else>{{ data.name }}</p>
@@ -336,7 +336,7 @@ onBeforeRouteLeave(() => {
                         <Column field="unit" :header="t('labels.unit')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="categoryStore.getIsLoadingCategory"/>
-                                <p v-else>{{ data.unit.name }}</p>
+                                <p v-else>{{ t(`labels.${data.unit.name}`) }}</p>
                             </template>
                         </Column>
                         <Column field="id" class="flex justify-end">
