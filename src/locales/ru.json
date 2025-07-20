@@ -138,7 +138,8 @@
         "title": "Название",
         "minQty": "Минимальное количество",
         "photoPreview": "Предпросмотр изображения",
-        "changePhoto": "Изменить фото"
+        "changePhoto": "Изменить фото",
+        "paymentType": "Тип оплаты"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -160,7 +161,8 @@
             "byCode": "Поиск по коду",
             "byQr": "Поиск по QR-коду",
             "byCategory": "Поиск по категории",
-            "byAssembly": "Поиск по коллекции"
+            "byAssembly": "Поиск по коллекции",
+            "byPaymentType": "Поиск по тип оплаты"
         },
         "select": {
             "role": "Выберите роль",
@@ -169,7 +171,8 @@
             "categoryType": "Выберите тип категории",
             "unit": "Выберите единицу",
             "category": "Выберите категорию",
-            "assembly": "Выберите комплект"
+            "assembly": "Выберите комплект",
+            "paymentType": "Выберите тип оплаты"
         },
         "supplierName": "Введите имя поставщика...",
         "colorName": "Введите название цвета...",
@@ -224,7 +227,8 @@
         "shopRequired": "Выбор магазина обязателен",
         "maxCharacter": "Не более {count} символов",
         "maxSizePhoto": "Размер изображения не должен превышать {size} МБ",
-        "availablePhotoFormat": "Допустимые форматы изображений: {formats}"
+        "availablePhotoFormat": "Допустимые форматы изображений: {formats}",
+        "paymentTypeRequired": "Тип оплаты обязателен"
     },
     "dialog": {
         "confirm": "Подтвердить",

@@ -43,7 +43,7 @@ const items = computed(() => [{ label: t('cards.payments'), route: { name: 'paym
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
     name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
-    paymentType: yup.number().required(t('errorMessages.shopRequired'))
+    paymentType: yup.number().required(t('errorMessages.paymentTypeRequired'))
 }))
 
 const { handleSubmit, errors, isSubmitting, resetForm } = useForm({

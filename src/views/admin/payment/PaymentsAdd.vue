@@ -63,7 +63,7 @@ const onSubmit = handleSubmit(async values => {
 })
 
 onMounted(() => {
-    if (!paymentTypeStore.getPaymentTypes.models.length) {
+    if (!paymentTypeStore.getCreatePaymentTypes.models.length) {
         paymentTypeStore.fetchCreatePaymentTypes({ page: 1, 'items-per-page': 100 })
     }
 })
@@ -104,7 +104,7 @@ onMounted(() => {
                 pt:title="font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
                 <template #content>
-                    <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-fit gap-2 sm:gap-4">
+                    <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:min-w-100 gap-2 sm:gap-4">
                         <label class="block">
                             <span>{{ t('labels.name') }}</span><span class="text-red-500"> *</span>
                             <InputText
