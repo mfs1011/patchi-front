@@ -139,6 +139,13 @@
         "assembly": "To‘plam",
         "title": "Nom",
         "minQty": "Eng kam miqdor",
+        "product": "Mahsulot",
+        "color": "Rangi",
+        "expiryDate": "Yaroqlilik muddati",
+        "income": "Kirim",
+        "expense": "Chiqim",
+        "currentQty": "Joriy miqdor",
+        "factQty": "Fakt miqdor",
         "photoPreview": "Rasm ko‘rinishi",
         "changePhoto": "Rasmni o‘zgartirish",
         "paymentType": "To‘lov turi"
