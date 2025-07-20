@@ -18,7 +18,7 @@ const cards = computed(() => [
     { id: 10, name: t('cards.currencyRates'), image: 'UsdRate.png', routeName: 'currency-rates' },
     { id: 11, name: t('cards.colors'), image: 'Colors.png', routeName: 'colors' },
     { id: 12, name: t('cards.kpi'), image: 'KPI.png', routeName: 'kpi' },
-    { id: 13, name: t('cards.paymentType'), image: 'Payment_type.png', routeName: 'payment-type' },
+    { id: 13, name: t('cards.payments'), image: 'Payment.png', routeName: 'payments' },
     { id: 14, name: t('cards.collection'), image: 'Gift.png', routeName: 'collections' },
     { id: 15, name: t('cards.expiryDateNotificationDay'), image: 'Expiry.png', routeName: 'expiry-date-notification-day' },
 ])
