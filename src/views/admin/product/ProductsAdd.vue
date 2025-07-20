@@ -45,14 +45,14 @@ const FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp'];
 
 const schema = computed(() => yup.object({
-    qr: yup.string().required(t('errorMessages.qrRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    qr: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     code: yup.string().required(t('errorMessages.codeRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     name: yup.string().required(t('errorMessages.titleRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     category: yup.number().required(t('errorMessages.categoryRequired')),
     assembly: yup.number().notRequired(),
-    wholesalePrice: yup.number().required(t('errorMessages.wholesalePriceRequired')),
-    retailPrice: yup.number().required(t('errorMessages.retailPriceRequired')),
-    minQty: yup.number().required(t('errorMessages.minQtyRequired')),
+    wholesalePrice: yup.number().notRequired(),
+    retailPrice: yup.number().notRequired(),
+    minQty: yup.number().notRequired(),
     photo: yup
         .mixed()
         .test(
@@ -103,13 +103,15 @@ const onSubmit = handleSubmit(async values => {
     }
 
     try {
-        const formData = new FormData()
-        formData.set('file', values.photo)
+        if (values.photo) {
+            const formData = new FormData()
+            formData.set('file', values.photo)
 
-        await mediaObjectStore.pushMediaObject(formData)
+            await mediaObjectStore.pushMediaObject(formData)
 
-        if (mediaObjectStore.getMediaObject) {
-            payload.photo = mediaObjectStore.getMediaObject['@id']
+            if (mediaObjectStore.getMediaObject) {
+                payload.photo = mediaObjectStore.getMediaObject['@id']
+            }
         }
 
         await productStore.pushProduct(payload)
@@ -178,7 +180,7 @@ onMounted(async () => {
                 <template #content>
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 sm:max-w-180 w-full">
                         <label class="block">
-                            <span>{{ t('labels.qr') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.qr') }}</span>
                             <InputText
                                 v-model.trim="qr"
                                 fluid
@@ -246,7 +248,7 @@ onMounted(async () => {
                         </div>
 
                         <label class="block">
-                            <span>{{ t('labels.wholesalePrice') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.wholesalePrice') }}</span>
                             <InputNumber
                                 v-model="wholesalePrice"
                                 fluid
@@ -261,7 +263,7 @@ onMounted(async () => {
                         </label>
 
                         <label class="block">
-                            <span>{{ t('labels.retailPrice') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.retailPrice') }}</span>
                             <InputNumber
                                 v-model="retailPrice"
                                 fluid
@@ -275,7 +277,7 @@ onMounted(async () => {
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.retailPrice }}</Message>
                         </label>
                         <label class="block">
-                            <span>{{ t('labels.minQty') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.minQty') }}</span>
                             <InputNumber
                                 v-model="minQty"
                                 fluid

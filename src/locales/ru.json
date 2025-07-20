@@ -91,7 +91,7 @@
         "accusative": "поставщика",
         "accusativeCapitalize": "Поставщика"
     },
-    "products": {
+    "product": {
         "nominative": "продукт",
         "nominativeCapitalize": "Продукт",
         "accusative": "продукта",
@@ -193,6 +193,7 @@
         "newShop": "Новый магазин",
         "newCollection": "Новая коллекция",
         "newColor": "Новый цвет",
+        "newPayment": "Новая оплата",
         "filters": "Фильтры"
     },
     "errorMessages": {
@@ -247,17 +248,17 @@
         "clientsB2B": "Корпоративные клиенты",
         "clientsB2C": "Клиенты бутиков",
         "suppliers": "Поставщики",
-        "products": "Товары",
+        "products": "Продукты",
         "warehouses": "Склады",
         "shops": "Магазины",
         "categories": "Категории",
         "currencyRates": "Курсы валют",
         "colors": "Цвета",
         "kpi": "Процент KPI",
-        "paymentType": "Тип оплаты",
+        "payments": "Оплаты",
         "collection": "Коллекция",
-        "productsInWarehouse": "Товары на складе",
-        "productsInShop": "Товары в магазине",
+        "productsInWarehouse": "Продукты на складе",
+        "productsInShop": "Продукты в магазине",
         "warehouseContent": "Состав склада",
         "marketContent": "Состав магазина",
         "incomeInvoices": "Поступления",
@@ -317,6 +318,10 @@
         "products": {
             "add": "Добавить",
             "edit": "Изменить"
+        },
+        "payments": {
+            "add": "Добавить",
+            "edit": "Изменить"
         }
     },
     "pagination": {
@@ -331,7 +336,7 @@
         "restored": "{name} успешно восстановлен!",
         "already_exists_error": "{field} уже существует",
         "already_exists_error_named": "\"{name}\" с таким именем уже существует",
-        "cannot_delete_product_in_stock": "Невозможно удалить товар, который есть на складе"
+        "cannot_delete_product_in_stock": "Невозможно удалить продукт, который есть на складе"
     },
     "choosePhoto": "Выберите фото",
     "changePhoto": "Изменить фото"
