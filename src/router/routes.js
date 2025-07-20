@@ -428,10 +428,10 @@ export const routes = [
                         component: () => import('@/views/report/inventory/Inventories.vue')
                     },
                     {
-                        path: 'edit/:id',
-                        name: 'edit-inventory',
+                        path: 'inventory/:id',
+                        name: 'inventory',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/report/inventory/InventoryEdit.vue')
+                        component: () => import('@/views/report/inventory/Inventory.vue')
                     },
                 ]
             },

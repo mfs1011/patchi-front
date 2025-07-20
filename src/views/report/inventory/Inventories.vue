@@ -200,7 +200,7 @@ onBeforeRouteLeave(() => {
                                     <div class="flex items-center gap-2">
                                         <Button
                                             @click="router.push({
-                                                name: 'edit-inventory',
+                                                name: 'inventory',
                                                 params: { id: data.id },
                                             })"
                                             icon="pi pi-pencil"
