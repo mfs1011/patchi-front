@@ -2,33 +2,34 @@
 import Section from "@/components/UI/Section.vue";
 import { useI18n } from "vue-i18n";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
-import {useCustomerStore} from "@/stores/customer.js";
-import {useLocationStore} from "@/stores/location.js";
 import {computed, onMounted, ref, watch} from "vue";
-import useDebouncedRef from "@/composables/useDebouncedRef.js";
+import Button from "@/volt/Button.vue";
+import Select from "@/volt/Select.vue";
+import SelectButton from "@/volt/SelectButton.vue";
+import InputText from "@/volt/InputText.vue";
 import {formatPhoneByCountry} from "@/helpers/phoneFormat.js";
 import NoData from "@/components/UI/NoData.vue";
-import Dialog from "@/volt/Dialog.vue";
-import Button from "@/volt/Button.vue";
 import Card from "@/volt/Card.vue";
+import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import DataTable from "@/volt/DataTable.vue";
 import Column from "primevue/column";
-import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
-import InputText from "@/volt/InputText.vue";
-import SelectButton from "@/volt/SelectButton.vue";
-import {useToast} from "primevue/usetoast";
+import Dialog from "@/volt/Dialog.vue";
+import useDebouncedRef from "@/composables/useDebouncedRef.js";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import Skeleton from "@/volt/Skeleton.vue";
+import {useToast} from "primevue/usetoast";
 import updateQuery from "@/helpers/updateQuery.js";
+import {usePaymentStore} from "@/stores/payment.js";
+import {usePaymentTypeStore} from "@/stores/paymentType.js";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const toast = useToast();
 
-const customerStore = useCustomerStore()
-const locationStore = useLocationStore()
+const paymentStore = usePaymentStore()
+const paymentTypeStore = usePaymentTypeStore()
 
 // refs
 const visible = ref({
@@ -38,12 +39,13 @@ const visible = ref({
 
 const isVisibleSectionHeader = ref(false);
 const isDeleteLoading = ref(false);
-const currentCustomerId = ref();
+const currentPaymentId = ref();
 const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
+    location: parseInt(route.query.location) || null,
     isDelete: route.query['is-delete'] || false,
 });
 
@@ -67,7 +69,7 @@ const home = computed(() => ({
     label: t("administration"),
     route: "/administration",
 }));
-const items = computed(() => [{ label: t("cards.clientsB2C") }]);
+const items = computed(() => [{ label: t("cards.payments") }]);
 const options = computed(() => [t('active'), t('archive')]);
 // watchers
 
@@ -79,6 +81,7 @@ watch(archiveOrActive, (newVal) => {
 watch(
     [() => debouncedFilter.value, () => filters.value],
     async () => {
+
         const queryFilter = {
             page: filters.value.page,
             "items-per-page": filters.value.itemsPerPage,
@@ -93,37 +96,44 @@ watch(
             delete queryFilter.name;
         }
 
+
+        if (filters.value.location !== null) {
+            queryFilter.location = filters.value.location;
+        } else {
+            delete queryFilter.location;
+        }
+
         await updateQuery(router, queryFilter);
 
-        await customerStore.fetchCustomers(route.query, false);
+        await paymentStore.fetchPayments(route.query);
     },
     { immediate: true, deep: true },
 );
 
 const deleteAction = (id) => {
-    currentCustomerId.value = id;
+    currentPaymentId.value = id;
     visible.value.deleteVisible = true;
 };
 
 const restoreAction = (id) => {
-    currentCustomerId.value = id;
+    currentPaymentId.value = id;
     visible.value.restoreVisible = true;
 };
 
-const deleteCustomer = async () => {
+const deletePayment = async () => {
     isDeleteLoading.value = true;
-    await customerStore.deleteCustomer(currentCustomerId.value);
-    toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('client.nominativeCapitalize') }), life: 3000 })
+    await paymentStore.deletePayment(currentPaymentId.value);
     isDeleteLoading.value = false;
     visible.value.deleteVisible = false;
+    toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('payment.nominativeCapitalize') }), life: 3000 })
 };
 
-const restoreCustomer = async () => {
+const restorePayment = async () => {
     isDeleteLoading.value = true;
-    await customerStore.restoreCustomer(currentCustomerId.value);
+    await paymentStore.restorePayment(currentPaymentId.value);
     isDeleteLoading.value = false;
     visible.value.restoreVisible = false;
-    toast.add({ severity: 'success', summary: t('toast.restored', { name: t('client.nominativeCapitalize') }), life: 3000 })
+    toast.add({ severity: 'success', summary: t('toast.restored', { name: t('payment.nominativeCapitalize') }), life: 3000 })
 };
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
@@ -137,14 +147,16 @@ function connectMercure() {
     eventSource.value.addEventListener('message', async (event) => {
         const eventDataId = JSON.parse(event.data).eventId
 
-        if (eventDataId === 5) {
-            await customerStore.fetchCustomers(route.query);
+        if (eventDataId === 15) {
+            await paymentStore.fetchPayments(route.query);
         }
     })
 }
 
 onMounted(() => {
-    locationStore.fetchLocations()
+    if(!paymentTypeStore.getPaymentTypes.models.length) {
+        paymentTypeStore.fetchPaymentTypes()
+    }
     connectMercure()
 })
 
@@ -170,9 +182,9 @@ onBeforeRouteLeave(() => {
                 class="group"
             >
                 <a :href="href" v-bind="props.action" @click="navigate">
-                <span class="text-surface-700 dark:text-surface-0 group-hover:text-main dark:group-hover:text-green transition-all">
-                    {{ item.label }}
-                </span>
+                    <span class="text-surface-700 dark:text-surface-0 group-hover:text-main dark:group-hover:text-green transition-all">
+                        {{ item.label }}
+                    </span>
                 </a>
             </router-link>
             <a v-else :href="item.url" :target="item.target" v-bind="props.action">
@@ -183,9 +195,10 @@ onBeforeRouteLeave(() => {
             <span class="text-primary">/</span>
         </template>
     </Breadcrumb>
+
     <Section
-        :add-button-name="t('buttons.newClient')"
-        :section-name="t('cards.clientsB2C')"
+        :add-button-name="t('buttons.newPayment')"
+        :section-name="t('cards.payments')"
         back-route-name="administration"
     >
         <template #buttons>
@@ -197,10 +210,10 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    @click="router.push({ name: 'add-client-b2c' })"
+                    @click="router.push({ name: 'add-payment' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >
-                    {{ t("buttons.newClient") }}
+                    {{ t("buttons.newPayment") }}
                 </Button>
             </div>
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
@@ -212,10 +225,10 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    @click="router.push({ name: 'add-client-b2c' })"
+                    @click="router.push({ name: 'add-payment' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >
-                    {{ t("buttons.newClient") }}
+                    {{ t("buttons.newPayment") }}
                 </Button>
             </div>
         </template>
@@ -223,13 +236,13 @@ onBeforeRouteLeave(() => {
         <template #sectionHeader>
             <div
                 :class="{
-                'h-0 border-transparent -my-1 sm:-my-2': !isVisibleSectionHeader,
-                'py-2 sm:py-4 h-fit border-surface-300 dark:border-surface-600/50 border': isVisibleSectionHeader
-            }"
+                    'h-0 border-transparent -my-1 sm:-my-2': !isVisibleSectionHeader,
+                    'py-2 sm:py-4 h-fit border-surface-300 dark:border-surface-600/50 border': isVisibleSectionHeader
+                }"
                 class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
             >
-                <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-y-2 sm:gap-y-4 sm:gap-x-0 items-center">
-                    <div class="col-span-2 sm:col-span-1">
+                <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
+                    <div>
                         <label class="relative max-w-full w-full">
                             <i class="pi pi-search absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1"/>
                             <InputText
@@ -240,8 +253,19 @@ onBeforeRouteLeave(() => {
                             />
                         </label>
                     </div>
+                    <div>
+                        <Select
+                            v-model="filters.location"
+                            :options="paymentTypeStore.getPaymentTypes.models"
+                            option-label="name"
+                            option-value="id"
+                            :placeholder="t('placeholders.search.byPaymentType')"
+                            showClear
+                            class="w-full"
+                        />
+                    </div>
 
-                    <div class="flex justify-end col-span-2 md:col-span-1 lg:col-span-1 xl:col-span-2">
+                    <div class="flex justify-end col-span-2 md:col-span-2 lg:col-span-1 xl:col-span-2">
                         <SelectButton v-model="archiveOrActive" :options="options" />
                     </div>
                 </div>
@@ -251,13 +275,13 @@ onBeforeRouteLeave(() => {
         <template #sectionBody>
             <!-- FILTERS OF TABLE ITEMS -->
 
-            <NoData v-if="!customerStore.getCustomers.totalItems && !customerStore.getIsLoadingCustomers" class="text-surface-400 mx-auto my-auto">
+            <NoData v-if="!paymentStore.getPayments.totalItems && !paymentStore.getIsLoadingPayments" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
 
             <!-- TABLE OF USERS -->
             <Card
-                v-if="customerStore.getIsLoadingCustomers || customerStore.getCustomers.totalItems > 0"
+                v-if="paymentStore.getIsLoadingPayments || paymentStore.getPayments.totalItems > 0"
                 pt:root="overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
@@ -266,8 +290,8 @@ onBeforeRouteLeave(() => {
                 <template #content>
                     <DataTable
                         ref="data-table"
-                        :value="customerStore.getIsLoadingCustomers ?  Array(10).fill({}) : customerStore.getCustomers.models"
-                        :total-records="customerStore.getCustomers.totalItems"
+                        :value="paymentStore.getIsLoadingPayments ?  Array(10).fill({}) : paymentStore.getPayments.models"
+                        :total-records="paymentStore.getPayments.totalItems"
                         :rows="filters.itemsPerPage"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
@@ -275,26 +299,20 @@ onBeforeRouteLeave(() => {
                     >
                         <Column field="id" :header="t('labels.id')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="customerStore.getIsLoadingCustomers"/>
+                                <Skeleton height="2rem" v-if="paymentStore.getIsLoadingPayments"/>
                                 <p v-else>{{ data.id }}</p>
                             </template>
                         </Column>
                         <Column field="name" :header="t('labels.name')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="customerStore.getIsLoadingCustomers"/>
+                                <Skeleton height="2rem" v-if="paymentStore.getIsLoadingPayments"/>
                                 <p v-else>{{ data.name }}</p>
                             </template>
                         </Column>
-                        <Column field="telephone" :header="t('labels.phoneNumber')">
+                        <Column field="paymentType" :header="t('labels.paymentType')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="customerStore.getIsLoadingCustomers"/>
-                                <p v-else>{{ formatPhoneByCountry(data.telephone) }}</p>
-                            </template>
-                        </Column>
-                        <Column field="comment" :header="t('labels.comment')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="customerStore.getIsLoadingCustomers"/>
-                                <p v-else>{{ data.comment }}</p>
+                                <Skeleton height="2rem" v-if="paymentStore.getIsLoadingPayments"/>
+                                <p v-else>{{ data.paymentType?.name }}</p>
                             </template>
                         </Column>
                         <Column field="id" class="flex justify-end">
@@ -302,12 +320,15 @@ onBeforeRouteLeave(() => {
                                 <p class="font-semibold">{{ t('actions') }}</p>
                             </template>
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="customerStore.getIsLoadingCustomers"/>
+                                <Skeleton height="2rem" v-if="paymentStore.getIsLoadingPayments"/>
+                                <div class="h-6" v-else-if="data.paymentType.id === 1">
+
+                                </div>
                                 <div v-else>
                                     <div v-if="route.query['is-delete'] === 'false'" class="flex items-center gap-2">
                                         <Button
                                             @click="router.push({
-                                                name: 'edit-client-b2c',
+                                                name: 'edit-payment',
                                                 params: { id: data.id },
                                             })"
                                             icon="pi pi-pencil"
@@ -334,7 +355,7 @@ onBeforeRouteLeave(() => {
                         </Column>
 
                         <template #footer>
-                            <div v-if="customerStore.getIsLoadingCustomers" class="flex justify-between">
+                            <div v-if="paymentStore.getIsLoadingPayments" class="flex justify-between">
                                 <Skeleton height="2rem" width="10rem" />
                                 <Skeleton height="2rem" width="5rem"/>
                             </div>
@@ -342,72 +363,73 @@ onBeforeRouteLeave(() => {
                                 <PaginatorComponent
                                     v-model="filters.page"
                                     v-model:items-per-page="filters.itemsPerPage"
-                                    :total-items="customerStore.getCustomers.totalItems"
+                                    :total-items="paymentStore.getPayments.totalItems"
                                 />
                             </div>
                         </template>
                     </DataTable>
+
+                    <!-- DELETE SELLER DIALOG -->
+                    <Dialog
+                        v-model:visible="visible.deleteVisible"
+                        modal
+                        :closable="false"
+                        class="sm:min-w-100 sm:w-fit w-9/10"
+                        pt:root="px-2"
+                    >
+                        <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                            {{ t('dialog.deleteConfirmation', { name: t('seller.accusative'), id: currentPaymentId }) }}
+                        </span>
+
+                        <template #footer>
+                            <div class="flex justify-end gap-2">
+                                <SecondaryButton
+                                    type="button"
+                                    :label="t('dialog.cancel')"
+                                    @click="visible.deleteVisible = false"
+                                />
+                                <Button
+                                    type="button"
+                                    :label="t('dialog.confirm')"
+                                    @click="deletePayment"
+                                    :loading="isDeleteLoading"
+                                    class="px-5"
+                                />
+                            </div>
+                        </template>
+                    </Dialog>
+
+                    <!-- RESTORE SELLER DIALOG -->
+                    <Dialog
+                        v-model:visible="visible.restoreVisible"
+                        modal
+                        :closable="false"
+                        class="sm:min-w-100 sm:w-fit w-9/10"
+                        pt:root="px-2"
+                    >
+                        <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                            {{ t('dialog.recoverConfirmation', { name: t('seller.accusative'), id: currentPaymentId }) }}
+                        </span>
+
+                        <template #footer>
+                            <div class="flex justify-end gap-2">
+                                <SecondaryButton
+                                    type="button"
+                                    :label="t('dialog.cancel')"
+                                    @click="visible.restoreVisible = false"
+                                />
+                                <Button
+                                    type="button"
+                                    :label="t('dialog.confirm')"
+                                    @click="restorePayment"
+                                    :loading="isDeleteLoading"
+                                    class="px-5"
+                                />
+                            </div>
+                        </template>
+                    </Dialog>
                 </template>
             </Card>
-            <!-- DELETE B2B DIALOG -->
-            <Dialog
-                v-model:visible="visible.deleteVisible"
-                modal
-                :closable="false"
-                class="sm:min-w-100 sm:w-fit w-9/10"
-                pt:root="px-2"
-            >
-                    <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.deleteConfirmation', { name: t('client.accusative'), id: currentCustomerId }) }}
-                    </span>
-
-                <template #footer>
-                    <div class="flex justify-end gap-2">
-                        <SecondaryButton
-                            type="button"
-                            :label="t('dialog.cancel')"
-                            @click="visible.deleteVisible = false"
-                        />
-                        <Button
-                            type="button"
-                            :label="t('dialog.confirm')"
-                            @click="deleteCustomer"
-                            :loading="isDeleteLoading"
-                            class="px-5"
-                        />
-                    </div>
-                </template>
-            </Dialog>
-
-            <!-- RECOVER B2B DIALOG -->
-            <Dialog
-                v-model:visible="visible.restoreVisible"
-                modal
-                :closable="false"
-                class="sm:min-w-100 sm:w-fit w-9/10"
-                pt:root="px-2"
-            >
-                    <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.recoverConfirmation', { name: t('client.accusative'), id: currentCustomerId }) }}
-                    </span>
-
-                <template #footer>
-                    <div class="flex justify-end gap-2">
-                        <SecondaryButton
-                            type="button"
-                            :label="t('dialog.cancel')"
-                            @click="visible.restoreVisible = false"
-                        />
-                        <Button
-                            type="button"
-                            :label="t('dialog.confirm')"
-                            @click="restoreCustomer"
-                            :loading="isDeleteLoading"
-                            class="px-5"
-                        />
-                    </div>
-                </template>
-            </Dialog>
         </template>
     </Section>
 </template>

@@ -91,7 +91,7 @@
         "accusative": "ta'minotchini",
         "accusativeCapitalize": "Ta'minotchini"
     },
-    "products": {
+    "product": {
         "nominative": "mahsulot",
         "nominativeCapitalize": "Mahsulot",
         "accusative": "mahsulotni",
@@ -178,7 +178,7 @@
         "categoryName": "Kategoriya nomini kiriting...",
         "qr": "QR kodni kiriting...",
         "code": "Kodni kiriting...",
-        "title": "Kodni kiriting...",
+        "title": "Nomni kiriting...",
         "wholesalePrice": "Ulgurji narxni kiriting...",
         "retailPrice": "Chakana narxni kiriting...",
         "minQty": "Eng kam miqdor kiriting..."
@@ -195,6 +195,7 @@
         "newShop": "Yangi do‘kon",
         "newCollection": "Yangi to‘plam",
         "newColor": "Yangi rang",
+        "newPayment": "Yangi to‘lov",
         "filters": "Filterlar"
     },
     "errorMessages": {
@@ -256,7 +257,7 @@
         "currencyRates": "Valyuta kurslari",
         "colors": "Ranglar",
         "kpi": "KPI foizi",
-        "paymentType": "To‘lov turi",
+        "payments": "To‘lovlar",
         "collection": "To‘plam",
         "productsInWarehouse": "Ombordagi mahsulotlar",
         "productsInShop": "Do‘kondagi mahsulotlar",
@@ -317,6 +318,10 @@
             "edit": "O‘zgartirish"
         },
         "products": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "payments": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
         }

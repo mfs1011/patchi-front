@@ -127,7 +127,7 @@ onBeforeRouteLeave(() => {
     <Section
         :section-name="t('cards.inventory')"
         back-route-name="reports"
-        without-add-button
+        without-buttons
     >
         <template #sectionBody>
             <!-- FILTERS OF TABLE ITEMS -->

@@ -91,7 +91,7 @@
         "accusative": "supplier",
         "accusativeCapitalize": "Supplier"
     },
-    "products": {
+    "product": {
         "nominative": "product",
         "nominativeCapitalize": "Product",
         "accusative": "product",
@@ -195,6 +195,7 @@
         "newShop": "New shop",
         "newCollection": "New collection",
         "newColor": "New color",
+        "newPayment": "New payment",
         "filters": "Filters"
     },
     "errorMessages": {
@@ -256,7 +257,7 @@
         "currencyRates": "Currency Rates",
         "colors": "Colors",
         "kpi": "KPI percent",
-        "paymentType": "Payment type",
+        "payments": "Payments",
         "collection": "Collection",
         "productsInWarehouse": "Products in warehouse",
         "productsInShop": "Products in shop",
@@ -317,6 +318,10 @@
             "edit": "Edit"
         },
         "products": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "payments": {
             "add": "Add",
             "edit": "Edit"
         }

@@ -393,10 +393,28 @@ export const routes = [
                         component: () => import('@/views/admin/KPI.vue')
                     },
                     {
-                        path: 'payment-type',
-                        name: 'payment-type',
+                        path: 'payments',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/PaymentType.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'payments',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/payment/Payments.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-payment',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/payment/PaymentsAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-payment',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/payment/PaymentsEdit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'collections',

@@ -60,9 +60,9 @@ const schema = computed(() => yup.object({
     name: yup.string().required(t('errorMessages.titleRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     category: yup.number().required(t('errorMessages.categoryRequired')),
     assembly: yup.number().notRequired(),
-    wholesalePrice: yup.number().required(t('errorMessages.wholesalePriceRequired')),
-    retailPrice: yup.number().required(t('errorMessages.retailPriceRequired')),
-    minQty: yup.number().required(t('errorMessages.minQtyRequired')),
+    wholesalePrice: yup.number().notRequired(),
+    retailPrice: yup.number().notRequired(),
+    minQty: yup.number().notRequired(),
     photo: yup
         .mixed()
         .test(
@@ -257,7 +257,7 @@ const confirmLeave = () => {
                 <template #content>
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-4 sm:max-w-180 w-full">
                         <label class="block">
-                            <span>{{ t('labels.qr') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.qr') }}</span>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="3.1rem" width="22rem" v-if="isLoading"/>
 
@@ -343,7 +343,7 @@ const confirmLeave = () => {
                         </div>
 
                         <label class="block">
-                            <span>{{ t('labels.wholesalePrice') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.wholesalePrice') }}</span>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="3.1rem" width="22rem" v-if="isLoading"/>
 
@@ -362,7 +362,7 @@ const confirmLeave = () => {
                         </label>
 
                         <label class="block">
-                            <span>{{ t('labels.retailPrice') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.retailPrice') }}</span>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="3.1rem" width="22rem" v-if="isLoading"/>
 
@@ -380,7 +380,7 @@ const confirmLeave = () => {
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.retailPrice }}</Message>
                         </label>
                         <label class="block">
-                            <span>{{ t('labels.minQty') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.minQty') }}</span>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="3.1rem" width="22rem" v-if="isLoading"/>
 
