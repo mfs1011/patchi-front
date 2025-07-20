@@ -138,7 +138,7 @@ function connectMercure() {
         const eventDataId = JSON.parse(event.data).eventId
 
         if (eventDataId === 5) {
-            await sellerStore.fetchSellers(route.query);
+            await customerStore.fetchCustomers(route.query);
         }
     })
 }
