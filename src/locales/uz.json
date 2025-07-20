@@ -140,7 +140,8 @@
         "title": "Nom",
         "minQty": "Eng kam miqdor",
         "photoPreview": "Rasm ko‘rinishi",
-        "changePhoto": "Rasmni o‘zgartirish"
+        "changePhoto": "Rasmni o‘zgartirish",
+        "paymentType": "To‘lov turi"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
@@ -160,7 +161,8 @@
             "byCode": "Kodi bo‘yicha qidiruv",
             "byQr": "QR kodi bo‘yicha qidiruv",
             "byCategory": "Kategoriyasi bo‘yicha qidiruv",
-            "byAssembly": "To‘plam bo‘yicha qidiruv"
+            "byAssembly": "To‘plam bo‘yicha qidiruv",
+            "byPaymentType": "To‘lov turi bo‘yicha qidiruv"
         },
         "select": {
             "role": "Rol tanlang",
@@ -169,7 +171,8 @@
             "categoryType": "Kategoriya turini tanlang",
             "unit": "Birlikni tanlang",
             "category": "Kategoriyani tanlang",
-            "assembly": "To‘plamni tanlang"
+            "assembly": "To‘plamni tanlang",
+            "paymentType": "To‘lov turini tanlang"
         },
         "shopName": "Do‘kon nomini kiriting...",
         "warehouseName": "Ombor nomini kiriting...",
@@ -226,7 +229,8 @@
         "shopRequired": "Do‘kon tanlash majburiy",
         "maxCharacter": "Eng ko‘pi bilan {count} ta belgidan iborat bo‘lishi kerak",
         "maxSizePhoto": "Rasm hajmi {size} MB dan oshmasligi kerak",
-        "availablePhotoFormat": "Yuklanadigan rasm formati faqat quyidagilardan biri bo‘lishi kerak: {formats}"
+        "availablePhotoFormat": "Yuklanadigan rasm formati faqat quyidagilardan biri bo‘lishi kerak: {formats}",
+        "paymentTypeRequired": "To‘lov tirini kiritish majburiy"
     },
     "dialog": {
         "confirm": "Tasdiqlash",

@@ -140,7 +140,8 @@
         "dateTo": "Date to",
         "responsible": "Responsible",
         "photoPreview": "Photo preview",
-        "changePhoto": "Change photo"
+        "changePhoto": "Change photo",
+        "paymentType": "Payment type"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
@@ -162,7 +163,8 @@
             "byCode": "Search by code",
             "byQr": "Search by QR code",
             "byCategory": "Search by category",
-            "byAssembly": "Search by collection"
+            "byAssembly": "Search by collection",
+            "byPaymentType": "Search by payment type"
         },
         "select": {
             "role": "Select role",
@@ -171,7 +173,8 @@
             "categoryType": "Select category type",
             "unit": "Select unit",
             "category": "Select category",
-            "assembly": "Select assembly"
+            "assembly": "Select assembly",
+            "paymentType": "Select payment type"
         },
         "supplierName": "Enter supplier name...",
         "colorName": "Enter color name...",
@@ -226,7 +229,8 @@
         "shopRequired": "Shop selection is required",
         "maxCharacter": "Must be no more than {count} characters",
         "maxSizePhoto": "The image size must not exceed {size} MB",
-        "availablePhotoFormat": "Allowed image formats: {formats}"
+        "availablePhotoFormat": "Allowed image formats: {formats}",
+        "paymentTypeRequired": "Payment type is required"
     },
     "dialog": {
         "confirm": "Confirm",
