@@ -103,6 +103,18 @@
         "accusative": "kodni",
         "accusativeCapitalize": "Kodni"
     },
+    "payment": {
+        "nominative": "to‘lov",
+        "nominativeCapitalize": "To‘lov",
+        "accusative": "to‘lovni",
+        "accusativeCapitalize": "To‘lovni"
+    },
+    "title": {
+        "nominative": "nom",
+        "nominativeCapitalize": "Nom",
+        "accusative": "nomni",
+        "accusativeCapitalize": "Nomni"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Sotuvchi",
@@ -215,7 +227,7 @@
         "newSeller": "Yangi sotuvchi",
         "newCategory": "Yangi kategoriya",
         "newClient": "Yangi mijoz",
-        "newSupplier": "Yangi yetkazib beruvchi",
+        "newSupplier": "Yangi Ta'minotchi",
         "newProduct": "Yangi mahsulot",
         "newWarehouse": "Yangi ombor",
         "newShop": "Yangi do‘kon",

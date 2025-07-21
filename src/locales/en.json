@@ -103,6 +103,18 @@
         "accusative": "code",
         "accusativeCapitalize": "Code"
     },
+    "payment": {
+        "nominative": "payment",
+        "nominativeCapitalize": "Payment",
+        "accusative": "payment",
+        "accusativeCapitalize": "Payment"
+    },
+    "title": {
+        "nominative": "title",
+        "nominativeCapitalize": "Title",
+        "accusative": "title",
+        "accusativeCapitalize": "Title"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",

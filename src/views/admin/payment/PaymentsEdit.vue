@@ -48,7 +48,7 @@ const createPaymentTypes = computed(() => paymentTypeStore.getCreatePaymentTypes
 }))
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
-    name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    name: yup.string().required(t('errorMessages.titleRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     paymentType: yup.number().required(t('errorMessages.paymentTypeRequired'))
 }))
 
@@ -79,7 +79,7 @@ const onSubmit = handleSubmit(async values => {
         resetForm()
         router.back()
     } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('phone.nominativeCapitalize') }), life: 3000 })
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('title.nominativeCapitalize') }), life: 3000 })
     }
 })
 
@@ -167,7 +167,7 @@ const confirmLeave = () => {
                 <template #content>
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-100 gap-2 sm:gap-4">
                         <label class="block">
-                            <span>{{ t('labels.name') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.title') }}</span><span class="text-red-500"> *</span>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="3.1rem" width="25rem" v-if="isLoading"/>
                             <InputText

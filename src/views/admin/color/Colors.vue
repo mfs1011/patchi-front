@@ -337,7 +337,7 @@ onBeforeRouteLeave(() => {
                 pt:root="px-2"
             >
                     <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.deleteConfirmation', { name: t('warehouses.accusative'), id: currentColorId }) }}
+                        {{ t('dialog.deleteConfirmation', { name: t('colors.accusative'), id: currentColorId }) }}
                     </span>
 
                 <template #footer>
@@ -367,7 +367,7 @@ onBeforeRouteLeave(() => {
                 pt:root="px-2"
             >
                     <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.recoverConfirmation', { name: t('warehouses.accusative'), id: currentColorId }) }}
+                        {{ t('dialog.recoverConfirmation', { name: t('colors.accusative'), id: currentColorId }) }}
                     </span>
 
                 <template #footer>

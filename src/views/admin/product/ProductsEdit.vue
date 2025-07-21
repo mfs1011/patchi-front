@@ -173,7 +173,7 @@ onMounted(async () => {
         wholesalePrice: productStore.getProduct.wholesalePrice,
         retailPrice :productStore.getProduct.retailPrice,
         minQty: productStore.getProduct.minQty,
-        photoPreview: productStore.getProduct.photo?.contentUrl
+        assembly: productStore.getProduct.assembly
     }
 
     photoPreview.value = productStore.getProduct.photo?.contentUrl
@@ -250,7 +250,7 @@ const confirmLeave = () => {
         </template>
     </Breadcrumb>
 
-    <Section
+     <Section
         :section-name="t('sections.products.edit')"
         back-route-name="products"
         without-buttons
