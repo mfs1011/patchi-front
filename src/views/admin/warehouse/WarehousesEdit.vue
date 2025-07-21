@@ -27,6 +27,7 @@ const showLeaveDialog = ref(false)
 const isEdited = ref(false)
 const pendingNavigation = ref(false)
 const isConfirmLoading = ref(false)
+const initialValues = ref({})
 
 const home = ref({
     icon: 'pi pi-home',
@@ -48,9 +49,11 @@ const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
 const { value: name } = useField('name');
 
 const onSubmit = handleSubmit(async values => {
-    const payload = {
-        name: values.name
-    };
+    const payload = buildChangedPayload(values, initialValues.value);
+
+    if (Object.keys(payload).length === 0) {
+        return // hech narsa o'zgarmasa shunchaki to'xtatish
+    }
 
     try {
         const response = await locationStore.putLocation(payload, route.params.id)
@@ -71,9 +74,17 @@ onMounted(async () => {
 
     await locationStore.fetchLocation(route.params.id)
 
-    isLoading.value = false
+    initialValues.value = {
+        name : locationStore.getLocation.name
+    }
 
-    name.value = locationStore.getLocation.name
+    resetForm({
+        values: {
+            ...initialValues.value
+        }
+    })
+
+    isLoading.value = false
 })
 
 const isChanged = computed(() => name.value !== locationStore.getLocation.name)

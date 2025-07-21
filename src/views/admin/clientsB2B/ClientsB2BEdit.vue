@@ -17,6 +17,7 @@ import Dialog from "@/volt/Dialog.vue";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
+import {buildChangedPayload} from "@/helpers/payloadUtils.js";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -31,6 +32,7 @@ const isEdited = ref(false)
 const pendingNavigation = ref(false)
 const isConfirmLoading = ref(false)
 const phoneInput = useTemplateRef('phoneInput')
+const initialValues = ref({})
 
 const home = ref({
     icon: 'pi pi-home',
@@ -56,11 +58,11 @@ const { value: telephone } = useField('telephone', undefined, { validateOnValueU
 const { value: comment } = useField('comment');
 
 const onSubmit = handleSubmit(async values => {
-    const payload = {
-        name: values.name,
-        telephone: values.telephone.replace(/\D/g, ''),
-        comment: values.comment
-    };
+    const payload = buildChangedPayload({...values, telephone: values.telephone.replace(/\D/g, '')}, initialValues.value);
+
+    if (Object.keys(payload).length === 0) {
+        return // hech narsa o'zgarmasa shunchaki to'xtatish
+    }
 
     try {
         const response = await customerStore.putCustomer(payload, route.params.id)
@@ -84,9 +86,19 @@ onMounted(async () => {
 
     isLoading.value = false
 
-    name.value = customerStore.getCustomer.name
     phoneInput.value.setPhone(await customerStore.getCustomer.telephone.slice(0, 3), await customerStore.getCustomer.telephone.slice(3))
-    comment.value = customerStore.getCustomer.comment
+
+    initialValues.value = {
+        name : customerStore.getCustomer.name,
+        telephone : customerStore.getCustomer.telephone.replace(/\D/g, ''),
+        comment: customerStore.getCustomer.comment
+    }
+
+    resetForm({
+        values: {
+            ...initialValues.value
+        }
+    })
 })
 
 const isChanged = computed(() => {
@@ -115,6 +127,7 @@ const confirmLeave = () => {
 </script>
 
 <template>
+    {{initialValues}}
     <Breadcrumb :home="home" :model="items" class="rounded-md border border-surface-300 dark:border-surface-600/50">
         <template #item="{ item, props }">
             <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom class="group hidden lg:block">
@@ -193,7 +206,7 @@ const confirmLeave = () => {
 
                         <div class="flex justify-end gap-2 mt-5">
                             <Skeleton height="2.7rem" width="7.6rem" v-if="isLoading"/>
-                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged"/>
+                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged || isSubmitting"/>
                         </div>
                     </form>
                 </template>

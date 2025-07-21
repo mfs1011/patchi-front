@@ -17,6 +17,7 @@ import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
 import {usePaymentStore} from "@/stores/payment.js";
 import {usePaymentTypeStore} from "@/stores/paymentType.js";
+import {buildChangedPayload} from "@/helpers/payloadUtils.js";
 
 const toast = useToast();
 const { t } = useI18n()
@@ -39,7 +40,12 @@ const home = ref({
 });
 
 const items = computed(() => [{ label: t('cards.payments'), route: { name: 'payments'} }, { label: t('sections.payments.edit') }]);
-
+const createPaymentTypes = computed(() => paymentTypeStore.getCreatePaymentTypes.models.map(createPaymentType => {
+    return {
+        ...createPaymentType,
+        name: t(`labels.${createPaymentType.name}`)
+    }
+}))
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
     name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
@@ -54,13 +60,11 @@ const { value: name } = useField('name');
 const { value: paymentType } = useField('paymentType')
 
 const onSubmit = handleSubmit(async values => {
-    const payload = {};
-
-    for(const key in values) {
-        if(values[key] !== initialValues.value[key]) {
-            payload[key] = values[key]
-        }
+    const uriKeys = {
+        paymentType: '/api/payment_types/',
     }
+
+    const payload = buildChangedPayload(values, initialValues.value, uriKeys);
 
     if (Object.keys(payload).length === 0) {
         return // hech narsa o'zgarmasa shunchaki to'xtatish
@@ -184,7 +188,7 @@ const confirmLeave = () => {
                             <Select
                                 v-show="!isLoading"
                                 v-model="paymentType"
-                                :options="paymentTypeStore.getCreatePaymentTypes.models"
+                                :options="createPaymentTypes"
                                 option-label="name"
                                 option-value="id"
                                 :placeholder="t('placeholders.select.paymentType')"
@@ -197,7 +201,7 @@ const confirmLeave = () => {
 
                         <div class="flex justify-end gap-2 mt-5">
                             <Skeleton height="2.7rem" width="7.5rem" v-if="isLoading"/>
-                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged"/>
+                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged || isSubmitting"/>
                         </div>
                     </form>
                 </template>

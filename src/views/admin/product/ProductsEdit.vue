@@ -21,6 +21,7 @@ import {useCategoryStore} from "@/stores/category.js";
 import InputNumber from "@/volt/InputNumber.vue";
 import InputFile from "@/components/UI/InputFile.vue";
 import Skeleton from "@/volt/Skeleton.vue";
+import {buildChangedPayload} from "@/helpers/payloadUtils.js";
 
 const toast = useToast();
 const { t } = useI18n()
@@ -40,6 +41,7 @@ const isConfirmLoading = ref(false)
 const isVisible = ref(false)
 const fileInput = useTemplateRef('fileInput');
 const photoName = ref('');
+const initialValues = ref({})
 
 const home = ref({
     icon: 'pi pi-home',
@@ -108,18 +110,15 @@ const setPhoto = event => {
 }
 
 const onSubmit = handleSubmit(async values => {
-    const payload = {
-        qr: values.qr,
-        code: values.code,
-        name: values.name,
-        category: `/api/categories/${values.category}`,
-        wholesalePrice: values.wholesalePrice,
-        retailPrice: values.retailPrice,
-        minQty: values.minQty,
+    const uriKeys = {
+        category: '/api/categories/',
+        assembly: '/api/assemblies/'
     };
 
-    if (assembly.value) {
-        payload.assembly = `/api/assemblies/${assembly.value}`
+    const payload = buildChangedPayload(values, initialValues.value, uriKeys);
+
+    if (Object.keys(payload).length === 0) {
+        return // hech narsa o'zgarmasa shunchaki to'xtatish
     }
 
     try {
@@ -166,19 +165,28 @@ onMounted(async () => {
 
     isLoading.value = false
 
-    qr.value = productStore.getProduct.qr
-    code.value = productStore.getProduct.code
-    name.value = productStore.getProduct.name
-    category.value = productStore.getProduct.category.id
-
-    if (productStore.getProduct.assembly) {
-        assembly.value = productStore.getProduct.assembly.id
+    initialValues.value = {
+        qr : productStore.getProduct.qr,
+        code : productStore.getProduct.code,
+        name: productStore.getProduct.name,
+        category: productStore.getProduct.category.id,
+        wholesalePrice: productStore.getProduct.wholesalePrice,
+        retailPrice :productStore.getProduct.retailPrice,
+        minQty: productStore.getProduct.minQty,
+        photoPreview: productStore.getProduct.photo?.contentUrl
     }
 
-    wholesalePrice.value = productStore.getProduct.wholesalePrice
-    retailPrice.value = productStore.getProduct.retailPrice
-    minQty.value = productStore.getProduct.minQty
     photoPreview.value = productStore.getProduct.photo?.contentUrl
+
+    if (productStore.getProduct.assembly) {
+        initialValues.value.assembly = productStore.getProduct.assembly.id
+    }
+
+    resetForm({
+        values: {
+            ...initialValues.value
+        }
+    })
 })
 
 const isChanged = computed(() => {
@@ -434,7 +442,7 @@ const confirmLeave = () => {
                         </div>
 
                         <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
-                            <Button type="submit" :label="t('dialog.confirm')" :disabled="!isChanged" class="px-5" :loading="isSubmitting"/>
+                            <Button type="submit" :label="t('dialog.confirm')" :disabled="!isChanged" class="px-5" :loading="isSubmitting || isSubmitting"/>
                         </div>
                     </form>
                 </template>

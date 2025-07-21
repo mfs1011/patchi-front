@@ -42,6 +42,7 @@ const showLeaveDialog = ref(false);
 const isEdited = ref(false);
 const isConfirmLoading = ref(false);
 const isLoading = ref(false);
+const isLoadingForLocation = ref(false);
 
 const items = computed(() => [{ label: t('cards.users'), route: { name: 'users'} }, { label: t('sections.users.edit') }]);
 
@@ -98,30 +99,50 @@ const { value: warehouse } = useField('warehouse')
 const { value: shop } = useField('shop')
 
 const onSubmit = handleSubmit(async values => {
-    const payload = {
-        username: values.phoneNumber.replace(/\D/g, ''),
-        name: values.fullName,
-        role: `/api/roles/${values.role}`,
-        locations: []
-    };
+    const payload = {};
+
+    if (values.phoneNumber.replace(/\D/g, '') !== userStore.getUser.username) {
+        payload.username = values.phoneNumber.replace(/\D/g, '')
+    }
+
+    if (values.fullName !== userStore.getUser.name) {
+        payload.name = values.fullName
+    }
+
+    if (values.role !== userStore.getUser.role.id) {
+        payload.role = `/api/roles/${values.role}`
+    }
 
     if (password.value) {
         payload.password = password.value
     }
 
     if (role.value === 2) {
-        payload.locations = values.warehouse.map(warehouseId => ({
-            location: `/api/locations/${warehouseId}`
-        }))
+        const selectedIds = values.warehouse;
+        const currentLocationIds = userStore.getUser.locations.map(loc => loc.id)
+
+        const hasChanged =
+            selectedIds.length !== currentLocationIds.length ||
+            selectedIds.some(id => !currentLocationIds.includes(id));
+
+        if (hasChanged) {
+            payload.locations = selectedIds.map(id => ({
+                location: `/api/locations/${id}`
+            }));
+        }
     }
 
     if (role.value === 3) {
-        payload.locations = [
-            {
-                location: `/api/locations/${values.shop}`
-            }
-        ]
+        if (userStore.getUser.locations[0].id !== values.shop) {
+            payload.locations = [
+                {
+                    location: `/api/locations/${values.shop}`
+                }
+            ]
+        }
     }
+
+    console.log(payload)
 
     try {
         isConfirmLoading.value = true
@@ -187,11 +208,10 @@ onMounted(async () => {
     if (userStore.getUser.role.name === 'ROLE_SELLER') {
         shop.value = userStore.getUser.locations.map(location => location.id)[0]
     }
-
-    // console.log(warehouse.value, shop.value)
 })
 
 watch(role, async (newValue) => {
+    isLoadingForLocation.value = true;
     switch (newValue) {
         case 2:
             await locationStore.fetchLocations({ isWarehouse: true })
@@ -200,6 +220,7 @@ watch(role, async (newValue) => {
             await locationStore.fetchLocations({ isWarehouse: false })
             break;
     }
+    isLoadingForLocation.value = false
 })
 
 onBeforeRouteLeave((to, from, next) => {
@@ -321,8 +342,8 @@ const confirmLeave = () => {
                         <div v-if="role === 2" class="mb-2 mt-1">
                             <p>{{ t('labels.warehouse') }}<span class="text-red-500"> *</span></p>
 
-                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading || !locationStore.getLocations.models.length"/>
-                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading || !locationStore.getLocations.models.length"/>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading || !locationStore.getLocations.models.length || isLoadingForLocation"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading || !locationStore.getLocations.models.length || isLoadingForLocation"/>
                             <MultiSelect
                                 v-else
                                 v-model="warehouse"
@@ -341,10 +362,10 @@ const confirmLeave = () => {
                         <div v-if="role === 3" class="mb-2 mt-1">
                             <p>{{ t('labels.shop') }}</p>
 
-                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
-                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading || isLoadingForLocation"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading || isLoadingForLocation"/>
                             <Select
-                                v-show="!isLoading"
+                                v-show="!isLoading && !isLoadingForLocation"
                                 v-model="shop"
                                 :options="locationStore.getLocations.models"
                                 option-label="name"
@@ -360,7 +381,7 @@ const confirmLeave = () => {
 
                         <div class="flex justify-end gap-2 mt-5">
                             <Skeleton height="2.7rem" width="6.5rem" v-if="isLoading"/>
-                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :disabled="!isChanged" :loading="isSubmitting"/>
+                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :disabled="!isChanged || isSubmitting" :loading="isSubmitting"/>
                         </div>
                     </form>
                 </template>

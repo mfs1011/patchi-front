@@ -18,6 +18,7 @@ import {useCustomerStore} from "@/stores/customer.js";
 import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
 import {useSupplierStore} from "@/stores/supplier.js";
+import {buildChangedPayload} from "@/helpers/payloadUtils.js";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -32,6 +33,7 @@ const isEdited = ref(false)
 const pendingNavigation = ref(false)
 const isConfirmLoading = ref(false)
 const phoneInput = useTemplateRef('phoneInput')
+const initialValues = ref({})
 
 const home = ref({
     icon: 'pi pi-home',
@@ -55,11 +57,11 @@ const { value: name } = useField('name');
 const { value: telephone } = useField('telephone', undefined, { validateOnValueUpdate: false });
 
 const onSubmit = handleSubmit(async values => {
-    const payload = {
-        name: values.name,
-        telephone: values.telephone.replace(/\D/g, ''),
-    };
+    const payload = buildChangedPayload({ ...values, telephone: values.telephone.replace(/\D/g, '')}, initialValues.value);
 
+    if (Object.keys(payload).length === 0) {
+        return // hech narsa o'zgarmasa shunchaki to'xtatish
+    }
     try {
         const response = await supplierStore.putSupplier(payload, route.params.id)
         isEdited.value = true
@@ -82,8 +84,18 @@ onMounted(async () => {
 
     isLoading.value = false
 
-    name.value = supplierStore.getSupplier.name
     phoneInput.value.setPhone(await supplierStore.getSupplier.telephone.slice(0, 3), await supplierStore.getSupplier.telephone.slice(3))
+
+    initialValues.value = {
+        name : supplierStore.getSupplier.name,
+        telephone: supplierStore.getSupplier.telephone.replace(/\D/g, '')
+    }
+
+    resetForm({
+        values: {
+            ...initialValues.value
+        }
+    })
 })
 
 const isChanged = computed(() => {
@@ -171,7 +183,7 @@ const confirmLeave = () => {
 
                         <div class="flex justify-end gap-2 mt-5">
                             <Skeleton height="2.7rem" width="7.6rem" v-if="isLoading"/>
-                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged"/>
+                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged || isSubmitting"/>
                         </div>
                     </form>
                 </template>

@@ -160,7 +160,10 @@
         "totalFact": "Umumiy fakt",
         "photoPreview": "Rasm ko‘rinishi",
         "changePhoto": "Rasmni o‘zgartirish",
-        "paymentType": "To‘lov turi"
+        "paymentType": "To‘lov turi",
+        "Cash": "Naqd",
+        "Card": "Karta",
+        "Bank": "Bank hisob raqami"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
