@@ -14,6 +14,7 @@ import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
 import {useToast} from "primevue/usetoast";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
+import {getFormattedDateWithTime} from "@/helpers/numberFormat.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -175,13 +176,13 @@ onBeforeRouteLeave(() => {
                         <Column field="dateFrom" :header="t('labels.dateFrom')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="inventoryStore.getIsLoadingInventories"/>
-                                <p v-else>{{ data.dateFrom }}</p>
+                                <p v-else>{{ getFormattedDateWithTime(data.dateFrom) }}</p>
                             </template>
                         </Column>
                         <Column field="dateTo" :header="t('labels.dateTo')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="inventoryStore.getIsLoadingInventories"/>
-                                <p v-else>{{ data.dateTo }}</p>
+                                <p v-else>{{ getFormattedDateWithTime(data.dateTo) }}</p>
                             </template>
                         </Column>
                         <Column field="responsible" :header="t('labels.responsible')">
