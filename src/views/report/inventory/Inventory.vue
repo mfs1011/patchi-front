@@ -10,6 +10,7 @@ import Card from "@/volt/Card.vue";
 import NoData from "@/components/UI/NoData.vue";
 import Column from "primevue/column";
 import DataTable from "@/volt/DataTable.vue";
+import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
 
 const { t } = useI18n();
 const route = useRoute()
@@ -32,7 +33,6 @@ onMounted(async () => {
     inventoryProducts.value = inventoryStore.getInventory.inventoryProducts
     inventoryKits.value = inventoryStore.getInventory.inventoryKits
     isLoading.value = false
-
 })
 </script>
 
@@ -108,43 +108,43 @@ onMounted(async () => {
                         <Column field="location" :header="t('labels.expiryDate')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.locationQuantity.expiryDate ? data.locationQuantity.expiryDate : '-' }}</p>
+                                <p v-else>{{ data.locationQuantity.expiryDate ? getFormattedDate(data.locationQuantity.expiryDate) : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="location" :header="t('labels.income')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.incomeQty }}</p>
+                                <p v-else>{{ formatCurrency(data.incomeQty) }}</p>
                             </template>
                         </Column>
                         <Column field="status" :header="t('labels.expense')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.expenseQty }}</p>
+                                <p v-else>{{ formatCurrency(data.expenseQty) }}</p>
                             </template>
                         </Column>
                         <Column field="dateFrom" :header="t('cards.writeOffInvoices')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.writeOffQty }}</p>
+                                <p v-else>{{ formatCurrency(data.writeOffQty) }}</p>
                             </template>
                         </Column>
                         <Column field="dateTo" :header="t('labels.currentQty')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.currentQty }}</p>
+                                <p v-else>{{ formatCurrency(data.currentQty) }}</p>
                             </template>
                         </Column>
                         <Column field="responsible" :header="t('labels.factQty')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.factQty }}</p>
+                                <p v-else>{{ formatCurrency(data.factQty) }}</p>
                             </template>
                         </Column>
                         <Column field="responsible" :header="t('labels.costPrice')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.costPrice }}</p>
+                                <p v-else>{{ formatCurrency(data.costPrice) }}$</p>
                             </template>
                         </Column>
                     </DataTable>
