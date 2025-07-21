@@ -286,6 +286,8 @@ onMounted(async () => {
                                 showButtons
                                 :placeholder="t('placeholders.minQty')"
                                 size="large"
+                                :minFractionDigits="1"
+                                :maxFractionDigits="5"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.minQty }}</Message>
                         </label>

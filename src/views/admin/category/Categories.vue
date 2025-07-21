@@ -73,6 +73,12 @@ const home = computed(() => ({
 }));
 const items = computed(() => [{ label: t("cards.categories") }]);
 const options = computed(() => [t('active'), t('archive')]);
+const units = computed(() => unitStore.getUnits.models.map(unit => {
+    return {
+        ...unit,
+        name: t(`labels.${unit.name}`) // yoki boshqa o'zgarish
+    }
+}))
 // watchers
 
 watch(archiveOrActive, (newVal) => {
@@ -274,7 +280,7 @@ onBeforeRouteLeave(() => {
                     <div>
                         <Select
                             v-model="filters.unit"
-                            :options="unitStore.getUnits.models"
+                            :options="units"
                             option-label="name"
                             option-value="id"
                             :placeholder="t('placeholders.search.byUnit')"
@@ -401,7 +407,7 @@ onBeforeRouteLeave(() => {
                 pt:root="px-2"
             >
                     <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.deleteConfirmation', { name: t('warehouses.accusative'), id: currentCategoryId }) }}
+                        {{ t('dialog.deleteConfirmation', { name: t('categories.accusative'), id: currentCategoryId }) }}
                     </span>
 
                 <template #footer>
@@ -431,7 +437,7 @@ onBeforeRouteLeave(() => {
                 pt:root="px-2"
             >
                     <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.recoverConfirmation', { name: t('warehouses.accusative'), id: currentCategoryId }) }}
+                        {{ t('dialog.recoverConfirmation', { name: t('categories.accusative'), id: currentCategoryId }) }}
                     </span>
 
                 <template #footer>
