@@ -137,13 +137,13 @@ const onSubmit = handleSubmit(async values => {
         await productStore.putProduct(payload, route.params.id)
         isEdited.value = true
 
-        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('seller.nominativeCapitalize') }), life: 3000 })
+        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('product.nominativeCapitalize') }), life: 3000 })
 
         resetForm()
         router.back()
 
     } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('phone.nominativeCapitalize') }), life: 3000 })
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
     }
 })
 
@@ -393,6 +393,8 @@ const confirmLeave = () => {
                                 showButtons
                                 :placeholder="t('placeholders.minQty')"
                                 size="large"
+                                :minFractionDigits="1"
+                                :maxFractionDigits="5"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.minQty }}</Message>
                         </label>

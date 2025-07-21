@@ -23,6 +23,7 @@ import Select from "@/volt/Select.vue";
 import {useCategoryStore} from "@/stores/category.js";
 import {useAssemblyStore} from "@/stores/assembly.js";
 import updateQuery from "@/helpers/updateQuery.js";
+import {formatCurrency} from "@/helpers/numberFormat.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -45,8 +46,6 @@ const isDeleteLoading = ref(false);
 const currentProduct = ref();
 const currentProductId = ref();
 const debouncedName = useDebouncedRef(route.query['name'] || '',  500)
-const debouncedQR = useDebouncedRef(route.query['qr'] || '',  500)
-const debouncedCode = useDebouncedRef(route.query['code'] || '',  500)
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
@@ -89,8 +88,6 @@ watch(archiveOrActive, (newVal) => {
 watch(
     [
         () => debouncedName.value,
-        () => debouncedQR.value,
-        () => debouncedCode.value,
         () => filters.value
     ],
     async () => {
@@ -106,22 +103,6 @@ watch(
 
         if (debouncedName.value === "") {
             delete queryFilter.name;
-        }
-
-        if (debouncedQR.value !== null) {
-            queryFilter.qr = debouncedQR.value;
-        }
-
-        if (debouncedQR.value === "") {
-            delete queryFilter.qr;
-        }
-
-        if (debouncedCode.value !== null) {
-            queryFilter.code = debouncedCode.value;
-        }
-
-        if (debouncedCode.value === "") {
-            delete queryFilter.code;
         }
 
         if (filters.value.category !== null) {
@@ -298,31 +279,7 @@ onBeforeRouteLeave(() => {
                                 pt:root="dark:bg-surface-800 ps-10"
                                 v-model="debouncedName"
                                 class="w-full"
-                                :placeholder="t('placeholders.search.byTitle')"
-                            />
-                        </label>
-                    </div>
-
-                    <div class="col-span-2 sm:col-span-1">
-                        <label class="relative max-w-full w-full">
-                            <i class="pi pi-search absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1"/>
-                            <InputText
-                                pt:root="dark:bg-surface-800 ps-10"
-                                v-model="debouncedCode"
-                                class="w-full"
-                                :placeholder="t('placeholders.search.byCode')"
-                            />
-                        </label>
-                    </div>
-
-                    <div class="col-span-2 sm:col-span-1">
-                        <label class="relative max-w-full w-full">
-                            <i class="pi pi-search absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1"/>
-                            <InputText
-                                pt:root="dark:bg-surface-800 ps-10"
-                                v-model="debouncedQR"
-                                class="w-full"
-                                :placeholder="t('placeholders.search.byQr')"
+                                :placeholder="t('placeholders.search.byTitleAndQRAndCode')"
                             />
                         </label>
                     </div>
@@ -346,7 +303,7 @@ onBeforeRouteLeave(() => {
                         class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
                     />
 
-                    <div class="flex justify-end col-span-2 md:col-span-1 lg:col-span-1 xl:col-span-3">
+                    <div class="flex justify-end col-span-1 lg:col-span-3 xl:col-span-1">
                         <SelectButton v-model="archiveOrActive" :options="options" />
                     </div>
                 </div>
@@ -438,25 +395,25 @@ onBeforeRouteLeave(() => {
                         <Column field="costPrice" :header="t('labels.costPrice')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.costPrice ? `${data.costPrice}$` : '-' }}</p>
+                                <p v-else>{{ data.costPrice ? `${formatCurrency(data.costPrice)}$` : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="retailPrice" :header="t('labels.retailPrice')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.retailPrice ? `${data.retailPrice}$` : '-' }}</p>
+                                <p v-else>{{ data.retailPrice ? `${formatCurrency(data.retailPrice)}$` : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.wholesalePrice ? `${data.wholesalePrice}$` : '-' }}</p>
+                                <p v-else>{{ data.wholesalePrice ? `${formatCurrency(data.wholesalePrice)}$` : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="wholesalePrice" :header="t('labels.minQty')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.minQty ? `${data.minQty}` : '-' }}</p>
+                                <p v-else>{{ data.minQty ? `${formatCurrency(data.minQty)}` : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="actions" :header="t('actions')">
@@ -518,7 +475,7 @@ onBeforeRouteLeave(() => {
                 pt:root="px-2"
             >
                     <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.deleteConfirmation', { name: t('warehouses.accusative'), id: currentProductId }) }}
+                        {{ t('dialog.deleteConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
                     </span>
 
                 <template #footer>
@@ -548,7 +505,7 @@ onBeforeRouteLeave(() => {
                 pt:root="px-2"
             >
                     <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.recoverConfirmation', { name: t('warehouses.accusative'), id: currentProductId }) }}
+                        {{ t('dialog.recoverConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
                     </span>
 
                 <template #footer>

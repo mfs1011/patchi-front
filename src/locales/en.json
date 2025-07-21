@@ -97,6 +97,12 @@
         "accusative": "product",
         "accusativeCapitalize": "Product"
     },
+    "code": {
+        "nominative": "code",
+        "nominativeCapitalize": "Code",
+        "accusative": "code",
+        "accusativeCapitalize": "Code"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
@@ -161,6 +167,7 @@
         "search": {
             "byName": "Search by name",
             "byTitle": "Search by name",
+            "byTitleAndQRAndCode": "Search by name, QR or code",
             "byNameAndPhone": "Search by name or phone number",
             "byRole": "Search by role",
             "byWarehouse": "Search by warehouse",

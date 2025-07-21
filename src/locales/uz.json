@@ -97,6 +97,12 @@
         "accusative": "mahsulotni",
         "accusativeCapitalize": "Mahsulotni"
     },
+    "code": {
+        "nominative": "kod",
+        "nominativeCapitalize": "Kod",
+        "accusative": "kodni",
+        "accusativeCapitalize": "Kodni"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Sotuvchi",
@@ -159,6 +165,7 @@
         "search": {
             "byName": "Ism bo‘yicha qidiruv",
             "byTitle": "Nomi bo‘yicha qidiruv",
+            "byTitleAndQRAndCode": "Nomi, QR yoki kod orqali qidirish",
             "byNameAndPhone": "Ism yoki telefon raqam orqali qidiruv",
             "byRole": "Rol bo‘yicha qidiruv",
             "byWarehouse": "Ombor bo‘yicha qidiruv",
