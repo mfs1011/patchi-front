@@ -7,11 +7,9 @@ import {useRoute} from "vue-router";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Skeleton from "@/volt/Skeleton.vue";
 import Card from "@/volt/Card.vue";
-import Button from "@/volt/Button.vue";
 import NoData from "@/components/UI/NoData.vue";
 import Column from "primevue/column";
 import DataTable from "@/volt/DataTable.vue";
-import PaginatorComponent from "@/components/PaginatorComponent.vue";
 
 const { t } = useI18n();
 const route = useRoute()
