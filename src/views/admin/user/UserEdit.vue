@@ -142,8 +142,6 @@ const onSubmit = handleSubmit(async values => {
         }
     }
 
-    console.log(payload)
-
     try {
         isConfirmLoading.value = true
         const response = await userStore.editUser(payload, userStore.getUser.id)

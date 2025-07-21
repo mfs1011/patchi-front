@@ -183,7 +183,7 @@ const confirmLeave = () => {
                                 size="large"
                                 :class="{ 'p-invalid': errors.name }"
                             />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.fullName }}</Message>
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.name }}</Message>
                         </label>
 
                         <label class="block">
@@ -209,7 +209,7 @@ const confirmLeave = () => {
                                 size="large"
                                 pt:root="w-full dark:bg-surface-700"
                             />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.shop }}</Message>
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.location }}</Message>
                         </div>
 
                         <div class="flex justify-end gap-2 mt-5">

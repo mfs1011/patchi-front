@@ -15,6 +15,7 @@ import Dialog from "@/volt/Dialog.vue";
 import {useToast} from "primevue/usetoast";
 import {useLocationStore} from "@/stores/location.js";
 import Skeleton from "@/volt/Skeleton.vue";
+import {buildChangedPayload} from "@/helpers/payloadUtils.js";
 
 const { t, locale } = useI18n()
 const toast = useToast()
@@ -39,7 +40,7 @@ const items = computed(() => [{ label: t('cards.warehouses'), route: { name: 'wa
 
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
-    name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    name: yup.string().required(t('errorMessages.titleRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
 }))
 
 const { handleSubmit, errors, isSubmitting, resetForm } = useForm({

@@ -262,7 +262,7 @@ onBeforeRouteLeave(() => {
                                 pt:root="dark:bg-surface-800 ps-10"
                                 v-model="debouncedFilter"
                                 class="w-full"
-                                :placeholder="t('placeholders.search.byName')"
+                                :placeholder="t('placeholders.search.byTitle')"
                             />
                         </label>
                     </div>

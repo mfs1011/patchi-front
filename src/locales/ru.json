@@ -103,6 +103,18 @@
         "accusative": "кода",
         "accusativeCapitalize": "Кода"
     },
+    "payment": {
+        "nominative": "платёж",
+        "nominativeCapitalize": "Платёж",
+        "accusative": "платёжа",
+        "accusativeCapitalize": "Платёжа"
+    },
+    "title": {
+        "nominative": "название",
+        "nominativeCapitalize": "Название",
+        "accusative": "названию",
+        "accusativeCapitalize": "Названию"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",

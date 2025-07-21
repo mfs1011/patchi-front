@@ -63,7 +63,7 @@ const onSubmit = handleSubmit(async values => {
         router.back()
 
     } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('phone.nominativeCapitalize') }), life: 3000 }) //todo
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('title.nominativeCapitalize') }), life: 3000 }) //todo
     }
 })
 
@@ -111,7 +111,7 @@ onMounted(() => {
                 <template #content>
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:min-w-100 gap-2 sm:gap-4">
                         <label class="block">
-                            <span>{{ t('labels.name') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.title') }}</span><span class="text-red-500"> *</span>
                             <InputText
                                 v-model.trim="name"
                                 fluid

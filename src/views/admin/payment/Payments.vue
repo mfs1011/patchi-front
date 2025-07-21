@@ -255,7 +255,7 @@ onBeforeRouteLeave(() => {
                                 pt:root="dark:bg-surface-800 ps-10"
                                 v-model="debouncedFilter"
                                 class="w-full"
-                                :placeholder="t('placeholders.search.byName')"
+                                :placeholder="t('placeholders.search.byTitle')"
                             />
                         </label>
                     </div>
@@ -309,7 +309,7 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ data.id }}</p>
                             </template>
                         </Column>
-                        <Column field="name" :header="t('labels.name')">
+                        <Column field="name" :header="t('labels.title')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="paymentStore.getIsLoadingPayments"/>
                                 <p v-else>{{ data.name }}</p>
@@ -375,7 +375,7 @@ onBeforeRouteLeave(() => {
                         </template>
                     </DataTable>
 
-                    <!-- DELETE SELLER DIALOG -->
+                    <!-- DELETE PAYMENT DIALOG -->
                     <Dialog
                         v-model:visible="visible.deleteVisible"
                         modal
@@ -384,7 +384,7 @@ onBeforeRouteLeave(() => {
                         pt:root="px-2"
                     >
                         <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                            {{ t('dialog.deleteConfirmation', { name: t('seller.accusative'), id: currentPaymentId }) }}
+                            {{ t('dialog.deleteConfirmation', { name: t('payment.accusative'), id: currentPaymentId }) }}
                         </span>
 
                         <template #footer>
@@ -405,7 +405,7 @@ onBeforeRouteLeave(() => {
                         </template>
                     </Dialog>
 
-                    <!-- RESTORE SELLER DIALOG -->
+                    <!-- RESTORE PAYMENT DIALOG -->
                     <Dialog
                         v-model:visible="visible.restoreVisible"
                         modal
@@ -414,7 +414,7 @@ onBeforeRouteLeave(() => {
                         pt:root="px-2"
                     >
                         <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                            {{ t('dialog.recoverConfirmation', { name: t('seller.accusative'), id: currentPaymentId }) }}
+                            {{ t('dialog.recoverConfirmation', { name: t('payment.accusative'), id: currentPaymentId }) }}
                         </span>
 
                         <template #footer>

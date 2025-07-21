@@ -201,7 +201,7 @@ const confirmLeave = () => {
                                 size="large"
                                 pt:root="w-full"
                             />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.categoryType }}</Message>
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.unit }}</Message>
                         </div>
                         <div class="flex justify-end gap-2 mt-5">
                             <Skeleton height="2.7rem" width="6.5rem" v-if="isLoading"/>

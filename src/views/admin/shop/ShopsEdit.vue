@@ -40,7 +40,7 @@ const items = computed(() => [{ label: t('cards.shops'), route: { name: 'shops'}
 
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
-    name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    name: yup.string().required(t('errorMessages.titleRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
 }))
 
 const { handleSubmit, errors, isSubmitting, resetForm } = useForm({

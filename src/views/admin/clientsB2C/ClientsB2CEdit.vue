@@ -174,7 +174,7 @@ const confirmLeave = () => {
                                 size="large"
                                 :class="{ 'p-invalid': errors.name }"
                             />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.fullName }}</Message>
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.name }}</Message>
                         </label>
 
                         <label class="block">

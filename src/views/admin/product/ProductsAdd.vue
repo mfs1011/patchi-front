@@ -121,7 +121,7 @@ const onSubmit = handleSubmit(async values => {
         router.back()
 
     } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('product.nominativeCapitalize') }), life: 3000 })
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
     }
 })
 
@@ -263,7 +263,6 @@ onMounted(async () => {
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.wholesalePrice }}</Message>
                         </label>
-
                         <label class="block">
                             <span>{{ t('labels.retailPrice') }}</span>
                             <InputNumber
