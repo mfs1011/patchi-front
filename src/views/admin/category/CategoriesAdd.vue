@@ -32,6 +32,12 @@ const home = ref({
 });
 
 const items = computed(() => [{ label: t('cards.categories'), route: { name: 'categories'} }, { label: t('sections.categories.add') }]);
+const units = computed(() => unitStore.getUnits.models.map(unit => {
+    return {
+        ...unit,
+        name: t(`labels.${unit.name}`)
+    }
+}))
 
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
@@ -147,7 +153,7 @@ onMounted(() => {
 
                             <Select
                                 v-model="unit"
-                                :options="unitStore.getUnits.models"
+                                :options="units"
                                 option-label="name"
                                 option-value="id"
                                 :placeholder="t('placeholders.select.unit')"

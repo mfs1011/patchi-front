@@ -76,7 +76,7 @@ const options = computed(() => [t('active'), t('archive')]);
 const units = computed(() => unitStore.getUnits.models.map(unit => {
     return {
         ...unit,
-        name: t(`labels.${unit.name}`) // yoki boshqa o'zgarish
+        name: t(`labels.${unit.name}`)
     }
 }))
 // watchers
