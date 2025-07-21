@@ -127,7 +127,6 @@ const confirmLeave = () => {
 </script>
 
 <template>
-    {{initialValues}}
     <Breadcrumb :home="home" :model="items" class="rounded-md border border-surface-300 dark:border-surface-600/50">
         <template #item="{ item, props }">
             <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom class="group hidden lg:block">
