@@ -93,58 +93,96 @@ onMounted(async () => {
                                 <p v-else>{{ data.id }}</p>
                             </template>
                         </Column>
-                        <Column field="location" :header="t('labels.product')">
+                        <Column field="product" :header="t('labels.product')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ data.locationQuantity.product.name }}</p>
                             </template>
                         </Column>
-                        <Column field="location" :header="t('labels.color')">
+                        <Column field="color" :header="t('labels.color')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ data.locationQuantity.color ? data.locationQuantity.color.name : '-' }}</p>
                             </template>
                         </Column>
-                        <Column field="location" :header="t('labels.expiryDate')">
+                        <Column field="expiryDate" :header="t('labels.expiryDate')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ data.locationQuantity.expiryDate ? getFormattedDate(data.locationQuantity.expiryDate) : '-' }}</p>
                             </template>
                         </Column>
-                        <Column field="location" :header="t('labels.income')">
+                        <Column field="income" :header="t('labels.income')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ formatCurrency(data.incomeQty) }}</p>
+                                <p v-else>{{ formatCurrency(data.incomeQty) }} {{ t(`labels.${data.locationQuantity.product.category.unit.name}`) }}</p>
                             </template>
                         </Column>
-                        <Column field="status" :header="t('labels.expense')">
+                        <Column field="expense" :header="t('labels.expense')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ formatCurrency(data.expenseQty) }}</p>
+                                <p v-else>{{ formatCurrency(data.expenseQty) }} {{ t(`labels.${data.locationQuantity.product.category.unit.name}`) }}</p>
                             </template>
                         </Column>
-                        <Column field="dateFrom" :header="t('cards.writeOffInvoices')">
+                        <Column field="writeOffInvoices" :header="t('cards.writeOffInvoices')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ formatCurrency(data.writeOffQty) }}</p>
+                                <p v-else>{{ formatCurrency(data.writeOffQty) }} {{ t(`labels.${data.locationQuantity.product.category.unit.name}`) }}</p>
                             </template>
                         </Column>
-                        <Column field="dateTo" :header="t('labels.currentQty')">
+                        <Column field="currentQty" :header="t('labels.currentQty')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ formatCurrency(data.currentQty) }}</p>
+                                <p v-else>{{ formatCurrency(data.currentQty) }} {{ t(`labels.${data.locationQuantity.product.category.unit.name}`) }}</p>
                             </template>
                         </Column>
-                        <Column field="responsible" :header="t('labels.factQty')">
+                        <Column field="factQty" :header="t('labels.factQty')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ formatCurrency(data.factQty) }}</p>
+                                <p v-else>{{ formatCurrency(data.factQty) }} {{ t(`labels.${data.locationQuantity.product.category.unit.name}`) }}</p>
                             </template>
                         </Column>
-                        <Column field="responsible" :header="t('labels.costPrice')">
+                        <Column field="price" :header="t('labels.price')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ formatCurrency(data.costPrice) }}$</p>
+                            </template>
+                        </Column>
+                        <Column field="currentPrice" :header="t('labels.currentPrice')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="isLoading"/>
+                                <p v-else>{{ formatCurrency(data.costPrice * data.currentQty) }}$</p>
+                            </template>
+                        </Column>
+                        <Column field="factPrice" :header="t('labels.factPrice')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="isLoading"/>
+                                <p v-else>{{ formatCurrency(data.costPrice * data.factQty) }}$</p>
+                            </template>
+                        </Column>
+                        <Column field="difference" :header="t('labels.difference')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="isLoading"/>
+                                <p
+                                    v-else
+                                    :class="{
+                                        'text-green-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) >= 0,
+                                        'text-red-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) < 0
+                                    }"
+                                >
+                                    {{ formatCurrency((data.costPrice * data.factQty) - (data.costPrice * data.currentQty)) }}$
+                                </p>
+                            </template>
+                        </Column>
+                        <Column field="forTheKit" :header="t('labels.forTheKit')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="isLoading"/>
+                                <p v-else>{{ formatCurrency(data.kitProductQty) }} {{ t(`labels.${data.locationQuantity.product.category.unit.name}`) }}</p>
+                            </template>
+                        </Column>
+                        <Column field="totalFact" :header="t('labels.totalFact')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="isLoading"/>
+                                <p v-else>{{ formatCurrency(data.factQty + data.kitProductQty) }} {{ t(`labels.${data.locationQuantity.product.category.unit.name}`) }}</p>
                             </template>
                         </Column>
                     </DataTable>
