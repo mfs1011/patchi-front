@@ -258,6 +258,8 @@ onMounted(async () => {
                                 showButtons
                                 :placeholder="t('placeholders.wholesalePrice')"
                                 size="large"
+                                :minFractionDigits="1"
+                                :maxFractionDigits="2"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.wholesalePrice }}</Message>
                         </label>
@@ -273,6 +275,8 @@ onMounted(async () => {
                                 showButtons
                                 :placeholder="t('placeholders.retailPrice')"
                                 size="large"
+                                :minFractionDigits="1"
+                                :maxFractionDigits="2"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.retailPrice }}</Message>
                         </label>
@@ -287,7 +291,7 @@ onMounted(async () => {
                                 :placeholder="t('placeholders.minQty')"
                                 size="large"
                                 :minFractionDigits="1"
-                                :maxFractionDigits="5"
+                                :maxFractionDigits="2"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.minQty }}</Message>
                         </label>
