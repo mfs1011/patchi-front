@@ -154,7 +154,10 @@
         "factQty": "Факт количество",
         "photoPreview": "Предпросмотр изображения",
         "changePhoto": "Изменить фото",
-        "paymentType": "Тип оплаты"
+        "paymentType": "Тип оплаты",
+        "Cash": "Наличные",
+        "Card": "Карта",
+        "Bank": "Банковский счёт"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",

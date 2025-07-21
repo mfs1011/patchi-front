@@ -154,7 +154,10 @@
         "responsible": "Responsible",
         "photoPreview": "Photo preview",
         "changePhoto": "Change photo",
-        "paymentType": "Payment type"
+        "paymentType": "Payment type",
+        "Cash": "Cash",
+        "Card": "Card",
+        "Bank": "Bank account"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",

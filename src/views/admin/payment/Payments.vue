@@ -71,6 +71,12 @@ const home = computed(() => ({
 }));
 const items = computed(() => [{ label: t("cards.payments") }]);
 const options = computed(() => [t('active'), t('archive')]);
+const paymentTypes = computed(() => paymentTypeStore.getPaymentTypes.models.map(paymentType => {
+    return {
+        ...paymentType,
+        name: t(`labels.${paymentType.name}`)
+    }
+}))
 // watchers
 
 watch(archiveOrActive, (newVal) => {
@@ -256,7 +262,7 @@ onBeforeRouteLeave(() => {
                     <div>
                         <Select
                             v-model="filters.location"
-                            :options="paymentTypeStore.getPaymentTypes.models"
+                            :options="paymentTypes"
                             option-label="name"
                             option-value="id"
                             :placeholder="t('placeholders.search.byPaymentType')"
@@ -312,7 +318,7 @@ onBeforeRouteLeave(() => {
                         <Column field="paymentType" :header="t('labels.paymentType')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="paymentStore.getIsLoadingPayments"/>
-                                <p v-else>{{ data.paymentType?.name }}</p>
+                                <p v-else>{{ t(`labels.${data.paymentType?.name}`) }}</p>
                             </template>
                         </Column>
                         <Column field="id" class="flex justify-end">

@@ -18,6 +18,7 @@ import {useField, useForm} from "vee-validate";
 import Dialog from "@/volt/Dialog.vue";
 import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
+import {buildChangedPayload} from "@/helpers/payloadUtils.js";
 
 const toast = useToast();
 const { t } = useI18n()
@@ -33,6 +34,7 @@ const isEdited = ref(false)
 const pendingNavigation = ref(false)
 const isConfirmLoading = ref(false)
 const phoneInput = useTemplateRef('phoneInput')
+const initialValues = ref({})
 
 const home = ref({
     icon: 'pi pi-home',
@@ -46,7 +48,7 @@ const items = computed(() => [{ label: t('cards.sellers'), route: { name: 'selle
 const schema = computed(() => yup.object({
     name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     telephone: yup.string().required().length(phoneLength.value, t('errorMessages.phoneNumberMustBeExactlyCharacters', { count: phoneLength.value })),
-    shop: yup.number().required(t('errorMessages.shopRequired'))
+    location: yup.number().required(t('errorMessages.shopRequired'))
 }))
 
 const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
@@ -55,14 +57,18 @@ const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
 
 const { value: name } = useField('name');
 const { value: telephone } = useField('telephone', undefined, { validateOnValueUpdate: false });
-const { value: shop } = useField('shop')
+const { value: location } = useField('location')
 
 const onSubmit = handleSubmit(async values => {
-    const payload = {
-        name: values.name,
-        telephone: values.telephone.replace(/\D/g, ''),
-        location: `/api/locations/${values.shop}`
+    const uriKeys = {
+        location: '/api/locations/',
     };
+
+    const payload = buildChangedPayload({ ...values, telephone: values.telephone.replace(/\D/g, '')}, initialValues.value, uriKeys);
+
+    if (Object.keys(payload).length === 0) {
+        return // hech narsa o'zgarmasa shunchaki to'xtatish
+    }
 
     try {
         const response = await sellerStore.putSeller(payload, route.params.id)
@@ -87,17 +93,27 @@ onMounted(async () => {
         sellerStore.fetchSeller(route.params.id)
     ])
 
-    isLoading.value = false
-
-    name.value = sellerStore.getSeller.name
     phoneInput.value.setPhone(await sellerStore.getSeller.telephone.slice(0, 3), await sellerStore.getSeller.telephone.slice(3))
-    shop.value = sellerStore.getSeller.location.id
+
+    initialValues.value = {
+        name : sellerStore.getSeller.name,
+        location : sellerStore.getSeller.location.id,
+        telephone: sellerStore.getSeller.telephone.replace(/\D/g, '')
+    }
+
+    resetForm({
+        values: {
+            ...initialValues.value
+        }
+    })
+
+    isLoading.value = false
 })
 
 const isChanged = computed(() => {
     if (name.value !== sellerStore.getSeller.name) return true
     if (telephone.value?.replace(/\D/g, '') !== sellerStore.getSeller.telephone) return true
-    return sellerStore.getSeller.location?.id !== shop.value;
+    return sellerStore.getSeller.location?.id !== location.value;
 })
 
 
@@ -166,7 +182,6 @@ const confirmLeave = () => {
                                 :placeholder="t('placeholders.fullName')"
                                 size="large"
                                 :class="{ 'p-invalid': errors.name }"
-                                autocomplete
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.fullName }}</Message>
                         </label>
@@ -185,7 +200,7 @@ const confirmLeave = () => {
                             <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
                             <Select
                                 v-show="!isLoading"
-                                v-model="shop"
+                                v-model="location"
                                 :options="locationStore.getLocations.models"
                                 option-label="name"
                                 option-value="id"
@@ -199,7 +214,7 @@ const confirmLeave = () => {
 
                         <div class="flex justify-end gap-2 mt-5">
                             <Skeleton height="2.7rem" width="6.5rem" v-if="isLoading"/>
-                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged"/>
+                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged || isSubmitting"/>
                         </div>
                     </form>
                 </template>

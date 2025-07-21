@@ -15,6 +15,7 @@ import Dialog from "@/volt/Dialog.vue";
 import {useToast} from "primevue/usetoast";
 import {useLocationStore} from "@/stores/location.js";
 import Skeleton from "@/volt/Skeleton.vue";
+import {buildChangedPayload} from "@/helpers/payloadUtils.js";
 
 const { t, locale } = useI18n()
 const toast = useToast()
@@ -27,6 +28,7 @@ const showLeaveDialog = ref(false)
 const isEdited = ref(false)
 const pendingNavigation = ref(false)
 const isConfirmLoading = ref(false)
+const initialValues = ref({})
 
 const home = ref({
     icon: 'pi pi-home',
@@ -48,9 +50,11 @@ const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
 const { value: name } = useField('name');
 
 const onSubmit = handleSubmit(async values => {
-    const payload = {
-        name: values.name
-    };
+    const payload = buildChangedPayload(values, initialValues.value);
+
+    if (Object.keys(payload).length === 0) {
+        return // hech narsa o'zgarmasa shunchaki to'xtatish
+    }
 
     try {
         const response = await locationStore.putLocation(payload, route.params.id)
@@ -73,7 +77,15 @@ onMounted(async () => {
 
     isLoading.value = false
 
-    name.value = locationStore.getLocation.name
+    initialValues.value = {
+        name : locationStore.getLocation.name
+    }
+
+    resetForm({
+        values: {
+            ...initialValues.value
+        }
+    })
 })
 
 const isChanged = computed(() => name.value !== locationStore.getLocation.name)
@@ -151,7 +163,7 @@ const confirmLeave = () => {
 
                         <div class="flex justify-end gap-2 mt-5">
                             <Skeleton height="2.7rem" width="6.5rem" v-if="isLoading"/>
-                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged"/>
+                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged || isSubmitting"/>
                         </div>
                     </form>
                 </template>

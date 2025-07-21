@@ -16,14 +16,13 @@ import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
 import {useCategoryStore} from "@/stores/category.js";
 import Select from "@/volt/Select.vue";
-import {useCategoryTypeStore} from "@/stores/categoryType.js";
 import {useUnitStore} from "@/stores/unit.js";
+import {buildChangedPayload} from "@/helpers/payloadUtils.js";
 
 const { t, locale } = useI18n()
 const toast = useToast()
 
 const categoryStore = useCategoryStore();
-const categoryTypeStore = useCategoryTypeStore();
 const unitStore = useUnitStore();
 const router = useRouter()
 const route = useRoute()
@@ -32,6 +31,7 @@ const showLeaveDialog = ref(false)
 const isEdited = ref(false)
 const pendingNavigation = ref(false)
 const isConfirmLoading = ref(false)
+const initialValues = ref({})
 
 const home = ref({
     icon: 'pi pi-home',
@@ -50,7 +50,6 @@ const units = computed(() => unitStore.getUnits.models.map(unit => {
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
     name: yup.string().required(t('errorMessages.categoryNameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
-    categoryType: yup.number().required(t('errorMessages.categoryTypeRequired')),
     unit: yup.number().required(t('errorMessages.unitRequired')),
 }))
 
@@ -59,15 +58,18 @@ const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
 })
 
 const { value: name } = useField('name');
-const { value: categoryType } = useField('categoryType');
 const { value: unit } = useField('unit');
 
 const onSubmit = handleSubmit(async values => {
-    const payload = {
-        name: values.name,
-        unit: `/api/units/${values.unit}`,
-        categoryType: `/api/category_types/${values.categoryType}`,
+    const uriKeys = {
+        unit: '/api/units/',
     };
+
+    const payload = buildChangedPayload(values, initialValues.value, uriKeys);
+
+    if (Object.keys(payload).length === 0) {
+        return // hech narsa o'zgarmasa shunchaki to'xtatish
+    }
 
     try {
         const response = await categoryStore.putCategory(payload, route.params.id)
@@ -88,20 +90,25 @@ onMounted(async () => {
 
     await Promise.allSettled([
         categoryStore.fetchCategory(route.params.id),
-        categoryTypeStore.fetchCategoryTypes(),
         unitStore.fetchUnits()
     ])
 
     isLoading.value = false
 
-    name.value = categoryStore.getCategory.name
-    categoryType.value = categoryStore.getCategory.categoryType.id
-    unit.value = categoryStore.getCategory.unit.id
+    initialValues.value = {
+        name : categoryStore.getCategory.name,
+        unit: categoryStore.getCategory.unit.id
+    }
+
+    resetForm({
+        values: {
+            ...initialValues.value
+        }
+    })
 })
 
 const isChanged = computed(() => {
     if (name.value !== categoryStore.getCategory.name) return true
-    if (categoryType.value !== categoryStore.getCategory.categoryType?.id) return true
     return unit.value !== categoryStore.getCategory.unit?.id;
 
 })
@@ -148,8 +155,8 @@ const confirmLeave = () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.warehouses.edit')"
-        back-route-name="warehouses"
+        :section-name="t('sections.categories.edit')"
+        back-route-name="categories"
         without-buttons
     >
         <template #sectionBody>
@@ -162,7 +169,7 @@ const confirmLeave = () => {
                 <template #content>
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-fit gap-2 sm:gap-4">
                         <label class="block">
-                            <span>{{ t('labels.warehouseName') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.categoryName') }}</span><span class="text-red-500"> *</span>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="3.1rem" width="20.8rem" v-if="isLoading"/>
 
@@ -176,25 +183,6 @@ const confirmLeave = () => {
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.name }}</Message>
                         </label>
-                        <div>
-                            <p class="inline">{{ t('labels.categoryType') }}</p><span class="text-red-500"> *</span>
-
-                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
-                            <Skeleton class="hidden sm:block" height="3.1rem" width="20.8rem" v-if="isLoading"/>
-
-                            <Select
-                                v-show="!isLoading"
-                                v-model="categoryType"
-                                :options="categoryTypeStore.getCategoryTypes.models"
-                                option-label="name"
-                                option-value="id"
-                                :placeholder="t('placeholders.select.categoryType')"
-                                showClear
-                                size="large"
-                                pt:root="w-full"
-                            />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.categoryType }}</Message>
-                        </div>
 
                         <div>
                             <p class="inline">{{ t('labels.unit') }}</p><span class="text-red-500"> *</span>
@@ -217,7 +205,7 @@ const confirmLeave = () => {
                         </div>
                         <div class="flex justify-end gap-2 mt-5">
                             <Skeleton height="2.7rem" width="6.5rem" v-if="isLoading"/>
-                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged"/>
+                            <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged || isSubmitting"/>
                         </div>
                     </form>
                 </template>
