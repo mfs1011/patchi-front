@@ -97,6 +97,12 @@
         "accusative": "продукта",
         "accusativeCapitalize": "Продукта"
     },
+    "inventory": {
+        "nominative": "инвентарь",
+        "nominativeCapitalize": "Инвентарь",
+        "accusative": "инвентарь",
+        "accusativeCapitalize": "Инвентарь"
+    },
     "code": {
         "nominative": "код",
         "nominativeCapitalize": "Код",
@@ -284,6 +290,8 @@
         "clear": "Очистить",
         "logoutConfirmation": "Вы действительно хотите выйти из системы?",
         "deleteConfirmation": "Вы действительно хотите удалить {name} с ID {id}?",
+        "acceptConfirmation": "Вы действительно хотите подтвердить {name} с ID {id}?",
+        "editedConfirmation": "Вы действительно хотите изменить {name} с ID {id}?",
         "addConfirmation": "Добавить {name}",
         "editConfirmation": "Изменить {name}",
         "recoverConfirmation": "Вы действительно хотите восстановить {name} с ID {id}?",
@@ -387,6 +395,7 @@
         "success": "Успешно!",
         "created": "{name} успешно создан!",
         "edited": "{name} успешно изменен!",
+        "accepted": "{name} успешно подтвержден!",
         "deleted": "{name} успешно удален!",
         "restored": "{name} успешно восстановлен!",
         "already_exists_error": "{field} уже существует",

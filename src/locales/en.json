@@ -97,6 +97,12 @@
         "accusative": "product",
         "accusativeCapitalize": "Product"
     },
+    "inventory": {
+        "nominative": "inventory",
+        "nominativeCapitalize": "Inventory",
+        "accusative": "inventory",
+        "accusativeCapitalize": "Inventory"
+    },
     "code": {
         "nominative": "code",
         "nominativeCapitalize": "Code",
@@ -284,6 +290,8 @@
         "clear": "Clear",
         "logoutConfirmation": "Are you sure you want to log out?",
         "deleteConfirmation": "Are you sure you want to delete {name} with ID {id}?",
+        "acceptConfirmation": "Are you sure you want to accept {name} with ID {id}?",
+        "editedConfirmation": "Are you sure you want to edit {name} with ID {id}?",
         "addConfirmation": "Add {name}",
         "editConfirmation": "Edit {name}",
         "recoverConfirmation": "Are you sure you want to recover {name} with ID {id}?",
@@ -387,6 +395,7 @@
         "success": "Success!",
         "created": "{name} successfully created!",
         "edited": "{name} successfully updated!",
+        "accepted": "{name} successfully accepted!",
         "deleted": "{name} successfully deleted!",
         "restored": "{name} successfully restored!",
         "already_exists_error": "{field} already exists",

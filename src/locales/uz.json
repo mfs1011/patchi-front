@@ -97,6 +97,12 @@
         "accusative": "mahsulotni",
         "accusativeCapitalize": "Mahsulotni"
     },
+    "inventory": {
+        "nominative": "inventarizatsiya",
+        "nominativeCapitalize": "Inventarizatsiya",
+        "accusative": "inventarizatsiyani",
+        "accusativeCapitalize": "Inventarizatsiyani"
+    },
     "code": {
         "nominative": "kod",
         "nominativeCapitalize": "Kod",
@@ -284,6 +290,8 @@
         "clear": "Tozalash",
         "logoutConfirmation": "Rostdan ham tizimdan chiqmoqchimisiz?",
         "deleteConfirmation": "Rostdan ham {id} id'lik {name} o‘chirmoqchimisiz?",
+        "acceptConfirmation": "Rostdan ham {id} id'lik {name} tasdiqlamoqchimisiz?",
+        "editedConfirmation": "Rostdan ham {id} id'lik {name} o'zgartirmoqchimisiz?",
         "addConfirmation": "{name} qo‘shish",
         "editConfirmation": "{name} o‘zgartirish",
         "recoverConfirmation": "Rostdan ham {id} lik {name} tiklamoqchimisiz?",
@@ -387,6 +395,7 @@
         "success": "Muvaffaqiyat!",
         "created": "{name} muvaffaqiyatli yaratildi!",
         "edited": "{name} muvaffaqiyatli o‘zgartirildi!",
+        "accepted": "{name} muvaffaqiyatli tasdiqlandi!",
         "deleted": "{name} muvaffaqiyatli o‘chirildi!",
         "restored": "{name} muvaffaqiyatli tiklandi!",
         "already_exists_error": "{field} allaqachon mavjud",

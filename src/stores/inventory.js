@@ -7,6 +7,7 @@ export const useInventoryStore = defineStore('inventory', () => {
         inventories: {
             models: [],
             totalItems: 0,
+            isAccept: false
         },
         inventory: {},
         isLoadingInventories: false,
@@ -30,6 +31,15 @@ export const useInventoryStore = defineStore('inventory', () => {
         }
     }
 
+    const putInventoryStatus = async (inventoryData, id) => {
+        try {
+            const { data } = await authorizedClient.put(`/inventories/status/${id}`, inventoryData)
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
     const fetchInventories = async (params = { page: 1 }) => {
         try {
             state.isLoadingInventories = true
@@ -37,6 +47,7 @@ export const useInventoryStore = defineStore('inventory', () => {
             const { data } = await authorizedClient.get('/inventories', { params })
             state.inventories.models = data.member
             state.inventories.totalItems = data.totalItems
+            state.inventories.isAccept = data.isAccept
 
             return data
         } catch (error) {
@@ -60,6 +71,7 @@ export const useInventoryStore = defineStore('inventory', () => {
     return {
         pushInventory,
         putInventory,
+        putInventoryStatus,
         fetchInventories,
         fetchInventory,
         getInventories: computed(() => state.inventories),

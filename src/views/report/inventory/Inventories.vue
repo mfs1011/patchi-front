@@ -9,16 +9,27 @@ import Card from "@/volt/Card.vue";
 import Column from "primevue/column";
 import Skeleton from "@/volt/Skeleton.vue";
 import {useInventoryStore} from "@/stores/inventory.js";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import {getFormattedDateWithTime} from "@/helpers/numberFormat.js";
 import updateQuery from "@/helpers/updateQuery.js";
+import Dialog from "@/volt/Dialog.vue";
+import SecondaryButton from "@/volt/SecondaryButton.vue";
+import {useToast} from "primevue/usetoast";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const toast = useToast();
+const editVisible = ref(false);
+const isDeleteLoading = ref(false);
+
+const inventory = reactive({
+    id: 0,
+    status: 0
+});
 
 const inventoryStore = useInventoryStore()
 
@@ -58,6 +69,24 @@ watch(
     },
     { immediate: true, deep: true },
 );
+
+const editInventory = (data) => {
+    inventory.id = data.id;
+    inventory.status = data.status;
+    editVisible.value = true;
+};
+
+const editAction = async () => {
+    try {
+        isDeleteLoading.value = true;
+
+        await inventoryStore.putInventoryStatus({status: inventory.status === 1 ? 2 : 1}, inventory.id);
+        toast.add({ severity: 'success', summary: inventory.status === 1 ? t('toast.accepted', { name: t('inventory.nominativeCapitalize') }) : t('toast.edited', { name: t('inventory.nominativeCapitalize') }), life: 3000 })
+    } finally {
+        isDeleteLoading.value = false;
+        editVisible.value = false;
+    }
+};
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
 const eventSource = ref(null)
@@ -160,8 +189,13 @@ onBeforeRouteLeave(() => {
                         </Column>
                         <Column field="status" :header="t('labels.status')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="inventoryStore.getIsLoadingInventories"/>
-                                <p v-else>{{ t(data.status) }}</p>
+                                <Skeleton height="2rem" v-if="inventoryStore.getIsLoadingInventories" />
+                                <p
+                                    v-else
+                                    :class="{'text-yellow-500': data.status === 1, 'text-green-500': data.status === 2}"
+                                >
+                                    {{ t(data.status) }}
+                                </p>
                             </template>
                         </Column>
                         <Column field="dateFrom" :header="t('labels.dateFrom')">
@@ -199,6 +233,13 @@ onBeforeRouteLeave(() => {
                                             pt:root="rounded-full size-8! bg-blue-400 dark:bg-blue-400 enabled:hover:bg-blue-300 dark:enabled:hover:bg-blue-300 border-blue-400 dark:border-blue-400 enabled:hover:border-blue-300 dark:enabled:hover:border-blue-300 focus-visible:outline-blue-400 dark:focus-visible:outline-blue-400"
                                             size="small"
                                         />
+                                        <Button
+                                            v-if="data.status === 1 || inventoryStore.getInventories.isAccept"
+                                            @click="editInventory(data)"
+                                            icon="pi pi-pencil"
+                                            pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
+                                            size="small"
+                                        />
                                     </div>
                                 </div>
                             </template>
@@ -218,6 +259,35 @@ onBeforeRouteLeave(() => {
                             </div>
                         </template>
                     </DataTable>
+
+                    <Dialog
+                        v-model:visible="editVisible"
+                        modal
+                        :closable="false"
+                        class="sm:min-w-100 sm:w-fit w-9/10"
+                        pt:root="px-2"
+                    >
+                    <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                        {{ inventory.status === 1 ? t('dialog.acceptConfirmation', { name: t('inventory.accusative'), id: inventory.id }) : t('dialog.editedConfirmation', { name: t('inventory.accusative'), id: inventory.id }) }}
+                    </span>
+
+                        <template #footer>
+                            <div class="flex justify-end gap-2">
+                                <SecondaryButton
+                                    type="button"
+                                    :label="t('dialog.cancel')"
+                                    @click="editVisible = false"
+                                />
+                                <Button
+                                    type="button"
+                                    :label="t('dialog.confirm')"
+                                    @click="editAction"
+                                    :loading="isDeleteLoading"
+                                    class="px-5"
+                                />
+                            </div>
+                        </template>
+                    </Dialog>
                 </template>
             </Card>
         </template>
