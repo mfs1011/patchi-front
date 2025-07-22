@@ -418,9 +418,27 @@ export const routes = [
                     },
                     {
                         path: 'collections',
-                        name: 'collections',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/Collections.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'collections',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/collection/Collections.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-collection',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/collection/CollectionsAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-collection',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/collection/CollectionsEdit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'expiry-date-notification-day',

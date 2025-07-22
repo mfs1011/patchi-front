@@ -115,6 +115,12 @@
         "accusative": "title",
         "accusativeCapitalize": "Title"
     },
+    "collection": {
+        "nominative": "collection",
+        "nominativeCapitalize": "Collection",
+        "accusative": "collection",
+        "accusativeCapitalize": "Collection"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
@@ -295,7 +301,7 @@
         "colors": "Colors",
         "kpi": "KPI percent",
         "payments": "Payments",
-        "collection": "Collection",
+        "collections": "Collections",
         "productsInWarehouse": "Products in warehouse",
         "productsInShop": "Products in shop",
         "warehouseContent": "Warehouse content",
@@ -359,6 +365,10 @@
             "edit": "Edit"
         },
         "payments": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "collections": {
             "add": "Add",
             "edit": "Edit"
         }
