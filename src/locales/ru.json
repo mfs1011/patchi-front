@@ -175,7 +175,9 @@
         "paymentType": "Тип оплаты",
         "Cash": "Наличные",
         "Card": "Карта",
-        "Bank": "Банковский счёт"
+        "Bank": "Банковский счёт",
+        "createdAt": "Дата",
+        "usdRate": "Курс USD"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -199,7 +201,9 @@
             "byQr": "Поиск по QR-коду",
             "byCategory": "Поиск по категории",
             "byAssembly": "Поиск по коллекции",
-            "byPaymentType": "Поиск по тип оплаты"
+            "byPaymentType": "Поиск по тип оплаты",
+            "byDateFrom": "Дата с",
+            "byDateTo": "Дата по"
         },
         "select": {
             "role": "Выберите роль",
