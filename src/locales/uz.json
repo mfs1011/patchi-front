@@ -115,6 +115,12 @@
         "accusative": "nomni",
         "accusativeCapitalize": "Nomni"
     },
+    "collection": {
+        "nominative": "to‘plam",
+        "nominativeCapitalize": "To‘plam",
+        "accusative": "to‘plamni",
+        "accusativeCapitalize": "To‘plamni"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Sotuvchi",
@@ -301,7 +307,7 @@
         "colors": "Ranglar",
         "kpi": "KPI foizi",
         "payments": "To‘lovlar",
-        "collection": "To‘plam",
+        "collections": "To‘plamlar",
         "productsInWarehouse": "Ombordagi mahsulotlar",
         "productsInShop": "Do‘kondagi mahsulotlar",
         "warehouseContent": "Ombor tarkibi",
@@ -365,6 +371,10 @@
             "edit": "O‘zgartirish"
         },
         "payments": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "collections": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
         }

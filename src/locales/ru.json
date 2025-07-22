@@ -115,6 +115,12 @@
         "accusative": "названию",
         "accusativeCapitalize": "Названию"
     },
+    "collection": {
+        "nominative": "коллекция",
+        "nominativeCapitalize": "Коллекция",
+        "accusative": "коллекцию",
+        "accusativeCapitalize": "Коллекцию"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",
@@ -301,7 +307,7 @@
         "colors": "Цвета",
         "kpi": "Процент KPI",
         "payments": "Оплаты",
-        "collection": "Коллекция",
+        "collections": "Коллекции",
         "productsInWarehouse": "Продукты на складе",
         "productsInShop": "Продукты в магазине",
         "warehouseContent": "Состав склада",
@@ -365,6 +371,10 @@
             "edit": "Изменить"
         },
         "payments": {
+            "add": "Добавить",
+            "edit": "Изменить"
+        },
+        "collections": {
             "add": "Добавить",
             "edit": "Изменить"
         }
