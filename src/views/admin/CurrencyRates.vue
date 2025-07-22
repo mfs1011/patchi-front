@@ -51,7 +51,9 @@ watch(
         };
 
         if (filters.value['date-from'] !== null) {
-            queryFilter['date-from'] = new Date(filters.value['date-from']).toISOString();
+            const date = new Date(filters.value['date-from']);
+            date.setHours(date.getHours() + 5);
+            queryFilter['date-from'] = date.toISOString();
         }
 
         if (filters.value['date-from'] === "") {
@@ -59,7 +61,9 @@ watch(
         }
 
         if (filters.value['date-to'] !== null) {
-            queryFilter['date-to'] = new Date(filters.value['date-to']).toISOString();
+            const date = new Date(filters.value['date-to']);
+            date.setHours(date.getHours() + 5);
+            queryFilter['date-to'] = date.toISOString();
         }
 
         if (filters.value['date-to'] === "") {
