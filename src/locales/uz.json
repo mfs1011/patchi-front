@@ -169,7 +169,9 @@
         "paymentType": "To‘lov turi",
         "Cash": "Naqd",
         "Card": "Karta",
-        "Bank": "Bank hisob raqami"
+        "Bank": "Bank hisob raqami",
+        "createdAt": "Sana",
+        "usdRate": "USD kursi"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
@@ -191,7 +193,9 @@
             "byQr": "QR kodi bo‘yicha qidiruv",
             "byCategory": "Kategoriyasi bo‘yicha qidiruv",
             "byAssembly": "To‘plam bo‘yicha qidiruv",
-            "byPaymentType": "To‘lov turi bo‘yicha qidiruv"
+            "byPaymentType": "To‘lov turi bo‘yicha qidiruv",
+            "byDateFrom": "Sanadan",
+            "byDateTo": "Sanagacha"
         },
         "select": {
             "role": "Rol tanlang",

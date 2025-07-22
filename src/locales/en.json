@@ -169,7 +169,9 @@
         "paymentType": "Payment type",
         "Cash": "Cash",
         "Card": "Card",
-        "Bank": "Bank account"
+        "Bank": "Bank account",
+        "createdAt": "Date",
+        "usdRate": "USD Rate"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
@@ -193,7 +195,9 @@
             "byQr": "Search by QR code",
             "byCategory": "Search by category",
             "byAssembly": "Search by collection",
-            "byPaymentType": "Search by payment type"
+            "byPaymentType": "Search by payment type",
+            "byDateFrom": "From date",
+            "byDateTo": "To date"
         },
         "select": {
             "role": "Select role",
