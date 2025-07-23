@@ -153,6 +153,7 @@ watch(
                         fluid
                         iconDisplay="input"
                         :placeholder="t('placeholders.search.byDateFrom')"
+                        show-button-bar
                     />
                     <DatePicker
                         v-model="filters['date-to']"
@@ -161,6 +162,7 @@ watch(
                         fluid
                         iconDisplay="input"
                         :placeholder="t('placeholders.search.byDateTo')"
+                        show-button-bar
                     />
                 </div>
             </div>
