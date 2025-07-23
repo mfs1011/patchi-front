@@ -22,10 +22,10 @@
             </SecondaryButton>
         </template>
         <template #todaybutton="{ actionCallback, keydownCallback }">
-            <SecondaryButton pt:root="enabled:hover:bg-primary-emphasis!" variant="text" label="Today" size="small" @click="actionCallback" @keydown="keydownCallback" />
+            <SecondaryButton pt:root="enabled:hover:bg-primary-emphasis!" variant="text" :label="t('today')" size="small" @click="actionCallback" @keydown="keydownCallback" />
         </template>
         <template #clearbutton="{ actionCallback, keydownCallback }">
-            <SecondaryButton pt:root="enabled:hover:bg-primary-emphasis!" variant="text" label="Clear" size="small" @click.prevent="(event) => clear(event, actionCallback)" @keydown="keydownCallback" />
+            <SecondaryButton pt:root="enabled:hover:bg-primary-emphasis!" variant="text" :label="t('clear')" size="small" @click.prevent="(event) => clear(event, actionCallback)" @keydown="keydownCallback" />
         </template>
         <template #dropdownicon>
             <ChevronDownIcon />
@@ -108,7 +108,7 @@ import { ptViewMerge } from './utils';
 import {useI18n} from "vue-i18n";
 import {usePrimeVue} from "primevue";
 
-const { locale } = useI18n();
+const { t, locale } = useI18n();
 const PrimeVue = usePrimeVue();
 const model = defineModel()
 
@@ -130,8 +130,6 @@ const locales = {
             'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
             'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
         ],
-        today: 'Today',
-        clear: 'Clear'
     },
     ru: {
         firstDayOfWeek: 1,
@@ -146,8 +144,6 @@ const locales = {
             'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
             'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'
         ],
-        today: 'Сегодня',
-        clear: 'Очистить'
     },
     uz: {
         firstDayOfWeek: 1,
@@ -162,8 +158,6 @@ const locales = {
             'Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyn',
             'Iyl', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek'
         ],
-        today: 'Bugun',
-        clear: 'Tozalash'
     }
 };
 

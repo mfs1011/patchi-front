@@ -425,5 +425,7 @@
         "cannot_delete_product_in_stock": "Omborda mavjud mahsulotni o'chirib bo'lmaydi"
     },
     "choosePhoto": "Rasm tanlang",
-    "changePhoto": "Rasmni o'zgartirish"
+    "changePhoto": "Rasmni o'zgartirish",
+    "today": "Bugun",
+    "clear": "Tozalash"
 }
