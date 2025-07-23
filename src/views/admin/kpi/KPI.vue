@@ -243,7 +243,7 @@ onBeforeRouteLeave(() => {
                 <template #content>
                     <Tabs v-model:value="tabVal" scrollable :showNavigators="false">
                         <TabList>
-                            <Tab pt:root="font-medium" v-for="tab of tabList" :key="tab.value" :value="tab.value">{{ tab.label }}</Tab>
+                            <Tab pt:root="font-medium dark:text-surface-0" v-for="tab of tabList" :key="tab.value" :value="tab.value">{{ tab.label }}</Tab>
                         </TabList>
                         <TabPanels>
                             <TabPanel v-for="panel of tabPanels" :key="panel.value" :value="panel.value" class="h-full">
