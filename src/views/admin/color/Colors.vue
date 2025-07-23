@@ -248,8 +248,6 @@ onBeforeRouteLeave(() => {
         </template>
 
         <template #sectionBody>
-            <!-- FILTERS OF TABLE ITEMS -->
-
             <NoData v-if="!colorStore.getColors.totalItems && !colorStore.getIsLoadingColor" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
@@ -264,7 +262,6 @@ onBeforeRouteLeave(() => {
             >
                 <template #content>
                     <DataTable
-                        ref="data-table"
                         :value="colorStore.getIsLoadingColor ?  Array(10).fill({}) : colorStore.getColors.models"
                         :total-records="colorStore.getColors.totalItems"
                         :rows="filters.itemsPerPage"

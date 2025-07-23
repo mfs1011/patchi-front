@@ -5,6 +5,7 @@
         :ptOptions="{
             mergeProps: ptViewMerge
         }"
+        v-model.trim="model"
     >
         <template #prevbutton="{ actionCallback, keydownCallback }">
             <SecondaryButton variant="text" rounded @click="actionCallback" @keydown="keydownCallback">
@@ -21,16 +22,16 @@
             </SecondaryButton>
         </template>
         <template #todaybutton="{ actionCallback, keydownCallback }">
-            <SecondaryButton variant="text" label="Today" size="small" @click="actionCallback" @keydown="keydownCallback" />
+            <SecondaryButton pt:root="enabled:hover:bg-primary-emphasis!" variant="text" label="Today" size="small" @click="actionCallback" @keydown="keydownCallback" />
         </template>
         <template #clearbutton="{ actionCallback, keydownCallback }">
-            <SecondaryButton variant="text" label="Clear" size="small" @click="actionCallback" @keydown="keydownCallback" />
+            <SecondaryButton pt:root="enabled:hover:bg-primary-emphasis!" variant="text" label="Clear" size="small" @click.prevent="(event) => clear(event, actionCallback)" @keydown="keydownCallback" />
         </template>
         <template #dropdownicon>
             <ChevronDownIcon />
         </template>
-        <template #inputicon>
-            <CalendarIcon />
+        <template #inputicon="{ clickCallback }">
+            <CalendarIcon @click="clickCallback"/>
         </template>
         <template #hourincrementbutton="{ callbacks }">
             <SecondaryButton variant="text" rounded v-on="callbacks">
@@ -109,7 +110,12 @@ import {usePrimeVue} from "primevue";
 
 const { locale } = useI18n();
 const PrimeVue = usePrimeVue();
+const model = defineModel()
 
+const clear = (event, call) => {
+    call(event)
+    model.value = null
+}
 const locales = {
     en: {
         firstDayOfWeek: 0,
@@ -166,23 +172,6 @@ const currentLocale = computed(() => locales[locale.value]);
 watch(currentLocale, (newLocale) => {
     PrimeVue.config.locale = newLocale;
 }, { immediate: true });
-
-const uzLocale = {
-    firstDayOfWeek: 1, // Dushanba
-    dayNames: ['Yakshanba', 'Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'],
-    dayNamesShort: ['Yak', 'Du', 'Se', 'Cho', 'Pa', 'Ju', 'Sha'],
-    dayNamesMin: ['Y', 'D', 'S', 'Ch', 'P', 'J', 'Sh'],
-    monthNames: [
-        'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun',
-        'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'
-    ],
-    monthNamesShort: [
-        'Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyn',
-        'Iyl', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek'
-    ],
-    today: 'Bugun',
-    clear: 'Tozalash'
-}
 
 const theme = ref({
     root: `inline-flex max-w-full relative p-fluid:flex`,
@@ -258,7 +247,7 @@ const theme = ref({
         p-disabled:opacity-60 p-disabled:pointer-events-none
         hover:bg-primary-emphasis hover:text-surface-800 dark:hover:bg-green-hover dark:hover:text-surface-0
         p-selected:bg-primary p-selected:text-primary-contrast
-        p-today:bg-main p-today:text-surface-0 dark:p-today:bg-green dark:p-today:text-surface-0
+        p-today:bg-main-hover p-today:text-surface-0 dark:p-today:bg-green dark:p-today:text-surface-0
         p-today:hover:bg-primary-emphasis p-today:hover:text-surface-0 dark:p-today:hover:bg-green-hover dark:p-today:hover:text-surface-0
         p-today:p-selected:bg-primary p-today:p-selected:text-primary-contrast`,
     monthView: `mt-2 mb-0 mx-0`,
