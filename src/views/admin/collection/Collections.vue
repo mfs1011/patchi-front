@@ -248,8 +248,6 @@ onBeforeRouteLeave(() => {
         </template>
 
         <template #sectionBody>
-            <!-- FILTERS OF TABLE ITEMS -->
-
             <NoData v-if="!assemblyStore.getAssemblies.totalItems && !assemblyStore.getIsLoadingAssembly" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
@@ -264,7 +262,6 @@ onBeforeRouteLeave(() => {
             >
                 <template #content>
                     <DataTable
-                        ref="data-table"
                         :value="assemblyStore.getIsLoadingAssembly ?  Array(10).fill({}) : assemblyStore.getAssemblies.models"
                         :total-records="assemblyStore.getAssemblies.totalItems"
                         :rows="filters.itemsPerPage"

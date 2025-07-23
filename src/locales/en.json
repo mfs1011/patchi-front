@@ -121,6 +121,12 @@
         "accusative": "collection",
         "accusativeCapitalize": "Collection"
     },
+    "kpiPercent": {
+        "nominative": "KPI percent",
+        "nominativeCapitalize": "KPI percent",
+        "accusative": "KPI percent",
+        "accusativeCapitalize": "KPI percent"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
@@ -177,7 +183,13 @@
         "Card": "Card",
         "Bank": "Bank account",
         "createdAt": "Date",
-        "usdRate": "USD Rate"
+        "usdRate": "USD Rate",
+        "categoryKpiPercent": "Category KPI percent",
+        "kitKpiPercent": "Composition KPI percent",
+        "orderKpiPercent": "Sales KPI percent",
+        "kit": "Composition",
+        "order": "Order",
+        "kpiPercent": "KPI percent"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
@@ -223,7 +235,9 @@
         "title": "Enter title...",
         "wholesalePrice": "Enter wholesale price...",
         "retailPrice": "Enter retail price...",
-        "minQty": "Enter minimum quantity..."
+        "minQty": "Enter minimum quantity...",
+        "kpiPercent": "Enter KPI percent...",
+        "date": "Enter date..."
     },
     "buttons": {
         "login": "Login",
@@ -238,6 +252,7 @@
         "newCollection": "New collection",
         "newColor": "New color",
         "newPayment": "New payment",
+        "newKpi": "New KPI",
         "filters": "Filters"
     },
     "errorMessages": {
@@ -269,7 +284,9 @@
         "maxCharacter": "Must be no more than {count} characters",
         "maxSizePhoto": "The image size must not exceed {size} MB",
         "availablePhotoFormat": "Allowed image formats: {formats}",
-        "paymentTypeRequired": "Payment type is required"
+        "paymentTypeRequired": "Payment type is required",
+        "kpiPercentRequired": "KPI percent is required",
+        "dateRequired": "Date is required"
     },
     "dialog": {
         "confirm": "Confirm",
@@ -371,6 +388,10 @@
         "collections": {
             "add": "Add",
             "edit": "Edit"
+        },
+        "kpi": {
+            "add": "Add",
+            "edit": "Edit"
         }
     },
     "pagination": {
@@ -383,6 +404,7 @@
         "edited": "{name} successfully updated!",
         "deleted": "{name} successfully deleted!",
         "restored": "{name} successfully restored!",
+        "internalServerError": "Internal server error.",
         "already_exists_error": "{field} already exists",
         "already_exists_error_named": "\"{name}\" with this name already exists",
         "cannot_delete_product_in_stock": "Cannot delete a product that is in stock"

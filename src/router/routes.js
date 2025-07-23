@@ -388,9 +388,27 @@ export const routes = [
                     },
                     {
                         path: 'kpi',
-                        name: 'kpi',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/KPI.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'kpi',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/kpi/KPI.vue')
+                            },
+                            {
+                                path: 'add/:entity',
+                                name: 'add-kpi',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/kpi/KPIAdd.vue')
+                            },
+                            {
+                                path: 'edit/:entity/:id',
+                                name: 'edit-kpi',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/kpi/KPIEdit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'payments',

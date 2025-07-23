@@ -64,8 +64,6 @@ onMounted(async () => {
         without-buttons
     >
         <template #sectionBody>
-            <!-- FILTERS OF TABLE ITEMS -->
-
             <NoData v-if="!inventoryProducts.length && !isLoading" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
@@ -79,7 +77,6 @@ onMounted(async () => {
             >
                 <template #content>
                     <DataTable
-                        ref="data-table"
                         :value="isLoading ? Array(10).fill({}) : inventoryProducts"
                         :total-records="100"
                         :rows="100"

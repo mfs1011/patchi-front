@@ -121,6 +121,12 @@
         "accusative": "коллекцию",
         "accusativeCapitalize": "Коллекцию"
     },
+    "kpiPercent": {
+        "nominative": "процент KPI",
+        "nominativeCapitalize": "Процент KPI",
+        "accusative": "процента KPI",
+        "accusativeCapitalize": "Процента KPI"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",
@@ -177,7 +183,13 @@
         "Card": "Карта",
         "Bank": "Банковский счёт",
         "createdAt": "Дата",
-        "usdRate": "Курс USD"
+        "usdRate": "Курс USD",
+        "categoryKpiPercent": "Процент KPI по категориям",
+        "kitKpiPercent": "Процент KPI по композициям",
+        "orderKpiPercent": "Процент KPI по продажам",
+        "kit": "Композиция",
+        "order": "Заказ",
+        "kpiPercent": "Процент KPI"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -223,7 +235,9 @@
         "title": "Введите название...",
         "wholesalePrice": "Введите оптовую цену...",
         "retailPrice": "Введите розничную цену...",
-        "minQty": "Введите минимальное количество..."
+        "minQty": "Введите минимальное количество...",
+        "kpiPercent": "Введите процент KPI...",
+        "date": "Введите дату..."
     },
     "buttons": {
         "login": "Войти",
@@ -238,6 +252,7 @@
         "newCollection": "Новая коллекция",
         "newColor": "Новый цвет",
         "newPayment": "Новая оплата",
+        "newKpi": "Новая KPI",
         "filters": "Фильтры"
     },
     "errorMessages": {
@@ -269,7 +284,9 @@
         "maxCharacter": "Не более {count} символов",
         "maxSizePhoto": "Размер изображения не должен превышать {size} МБ",
         "availablePhotoFormat": "Допустимые форматы изображений: {formats}",
-        "paymentTypeRequired": "Тип оплаты обязателен"
+        "paymentTypeRequired": "Тип оплаты обязателен",
+        "kpiPercentRequired": "Процент KPI обязателен",
+        "dateRequired": "Дата обязателен"
     },
     "dialog": {
         "confirm": "Подтвердить",
@@ -371,6 +388,10 @@
         "collections": {
             "add": "Добавить",
             "edit": "Изменить"
+        },
+        "kpi": {
+            "add": "Добавить",
+            "edit": "Изменить"
         }
     },
     "pagination": {
@@ -383,6 +404,7 @@
         "edited": "{name} успешно изменен!",
         "deleted": "{name} успешно удален!",
         "restored": "{name} успешно восстановлен!",
+        "internalServerError": "Внутренняя ошибка сервера.",
         "already_exists_error": "{field} уже существует",
         "already_exists_error_named": "\"{name}\" с таким именем уже существует",
         "cannot_delete_product_in_stock": "Невозможно удалить продукт, который есть на складе"

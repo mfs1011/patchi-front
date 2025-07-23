@@ -18,7 +18,7 @@ defineProps({
             pt:root="flex items-center justify-start h-full rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group hover:bg-surface-100 dark:hover:bg-surface-900 transition-all"
             pt:body="p-0 h-full gap-0 sm:gap-2 w-full"
             pt:content="sm:p-6"
-            pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
+            pt:title="hidden sm:block font-normal text-xl lg:text-xl dark:text-surface-0"
         >
             <template #title>
                 <div class="border-b border-surface-300 dark:border-surface-700 px-5 text-center h-20 flex items-center justify-center">

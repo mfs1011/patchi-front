@@ -297,8 +297,6 @@ onBeforeRouteLeave(() => {
         </template>
 
         <template #sectionBody>
-            <!-- FILTERS OF TABLE ITEMS -->
-
             <NoData v-if="!categoryStore.getCategories.totalItems && !categoryStore.getIsLoadingCategory" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
@@ -313,7 +311,6 @@ onBeforeRouteLeave(() => {
             >
                 <template #content>
                     <DataTable
-                        ref="data-table"
                         :value="categoryStore.getIsLoadingCategory ?  Array(10).fill({}) : categoryStore.getCategories.models"
                         :total-records="categoryStore.getCategories.totalItems"
                         :rows="filters.itemsPerPage"

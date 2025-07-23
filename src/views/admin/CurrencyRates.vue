@@ -7,7 +7,6 @@ import Card from "@/volt/Card.vue";
 import DataTable from "@/volt/DataTable.vue";
 import Column from "primevue/column";
 import PaginatorComponent from "@/components/PaginatorComponent.vue";
-import InputText from "@/volt/InputText.vue";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import {useRoute, useRouter} from "vue-router";
 import {computed, ref, watch} from "vue";
@@ -76,23 +75,6 @@ watch(
     },
     { immediate: true, deep: true },
 );
-
-const customLocale = {
-    firstDayOfWeek: 1,
-    dayNames: ['Yakshanba', 'Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba'],
-    dayNamesShort: ['Yak', 'Du', 'Se', 'Chor', 'Pay', 'Ju', 'Sha'],
-    dayNamesMin: ['Ya', 'Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh'],
-    monthNames: [
-        'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun',
-        'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr'
-    ],
-    monthNamesShort: [
-        'Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyn',
-        'Iyl', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek'
-    ],
-    today: 'Bugun',
-    clear: 'Tozalash',
-};
 </script>
 
 <template>
@@ -163,7 +145,7 @@ const customLocale = {
                 }"
                 class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
             >
-                <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-4 items-center">
+                <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
                     <DatePicker
                         v-model="filters['date-from']"
                         dateFormat="dd.mm.yy"
@@ -171,7 +153,6 @@ const customLocale = {
                         fluid
                         iconDisplay="input"
                         :placeholder="t('placeholders.search.byDateFrom')"
-                        :locale="customLocale"
                     />
                     <DatePicker
                         v-model="filters['date-to']"
@@ -180,15 +161,12 @@ const customLocale = {
                         fluid
                         iconDisplay="input"
                         :placeholder="t('placeholders.search.byDateTo')"
-                        :locale="customLocale"
                     />
                 </div>
             </div>
         </template>
 
         <template #sectionBody>
-            <!-- FILTERS OF TABLE ITEMS -->
-
             <NoData v-if="!USDRateStore.getUSDRates.totalItems && !USDRateStore.getIsLoadingUSDRate" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
@@ -203,7 +181,6 @@ const customLocale = {
             >
                 <template #content>
                     <DataTable
-                        ref="data-table"
                         :value="USDRateStore.getIsLoadingUSDRate ?  Array(10).fill({}) : USDRateStore.getUSDRates.models"
                         :total-records="USDRateStore.getUSDRates.totalItems"
                         :rows="filters.itemsPerPage"
