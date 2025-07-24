@@ -89,14 +89,26 @@ const setPhoto = event => {
 
 const onSubmit = handleSubmit(async values => {
     const payload = {
-        qr: values.qr,
         code: values.code,
         name: values.name,
-        category: `/api/categories/${values.category}`,
-        wholesalePrice: values.wholesalePrice,
-        retailPrice: values.retailPrice,
-        minQty: values.minQty,
+        category: `/api/categories/${values.category}`
     };
+
+    if (qr.value) {
+        payload.qr = values.qr
+    }
+
+    if (wholesalePrice.value) {
+        payload.wholesalePrice = values.wholesalePrice
+    }
+
+    if (retailPrice.value) {
+        payload.retailPrice = values.retailPrice
+    }
+
+    if (minQty.value) {
+        payload.minQty = values.minQty
+    }
 
     if (assembly.value) {
         payload.assembly = `/api/assemblies/${assembly.value}`
