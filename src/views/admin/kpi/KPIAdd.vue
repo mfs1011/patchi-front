@@ -54,9 +54,12 @@ const { value: kpiPercent } = useField('kpiPercent');
 const { value: createdAt } = useField('createdAt');
 
 const onSubmit = handleSubmit(async values => {
+    const date = new Date(values.createdAt);
+    date.setHours(date.getHours() + 5);
+
     const payload = {
         kpiPercent: values.kpiPercent,
-        createdAt: values.createdAt,
+        createdAt: date,
     };
 
     if (isCategory.value) {

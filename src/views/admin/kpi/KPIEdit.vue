@@ -64,9 +64,18 @@ const { value: kpiPercent } = useField('kpiPercent');
 const { value: createdAt } = useField('createdAt');
 
 const onSubmit = handleSubmit(async values => {
+    const newDate = new Date(values.createdAt);
+    const oldDate = new Date(initialValues.value.createdAt);
+    newDate.setHours(newDate.getHours() + 5);
+    oldDate.setHours(oldDate.getHours() + 5);
+
     const payload = buildChangedPayload(values, initialValues.value);
 
-    if (isCategory.value) {
+    if (+newDate !== +oldDate) {
+        payload.createdAt = newDate
+    }
+
+    if (isCategory.value && initialValues.value.category !== values.category) {
         payload.category = `/api/categories/${values.category}`
     }
 
