@@ -108,6 +108,12 @@ onMounted(async () => {
                                 <p v-else>{{ data.locationQuantity.expiryDate ? getFormattedDate(data.locationQuantity.expiryDate) : '-' }}</p>
                             </template>
                         </Column>
+                        <Column field="income" :header="t('labels.initial')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="isLoading"/>
+                                <p v-else>{{ formatCurrency(data.initialQty) }} {{ t(`labels.${data.locationQuantity.product.category.unit.name}`) }}</p>
+                            </template>
+                        </Column>
                         <Column field="income" :header="t('labels.income')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>

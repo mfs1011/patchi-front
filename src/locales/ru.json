@@ -178,6 +178,7 @@
         "product": "Продукт",
         "color": "Цвет",
         "expiryDate": "Срок годности",
+        "initial": "Начальный",
         "income": "Доход",
         "expense": "Расход",
         "currentQty": "Текущее",

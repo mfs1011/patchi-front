@@ -178,6 +178,7 @@
         "product": "Mahsulot",
         "color": "Rangi",
         "expiryDate": "Yaroqlilik muddati",
+        "initial": "Boshlang'ich",
         "income": "Kirim",
         "expense": "Chiqim",
         "currentQty": "Joriy",
