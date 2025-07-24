@@ -45,7 +45,7 @@ const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
 const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
-    location: parseInt(route.query.location) || null,
+    paymentType: parseInt(route.query.paymentType) || null,
     isDelete: route.query['is-delete'] || false,
 });
 
@@ -103,10 +103,10 @@ watch(
         }
 
 
-        if (filters.value.location !== null) {
-            queryFilter.location = filters.value.location;
+        if (filters.value.paymentType !== null) {
+            queryFilter.paymentType = filters.value.paymentType;
         } else {
-            delete queryFilter.location;
+            delete queryFilter.paymentType;
         }
 
         await updateQuery(router, queryFilter);
@@ -261,7 +261,7 @@ onBeforeRouteLeave(() => {
                     </div>
                     <div>
                         <Select
-                            v-model="filters.location"
+                            v-model="filters.paymentType"
                             :options="paymentTypes"
                             option-label="name"
                             option-value="id"

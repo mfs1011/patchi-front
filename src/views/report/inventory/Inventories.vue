@@ -222,19 +222,19 @@ onBeforeRouteLeave(() => {
                                 <div v-else>
                                     <div class="flex items-center gap-2">
                                         <Button
+                                            v-if="data.status === 1 || inventoryStore.getInventories.isAccept"
+                                            @click="editInventory(data)"
+                                            icon="pi pi-pencil"
+                                            pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
+                                            size="small"
+                                        />
+                                        <Button
                                             @click="router.push({
                                                 name: 'inventory',
                                                 params: { id: data.id },
                                             })"
                                             icon="pi pi-eye"
                                             pt:root="rounded-full size-8! bg-blue-400 dark:bg-blue-400 enabled:hover:bg-blue-300 dark:enabled:hover:bg-blue-300 border-blue-400 dark:border-blue-400 enabled:hover:border-blue-300 dark:enabled:hover:border-blue-300 focus-visible:outline-blue-400 dark:focus-visible:outline-blue-400"
-                                            size="small"
-                                        />
-                                        <Button
-                                            v-if="data.status === 1 || inventoryStore.getInventories.isAccept"
-                                            @click="editInventory(data)"
-                                            icon="pi pi-pencil"
-                                            pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
                                             size="small"
                                         />
                                     </div>
