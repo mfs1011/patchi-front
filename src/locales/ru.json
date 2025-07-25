@@ -133,6 +133,12 @@
         "accusative": "процента KPI",
         "accusativeCapitalize": "Процента KPI"
     },
+    "expiryDateNotificationDay": {
+        "nominative": "день уведомления о сроке годности",
+        "nominativeCapitalize": "День уведомления о сроке годности",
+        "accusative": "день уведомления о сроке годности",
+        "accusativeCapitalize": "День уведомления о сроке годности"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",

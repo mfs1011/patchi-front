@@ -133,6 +133,12 @@
         "accusative": "KPI percent",
         "accusativeCapitalize": "KPI percent"
     },
+    "expiryDateNotificationDay": {
+        "nominative": "expiry Date Notification Day",
+        "nominativeCapitalize": "Expiry Date Notification Day",
+        "accusative": "expiry Date Notification Day",
+        "accusativeCapitalize": "Expiry Date Notification Day"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
