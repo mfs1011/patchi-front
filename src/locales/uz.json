@@ -127,6 +127,12 @@
         "accusative": "KPI foizini",
         "accusativeCapitalize": "KPI foizini"
     },
+    "expiryDateNotificationDay": {
+        "nominative": "yaroqlilik muddati eslatma kuni",
+        "nominativeCapitalize": "Yaroqlilik muddati eslatma kuni",
+        "accusative": "yaroqlilik muddati eslatma kunini",
+        "accusativeCapitalize": "Yaroqlilik muddati eslatma kunini"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Sotuvchi",
