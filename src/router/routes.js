@@ -460,9 +460,21 @@ export const routes = [
                     },
                     {
                         path: 'expiry-date-notification-day',
-                        name: 'expiry-date-notification-day',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/admin/ExpiryDateNotificationDay.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'expiry-date-notification-day',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/expiryDateNotificationDay/ExpiryDateNotificationDay.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-expiry-date-notification-day',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/admin/expiryDateNotificationDay/ExpiryDateNotificationDayEdit.vue')
+                            },
+                        ]
                     },
                 ]
             },

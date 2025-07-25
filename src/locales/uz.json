@@ -202,7 +202,8 @@
         "orderKpiPercent": "Sotuv KPI foizi",
         "kit": "Kompozitsiya",
         "order": "Sotuv",
-        "kpiPercent": "KPI foiz"
+        "kpiPercent": "KPI foiz",
+        "notificationDay": "Ogohlantirishga qolgan kun"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
@@ -250,7 +251,8 @@
         "retailPrice": "Chakana narxni kiriting...",
         "minQty": "Eng kam miqdor kiriting...",
         "kpiPercent": "KPI foizni kiriting...",
-        "date": "Sanani kiriting..."
+        "date": "Sanani kiriting...",
+        "notificationDay": "Kunni kiriting..."
     },
     "buttons": {
         "login": "Kirish",
@@ -299,7 +301,8 @@
         "availablePhotoFormat": "Yuklanadigan rasm formati faqat quyidagilardan biri bo‘lishi kerak: {formats}",
         "paymentTypeRequired": "To‘lov tirini kiritish majburiy",
         "kpiPercentRequired": "KPI foizini kiritish majburiy",
-        "dateRequired": "Sanani kiritish majburiy"
+        "dateRequired": "Sanani kiritish majburiy",
+        "notificationDayRequired": "Kun kiritish majburiy"
     },
     "dialog": {
         "confirm": "Tasdiqlash",
@@ -407,6 +410,10 @@
         "kpi": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
+        },
+        "expiryDateNotificationDay": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
         }
     },
     "pagination": {
@@ -428,5 +435,8 @@
     "choosePhoto": "Rasm tanlang",
     "changePhoto": "Rasmni o'zgartirish",
     "today": "Bugun",
-    "clear": "Tozalash"
+    "clear": "Tozalash",
+    "notifyPrefix": "Xabar beradi: ",
+    "notifySuffix": " kun qolganda",
+    "day": "kun"
 }
