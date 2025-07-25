@@ -189,7 +189,8 @@
         "orderKpiPercent": "Процент KPI по продажам",
         "kit": "Композиция",
         "order": "Заказ",
-        "kpiPercent": "Процент KPI"
+        "kpiPercent": "Процент KPI",
+        "notificationDay": "До оповещения (дней)"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -237,7 +238,8 @@
         "retailPrice": "Введите розничную цену...",
         "minQty": "Введите минимальное количество...",
         "kpiPercent": "Введите процент KPI...",
-        "date": "Введите дату..."
+        "date": "Введите дату...",
+        "notificationDay": "Введите количество дней..."
     },
     "buttons": {
         "login": "Войти",
@@ -286,7 +288,8 @@
         "availablePhotoFormat": "Допустимые форматы изображений: {formats}",
         "paymentTypeRequired": "Тип оплаты обязателен",
         "kpiPercentRequired": "Процент KPI обязателен",
-        "dateRequired": "Дата обязателен"
+        "dateRequired": "Дата обязателен",
+        "notificationDayRequired": "День обязателен"
     },
     "dialog": {
         "confirm": "Подтвердить",
@@ -392,6 +395,10 @@
         "kpi": {
             "add": "Добавить",
             "edit": "Изменить"
+        },
+        "expiryDateNotificationDay": {
+            "add": "Добавить",
+            "edit": "Изменить"
         }
     },
     "pagination": {
@@ -412,5 +419,8 @@
     "choosePhoto": "Выберите фото",
     "changePhoto": "Изменить фото",
     "today": "Сегодня",
-    "clear": "Очистить"
+    "clear": "Очистить",
+    "notifyPrefix": "Уведомит за ",
+    "notifySuffix": " дней до окончания",
+    "day": "день"
 }

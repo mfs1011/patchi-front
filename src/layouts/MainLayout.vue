@@ -72,7 +72,7 @@ const logout = () => {
                 </Dialog>
             </div>
         </div>
-        <div class="grow min-h-dvh flex flex-col sm:overflow-x-auto">
+        <div class="grow h-dvh flex flex-col sm:overflow-auto">
             <Header />
 
             <div class="bg-surface-100 dark:bg-surface-700 grow flex flex-col" :class="{'p-2 sm:p-4': $route.name !== 'home'}">
