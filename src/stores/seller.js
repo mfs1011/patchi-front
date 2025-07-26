@@ -8,6 +8,10 @@ export const useSellerStore = defineStore('seller', () => {
             models: [],
             totalItems: 0,
         },
+        sellersKpi: {
+            models: [],
+            totalItems: 0,
+        },
         seller: {},
         isLoadingSellers: false,
     })
@@ -37,6 +41,22 @@ export const useSellerStore = defineStore('seller', () => {
             const { data } = await authorizedClient.get('/sellers', { params })
             state.sellers.models = data.member
             state.sellers.totalItems = data.totalItems
+
+            return data
+        } catch (error) {
+            throw error
+        } finally {
+            state.isLoadingSellers = false
+        }
+    }
+
+    const fetchSellersKpi = async (params = { page: 1 }) => {
+        try {
+            state.isLoadingSellers = true
+
+            const { data } = await authorizedClient.get('/sellers/kpi', { params })
+            state.sellersKpi.models = data.member
+            state.sellersKpi.totalItems = data.totalItems
 
             return data
         } catch (error) {
@@ -77,10 +97,12 @@ export const useSellerStore = defineStore('seller', () => {
         pushSeller,
         putSeller,
         fetchSellers,
+        fetchSellersKpi,
         fetchSeller,
         deleteSeller,
         restoreSeller,
         getSellers: computed(() => state.sellers),
+        getSellersKpi: computed(() => state.sellersKpi),
         getSeller: computed(() => state.seller),
         getIsLoadingSellers: computed(() => state.isLoadingSellers),
     }
