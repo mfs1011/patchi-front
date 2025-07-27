@@ -1,7 +1,7 @@
 <script setup>
 import Section from "@/components/UI/Section.vue";
 import {useI18n} from "vue-i18n";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, useTemplateRef} from "vue";
 import {useInventoryStore} from "@/stores/inventory.js";
 import {useRoute} from "vue-router";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
@@ -11,6 +11,7 @@ import NoData from "@/components/UI/NoData.vue";
 import Column from "primevue/column";
 import DataTable from "@/volt/DataTable.vue";
 import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
+import Button from "@/volt/Button.vue";
 
 const { t } = useI18n();
 const route = useRoute()
@@ -25,6 +26,11 @@ const home = ref({
     label: t('reports'),
     route: '/reports'
 });
+
+const dt = ref();
+const exportCSV = () => {
+    dt.value.exportCSV();
+};
 
 const items = computed(() => [{ label: t('cards.inventories'), route: { name: 'inventories'} }, { label: t('cards.inventory') }]);
 
@@ -75,8 +81,20 @@ onMounted(async () => {
                 pt:content="p-2 sm:p-4"
                 pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
+                <template #header>
+                    <div class="p-5">
+                        <Button
+                            @click="exportCSV"
+                            icon="pi pi-file-excel"
+                            pt:root="bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                            size="small"
+                            label="Export"
+                        />
+                    </div>
+                </template>
                 <template #content>
                     <DataTable
+                        ref="dt"
                         :value="isLoading ? Array(10).fill({}) : inventoryProducts"
                         :total-records="100"
                         :rows="100"

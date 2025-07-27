@@ -10,12 +10,15 @@ import { useSidebarStore } from "@/stores/sidebar.js";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
 import { useUserStore } from "@/stores/user.js";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
-import { ref } from "vue";
+import {ref, useTemplateRef} from "vue";
+import useIsTop from "@/composables/useIsTop.js";
 const { t } = useI18n()
 
 const sidebar = useSidebarStore()
 const userStore = useUserStore()
 const visible = ref(false)
+const element = useTemplateRef('element')
+const isTop = useIsTop(element)
 
 const closeSidebar = () => {
     if (window.innerWidth <= 640) {
@@ -72,8 +75,8 @@ const logout = () => {
                 </Dialog>
             </div>
         </div>
-        <div class="grow h-dvh flex flex-col sm:overflow-auto">
-            <Header />
+        <div class="grow h-dvh flex flex-col overflow-auto bg-surface-100 dark:bg-surface-700" ref="element">
+            <Header :isTop/>
 
             <div class="bg-surface-100 dark:bg-surface-700 grow flex flex-col" :class="{'p-2 sm:p-4': $route.name !== 'home'}">
                 <Suspense>

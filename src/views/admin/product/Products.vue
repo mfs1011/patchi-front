@@ -46,6 +46,10 @@ const isDeleteLoading = ref(false);
 const currentProduct = ref();
 const currentProductId = ref();
 const debouncedName = useDebouncedRef(route.query['name'] || '',  500)
+const dt = ref();
+const exportCSV = () => {
+    dt.value.exportCSV();
+};
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
@@ -323,8 +327,21 @@ onBeforeRouteLeave(() => {
                 pt:content="p-2 sm:p-4"
                 pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
+                <template #header>
+                    <div class="p-5">
+                        <Button
+                            @click="exportCSV"
+                            icon="pi pi-file-excel"
+                            pt:root="bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                            size="small"
+                            label="Export"
+                        />
+                    </div>
+                </template>
+
                 <template #content>
                     <DataTable
+                        ref="dt"
                         :value="productStore.getIsLoadingProducts ?  Array(10).fill({}) : productStore.getProducts.models"
                         :total-records="productStore.getProducts.totalItems"
                         :rows="filters.itemsPerPage"
@@ -471,9 +488,9 @@ onBeforeRouteLeave(() => {
                 class="sm:min-w-100 sm:w-fit w-9/10"
                 pt:root="px-2"
             >
-                    <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.deleteConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
-                    </span>
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.deleteConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
+                </span>
 
                 <template #footer>
                     <div class="flex justify-end gap-2">
@@ -501,9 +518,9 @@ onBeforeRouteLeave(() => {
                 class="sm:min-w-100 sm:w-fit w-9/10"
                 pt:root="px-2"
             >
-                    <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.recoverConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
-                    </span>
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.recoverConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
+                </span>
 
                 <template #footer>
                     <div class="flex justify-end gap-2">

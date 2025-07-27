@@ -70,6 +70,8 @@ watch(
     { immediate: true, deep: true },
 );
 
+const isStatusOne = id => id === 1;
+
 const editInventory = (data) => {
     inventory.id = data.id;
     inventory.status = data.status;
@@ -224,8 +226,8 @@ onBeforeRouteLeave(() => {
                                         <Button
                                             v-if="data.status === 1 || inventoryStore.getInventories.isAccept"
                                             @click="editInventory(data)"
-                                            icon="pi pi-pencil"
-                                            pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
+                                            :icon="`pi pi-${data.status === 2 ? 'pencil': 'check'}`"
+                                            :pt:root="`rounded-full size-8! bg-${isStatusOne(data.status) ? 'teal': 'amber'}-500 dark:bg-${isStatusOne(data.status) ? 'teal': 'amber'}-500 enabled:hover:bg-${isStatusOne(data.status) ? 'teal': 'amber'}-400 dark:enabled:hover:bg-${isStatusOne(data.status) ? 'teal': 'amber'}-400 border-${isStatusOne(data.status) ? 'teal': 'amber'}-500 dark:border-${isStatusOne(data.status) ? 'teal': 'amber'}-500 enabled:hover:border-${isStatusOne(data.status) ? 'teal': 'amber'}-400 dark:enabled:hover:border-${isStatusOne(data.status) ? 'teal': 'amber'}-400 focus-visible:outline-${isStatusOne(data.status) ? 'teal': 'amber'}-500 dark:focus-visible:outline-${isStatusOne(data.status) ? 'teal' : 'amber'}-500`"
                                             size="small"
                                         />
                                         <Button
