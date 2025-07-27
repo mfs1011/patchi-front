@@ -20,10 +20,12 @@ import Tab from '@/volt/Tab.vue';
 import TabPanels from '@/volt/TabPanels.vue';
 import TabPanel from '@/volt/TabPanel.vue';
 import {useKpiPercentStore} from "@/stores/kpiPercent.js";
+import {useToast} from "primevue/usetoast";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const toast = useToast()
 
 const kpiPercentStore = useKpiPercentStore()
 
@@ -96,10 +98,27 @@ const tabList = computed(() => [
 ])
 
 const tabPanels = computed(() => [
-    { value: 'order' },
-    { value: 'kit' },
-    { value: 'category' }
+    { value: 'order', key: 'orderInvoices' },
+    { value: 'kit', key: 'orderInvoiceKits' },
+    { value: 'category', key: 'orderInvoiceProducts' }
 ])
+
+function editKpiPercent(data) {
+    const panel = tabPanels.value.find(p => p.value === tabVal.value)
+
+    if (panel && data[panel.key]?.length) {
+        toast.add({
+            severity: 'error',
+            summary: t('toast.cannot_edit_kpi_used_in_sales'),
+            life: 3000
+        })
+    } else {
+        router.push({
+            name: 'edit-kpi',
+            params: { entity: tabVal.value, id: data.id },
+        })
+    }
+}
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
 const eventSource = ref(null)
@@ -293,10 +312,7 @@ onBeforeRouteLeave(() => {
                                             <div v-else>
                                                 <div class="flex items-center gap-2">
                                                     <Button
-                                                        @click="router.push({
-                                                            name: 'edit-kpi',
-                                                            params: { entity: tabVal, id: data.id },
-                                                        })"
+                                                        @click="editKpiPercent(data)"
                                                         icon="pi pi-pencil"
                                                         pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
                                                         size="small"

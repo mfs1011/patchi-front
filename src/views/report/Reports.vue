@@ -7,6 +7,7 @@ const { t } = useI18n();
 
 const cards = computed(() => [
     { id: 1, name: t('cards.inventory'), image: 'SalesReport.png', routeName: 'inventories' },
+    { id: 1, name: t('cards.sellerKpi'), image: 'SalesTraffic.png', routeName: 'seller_kpi' },
 ])
 
 </script>

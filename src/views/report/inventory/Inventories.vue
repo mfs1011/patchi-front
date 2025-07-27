@@ -148,7 +148,7 @@ onBeforeRouteLeave(() => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('cards.inventory')"
+        :section-name="t('cards.inventories')"
         back-route-name="reports"
         without-buttons
     >

@@ -499,6 +499,11 @@ export const routes = [
                         meta: { requiresAuth: true, roles: []},
                         component: () => import('@/views/report/inventory/Inventory.vue')
                     },
+                    {
+                        path: 'seller_kpi',
+                        name: 'seller_kpi',
+                        component: () => import('@/views/report/kpi/SellersKpi.vue')
+                    },
                 ]
             },
             {

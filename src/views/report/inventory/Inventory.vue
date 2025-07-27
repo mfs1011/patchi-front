@@ -65,7 +65,7 @@ onMounted(async () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.inventories.edit')"
+        :section-name="t('cards.inventory')"
         back-route-name="inventories"
         without-buttons
     >
