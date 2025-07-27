@@ -500,8 +500,8 @@ export const routes = [
                         component: () => import('@/views/report/inventory/Inventory.vue')
                     },
                     {
-                        path: 'kpi',
-                        name: 'kpi',
+                        path: 'seller_kpi',
+                        name: 'seller_kpi',
                         component: () => import('@/views/report/kpi/SellersKpi.vue')
                     },
                 ]

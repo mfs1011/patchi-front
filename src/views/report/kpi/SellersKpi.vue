@@ -13,12 +13,30 @@ import Breadcrumb from "@/volt/Breadcrumb.vue";
 import updateQuery from "@/helpers/updateQuery.js";
 import {useSellerStore} from "@/stores/seller.js";
 import {formatCurrency} from "@/helpers/numberFormat.js";
+import InputText from "@/volt/InputText.vue";
+import Select from "@/volt/Select.vue";
+import Button from "@/volt/Button.vue";
+import {useLocationStore} from "@/stores/location.js";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const isVisibleSectionHeader = ref(false);
+
+const years = computed(() => {
+    const currentYear = new Date().getFullYear();
+    const range = 10;
+    return Array.from({ length: range + 1 }, (_, i) => {
+        const year = currentYear - i;
+        return {
+            id: year,
+            name: String(year),
+        };
+    });
+});
 
 const sellerStore = useSellerStore()
+const locationStore = useLocationStore()
 
 // computed
 const home = computed(() => ({
@@ -29,12 +47,18 @@ const home = computed(() => ({
 const items = computed(() => [{ label: t("cards.sellerKpi") }]);
 
 const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
-const filters = ref({});
+
+const filters = ref({
+    year: parseInt(route.query.year) || new Date().getFullYear(),
+    location: parseInt(route.query.location) || null,
+});
 
 watch(
     [() => debouncedFilter.value, () => filters.value],
     async () => {
-        const queryFilter = {};
+        const queryFilter = {
+            "year": filters.value.year
+        };
 
         if (debouncedFilter.value !== null) {
             queryFilter.name = debouncedFilter.value;
@@ -42,6 +66,12 @@ watch(
 
         if (debouncedFilter.value === "") {
             delete queryFilter.name;
+        }
+
+        if (filters.value.location !== null) {
+            queryFilter.location = filters.value.location;
+        } else {
+            delete queryFilter.location;
         }
 
         await updateQuery(router, queryFilter);
@@ -96,6 +126,10 @@ function connectMercure() {
 
 onMounted(() => {
     connectMercure()
+
+    if(!locationStore.getLocations.models.length) {
+        locationStore.fetchLocations()
+    }
 })
 
 onBeforeRouteLeave(() => {
@@ -135,10 +169,75 @@ onBeforeRouteLeave(() => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('cards.inventory')"
+        :section-name="t('cards.sellerKpi')"
         back-route-name="reports"
         without-buttons
     >
+        <template #buttons>
+            <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end">
+                <Button
+                    @click="isVisibleSectionHeader = !isVisibleSectionHeader"
+                    class="px-2 sm:px-5 whitespace-nowrap"
+                    :icon="isVisibleSectionHeader ? 'pi pi-filter' : 'pi pi-filter-slash'"
+                    :label="t('buttons.filters')"
+                />
+            </div>
+            <div class="sm:hidden flex grow gap-2 sm:gap-4">
+                <Button
+                    size="small"
+                    @click="isVisibleSectionHeader = !isVisibleSectionHeader"
+                    class="w-full px-2 sm:px-5 whitespace-nowrap"
+                    :icon="isVisibleSectionHeader ? 'pi pi-filter' : 'pi pi-filter-slash'"
+                    :label="t('buttons.filters')"
+                />
+            </div>
+        </template>
+
+        <template #sectionHeader>
+            <div
+                :class="{
+                    'h-0 border-transparent -my-1 sm:-my-2': !isVisibleSectionHeader,
+                    'py-2 sm:py-4 h-fit border-surface-300 dark:border-surface-600/50 border': isVisibleSectionHeader
+                }"
+                class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
+            >
+                <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
+                    <div>
+                        <label class="relative max-w-full w-full">
+                            <i class="pi pi-search absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1"/>
+                            <InputText
+                                pt:root="dark:bg-surface-800 ps-10"
+                                v-model="debouncedFilter"
+                                class="w-full"
+                                :placeholder="t('placeholders.search.byName')"
+                            />
+                        </label>
+                    </div>
+                    <div>
+                        <Select
+                            v-model="filters.location"
+                            :options="locationStore.getLocations.models"
+                            option-label="name"
+                            option-value="id"
+                            :placeholder="t('placeholders.search.byShop')"
+                            showClear
+                            class="w-full"
+                        />
+                    </div>
+                    <div>
+                        <Select
+                            v-model="filters.year"
+                            :options="years"
+                            option-label="name"
+                            option-value="id"
+                            :placeholder="t('placeholders.search.byShop')"
+                            class="w-full"
+                        />
+                    </div>
+                </div>
+            </div>
+        </template>
+
         <template #sectionBody>
             <NoData v-if="!sellerStore.getSellersKpi.totalItems && !sellerStore.getIsLoadingSellers" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>

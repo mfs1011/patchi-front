@@ -154,10 +154,11 @@ function connectMercure() {
 }
 
 onMounted(() => {
+    connectMercure()
+
     if(!locationStore.getLocations.models.length) {
         locationStore.fetchLocations()
     }
-    connectMercure()
 })
 
 onBeforeRouteLeave(() => {
