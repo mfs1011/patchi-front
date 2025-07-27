@@ -302,6 +302,12 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ formatCurrency(data.categoriesKpi) }}$</p>
                             </template>
                         </Column>
+                        <Column field="dateFrom" :header="t('labels.total')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="sellerStore.getIsLoadingSellers"/>
+                                <p v-else>{{ formatCurrency(data.kitsKpi + data.orderInvoicesKpi + data.categoriesKpi) }}$</p>
+                            </template>
+                        </Column>
 
                         <template #footer>
                             <div v-if="sellerStore.getIsLoadingSellers" class="flex justify-between">
