@@ -8,6 +8,10 @@ export const useProductStore = defineStore('product', () => {
             models: [],
             totalItems: 0,
         },
+        abcProducts: {
+            models: [],
+            totalItems: 0,
+        },
         product: {},
         isLoadingProducts: false,
     })
@@ -37,6 +41,22 @@ export const useProductStore = defineStore('product', () => {
             const { data } = await authorizedClient.get('/products', { params })
             state.products.models = data.member
             state.products.totalItems = data.totalItems
+
+            return data
+        } catch (error) {
+            throw error
+        } finally {
+            state.isLoadingProducts = false
+        }
+    }
+
+    const fetchABCProducts = async (params = { page: 1 }) => {
+        try {
+            state.isLoadingProducts = true
+
+            const { data } = await authorizedClient.get('/products/abc', { params })
+            state.abcProducts.models = data.member
+            state.abcProducts.totalItems = data.totalItems
 
             return data
         } catch (error) {
@@ -77,10 +97,12 @@ export const useProductStore = defineStore('product', () => {
         pushProduct,
         putProduct,
         fetchProducts,
+        fetchABCProducts,
         fetchProduct,
         deleteProduct,
         restoreProduct,
         getProducts: computed(() => state.products),
+        getABCProducts: computed(() => state.abcProducts),
         getProduct: computed(() => state.product),
         getIsLoadingProducts: computed(() => state.isLoadingProducts),
     }

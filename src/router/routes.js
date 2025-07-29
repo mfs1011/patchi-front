@@ -504,6 +504,11 @@ export const routes = [
                         name: 'seller_kpi',
                         component: () => import('@/views/report/kpi/SellersKpi.vue')
                     },
+                    {
+                        path: 'abc',
+                        name: 'abc',
+                        component: () => import('@/views/report/abc/ABCAnalysis.vue')
+                    },
                 ]
             },
             {
