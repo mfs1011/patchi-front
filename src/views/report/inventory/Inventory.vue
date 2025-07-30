@@ -161,8 +161,7 @@ const pushChanges = async () => {
             <span>/</span>
         </template>
     </Breadcrumb>
-<pre>{{changedInventoryProducts}}</pre>
-<pre>{{changedInventoryKits}}</pre>
+
     <Section
         :section-name="t('cards.inventory')"
         back-route-name="inventories"
