@@ -151,6 +151,12 @@
         "accusative": "yaroqlilik muddati eslatma kunini",
         "accusativeCapitalize": "Yaroqlilik muddati eslatma kunini"
     },
+    "data": {
+        "nominative": "ma'lumotlar",
+        "nominativeCapitalize": "Ma'lumotlar",
+        "accusative": "ma'lumotlarni",
+        "accusativeCapitalize": "Ma'lumotlarni"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Sotuvchi",

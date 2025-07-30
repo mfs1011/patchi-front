@@ -151,6 +151,12 @@
         "accusative": "expiry Date Notification Day",
         "accusativeCapitalize": "Expiry Date Notification Day"
     },
+    "data": {
+        "nominative": "data",
+        "nominativeCapitalize": "Data",
+        "accusative": "data",
+        "accusativeCapitalize": "Data"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",

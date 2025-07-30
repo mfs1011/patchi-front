@@ -63,12 +63,16 @@ export const useInventoryStore = defineStore('inventory', () => {
 
     const fetchInventory = async id => {
         try {
+            state.isLoadingInventories = true
+
             const { data } = await authorizedClient.get(`/inventories/${id}`)
             state.inventory = data
 
             return data
         } catch (error) {
             throw error
+        } finally {
+            state.isLoadingInventories = false
         }
     }
 

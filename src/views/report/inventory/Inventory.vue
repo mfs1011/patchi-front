@@ -3,7 +3,7 @@ import Section from "@/components/UI/Section.vue";
 import {useI18n} from "vue-i18n";
 import {computed, onMounted, ref} from "vue";
 import {useInventoryStore} from "@/stores/inventory.js";
-import {onBeforeRouteLeave, useRoute} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Skeleton from "@/volt/Skeleton.vue";
 import Card from "@/volt/Card.vue";
@@ -23,9 +23,12 @@ import InputNumber from "@/volt/InputNumber.vue";
 import Dialog from "@/volt/Dialog.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {STATUSES} from "@/helpers/constants.js";
+import {useToast} from "primevue/usetoast";
 
 const { t } = useI18n();
+const toast = useToast();
 const route = useRoute()
+const router = useRouter()
 const isLoading = ref(true)
 const isLoadingEdit = ref(false)
 const inventoryProducts = ref([])
@@ -34,7 +37,7 @@ const tabVal = ref('products')
 const showLeaveDialog = ref(false)
 const isConfirmLoading = ref(false)
 const pendingNavigation = ref(false)
-const isEdited = ref(false)
+const isSaved = ref(false)
 
 const inventoryStore = useInventoryStore()
 
@@ -99,7 +102,7 @@ onMounted(async () => {
 })
 
 onBeforeRouteLeave((to, from, next) => {
-    if ((changedInventoryProducts.value.length || changedInventoryKits.value.length) && !isEdited.value) {
+    if ((changedInventoryProducts.value.length || changedInventoryKits.value.length) && !isSaved.value) {
         showLeaveDialog.value = true
         pendingNavigation.value = next
     } else {
@@ -109,7 +112,6 @@ onBeforeRouteLeave((to, from, next) => {
 
 const confirmLeave = () => {
     showLeaveDialog.value = false
-    isEdited.value = false
     if (pendingNavigation.value) {
         pendingNavigation.value()
     }
@@ -129,9 +131,10 @@ const pushChanges = async () => {
         }
 
         await inventoryStore.putInventory(payload, route.params.id)
-        await inventoryStore.fetchInventory(route.params.id)
-        inventoryProducts.value = JSON.parse(JSON.stringify(inventoryStore.getInventory.inventoryProducts))
-        inventoryKits.value = JSON.parse(JSON.stringify(inventoryStore.getInventory.inventoryKits))
+
+        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('data.nominativeCapitalize') }), life: 3000 })
+        isSaved.value = true
+        router.back()
     } catch (err) {
         console.log(err)
     } finally {
@@ -169,9 +172,9 @@ const pushChanges = async () => {
     >
         <template #sectionBody>
             <Card
-                pt:root="overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
-                pt:body="p-0"
-                pt:content="p-2 sm:p-4"
+                pt:root="grow overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
+                pt:body="p-0 grow"
+                pt:content="h-full grow flex flex-col p-2 sm:p-4"
                 pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
 <!--                <template #header>-->
@@ -197,6 +200,7 @@ const pushChanges = async () => {
                                 value="products"
                             >
                                 <DataTable
+
                                     :rowClass="rowClassProducts"
                                     ref="dt"
                                     :value="isLoading ? Array(10).fill({}) : inventoryProducts"
@@ -271,7 +275,7 @@ const pushChanges = async () => {
                                                 class="min-w-26!"
                                                 show-buttons
                                                 :min="0"
-                                                :minFractionDigits="0"
+                                                :minFractionDigits="1"
                                                 :maxFractionDigits="2"
                                             />
                                         </template>
@@ -323,26 +327,34 @@ const pushChanges = async () => {
 
                                     <ColumnGroup type="footer">
                                         <Row>
-                                            <Column :footer="`${t('labels.totals')}:`" :colspan="11" footerStyle="text-align:right"/>
-                                            <Column>
+                                            <Column :colspan="11" footerStyle="text-align:right">
                                                 <template #footer>
-                                                    <p class="font-semibold">{{ formatCurrency(totalProductCurrentPrice) }}$</p>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold">{{ t('labels.totals') }}:</p>
                                                 </template>
                                             </Column>
                                             <Column>
                                                 <template #footer>
-                                                    <p class="font-semibold">{{ formatCurrency(totalProductFactPrice) }}$</p>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(totalProductCurrentPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(totalProductFactPrice) }}$</p>
                                                 </template>
                                             </Column>
                                             <Column :colspan="3">
                                                 <template #footer>
-                                                    <p class="font-semibold">{{ formatCurrency(totalProductDifferencePrice) }}$</p>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(totalProductDifferencePrice) }}$</p>
                                                 </template>
                                             </Column>
                                         </Row>
                                     </ColumnGroup>
 
-                                    <template v-if="changedInventoryProducts.length" #footer>
+                                    <template v-if="changedInventoryProducts.length || changedInventoryKits.length" #footer>
                                         <div>
                                             <Button
                                                 class="px-2! sm:px-5! whitespace-nowrap"
@@ -356,7 +368,7 @@ const pushChanges = async () => {
                                     </template>
                                 </DataTable>
 
-                                <NoData v-if="!inventoryProducts?.length && !isLoading" class="text-surface-400 mx-auto my-auto">
+                                <NoData v-if="!inventoryProducts?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
                                     <p class="text-xl font-normal">{{ t("noResults") }}</p>
                                 </NoData>
                             </TabPanel>
@@ -367,6 +379,7 @@ const pushChanges = async () => {
                                 value="kits"
                             >
                                 <DataTable
+                                    v-if="inventoryStore.getIsLoadingInventories || inventoryKits.length > 0"
                                     :rowClass="rowClassKits"
                                     ref="dt"
                                     :value="isLoading ? Array(10).fill({}) : inventoryKits"
@@ -440,7 +453,7 @@ const pushChanges = async () => {
                                                 class="min-w-26!"
                                                 show-buttons
                                                 :min="0"
-                                                :minFractionDigits="0"
+                                                :minFractionDigits="1"
                                                 :maxFractionDigits="2"
                                             />
                                         </template>
@@ -480,26 +493,34 @@ const pushChanges = async () => {
 
                                     <ColumnGroup type="footer">
                                         <Row>
-                                            <Column :footer="`${t('labels.totals')}:`" :colspan="11" footerStyle="text-align:right"/>
-                                            <Column>
+                                            <Column :colspan="11" footerStyle="text-align:right">
                                                 <template #footer>
-                                                    <p class="font-semibold">{{ formatCurrency(totalKitCurrentPrice) }}$</p>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold">{{ t('labels.totals') }}:</p>
                                                 </template>
                                             </Column>
                                             <Column>
                                                 <template #footer>
-                                                    <p class="font-semibold">{{ formatCurrency(totalKitFactPrice) }}$</p>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(totalKitCurrentPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(totalKitFactPrice) }}$</p>
                                                 </template>
                                             </Column>
                                             <Column :colspan="3">
                                                 <template #footer>
-                                                    <p class="font-semibold">{{ formatCurrency(totalKitDifferencePrice) }}$</p>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(totalKitDifferencePrice) }}$</p>
                                                 </template>
                                             </Column>
                                         </Row>
                                     </ColumnGroup>
 
-                                    <template v-if="changedInventoryKits.length" #footer>
+                                    <template v-if="changedInventoryKits.length || changedInventoryProducts.length" #footer>
                                         <div>
                                             <Button
                                                 class="px-2! sm:px-5! whitespace-nowrap"
@@ -513,7 +534,7 @@ const pushChanges = async () => {
                                     </template>
                                 </DataTable>
 
-                                <NoData v-if="!inventoryKits?.length && !isLoading" class="text-surface-400 mx-auto my-auto">
+                                <NoData v-if="!inventoryKits?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
                                     <p class="text-xl font-normal">{{ t("noResults") }}</p>
                                 </NoData>
                             </TabPanel>
