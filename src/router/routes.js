@@ -490,8 +490,20 @@ export const routes = [
                     },
                     {
                         path: 'inventories',
-                        name: 'inventories',
-                        component: () => import('@/views/report/inventory/Inventories.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'inventories',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/report/inventory/Inventories.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-inventory',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/report/inventory/InventoriesAdd.vue')
+                            }
+                        ]
                     },
                     {
                         path: 'inventory/:id',

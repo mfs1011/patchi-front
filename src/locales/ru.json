@@ -171,6 +171,7 @@
         "shopName": "Имя магазина",
         "warehouseName": "Имя склада",
         "locations": "Локация",
+        "location": "Объект",
         "supplierName": "Имя поставщика",
         "colorName": "Название цвета",
         "categoryType": "Тип категории",
@@ -225,7 +226,8 @@
         "kit": "Композиция",
         "order": "Заказ",
         "kpiPercent": "Процент KPI",
-        "notificationDay": "До оповещения (дней)"
+        "notificationDay": "До оповещения (дней)",
+        "totals": "Итого"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -261,7 +263,8 @@
             "unit": "Выберите единицу",
             "category": "Выберите категорию",
             "assembly": "Выберите комплект",
-            "paymentType": "Выберите тип оплаты"
+            "paymentType": "Выберите тип оплаты",
+            "location": "Выберите объект"
         },
         "supplierName": "Введите имя поставщика...",
         "colorName": "Введите название цвета...",
@@ -274,7 +277,8 @@
         "minQty": "Введите минимальное количество...",
         "kpiPercent": "Введите процент KPI...",
         "date": "Введите дату...",
-        "notificationDay": "Введите количество дней..."
+        "notificationDay": "Введите количество дней...",
+        "qty": "Введите количество..."
     },
     "buttons": {
         "login": "Войти",
@@ -290,7 +294,9 @@
         "newColor": "Новый цвет",
         "newPayment": "Новая оплата",
         "newKpi": "Новая KPI",
-        "filters": "Фильтры"
+        "newInventory": "Новая инвентаризация",
+        "filters": "Фильтры",
+        "saveAndExit": "Сохранить и выйти"
     },
     "errorMessages": {
         "usernameRequired": "Имя пользователя обязательно",
@@ -324,7 +330,8 @@
         "paymentTypeRequired": "Тип оплаты обязателен",
         "kpiPercentRequired": "Процент KPI обязателен",
         "dateRequired": "Дата обязателен",
-        "notificationDayRequired": "День обязателен"
+        "notificationDayRequired": "День обязателен",
+        "locationRequired": "Объект обязателен"
     },
     "dialog": {
         "confirm": "Подтвердить",
@@ -454,7 +461,9 @@
         "already_exists_error": "{field} уже существует",
         "already_exists_error_named": "\"{name}\" с таким именем уже существует",
         "cannot_delete_product_in_stock": "Невозможно удалить продукт, который есть на складе",
-        "cannot_edit_kpi_used_in_sales": "KPI, используемые в продажах, не могут быть изменены"
+        "cannot_edit_kpi_used_in_sales": "KPI, используемые в продажах, не могут быть изменены",
+        "unconfirmedExists": "Имеется неподтверждённая инвентаризация",
+        "noIncomingToLocation": "На этот объект не было ни одного поступления"
     },
     "choosePhoto": "Выберите фото",
     "changePhoto": "Изменить фото",

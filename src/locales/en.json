@@ -171,6 +171,7 @@
         "shopName": "Shop name",
         "warehouseName": "Warehouse name",
         "locations": "Location",
+        "location": "Location",
         "supplierName": "Supplier name",
         "colorName": "Color name",
         "categoryType": "Category type",
@@ -225,7 +226,8 @@
         "kit": "Composition",
         "order": "Order",
         "kpiPercent": "KPI percent",
-        "notificationDay": "Days before notification"
+        "notificationDay": "Days before notification",
+        "totals": "Totals"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
@@ -261,7 +263,8 @@
             "unit": "Select unit",
             "category": "Select category",
             "assembly": "Select assembly",
-            "paymentType": "Select payment type"
+            "paymentType": "Select payment type",
+            "location": "Select location"
         },
         "supplierName": "Enter supplier name...",
         "colorName": "Enter color name...",
@@ -274,7 +277,8 @@
         "minQty": "Enter minimum quantity...",
         "kpiPercent": "Enter KPI percent...",
         "date": "Enter date...",
-        "notificationDay": "Enter number of days..."
+        "notificationDay": "Enter number of days...",
+        "qty": "Enter quantity..."
     },
     "buttons": {
         "login": "Login",
@@ -290,7 +294,9 @@
         "newColor": "New color",
         "newPayment": "New payment",
         "newKpi": "New KPI",
-        "filters": "Filters"
+        "newInventory": "New inventory",
+        "filters": "Filters",
+        "saveAndExit": "Save and exit"
     },
     "errorMessages": {
         "usernameRequired": "Username is required",
@@ -324,7 +330,8 @@
         "paymentTypeRequired": "Payment type is required",
         "kpiPercentRequired": "KPI percent is required",
         "dateRequired": "Date is required",
-        "notificationDayRequired": "Day is required"
+        "notificationDayRequired": "Day is required",
+        "locationRequired": "Location is required"
     },
     "dialog": {
         "confirm": "Confirm",
@@ -454,7 +461,9 @@
         "already_exists_error": "{field} already exists",
         "already_exists_error_named": "\"{name}\" with this name already exists",
         "cannot_delete_product_in_stock": "Cannot delete a product that is in stock",
-        "cannot_edit_kpi_used_in_sales": "The KPI used in sales cannot be changed"
+        "cannot_edit_kpi_used_in_sales": "The KPI used in sales cannot be changed",
+        "unconfirmedExists": "There is an unconfirmed inventory",
+        "noIncomingToLocation": "There have been no incoming entries to this location"
     },
     "choosePhoto": "Choose a photo",
     "changePhoto": "Change photo",

@@ -9,8 +9,12 @@ export const useInventoryStore = defineStore('inventory', () => {
             totalItems: 0,
             isAccept: false
         },
-        inventory: {},
+        inventory: {
+            inventoryProducts: [],
+            inventoryKits: []
+        },
         isLoadingInventories: false,
+        lastInventoryDateTo: null,
     })
 
     const pushInventory = async inventoryData => {
@@ -68,14 +72,27 @@ export const useInventoryStore = defineStore('inventory', () => {
         }
     }
 
+    const fetchLastDateToByLocation = async location => {
+        try {
+            const { data } = await authorizedClient.post(`/inventories/check`, location)
+            state.lastInventoryDateTo = data
+
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
     return {
         pushInventory,
         putInventory,
         putInventoryStatus,
         fetchInventories,
         fetchInventory,
+        fetchLastDateToByLocation,
         getInventories: computed(() => state.inventories),
         getInventory: computed(() => state.inventory),
         getIsLoadingInventories: computed(() => state.isLoadingInventories),
+        getLastInventoryDateTo: computed(() => state.lastInventoryDateTo),
     }
 })

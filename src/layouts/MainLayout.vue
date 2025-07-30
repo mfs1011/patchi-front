@@ -35,9 +35,9 @@ const logout = () => {
 <template>
     <div class="flex flex-col sm:flex-row grow">
         <div v-if="sidebar.isOpen" @click="sidebar.close" class="fixed inset-0 bg-black/30 z-40 sm:hidden transition-all"></div>
-        <div :class="['flex-col bg-surface-0 dark:bg-surface-800 fixed z-50 flex border-r border-r-surface-300 dark:border-r-surface-600/50 h-dvh sm:sticky top-0 flex-none transition-all overflow-hidden', sidebar.isOpen ? 'w-60 translate-x-0' : 'sm:w-20 -translate-x-full sm:translate-0']">
-            <div class="px-4 flex items-center h-16 border-b border-b-surface-300 dark:border-b-surface-600/50 box-border">
-                <svg v-if="sidebar.isOpen" :class="['text-main dark:text-surface-0 h-7 flex-none']" id="Group_22937" data-name="Group 22937" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="182" height="34.499" viewBox="0 0 182 34.499">
+        <div :class="['flex-col overflow-y-auto bg-surface-0 dark:bg-surface-800 fixed z-50 flex border-r border-r-surface-300 dark:border-r-surface-600/50 h-dvh sm:sticky top-0 flex-none transition-all overflow-hidden', sidebar.isOpen ? 'w-60 translate-x-0' : 'sm:w-20 -translate-x-full sm:translate-0']">
+            <div class="px-4 flex items-center h-16 border-b border-b-surface-300 dark:border-b-surface-600/50 box-border flex-none">
+                <svg v-if="sidebar.isOpen" :class="['text-main sticky top-0 dark:text-surface-0 h-7 flex-none']" id="Group_22937" data-name="Group 22937" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="182" height="34.499" viewBox="0 0 182 34.499">
                     <defs>
                         <clipPath id="clip-path">
                             <rect id="Rectangle_888" data-name="Rectangle 888" width="182" height="34.499" fill="none"/>
