@@ -1,7 +1,7 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, onMounted} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import Message from "@/volt/Message.vue";
 import Button from "@/volt/Button.vue";
@@ -10,77 +10,88 @@ import Card from "@/volt/Card.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {useField, useForm} from "vee-validate";
 import * as yup from "yup";
-import {useRoute, useRouter} from "vue-router";
+import {useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
-import {useKpiPercentStore} from "@/stores/kpiPercent.js";
-import InputNumber from "@/volt/InputNumber.vue";
+import {useInventoryStore} from "@/stores/inventory.js";
+import {useLocationStore} from "@/stores/location.js";
 import DatePicker from "@/volt/DatePicker.vue";
-import {useCategoryStore} from "@/stores/category.js";
 
 const { t } = useI18n()
 const toast = useToast()
 
-const kpiPercentStore = useKpiPercentStore();
-const categoryStore = useCategoryStore();
+const locationStore = useLocationStore();
+const inventoryStore = useInventoryStore();
 const router = useRouter();
-const route = useRoute();
+const dateFrom = ref();
 
 const home = computed(() => ({
-    icon: 'pi pi-home',
-    label: t('administration'),
-    route: '/administration'
+    icon: "pi pi-slash",
+    label: t("reports"),
+    route: "/reports",
 }));
 
-const items = computed(() => [{ label: t('cards.kpi'), route: { name: 'kpi'} }, { label: t('sections.kpi.add') }]);
-const isCategory = computed(() => route.params.entity === 'category');
+const items = computed(() => [{ label: t('cards.inventories'), route: { name: 'inventories'} }, { label: t('sections.inventories.add') }]);
 
 // VeeValidate formani sozlash
+
 const schema = computed(() => yup.object({
-    category: yup.number().when([], {
-        is: () => route.params.entity === 'category',
-        then: schema => schema.required(t('errorMessages.categoryRequired')),
-        otherwise: schema => schema.notRequired(),
-    }),
-    kpiPercent: yup.number().required(t('errorMessages.kpiPercentRequired')),
-    createdAt: yup.date().required(t('errorMessages.dateRequired'))
+    location: yup.number().required(t('errorMessages.locationRequired')),
+    dateTo: yup.date().required(t('errorMessages.dateRequired')),
 }))
 
 const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
     validationSchema: schema
 })
 
-const { value: category } = useField('category');
-const { value: kpiPercent } = useField('kpiPercent');
-const { value: createdAt } = useField('createdAt');
+const { value: location } = useField('location');
+const { value: dateTo } = useField('dateTo');
 
 const onSubmit = handleSubmit(async values => {
-    const date = new Date(values.createdAt);
+    const date = new Date(values.dateTo);
     date.setHours(date.getHours() + 5);
 
     const payload = {
-        kpiPercent: values.kpiPercent,
-        createdAt: date,
+        location: `/api/locations/${values.location}`,
+        dateTo: date
     };
 
-    if (isCategory.value) {
-        payload.category = `/api/categories/${values.category}`
-    }
-
     try {
-        await kpiPercentStore.pushKpiPercent(payload, route.params.entity)
+        await inventoryStore.pushInventory(payload)
 
-        toast.add({ severity: 'success', summary: t('toast.created', { name: t('kpiPercent.nominativeCapitalize') }), life: 3000 })
+        toast.add({ severity: 'success', summary: t('toast.created', { name: t('inventory.nominativeCapitalize') }), life: 3000 })
         resetForm()
         router.back()
 
     } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 }) //todo
+        if (error.status === 400) {
+            toast.add({ severity: 'error', summary: t('toast.unconfirmedExists'), life: 3000 })
+        }
+
+        if (error.status === 404) {
+            toast.add({ severity: 'error', summary: t('toast.noIncomingToLocation'), life: 3000 })
+        }
     }
 })
 
-onMounted(() => {
-    if(isCategory) {
-        categoryStore.fetchCategories({ page: 1, 'items-per-page': 100 })
+watch(location, async () => {
+    if (location.value) {
+        await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value}`})
+
+        if (inventoryStore.getLastInventoryDateTo === null) {
+            dateFrom.value = null
+        } else {
+            const date = new Date(inventoryStore.getLastInventoryDateTo);
+            date.setDate(date.getDate() + 1);
+            dateFrom.value = date;
+        }
+    } else {
+        dateFrom.value = null
+    }
+})
+
+onMounted(async () => {
+    if(!locationStore.getLocations.models.length) {
+        await locationStore.fetchLocations({ page: 1, 'items-per-page': 100 })
     }
 })
 </script>
@@ -108,8 +119,8 @@ onMounted(() => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.kpi.add')"
-        back-route-name="kpi"
+        :section-name="t('sections.sellers.add')"
+        back-route-name="sellers"
         without-buttons
     >
         <template #sectionBody>
@@ -117,52 +128,30 @@ onMounted(() => {
                 pt:root="sm:w-fit overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
-                pt:header="p-2 sm:p-4 border-b border-surface-300 dark:border-surface-600/50"
                 pt:title="font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
-                <template #header>
-                    <h3 class="text-xl">{{t('labels.' + route.params.entity + 'KpiPercent')}}</h3>
-                </template>
                 <template #content>
-                    <form @submit.prevent="onSubmit" class="grid grid-cols-1 md:min-w-100 gap-2 sm:gap-4">
-                        <div v-if="isCategory">
-                            <p>{{ t('labels.category') }}<span class="text-red-500"> *</span></p>
+                    <form @submit.prevent="onSubmit" class="grid grid-cols-1  gap-2 sm:gap-4 md:min-w-100 w-full">
+                        <div>
+                            <p>{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
 
                             <Select
-                                v-model="category"
-                                :options="categoryStore.getCategories.models"
+                                v-model="location"
+                                :options="locationStore.getLocations.models"
                                 option-label="name"
                                 option-value="id"
-                                :placeholder="t('placeholders.select.category')"
+                                :placeholder="t('placeholders.select.location')"
                                 showClear
                                 size="large"
                                 pt:root="w-full dark:bg-surface-700"
                             />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.category }}</Message>
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.location }}</Message>
                         </div>
-
-                        <label class="block">
-                            <span>{{ t('labels.kpiPercent') }}</span><span class="text-red-500"> *</span>
-
-                            <InputNumber
-                                v-model="kpiPercent"
-                                fluid
-                                prefix="%"
-                                showButtons
-                                :placeholder="t('placeholders.kpiPercent')"
-                                size="large"
-                                :minFractionDigits="1"
-                                :maxFractionDigits="2"
-                                :max="100"
-                            />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.kpiPercent }}</Message>
-                        </label>
-
                         <div>
-                            <p>{{ t('labels.createdAt') }}<span class="text-red-500"> *</span></p>
+                            <p>{{ t('labels.dateTo') }}<span class="text-red-500"> *</span></p>
 
                             <DatePicker
-                                v-model.trim="createdAt"
+                                v-model.trim="dateTo"
                                 dateFormat="dd.mm.yy"
                                 showIcon
                                 fluid
@@ -170,12 +159,15 @@ onMounted(() => {
                                 :placeholder="t('placeholders.date')"
                                 show-button-bar
                                 size="large"
+                                :minDate="dateFrom"
+                                showTime
+                                hourFormat="24"
                             />
 
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.createdAt }}</Message>
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.dateTo }}</Message>
                         </div>
 
-                        <div class="flex justify-end gap-2 mt-5">
+                        <div class="flex justify-end gap-2 mt-5 col-span-1">
                             <SecondaryButton type="button" :label="t('dialog.clear')" @click="resetForm" />
                             <Button type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting"/>
                         </div>

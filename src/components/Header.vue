@@ -6,6 +6,14 @@ import {useSidebarStore} from "@/stores/sidebar.js";
 import DarkModeSwitcher from "@/components/DarkModeSwitcher.vue";
 import {useUserStore} from "@/stores/user.js";
 import {useI18n} from "vue-i18n";
+
+defineProps({
+    isTop: {
+        type: Boolean,
+        default: false
+    }
+})
+
 const sidebar = useSidebarStore()
 const userStore = useUserStore()
 
@@ -28,7 +36,7 @@ const PRETTY_ROLE_NAMES = computed(() => ({
 </script>
 
 <template>
-    <div class="sticky box-border top-0 z-20 bg-surface-0 dark:bg-surface-800 h-16 p-4 flex items-center border-b border-b-surface-300 dark:border-b-surface-600/50">
+    <div class="sticky backdrop-blur box-border top-0 z-20 h-16 p-4 flex items-center border-b border-b-surface-300 dark:border-b-surface-600/50" :class="{'bg-surface-0/40 dark:bg-surface-800/40': !isTop, 'bg-surface-0 dark:bg-surface-800': isTop}">
         <div class="sm:hidden flex items-center h-13 box-border">
             <LogoButton class="bg-surface-0 border-none hover:bg-transparent hover:fill-white w-fit justify-start">
                 <svg :class="['text-green-hover dark:text-surface-0 h-6 flex-none']" id="Group_22937" data-name="Group 22937" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="34.499" viewBox="0 0 182 34.499">

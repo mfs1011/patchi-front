@@ -238,7 +238,7 @@ const theme = ref({
     day: `flex items-center justify-center cursor-pointer my-0 mx-auto overflow-hidden relative w-8 h-8
         rounded-full p-1 transition-colors duration-200 border border-transparent text-surface-700 dark:text-surface-0
         focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-primary
-        p-disabled:opacity-60 p-disabled:pointer-events-none
+        p-disabled:opacity-50 p-disabled:pointer-events-none p-disabled:font-light
         hover:bg-primary-emphasis hover:text-surface-800 dark:hover:bg-green-hover dark:hover:text-surface-0
         p-selected:bg-primary p-selected:text-primary-contrast
         p-today:bg-main-hover p-today:text-surface-0 dark:p-today:bg-green dark:p-today:text-surface-0

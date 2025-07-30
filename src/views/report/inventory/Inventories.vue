@@ -18,6 +18,9 @@ import updateQuery from "@/helpers/updateQuery.js";
 import Dialog from "@/volt/Dialog.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {useToast} from "primevue/usetoast";
+import Select from "@/volt/Select.vue";
+import {useLocationStore} from "@/stores/location.js";
+import DatePicker from "@/volt/DatePicker.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -25,13 +28,21 @@ const { t } = useI18n();
 const toast = useToast();
 const editVisible = ref(false);
 const isDeleteLoading = ref(false);
+const isVisibleSectionHeader = ref(false);
+const debouncedName = useDebouncedRef(route.query['name'] || '',  500)
 
 const inventory = reactive({
     id: 0,
     status: 0
 });
 
+const statuses = computed(() => [
+    { id: 1, name: t('1') },
+    { id: 2, name: t('2') }
+])
+
 const inventoryStore = useInventoryStore()
+const locationStore = useLocationStore()
 
 // computed
 const home = computed(() => ({
@@ -42,9 +53,14 @@ const home = computed(() => ({
 const items = computed(() => [{ label: t("cards.inventories") }]);
 
 const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
+
 const filters = ref({
     page: parseInt(route.query.page) || 1,
-    itemsPerPage: parseInt(route.query["items-per-page"]) || 10
+    itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
+    status: parseInt(route.query.status) || null,
+    location: parseInt(route.query.location) || null,
+    'date-from': route.query['date-from'] || null,
+    'date-to': route.query['date-to'] || null
 });
 
 watch(
@@ -63,12 +79,51 @@ watch(
             delete queryFilter.name;
         }
 
+        if (filters.value.location !== null) {
+            queryFilter.location = filters.value.location;
+        } else {
+            delete queryFilter.location;
+        }
+
+        if (filters.value.status !== null) {
+            queryFilter.status = filters.value.status;
+        } else {
+            delete queryFilter.status;
+        }
+
+        if (filters.value['date-from']) {
+            if (filters.value['date-from'] !== null) {
+                const date = new Date(filters.value['date-from']);
+                date.setHours(date.getHours() + 5);
+                queryFilter['date-from'] = date.toISOString();
+            }
+
+
+            if (filters.value['date-from'] === "") {
+                delete queryFilter['date-from'];
+            }
+        }
+
+        if (filters.value['date-to']) {
+            if (filters.value['date-to'] !== null) {
+                const date = new Date(filters.value['date-to']);
+                date.setHours(date.getHours() + 5);
+                queryFilter['date-to'] = date.toISOString();
+            }
+
+            if (filters.value['date-to'] === "") {
+                delete queryFilter['date-to'];
+            }
+        }
+
         await updateQuery(router, queryFilter);
 
         await inventoryStore.fetchInventories(route.query);
     },
     { immediate: true, deep: true },
 );
+
+const isStatusOne = id => id === 1;
 
 const editInventory = (data) => {
     inventory.id = data.id;
@@ -107,6 +162,10 @@ function connectMercure() {
 
 onMounted(() => {
     connectMercure()
+
+    if(!locationStore.getLocations.models.length) {
+        locationStore.fetchLocations({ page: 1, 'items-per-page': 100 })
+    }
 })
 
 onBeforeRouteLeave(() => {
@@ -146,10 +205,93 @@ onBeforeRouteLeave(() => {
     </Breadcrumb>
 
     <Section
+        :add-button-name="t('buttons.newInventory')"
         :section-name="t('cards.inventories')"
         back-route-name="reports"
-        without-buttons
     >
+        <template #buttons>
+            <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end">
+                <Button
+                    @click="isVisibleSectionHeader = !isVisibleSectionHeader"
+                    class="px-2 sm:px-5 whitespace-nowrap"
+                    :icon="isVisibleSectionHeader ? 'pi pi-filter' : 'pi pi-filter-slash'"
+                    :label="t('buttons.filters')"
+                />
+                <Button
+                    @click="router.push({ name: 'add-inventory' })"
+                    class="px-2 sm:px-5 whitespace-nowrap"
+                >
+                    {{ t("buttons.newInventory") }}
+                </Button>
+            </div>
+            <div class="sm:hidden flex grow gap-2 sm:gap-4">
+                <Button
+                    size="small"
+                    @click="isVisibleSectionHeader = !isVisibleSectionHeader"
+                    class="w-full px-2 sm:px-5 whitespace-nowrap"
+                    :icon="isVisibleSectionHeader ? 'pi pi-filter' : 'pi pi-filter-slash'"
+                    :label="t('buttons.filters')"
+                />
+                <Button
+                    @click="router.push({ name: 'add-inventory' })"
+                    class="w-full px-2 sm:px-5 whitespace-nowrap"
+                >
+                    {{ t("buttons.newInventory") }}
+                </Button>
+            </div>
+        </template>
+
+        <template #sectionHeader>
+            <div
+                :class="{
+                    'h-0 border-transparent -my-1 sm:-my-2': !isVisibleSectionHeader,
+                    'py-2 sm:py-4 h-fit border-surface-300 dark:border-surface-600/50 border': isVisibleSectionHeader
+                }"
+                class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
+            >
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
+                    <DatePicker
+                        v-model.trim="filters['date-from']"
+                        dateFormat="dd.mm.yy"
+                        showIcon
+                        fluid
+                        iconDisplay="input"
+                        :placeholder="t('placeholders.search.byDateFrom')"
+                        show-button-bar
+                    />
+                    <DatePicker
+                        v-model.trim="filters['date-to']"
+                        dateFormat="dd.mm.yy"
+                        showIcon
+                        fluid
+                        iconDisplay="input"
+                        :placeholder="t('placeholders.search.byDateTo')"
+                        show-button-bar
+                    />
+
+                    <Select
+                        v-model="filters.location"
+                        :options="locationStore.getLocations.models"
+                        option-label="name"
+                        option-value="id"
+                        :placeholder="t('placeholders.search.byCategory')"
+                        showClear
+                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                    />
+
+                    <Select
+                        v-model="filters.status"
+                        :options="statuses"
+                        option-label="name"
+                        option-value="id"
+                        :placeholder="t('placeholders.search.byAssembly')"
+                        showClear
+                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                    />
+                </div>
+            </div>
+        </template>
+
         <template #sectionBody>
             <NoData v-if="!inventoryStore.getInventories.totalItems && !inventoryStore.getIsLoadingInventories" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
@@ -224,8 +366,8 @@ onBeforeRouteLeave(() => {
                                         <Button
                                             v-if="data.status === 1 || inventoryStore.getInventories.isAccept"
                                             @click="editInventory(data)"
-                                            icon="pi pi-pencil"
-                                            pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
+                                            :icon="`pi pi-${data.status === 2 ? 'pencil': 'check'}`"
+                                            :pt:root="`rounded-full size-8! bg-${isStatusOne(data.status) ? 'teal': 'amber'}-500 dark:bg-${isStatusOne(data.status) ? 'teal': 'amber'}-500 enabled:hover:bg-${isStatusOne(data.status) ? 'teal': 'amber'}-400 dark:enabled:hover:bg-${isStatusOne(data.status) ? 'teal': 'amber'}-400 border-${isStatusOne(data.status) ? 'teal': 'amber'}-500 dark:border-${isStatusOne(data.status) ? 'teal': 'amber'}-500 enabled:hover:border-${isStatusOne(data.status) ? 'teal': 'amber'}-400 dark:enabled:hover:border-${isStatusOne(data.status) ? 'teal': 'amber'}-400 focus-visible:outline-${isStatusOne(data.status) ? 'teal': 'amber'}-500 dark:focus-visible:outline-${isStatusOne(data.status) ? 'teal' : 'amber'}-500`"
                                             size="small"
                                         />
                                         <Button

@@ -325,6 +325,7 @@ onBeforeRouteLeave(() => {
             >
                 <template #content>
                     <DataTable
+                        ref="dt"
                         :value="productStore.getIsLoadingProducts ?  Array(10).fill({}) : productStore.getProducts.models"
                         :total-records="productStore.getProducts.totalItems"
                         :rows="filters.itemsPerPage"
@@ -471,9 +472,9 @@ onBeforeRouteLeave(() => {
                 class="sm:min-w-100 sm:w-fit w-9/10"
                 pt:root="px-2"
             >
-                    <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.deleteConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
-                    </span>
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.deleteConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
+                </span>
 
                 <template #footer>
                     <div class="flex justify-end gap-2">
@@ -501,9 +502,9 @@ onBeforeRouteLeave(() => {
                 class="sm:min-w-100 sm:w-fit w-9/10"
                 pt:root="px-2"
             >
-                    <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                        {{ t('dialog.recoverConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
-                    </span>
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.recoverConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
+                </span>
 
                 <template #footer>
                     <div class="flex justify-end gap-2">

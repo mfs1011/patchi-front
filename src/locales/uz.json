@@ -171,6 +171,7 @@
         "warehouseName": "Ombor nomi",
         "comment": "Izoh",
         "locations": "Joylashuvi",
+        "location": "Obyekt",
         "supplierName": "Ta'minotchi nomi",
         "colorName": "Rang nomi",
         "categoryType": "Kategoriya turi",
@@ -231,7 +232,8 @@
         "benefit": "Foyda",
         "benefitPercent": "Foyda, %",
         "kpiPercent": "KPI foiz",
-        "notificationDay": "Ogohlantirishga qolgan kun"
+        "notificationDay": "Ogohlantirishga qolgan kun",
+        "totals": "Jami"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
@@ -265,7 +267,8 @@
             "unit": "Birlikni tanlang",
             "category": "Kategoriyani tanlang",
             "assembly": "To‘plamni tanlang",
-            "paymentType": "To‘lov turini tanlang"
+            "paymentType": "To‘lov turini tanlang",
+            "location": "Obyektni tanlang"
         },
         "shopName": "Do‘kon nomini kiriting...",
         "warehouseName": "Ombor nomini kiriting...",
@@ -280,7 +283,8 @@
         "minQty": "Eng kam miqdor kiriting...",
         "kpiPercent": "KPI foizni kiriting...",
         "date": "Sanani kiriting...",
-        "notificationDay": "Kunni kiriting..."
+        "notificationDay": "Kunni kiriting...",
+        "qty": "Miqdor kiriting..."
     },
     "buttons": {
         "login": "Kirish",
@@ -296,7 +300,9 @@
         "newColor": "Yangi rang",
         "newPayment": "Yangi to‘lov",
         "newKpi": "Yangi KPI",
-        "filters": "Filterlar"
+        "newInventory": "Yangi inventarizatisya",
+        "filters": "Filterlar",
+        "saveAndExit": "Saqlash va chiqish"
     },
     "errorMessages": {
         "usernameRequired": "Username kiritish majburiy",
@@ -330,7 +336,8 @@
         "paymentTypeRequired": "To‘lov tirini kiritish majburiy",
         "kpiPercentRequired": "KPI foizini kiritish majburiy",
         "dateRequired": "Sanani kiritish majburiy",
-        "notificationDayRequired": "Kun kiritish majburiy"
+        "notificationDayRequired": "Kun kiritish majburiy",
+        "locationRequired": "Obyekt kiritish majburiy"
     },
     "dialog": {
         "confirm": "Tasdiqlash",
@@ -461,7 +468,9 @@
         "already_exists_error": "{field} allaqachon mavjud",
         "already_exists_error_named": "Bunday nomli \"{name}\" allaqachon mavjud",
         "cannot_delete_product_in_stock": "Omborda mavjud mahsulotni o'chirib bo'lmaydi",
-        "cannot_edit_kpi_used_in_sales": "Sotuvda ishlatilgan KPI ni o'zgartirib bo'lmaydi"
+        "cannot_edit_kpi_used_in_sales": "Sotuvda ishlatilgan KPI ni o'zgartirib bo'lmaydi",
+        "unconfirmedExists": "Tasdiqlanmagan inventarizatsiya mavjud",
+        "noIncomingToLocation": "Bu obyektga umuman kirim bo‘lmagan"
     },
     "choosePhoto": "Rasm tanlang",
     "changePhoto": "Rasmni o'zgartirish",
