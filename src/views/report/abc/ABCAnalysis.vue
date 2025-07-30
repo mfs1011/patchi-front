@@ -236,7 +236,7 @@ onBeforeRouteLeave(() => {
                         <Column field="salesPercent" :header="t('labels.salesPercent')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{  data.ordersQtyPercent.toFixed(2) }}%</p>
+                                <p v-else>{{ data.ordersQtyPercent.toFixed(2) }}%</p>
                             </template>
                         </Column>
                         <Column field="revenue" :header="t('labels.revenue')">
@@ -248,7 +248,7 @@ onBeforeRouteLeave(() => {
                         <Column field="revenuePercent" :header="t('labels.revenuePercent')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{  data.ordersPricePercent.toFixed(2) }}%</p>
+                                <p v-else>{{ data.ordersPricePercent.toFixed(2) }}%</p>
                             </template>
                         </Column>
                         <Column field="benefit" :header="t('labels.benefit')">
@@ -260,27 +260,33 @@ onBeforeRouteLeave(() => {
                         <Column field="benefitPercent" :header="t('labels.benefitPercent')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{  data.benefitPercent.toFixed(2) }}%</p>
+                                <p v-else>{{ data.benefitPercent.toFixed(2) }}%</p>
                             </template>
                         </Column>
                         <Column field="salesCategory" :header="t('labels.sales')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts" />
-                                <p v-else :class="getCategoryClass(data.qtyCategory)">{{ data.qtyCategory }}</p>
+                                <p v-else :class="getCategoryClass(data.qtyCategory)">
+                                    {{ data.qtyCategory }} {{ Math.round(data.qtyCumulativePercent) }}%
+                                </p>
                             </template>
                         </Column>
 
                         <Column field="revenueCategory" :header="t('labels.revenue')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts" />
-                                <p v-else :class="getCategoryClass(data.priceCategory)">{{ data.priceCategory }}</p>
+                                <p v-else :class="getCategoryClass(data.priceCategory)">
+                                    {{ data.priceCategory }} {{ Math.round(data.priceCumulativePercent) }}%
+                                </p>
                             </template>
                         </Column>
 
                         <Column field="benefitCategory" :header="t('labels.benefit')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts" />
-                                <p v-else :class="getCategoryClass(data.benefitCategory)">{{ data.benefitCategory }}</p>
+                                <p v-else :class="getCategoryClass(data.benefitCategory)">
+                                    {{ data.benefitCategory }} {{ Math.round(data.benefitCumulativePercent)}}%
+                                </p>
                             </template>
                         </Column>
                     </DataTable>
