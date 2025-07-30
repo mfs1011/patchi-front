@@ -27,6 +27,7 @@ import {STATUSES} from "@/helpers/constants.js";
 const { t } = useI18n();
 const route = useRoute()
 const isLoading = ref(true)
+const isLoadingEdit = ref(false)
 const inventoryProducts = ref([])
 const inventoryKits = ref([])
 const tabVal = ref('products')
@@ -113,6 +114,30 @@ const confirmLeave = () => {
         pendingNavigation.value()
     }
 }
+
+const pushChanges = async () => {
+    try {
+        isLoadingEdit.value = true
+        const payload = {};
+
+        if (changedInventoryProducts.value.length) {
+            payload.inventoryProducts = changedInventoryProducts.value
+        }
+
+        if (changedInventoryKits.value.length) {
+            payload.inventoryKits = changedInventoryKits.value
+        }
+
+        await inventoryStore.putInventory(payload, route.params.id)
+        await inventoryStore.fetchInventory(route.params.id)
+        inventoryProducts.value = JSON.parse(JSON.stringify(inventoryStore.getInventory.inventoryProducts))
+        inventoryKits.value = JSON.parse(JSON.stringify(inventoryStore.getInventory.inventoryKits))
+    } catch (err) {
+        console.log(err)
+    } finally {
+        isLoadingEdit.value = false
+    }
+}
 </script>
 
 <template>
@@ -136,7 +161,8 @@ const confirmLeave = () => {
             <span>/</span>
         </template>
     </Breadcrumb>
-
+<pre>{{changedInventoryProducts}}</pre>
+<pre>{{changedInventoryKits}}</pre>
     <Section
         :section-name="t('cards.inventory')"
         back-route-name="inventories"
@@ -323,6 +349,9 @@ const confirmLeave = () => {
                                                 class="px-2! sm:px-5! whitespace-nowrap"
                                                 icon="pi pi-save"
                                                 :label="t('buttons.saveAndExit')"
+                                                @click="pushChanges"
+                                                :loading="isLoadingEdit"
+                                                :disabled="isLoadingEdit"
                                             />
                                         </div>
                                     </template>
@@ -477,6 +506,9 @@ const confirmLeave = () => {
                                                 class="px-2! sm:px-5! whitespace-nowrap"
                                                 icon="pi pi-save"
                                                 :label="t('buttons.saveAndExit')"
+                                                @click="pushChanges"
+                                                :loading="isLoadingEdit"
+                                                :disabled="isLoadingEdit"
                                             />
                                         </div>
                                     </template>
