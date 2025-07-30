@@ -5,6 +5,8 @@
         :ptOptions="{
             mergeProps: ptViewMerge
         }"
+        :model-value="modelValue"
+        @input="event => $emit('update:modelValue', event.value)"
     >
         <template #incrementicon>
             <AngleUpIcon />
@@ -25,7 +27,9 @@ import InputNumber, { type InputNumberPassThroughOptions, type InputNumberProps 
 import { ref } from 'vue';
 import { ptViewMerge } from './utils';
 
-interface Props extends /* @vue-ignore */ InputNumberProps {}
+interface Props extends /* @vue-ignore */ InputNumberProps {
+    modelValue?: number
+}
 defineProps<Props>();
 
 const theme = ref<InputNumberPassThroughOptions>({

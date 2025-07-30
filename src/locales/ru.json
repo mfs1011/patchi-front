@@ -151,6 +151,12 @@
         "accusative": "день уведомления о сроке годности",
         "accusativeCapitalize": "День уведомления о сроке годности"
     },
+    "data": {
+        "nominative": "данные",
+        "nominativeCapitalize": "Данные",
+        "accusative": "данные",
+        "accusativeCapitalize": "Данные"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",
