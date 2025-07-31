@@ -263,7 +263,9 @@
             "byAssembly": "To‘plam bo‘yicha qidiruv",
             "byPaymentType": "To‘lov turi bo‘yicha qidiruv",
             "byDateFrom": "Sanadan",
-            "byDateTo": "Sanagacha"
+            "byDateTo": "Sanagacha",
+            "byStatus": "Statusi bo‘yicha qidiruv",
+            "byLocation": "Obyekt bo‘yicha qidiruv"
         },
         "select": {
             "role": "Rol tanlang",

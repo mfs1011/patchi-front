@@ -444,6 +444,7 @@ const pushChanges = async () => {
                                     <Column field="factQty" :header="t('labels.factQty')">
                                         <template #body="{ data, index }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else-if="inventoryStore.getInventory.status !== STATUSES.WAITING">{{ formatCurrency(data.factQty) }} {{ t(`labels.pcs`) }}</p>
                                             <InputNumber
                                                 v-else
                                                 fluid

@@ -265,7 +265,9 @@
             "byAssembly": "Поиск по коллекции",
             "byPaymentType": "Поиск по тип оплаты",
             "byDateFrom": "Дата с",
-            "byDateTo": "Дата по"
+            "byDateTo": "Дата по",
+            "byStatus": "Поиск по статусу",
+            "byLocation": "Поиск по объекту"
         },
         "select": {
             "role": "Выберите роль",

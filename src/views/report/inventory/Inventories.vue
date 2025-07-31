@@ -274,7 +274,7 @@ onBeforeRouteLeave(() => {
                         :options="locationStore.getLocations.models"
                         option-label="name"
                         option-value="id"
-                        :placeholder="t('placeholders.search.byCategory')"
+                        :placeholder="t('placeholders.search.byLocation')"
                         showClear
                         class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
                     />
@@ -284,7 +284,7 @@ onBeforeRouteLeave(() => {
                         :options="statuses"
                         option-label="name"
                         option-value="id"
-                        :placeholder="t('placeholders.search.byAssembly')"
+                        :placeholder="t('placeholders.search.byStatus')"
                         showClear
                         class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
                     />
