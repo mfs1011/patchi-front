@@ -265,7 +265,9 @@
             "byAssembly": "Search by collection",
             "byPaymentType": "Search by payment type",
             "byDateFrom": "From date",
-            "byDateTo": "To date"
+            "byDateTo": "To date",
+            "byStatus": "Search by status",
+            "byLocation": "Search by location"
         },
         "select": {
             "role": "Select role",
