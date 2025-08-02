@@ -12,6 +12,10 @@ export const useProductStore = defineStore('product', () => {
             models: [],
             totalItems: 0,
         },
+        residualProducts: {
+            models: [],
+            totalItems: 0,
+        },
         product: {},
         isLoadingProducts: false,
     })
@@ -66,6 +70,22 @@ export const useProductStore = defineStore('product', () => {
         }
     }
 
+    const fetchResidualProducts = async (params = { page: 1 }) => {
+        try {
+            state.isLoadingProducts = true
+
+            const { data } = await authorizedClient.get('/products/residual', { params })
+            state.residualProducts.models = data.member
+            state.residualProducts.totalItems = data.totalItems
+
+            return data
+        } catch (error) {
+            throw error
+        } finally {
+            state.isLoadingProducts = false
+        }
+    }
+
     const fetchProduct = async id => {
         try {
             const { data } = await authorizedClient.get(`/products/${id}`)
@@ -98,11 +118,13 @@ export const useProductStore = defineStore('product', () => {
         putProduct,
         fetchProducts,
         fetchABCProducts,
+        fetchResidualProducts,
         fetchProduct,
         deleteProduct,
         restoreProduct,
         getProducts: computed(() => state.products),
         getABCProducts: computed(() => state.abcProducts),
+        getResidualProducts: computed(() => state.residualProducts),
         getProduct: computed(() => state.product),
         getIsLoadingProducts: computed(() => state.isLoadingProducts),
     }

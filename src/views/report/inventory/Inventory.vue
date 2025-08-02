@@ -214,10 +214,16 @@ const pushChanges = async () => {
                                             <p v-else>{{ data.id }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="product" :header="t('labels.product')">
+                                    <Column field="name" :header="t('labels.name')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ data.locationQuantity?.product.name }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="code" :header="t('labels.code')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.locationQuantity?.product.code }}</p>
                                         </template>
                                     </Column>
                                     <Column field="color" :header="t('labels.color')">
@@ -232,7 +238,7 @@ const pushChanges = async () => {
                                             <p v-else>{{ data.locationQuantity?.expiryDate ? getFormattedDate(data.locationQuantity.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="income" :header="t('labels.initial')">
+                                    <Column field="initial" :header="t('labels.initial')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ formatCurrency(data.initialQty) }} {{ t(`labels.${data.locationQuantity?.product?.category?.unit?.name}`) }}</p>
@@ -393,10 +399,16 @@ const pushChanges = async () => {
                                             <p v-else>{{ data.id }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="locationQuantityKit.kit.name" :header="t('labels.kit')">
+                                    <Column field="name" :header="t('labels.name')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ data.locationQuantityKit?.kit.name }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="code" :header="t('labels.code')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.locationQuantityKit?.kit.code }}</p>
                                         </template>
                                     </Column>
                                     <Column field="color" :header="t('labels.color')">

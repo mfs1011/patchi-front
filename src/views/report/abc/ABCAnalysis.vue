@@ -76,6 +76,7 @@ watch(
 
         await updateQuery(router, queryFilter);
         await productStore.fetchABCProducts(route.query);
+        console.log('mana')
     },
     { immediate: true, deep: true }
 );

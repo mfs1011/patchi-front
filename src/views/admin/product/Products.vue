@@ -51,8 +51,8 @@ const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
     isDelete: route.query['is-delete'] || false,
-    category: route.query['category'] || null,
-    assembly: route.query['assembly'] || null,
+    category: parseInt(route.query.category) || null,
+    assembly: parseInt(route.query.assembly) || null,
 });
 
 const archiveOrActive = computed({
