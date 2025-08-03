@@ -115,6 +115,10 @@ watch(
     { immediate: true, deep: true }
 );
 
+watch(() => tabVal.value, () => {
+    filters.value.page = 1;
+});
+
 onMounted(() => {
     if(!categoryStore.getCategories.models.length) {
         categoryStore.fetchCategories()
