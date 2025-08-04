@@ -393,7 +393,15 @@ onBeforeRouteLeave(() => {
                         <Column field="costPrice" :header="t('labels.costPrice')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.costPrice ? `${formatCurrency(data.costPrice)}$` : '-' }}</p>
+                                <p
+                                    v-else
+                                   :class="{
+                                        'text-green-600': data.costPrice < data.wholesalePrice,
+                                        'text-red-600': data.costPrice >= data.wholesalePrice
+                                   }"
+                                >
+                                    {{ data.costPrice ? `${formatCurrency(data.costPrice)}$` : '-' }}
+                                </p>
                             </template>
                         </Column>
                         <Column field="retailPrice" :header="t('labels.retailPrice')">

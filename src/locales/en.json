@@ -240,6 +240,17 @@
         "benefitPercent": "Benefit, %",
         "kpiPercent": "KPI percent",
         "notificationDay": "Days before notification",
+        "element": "Element",
+        "elementId": "Element ID",
+        "actionType": "Action Type",
+        "oldValue": "Old Value",
+        "newValue": "New Value",
+        "create": "Created",
+        "update": "Changed",
+        "delete": "Deleted",
+        "restore": "Restored",
+        "imageUpdated": "Image updated",
+        "passwordUpdated": "Password updated",
         "totals": "Totals"
     },
     "placeholders": {

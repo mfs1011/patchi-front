@@ -240,6 +240,17 @@
         "benefitPercent": "Foyda, %",
         "kpiPercent": "KPI foiz",
         "notificationDay": "Ogohlantirishga qolgan kun",
+        "element": "Element",
+        "elementId": "Element ID",
+        "actionType": "Amallar turi",
+        "oldValue": "Eski qiymat",
+        "newValue": "Yangi qiymat",
+        "create": "Yaratildi",
+        "update": "O'zgartirildi",
+        "delete": "Oʻchirildi",
+        "restore": "Tiklandi",
+        "imageUpdated": "Rasm yangilandi",
+        "passwordUpdated": "Parol yangilandi",
         "totals": "Jami"
     },
     "placeholders": {

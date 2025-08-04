@@ -240,6 +240,17 @@
         "benefitPercent": "Прибыль, %",
         "kpiPercent": "Процент KPI",
         "notificationDay": "До оповещения (дней)",
+        "element": "Элемент",
+        "elementId": "Элемент ID",
+        "actionType": "Тип операций",
+        "oldValue": "Старое значение",
+        "newValue": "Новое значение",
+        "create": "Создано",
+        "update": "Изменено",
+        "delete": "Удалено",
+        "restore": "Восстановлено",
+        "imageUpdated": "Изображение обновлено",
+        "passwordUpdated": "Пароль обновлено",
         "totals": "Итого"
     },
     "placeholders": {
