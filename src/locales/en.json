@@ -262,7 +262,13 @@
         "Supplier": "Supplier",
         "Product": "Product",
         "Location": "Location",
-        "Category": "Category"
+        "Category": "Category",
+        "Color": "Color",
+        "OrderKpiPercent": "Sales KPI percent",
+        "KitKpiPercent": "Composition KPI percent",
+        "CategoryKpiPercent": "Category KPI percent",
+        "Payment": "Payment",
+        "Assembly": "Assembly"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",

@@ -262,7 +262,13 @@
         "Supplier": "Поставщик",
         "Product": "Продукт",
         "Location": "Локация",
-        "Category": "Категория"
+        "Category": "Категория",
+        "Color": "Цвет",
+        "OrderKpiPercent": "Процент KPI по продажам",
+        "KitKpiPercent": "Процент KPI по композициям",
+        "CategoryKpiPercent": "Процент KPI по категориям",
+        "Payment": "Платёж",
+        "Assembly": "Сборка"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",

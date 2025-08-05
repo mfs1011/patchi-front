@@ -262,7 +262,13 @@
         "Supplier": "Ta'minotchi",
         "Product": "Mahsulot",
         "Location": "Joylashuvi",
-        "Category": "Kategoriya"
+        "Category": "Kategoriya",
+        "Color": "Rangi",
+        "OrderKpiPercent": "Sotuv KPI foizi",
+        "KitKpiPercent": "Kompozitsiya KPI foizi",
+        "CategoryKpiPercent": "Kategoriya KPI foizi",
+        "Payment": "To‘lov",
+        "Assembly": "To‘plam"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",

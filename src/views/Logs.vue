@@ -12,7 +12,7 @@ import {computed, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {formatCurrency, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
+import {formatCurrency, getFormattedDate, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
 import updateQuery from "@/helpers/updateQuery.js";
 import DatePicker from "@/volt/DatePicker.vue";
 import {useLogStore} from "@/stores/log.js";
@@ -43,6 +43,12 @@ const elements = computed(() => [
     {id: 6, name: t('labels.Product'), value: 'Product'},
     {id: 7, name: t('labels.Location'), value: 'Location'},
     {id: 8, name: t('labels.Category'), value: 'Category'},
+    {id: 9, name: t('labels.Color'), value: 'Color'},
+    {id: 10, name: t('labels.OrderKpiPercent'), value: 'OrderKpiPercent'},
+    {id: 11, name: t('labels.KitKpiPercent'), value: 'KitKpiPercent'},
+    {id: 12, name: t('labels.CategoryKpiPercent'), value: 'CategoryKpiPercent'},
+    {id: 13, name: t('labels.Payment'), value: 'Payment'},
+    {id: 14, name: t('labels.Assembly'), value: 'Assembly'},
 ]);
 
 const actions = computed(() => [
@@ -341,6 +347,28 @@ watch(
                                         <h6 v-if="data.oldData?.categoryType">{{ t('labels.categoryType') }}: <b>{{ data.oldData.categoryType.name }}</b></h6>
                                         <h6 v-if="data.oldData?.unit">{{ t('labels.unit') }}: <b>{{ t(`labels.${data.oldData.unit.name}`) }}</b></h6>
                                     </div>
+                                    <div v-if="data.entityType === 'Color'">
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'OrderKpiPercent'">
+                                        <h6 v-if="data.oldData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.oldData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.oldData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.oldData.createdAt) }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'KitKpiPercent'">
+                                        <h6 v-if="data.oldData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.oldData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.oldData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.oldData.createdAt) }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'CategoryKpiPercent'">
+                                        <h6 v-if="data.oldData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.oldData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.oldData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.oldData.createdAt) }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Payment'">
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}%</b></h6>
+                                        <h6 v-if="data.oldData?.paymentType">{{ t('labels.paymentType') }}: <b>{{ data.oldData.paymentType.name }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Assembly'">
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                    </div>
                                 </div>
                             </template>
                         </Column>
@@ -414,6 +442,28 @@ watch(
                                         <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
                                         <h6 v-if="data.newData?.categoryType">{{ t('labels.categoryType') }}: <b>{{ data.newData.categoryType.name }}</b></h6>
                                         <h6 v-if="data.newData?.unit">{{ t('labels.unit') }}: <b>{{ t(`labels.${data.newData.unit.name}`) }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Color'">
+                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'OrderKpiPercent'">
+                                        <h6 v-if="data.newData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.newData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.newData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.newData.createdAt) }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'KitKpiPercent'">
+                                        <h6 v-if="data.newData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.newData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.newData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.newData.createdAt) }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'CategoryKpiPercent'">
+                                        <h6 v-if="data.newData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.newData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.newData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.newData.createdAt) }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Payment'">
+                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}%</b></h6>
+                                        <h6 v-if="data.newData?.paymentType">{{ t('labels.paymentType') }}: <b>{{ data.newData.paymentType.name }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Assembly'">
+                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
                                     </div>
                                 </div>
                             </template>

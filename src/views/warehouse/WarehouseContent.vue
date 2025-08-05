@@ -11,7 +11,7 @@ import updateQuery from "@/helpers/updateQuery.js";
 import {useLocationQuantityStore} from "@/stores/locationQuantity.js";
 import Select from "@/volt/Select.vue";
 import {useLocationStore} from "@/stores/location.js";
-import {getFormattedDate} from "@/helpers/numberFormat.js";
+import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
 import Skeleton from "@/volt/Skeleton.vue";
 import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import DataTable from "@/volt/DataTable.vue";
@@ -356,7 +356,7 @@ async function firstFetchProduct(queryFilters) {
                                     <Column field="color" :header="t('labels.color')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
-                                            <p v-else>{{ data.color || '-' }}</p>
+                                            <p v-else>{{ data.color?.name || '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
@@ -368,7 +368,7 @@ async function firstFetchProduct(queryFilters) {
                                     <Column field="qty" :header="t('labels.qty')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
-                                            <p v-else>{{ data.qty }} {{ t(`labels.${data.product.category.unit.name}`) }}</p>
+                                            <p v-else>{{ formatCurrency(data.qty) }} {{ t(`labels.${data.product.category.unit.name}`) }}</p>
                                         </template>
                                     </Column>
 
@@ -425,12 +425,6 @@ async function firstFetchProduct(queryFilters) {
                                             <p v-else>{{ data.location.name }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="color" :header="t('labels.color')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.color || '-' }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
@@ -440,7 +434,7 @@ async function firstFetchProduct(queryFilters) {
                                     <Column field="qty" :header="t('labels.qty')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.qty }} {{ t('labels.pcs')}}</p>
+                                            <p v-else>{{ formatCurrency(data.qty) }} {{ t('labels.pcs')}}</p>
                                         </template>
                                     </Column>
 
