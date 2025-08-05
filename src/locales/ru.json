@@ -239,7 +239,8 @@
         "benefitPercent": "Прибыль, %",
         "kpiPercent": "Процент KPI",
         "notificationDay": "До оповещения (дней)",
-        "totals": "Итого"
+        "totals": "Итого",
+        "qty": "Количество"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -267,7 +268,8 @@
             "byDateFrom": "Дата с",
             "byDateTo": "Дата по",
             "byStatus": "Поиск по статусу",
-            "byLocation": "Поиск по объекту"
+            "byLocation": "Поиск по объекту",
+            "byProduct": "Поиск по продукту"
         },
         "select": {
             "role": "Выберите роль",
@@ -385,7 +387,7 @@
         "productsInWarehouse": "Продукты на складе",
         "productsInShop": "Продукты в магазине",
         "warehouseContent": "Состав склада",
-        "marketContent": "Состав магазина",
+        "shopContent": "Состав магазина",
         "incomeInvoices": "Поступления",
         "transferInvoices": "Перемещение",
         "orders": "Заказы",

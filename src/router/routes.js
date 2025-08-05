@@ -41,10 +41,10 @@ export const routes = [
                         component: () => import('@/views/warehouse/Warehouse.vue')
                     },
                     {
-                        path: 'products-in-stock',
-                        name: 'warehouse-products-in-stock',
+                        path: 'content',
+                        name: 'warehouse-content',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/warehouse/WarehouseProductsInStock.vue')
+                        component: () => import('@/views/warehouse/WarehouseContent.vue')
                     },
                     {
                         path: 'warehouse-kits',
@@ -96,10 +96,10 @@ export const routes = [
                         component: () => import('@/views/shop/Shop.vue')
                     },
                     {
-                        path: 'products-in-stock',
-                        name: 'shop-products-in-stock',
+                        path: 'content',
+                        name: 'shop-content',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/shop/ShopProductsInStock.vue')
+                        component: () => import('@/views/shop/ShopContent.vue')
                     },
                     {
                         path: 'shop-kits',

@@ -239,7 +239,8 @@
         "benefitPercent": "Foyda, %",
         "kpiPercent": "KPI foiz",
         "notificationDay": "Ogohlantirishga qolgan kun",
-        "totals": "Jami"
+        "totals": "Jami",
+        "qty": "Miqdori"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
@@ -265,7 +266,8 @@
             "byDateFrom": "Sanadan",
             "byDateTo": "Sanagacha",
             "byStatus": "Statusi bo‘yicha qidiruv",
-            "byLocation": "Obyekt bo‘yicha qidiruv"
+            "byLocation": "Obyekt bo‘yicha qidiruv",
+            "byProduct": "Mahsulot bo‘yicha qidiruv"
         },
         "select": {
             "role": "Rol tanlang",
@@ -385,7 +387,7 @@
         "productsInWarehouse": "Ombordagi mahsulotlar",
         "productsInShop": "Do‘kondagi mahsulotlar",
         "warehouseContent": "Ombor tarkibi",
-        "marketContent": "Do'kon tarkibi",
+        "shopContent": "Do'kon tarkibi",
         "incomeInvoices": "Kirim",
         "transferInvoices": "Ko‘chirish",
         "orders": "Buyurtmalar",

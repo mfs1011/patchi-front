@@ -239,7 +239,8 @@
         "benefitPercent": "Benefit, %",
         "kpiPercent": "KPI percent",
         "notificationDay": "Days before notification",
-        "totals": "Totals"
+        "totals": "Totals",
+        "qty": "Quantity"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
@@ -267,7 +268,8 @@
             "byDateFrom": "From date",
             "byDateTo": "To date",
             "byStatus": "Search by status",
-            "byLocation": "Search by location"
+            "byLocation": "Search by location",
+            "byProduct": "Search by product"
         },
         "select": {
             "role": "Select role",
@@ -385,7 +387,7 @@
         "productsInWarehouse": "Products in warehouse",
         "productsInShop": "Products in shop",
         "warehouseContent": "Warehouse content",
-        "marketContent": "Shop content",
+        "shopContent": "Shop content",
         "incomeInvoices": "Incoming",
         "transferInvoices": "Transfer",
         "orders": "Orders",
