@@ -240,6 +240,8 @@
         "benefitPercent": "Прибыль, %",
         "kpiPercent": "Процент KPI",
         "notificationDay": "До оповещения (дней)",
+        "totals": "Итого",
+        "qty": "Количество",
         "element": "Элемент",
         "elementId": "Элемент ID",
         "actionType": "Тип операций",
@@ -260,8 +262,7 @@
         "Supplier": "Поставщик",
         "Product": "Продукт",
         "Location": "Локация",
-        "Category": "Категория",
-        "totals": "Итого"
+        "Category": "Категория"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -289,9 +290,10 @@
             "byDateFrom": "Дата с",
             "byDateTo": "Дата по",
             "byStatus": "Поиск по статусу",
+            "byLocation": "Поиск по объекту",
+            "byProduct": "Поиск по продукту",
             "byElement": "Поиск по элементу",
-            "byAction": "Поиск по действию",
-            "byLocation": "Поиск по объекту"
+            "byAction": "Поиск по действию"
         },
         "select": {
             "role": "Выберите роль",
@@ -410,7 +412,7 @@
         "productsInWarehouse": "Продукты на складе",
         "productsInShop": "Продукты в магазине",
         "warehouseContent": "Состав склада",
-        "marketContent": "Состав магазина",
+        "shopContent": "Состав магазина",
         "incomeInvoices": "Поступления",
         "transferInvoices": "Перемещение",
         "orders": "Заказы",

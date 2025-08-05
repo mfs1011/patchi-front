@@ -240,6 +240,8 @@
         "benefitPercent": "Benefit, %",
         "kpiPercent": "KPI percent",
         "notificationDay": "Days before notification",
+        "totals": "Totals",
+        "qty": "Quantity",
         "element": "Element",
         "elementId": "Element ID",
         "actionType": "Action Type",
@@ -260,8 +262,7 @@
         "Supplier": "Supplier",
         "Product": "Product",
         "Location": "Location",
-        "Category": "Category",
-        "totals": "Totals"
+        "Category": "Category"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
@@ -289,9 +290,10 @@
             "byDateFrom": "From date",
             "byDateTo": "To date",
             "byStatus": "Search by status",
+            "byLocation": "Search by location",
+            "byProduct": "Search by product",
             "byElement": "Search by element",
-            "byAction": "Search by action",
-            "byLocation": "Search by location"
+            "byAction": "Search by action"
         },
         "select": {
             "role": "Select role",
@@ -410,7 +412,7 @@
         "productsInWarehouse": "Products in warehouse",
         "productsInShop": "Products in shop",
         "warehouseContent": "Warehouse content",
-        "marketContent": "Shop content",
+        "shopContent": "Shop content",
         "incomeInvoices": "Incoming",
         "transferInvoices": "Transfer",
         "orders": "Orders",
