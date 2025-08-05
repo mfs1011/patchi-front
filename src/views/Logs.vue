@@ -363,7 +363,7 @@ watch(
                                         <h6 v-if="data.oldData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.oldData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Payment'">
-                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}%</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
                                         <h6 v-if="data.oldData?.paymentType">{{ t('labels.paymentType') }}: <b>{{ data.oldData.paymentType.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Assembly'">
@@ -459,7 +459,7 @@ watch(
                                         <h6 v-if="data.newData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.newData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Payment'">
-                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}%</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
                                         <h6 v-if="data.newData?.paymentType">{{ t('labels.paymentType') }}: <b>{{ data.newData.paymentType.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Assembly'">
