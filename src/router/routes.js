@@ -521,6 +521,11 @@ export const routes = [
                         name: 'abc',
                         component: () => import('@/views/report/abc/ABCAnalysis.vue')
                     },
+                    {
+                        path: 'residual',
+                        name: 'residual',
+                        component: () => import('@/views/report/residual/Residual.vue')
+                    },
                 ]
             },
             {

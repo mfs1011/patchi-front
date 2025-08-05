@@ -47,8 +47,8 @@ const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
     isDelete: route.query['is-delete'] || false,
-    categoryType: route.query['categoryType'] || null,
-    unit: route.query['unit'] || null
+    categoryType: parseInt(route.query.categoryType) || null,
+    unit: parseInt(route.query.unit) || null
 });
 
 const archiveOrActive = computed({

@@ -70,12 +70,13 @@ watch(
 
         if (dateTo) {
             const toDate = new Date(dateTo);
-            toDate.setHours(28, 59, 59, 999);
+            toDate.setHours(5, 0, 0, 0);
             queryFilter['date-to'] = toDate.toISOString();
         }
 
         await updateQuery(router, queryFilter);
         await productStore.fetchABCProducts(route.query);
+        console.log('mana')
     },
     { immediate: true, deep: true }
 );
