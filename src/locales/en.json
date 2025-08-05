@@ -251,6 +251,16 @@
         "restore": "Restored",
         "imageUpdated": "Image updated",
         "passwordUpdated": "Password updated",
+        "clientB2B": "Corporate Client",
+        "clientB2C": "Boutique Client",
+        "Notification": "Notification",
+        "User": "User",
+        "Seller": "Seller",
+        "Customer": "Client",
+        "Supplier": "Supplier",
+        "Product": "Product",
+        "Location": "Location",
+        "Category": "Category",
         "totals": "Totals"
     },
     "placeholders": {
@@ -279,6 +289,8 @@
             "byDateFrom": "From date",
             "byDateTo": "To date",
             "byStatus": "Search by status",
+            "byElement": "Search by element",
+            "byAction": "Search by action",
             "byLocation": "Search by location"
         },
         "select": {

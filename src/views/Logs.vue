@@ -16,6 +16,8 @@ import {formatCurrency, getFormattedDateWithTime} from "@/helpers/numberFormat.j
 import updateQuery from "@/helpers/updateQuery.js";
 import DatePicker from "@/volt/DatePicker.vue";
 import {useLogStore} from "@/stores/log.js";
+import {formatPhoneByCountry} from "@/helpers/phoneFormat.js";
+import Select from "@/volt/Select.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -32,11 +34,31 @@ const home = computed(() => ({
 }));
 const items = computed(() => [{ label: t("logs") }]);
 
+const elements = computed(() => [
+    {id: 1, name: t('labels.Notification'), value: 'Notification'},
+    {id: 2, name: t('labels.User'), value: 'User'},
+    {id: 3, name: t('labels.Seller'), value: 'Seller'},
+    {id: 4, name: t('labels.Customer'), value: 'Customer'},
+    {id: 5, name: t('labels.Supplier'), value: 'Supplier'},
+    {id: 6, name: t('labels.Product'), value: 'Product'},
+    {id: 7, name: t('labels.Location'), value: 'Location'},
+    {id: 8, name: t('labels.Category'), value: 'Category'},
+]);
+
+const actions = computed(() => [
+    {id: 1, name: t('labels.create'), value: 'create'},
+    {id: 2, name: t('labels.update'), value: 'update'},
+    {id: 3, name: t('labels.delete'), value: 'delete'},
+    {id: 4, name: t('labels.restore'), value: 'restore'},
+]);
+
 const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
+    entityType: parseInt(route.query.entityType) || null,
+    action: parseInt(route.query.action) || null,
     'date-from': route.query['date-from'] || null,
     'date-to': route.query['date-to'] || null
 });
@@ -55,6 +77,18 @@ watch(
 
         if (debouncedFilter.value === "") {
             delete queryFilter.name;
+        }
+
+        if (filters.value.entityType !== null) {
+            queryFilter.entityType = filters.value.entityType;
+        } else {
+            delete queryFilter.entityType;
+        }
+
+        if (filters.value.action !== null) {
+            queryFilter.action = filters.value.action;
+        } else {
+            delete queryFilter.action;
         }
 
         if (filters.value['date-from']) {
@@ -152,6 +186,24 @@ watch(
                 class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
             >
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
+                    <Select
+                        v-model="filters.entityType"
+                        :options="elements"
+                        option-label="name"
+                        option-value="value"
+                        :placeholder="t('placeholders.search.byElement')"
+                        showClear
+                        class="min-w-50 max-w-full w-full"
+                    />
+                    <Select
+                        v-model="filters.action"
+                        :options="actions"
+                        option-label="name"
+                        option-value="value"
+                        :placeholder="t('placeholders.search.byAction')"
+                        showClear
+                        class="min-w-50 max-w-full w-full"
+                    />
                     <DatePicker
                         v-model.trim="filters['date-from']"
                         dateFormat="dd.mm.yy"
@@ -211,7 +263,7 @@ watch(
                         <Column field="element" :header="t('labels.element')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="logStore.getIsLoadingLogs"/>
-                                <p v-else>{{ data.entityType }}</p>
+                                <p v-else>{{ t(`labels.${data.entityType}`) }}</p>
                             </template>
                         </Column>
                         <Column field="elementId" :header="t('labels.elementId')">
@@ -228,7 +280,7 @@ watch(
                                         <h6 v-if="data.oldData?.status">{{ t('labels.status') }}: <b>{{ t(data.oldData.status) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'User'">
-                                        <h6 v-if="data.oldData?.username">{{ t('labels.phoneNumber') }}: <b>{{ data.oldData.username }}</b></h6>
+                                        <h6 v-if="data.oldData?.username">{{ t('labels.phoneNumber') }}: <b>{{ formatPhoneByCountry(data.oldData.username) }}</b></h6>
                                         <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
                                         <h6 v-if="data.oldData?.role">{{ t('labels.role') }}:
                                             <b v-if="data.oldData.role.name === 'ROLE_ADMIN'">{{ t('roles.admin') }}</b>
@@ -256,6 +308,21 @@ watch(
                                             </b>
                                         </h6>
                                     </div>
+                                    <div v-if="data.entityType === 'Seller'">
+                                        <h6 v-if="data.oldData?.telephone">{{ t('labels.phoneNumber') }}: <b>{{ formatPhoneByCountry(data.oldData.telephone) }}</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.location">{{ t('labels.locations') }}: <b>{{ data.oldData.location.name }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Customer'">
+                                        <h6 v-if="data.oldData?.telephone">{{ t('labels.phoneNumber') }}: <b>{{ formatPhoneByCountry(data.oldData.telephone) }}</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.comment">{{ t('labels.comment') }}: <b>{{ data.oldData.comment }}</b></h6>
+                                        <h6 v-if="data.oldData?.b2b !== undefined"><b>{{ data.oldData?.b2b ? t('labels.clientB2B') : t('labels.clientB2C') }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Supplier'">
+                                        <h6 v-if="data.oldData?.telephone">{{ t('labels.phoneNumber') }}: <b>{{ formatPhoneByCountry(data.oldData.telephone) }}</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                    </div>
                                     <div v-if="data.entityType === 'Product'">
                                         <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
                                         <h6 v-if="data.oldData?.code">{{ t('labels.code') }}: <b>{{ data.oldData.code }}</b></h6>
@@ -265,6 +332,14 @@ watch(
                                         <h6 v-if="data.oldData?.wholesalePrice">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.oldData.wholesalePrice) }}$</b></h6>
                                         <h6 v-if="data.oldData?.retailPrice">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.oldData.retailPrice) }}$</b></h6>
                                         <h6 v-if="data.oldData?.minQty">{{ t('labels.minQty') }}: <b>{{ formatCurrency(data.oldData.minQty) }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Location'">
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Category'">
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.categoryType">{{ t('labels.categoryType') }}: <b>{{ data.oldData.categoryType.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.unit">{{ t('labels.unit') }}: <b>{{ t(`labels.${data.oldData.unit.name}`) }}</b></h6>
                                     </div>
                                 </div>
                             </template>
@@ -277,7 +352,7 @@ watch(
                                         <h6 v-if="data.newData?.status">{{ t('labels.status') }}: <b>{{ t(data.newData.status) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'User'">
-                                        <h6 v-if="data.newData?.username">{{ t('labels.phoneNumber') }}: <b>{{ data.newData.username }}</b></h6>
+                                        <h6 v-if="data.newData?.username">{{ t('labels.phoneNumber') }}: <b>{{ formatPhoneByCountry(data.newData.username) }}</b></h6>
                                         <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
                                         <h6 v-if="data.newData?.password">{{ t('labels.password') }}: <b>{{ t('labels.passwordUpdated') }}</b></h6>
                                         <h6 v-if="data.newData?.role">{{ t('labels.role') }}:
@@ -306,6 +381,21 @@ watch(
                                             </b>
                                         </h6>
                                     </div>
+                                    <div v-if="data.entityType === 'Seller'">
+                                        <h6 v-if="data.newData?.telephone">{{ t('labels.phoneNumber') }}: <b>{{ formatPhoneByCountry(data.newData.telephone) }}</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                        <h6 v-if="data.newData?.location">{{ t('labels.locations') }}: <b>{{ data.newData.location.name }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Customer'">
+                                        <h6 v-if="data.newData?.telephone">{{ t('labels.phoneNumber') }}: <b>{{ formatPhoneByCountry(data.newData.telephone) }}</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                        <h6 v-if="data.newData?.comment">{{ t('labels.comment') }}: <b>{{ data.newData.comment }}</b></h6>
+                                        <h6 v-if="data.newData?.b2b !== undefined"><b>{{ data.newData?.b2b ? t('labels.clientB2B') : t('labels.clientB2C') }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Supplier'">
+                                        <h6 v-if="data.newData?.telephone">{{ t('labels.phoneNumber') }}: <b>{{ formatPhoneByCountry(data.newData.telephone) }}</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                    </div>
                                     <div v-if="data.entityType === 'Product'">
                                         <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
                                         <h6 v-if="data.newData?.code">{{ t('labels.code') }}: <b>{{ data.newData.code }}</b></h6>
@@ -316,6 +406,14 @@ watch(
                                         <h6 v-if="data.newData?.retailPrice">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.newData.retailPrice) }}$</b></h6>
                                         <h6 v-if="data.newData?.minQty">{{ t('labels.minQty') }}: <b>{{ formatCurrency(data.newData.minQty) }}</b></h6>
                                         <h6 v-if="data.action === 'update' && data.newData?.photo">{{ t('labels.photo') }}: <b>{{ t('labels.imageUpdated') }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Location'">
+                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Category'">
+                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                        <h6 v-if="data.newData?.categoryType">{{ t('labels.categoryType') }}: <b>{{ data.newData.categoryType.name }}</b></h6>
+                                        <h6 v-if="data.newData?.unit">{{ t('labels.unit') }}: <b>{{ t(`labels.${data.newData.unit.name}`) }}</b></h6>
                                     </div>
                                 </div>
                             </template>

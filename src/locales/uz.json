@@ -251,6 +251,16 @@
         "restore": "Tiklandi",
         "imageUpdated": "Rasm yangilandi",
         "passwordUpdated": "Parol yangilandi",
+        "clientB2B": "Korporativ mijoz",
+        "clientB2C": "Butik mijoz",
+        "Notification": "Bildirishnoma",
+        "User": "Foydalanuvchi",
+        "Seller": "Sotuvchi",
+        "Customer": "Mijoz",
+        "Supplier": "Ta'minotchi",
+        "Product": "Mahsulot",
+        "Location": "Joylashuvi",
+        "Category": "Kategoriya",
         "totals": "Jami"
     },
     "placeholders": {
@@ -277,6 +287,8 @@
             "byDateFrom": "Sanadan",
             "byDateTo": "Sanagacha",
             "byStatus": "Statusi bo‘yicha qidiruv",
+            "byElement": "Element bo'yicha qidiruv",
+            "byAction": "Harakat bo'yicha qidiruv",
             "byLocation": "Obyekt bo‘yicha qidiruv"
         },
         "select": {

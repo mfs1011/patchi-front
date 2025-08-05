@@ -251,6 +251,16 @@
         "restore": "Восстановлено",
         "imageUpdated": "Изображение обновлено",
         "passwordUpdated": "Пароль обновлено",
+        "clientB2B": "Корпоративный клиент",
+        "clientB2C": "Клиент бутика",
+        "Notification": "Уведомление",
+        "User": "Пользователь",
+        "Seller": "Продавец",
+        "Customer": "Клиент",
+        "Supplier": "Поставщик",
+        "Product": "Продукт",
+        "Location": "Локация",
+        "Category": "Категория",
         "totals": "Итого"
     },
     "placeholders": {
@@ -279,6 +289,8 @@
             "byDateFrom": "Дата с",
             "byDateTo": "Дата по",
             "byStatus": "Поиск по статусу",
+            "byElement": "Поиск по элементу",
+            "byAction": "Поиск по действию",
             "byLocation": "Поиск по объекту"
         },
         "select": {
