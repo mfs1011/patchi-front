@@ -19,6 +19,8 @@
     "administration": "Администратция",
     "reports": "Отчеты",
     "logs": "Логи",
+    "log": "Лог",
+    "details": "Подробности",
     "logout": "Выход",
     "forgotPassword": "Забыли пароль?",
     "noResults": "Ничего не найдено",
@@ -268,7 +270,9 @@
         "KitKpiPercent": "Процент KPI по композициям",
         "CategoryKpiPercent": "Процент KPI по категориям",
         "Payment": "Платёж",
-        "Assembly": "Сборка"
+        "Assembly": "Сборка",
+        "Inventory": "Инвентарь",
+        "OrderInvoice": "Заказ"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",

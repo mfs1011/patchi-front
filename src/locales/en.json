@@ -19,6 +19,8 @@
     "administration": "Administration",
     "reports": "Reports",
     "logs": "Logs",
+    "log": "Log",
+    "details": "Details",
     "logout": "Logout",
     "forgotPassword": "Forgot your password?",
     "noResults": "No results found",
@@ -268,7 +270,9 @@
         "KitKpiPercent": "Composition KPI percent",
         "CategoryKpiPercent": "Category KPI percent",
         "Payment": "Payment",
-        "Assembly": "Assembly"
+        "Assembly": "Assembly",
+        "Inventory": "Inventory",
+        "OrderInvoice": "Order"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",

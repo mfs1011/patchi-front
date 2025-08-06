@@ -385,7 +385,6 @@ const pushChanges = async () => {
                                 value="kits"
                             >
                                 <DataTable
-                                    v-if="inventoryStore.getIsLoadingInventories || inventoryKits.length > 0"
                                     :rowClass="rowClassKits"
                                     ref="dt"
                                     :value="isLoading ? Array(10).fill({}) : inventoryKits"

@@ -19,6 +19,8 @@
     "administration": "Administratsiya",
     "reports": "Hisobotlar",
     "logs": "Loglar",
+    "log": "Log",
+    "details": "Tafsilotlar",
     "logout": "Chiqish",
     "forgotPassword": "Parolingizni unutdingizmi?",
     "noResults": "Hech narsa topilmadi",
@@ -268,7 +270,9 @@
         "KitKpiPercent": "Kompozitsiya KPI foizi",
         "CategoryKpiPercent": "Kategoriya KPI foizi",
         "Payment": "To‘lov",
-        "Assembly": "To‘plam"
+        "Assembly": "To‘plam",
+        "Inventory": "Inventarizatsiya",
+        "OrderInvoice": "Buyurtma"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",

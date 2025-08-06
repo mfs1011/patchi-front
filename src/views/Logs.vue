@@ -11,7 +11,6 @@ import Skeleton from "@/volt/Skeleton.vue";
 import {computed, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
-import Breadcrumb from "@/volt/Breadcrumb.vue";
 import {formatCurrency, getFormattedDate, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
 import updateQuery from "@/helpers/updateQuery.js";
 import DatePicker from "@/volt/DatePicker.vue";
@@ -25,14 +24,6 @@ const { t } = useI18n();
 const isVisibleSectionHeader = ref(false);
 
 const logStore = useLogStore()
-
-// computed
-const home = computed(() => ({
-    icon: "pi pi-slash",
-    label: t("reports"),
-    route: "/reports",
-}));
-const items = computed(() => [{ label: t("logs") }]);
 
 const elements = computed(() => [
     {id: 1, name: t('labels.Notification'), value: 'Notification'},
@@ -49,6 +40,8 @@ const elements = computed(() => [
     {id: 12, name: t('labels.CategoryKpiPercent'), value: 'CategoryKpiPercent'},
     {id: 13, name: t('labels.Payment'), value: 'Payment'},
     {id: 14, name: t('labels.Assembly'), value: 'Assembly'},
+    {id: 15, name: t('labels.Inventory'), value: 'Inventory'},
+    {id: 16, name: t('labels.OrderInvoice'), value: 'OrderInvoice'},
 ]);
 
 const actions = computed(() => [
@@ -57,6 +50,53 @@ const actions = computed(() => [
     {id: 3, name: t('labels.delete'), value: 'delete'},
     {id: 4, name: t('labels.restore'), value: 'restore'},
 ]);
+
+function hasAnyLength(log) {
+    let added
+    let oldChanged
+    let newChanged
+    let removed
+
+    const propertyName = computePropertyByEntityType(log.entityType)
+
+    if (log.action === 'create') {
+        added = log.newData[propertyName] || []
+    } else if (log.action === 'update') {
+        added = log.newData[propertyName]?.added || []
+    } else {
+        added = []
+    }
+
+    if (log.action === 'delete') {
+        removed = log.oldData[propertyName] || []
+    } else if (log.action === 'update') {
+        removed = log.oldData[propertyName]?.removed || []
+    } else {
+        removed = []
+    }
+
+    oldChanged = log.action === 'update' ? log.oldData[propertyName]?.changed || [] : []
+    newChanged = log.action === 'update' ? log.newData[propertyName]?.changed || [] : []
+
+    return [...added, ...removed, ...oldChanged, ...newChanged].length
+}
+
+function modal(log) {
+    console.log('modalka chiqshi kerak bolalari uchun')
+}
+
+function computePropertyByEntityType(entityType) {
+    return entityTypeToPropertyMap[entityType] || null
+}
+
+const entityTypeToPropertyMap = {
+    IncomeInvoice: 'incomeInvoiceProducts',
+    TransferInvoice: 'transferInvoiceProducts',
+    OrderInvoice: 'orderInvoiceProducts',
+    ReturnInvoice: 'returnInvoiceProducts',
+    WriteOffInvoice: 'writeOffInvoiceProducts',
+    Inventory: 'inventoryProducts',
+}
 
 const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
 
@@ -131,34 +171,6 @@ watch(
 </script>
 
 <template>
-    <Breadcrumb
-        :home="home"
-        :model="items"
-        class="mb-2 sm:mb-4 rounded-md border border-surface-300 dark:border-surface-600/50"
-    >
-        <template #item="{ item, props }">
-            <router-link
-                v-if="item.route"
-                v-slot="{ href, navigate }"
-                :to="item.route"
-                custom
-                class="group"
-            >
-                <a :href="href" v-bind="props.action" @click="navigate">
-                <span class="text-surface-700 dark:text-surface-0 group-hover:text-main dark:group-hover:text-green transition-all">
-                    {{ item.label }}
-                </span>
-                </a>
-            </router-link>
-            <a v-else :href="item.url" :target="item.target" v-bind="props.action">
-                <span class="text-main dark:text-green font-semibold">{{ item.label }}</span>
-            </a>
-        </template>
-        <template #separator>
-            <span class="text-primary">/</span>
-        </template>
-    </Breadcrumb>
-
     <Section
         :section-name="t('logs')"
         back-route-name="reports"
@@ -369,6 +381,20 @@ watch(
                                     <div v-if="data.entityType === 'Assembly'">
                                         <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
                                     </div>
+                                    <div v-if="data.entityType === 'Inventory'">
+                                        <h6 v-if="data.oldData?.location">{{ t('labels.locations') }}: <b>{{ data.oldData.location.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.dateFrom">{{ t('labels.dateFrom') }}: <b>{{ getFormattedDateWithTime(data.oldData.dateFrom) }}</b></h6>
+                                        <h6 v-if="data.oldData?.dateTo">{{ t('labels.dateTo') }}: <b>{{ getFormattedDateWithTime(data.oldData.dateTo) }}</b></h6>
+                                        <h6 v-if="data.oldData?.status">{{ t('labels.status') }}: <b>{{ t(data.oldData.status) }}</b></h6>
+                                        <h6 v-if="data.oldData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'OrderInvoice'">
+                                        <h6 v-if="data.oldData?.location">{{ t('labels.locations') }}: <b>{{ data.oldData.location.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.seller">{{ t('labels.Seller') }}: <b>{{ data.oldData.seller.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.customer">{{ t('labels.Customer') }}: <b>{{ data.oldData.customer.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.status">{{ t('labels.status') }}: <b>{{ t(data.oldData.status) }}</b></h6>
+                                        <h6 v-if="data.oldData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
+                                    </div>
                                 </div>
                             </template>
                         </Column>
@@ -465,6 +491,20 @@ watch(
                                     <div v-if="data.entityType === 'Assembly'">
                                         <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
                                     </div>
+                                    <div v-if="data.entityType === 'Inventory'">
+                                        <h6 v-if="data.newData?.location">{{ t('labels.locations') }}: <b>{{ data.newData.location.name }}</b></h6>
+                                        <h6 v-if="data.newData?.dateFrom">{{ t('labels.dateFrom') }}: <b>{{ getFormattedDateWithTime(data.newData.dateFrom) }}</b></h6>
+                                        <h6 v-if="data.newData?.dateTo">{{ t('labels.dateTo') }}: <b>{{ getFormattedDateWithTime(data.newData.dateTo) }}</b></h6>
+                                        <h6 v-if="data.newData?.status">{{ t('labels.status') }}: <b>{{ t(data.newData.status) }}</b></h6>
+                                        <h6 v-if="data.newData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'OrderInvoice'">
+                                        <h6 v-if="data.newData?.location">{{ t('labels.locations') }}: <b>{{ data.newData.location.name }}</b></h6>
+                                        <h6 v-if="data.newData?.seller">{{ t('labels.Seller') }}: <b>{{ data.newData.seller.name }}</b></h6>
+                                        <h6 v-if="data.newData?.customer">{{ t('labels.Customer') }}: <b>{{ data.newData.customer.name }}</b></h6>
+                                        <h6 v-if="data.newData?.status">{{ t('labels.status') }}: <b>{{ t(data.newData.status) }}</b></h6>
+                                        <h6 v-if="data.newData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
+                                    </div>
                                 </div>
                             </template>
                         </Column>
@@ -478,6 +518,24 @@ watch(
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="logStore.getIsLoadingLogs"/>
                                 <p v-else>{{ data.createdBy.name }}</p>
+                            </template>
+                        </Column>
+                        <Column field="id" style="width: 60px;">  <!-- Fixed width for the column -->
+                            <template #header>
+                                <p class="font-semibold">{{ t('details') }}</p>
+                            </template>
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="logStore.getIsLoadingLogs"/>
+                                <div v-else>
+                                    <div v-if="hasAnyLength(data)" class="flex justify-center w-full">
+                                        <Button
+                                            @click="modal(data)"
+                                            icon="pi pi-eye"
+                                            pt:root="rounded-full size-8! min-w-8! h-8! bg-blue-400 dark:bg-blue-400 enabled:hover:bg-blue-300 dark:enabled:hover:bg-blue-300 border-blue-400 dark:border-blue-400 enabled:hover:border-blue-300 dark:enabled:hover:border-blue-300 focus-visible:outline-blue-400 dark:focus-visible:outline-blue-400"
+                                            size="small"
+                                        />
+                                    </div>
+                                </div>
                             </template>
                         </Column>
 
