@@ -11,8 +11,6 @@ import Tabs from "@/volt/Tabs.vue";
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
-import {STATUSES} from "@/helpers/constants.js";
-import InputNumber from "@/volt/InputNumber.vue";
 
 const { t } = useI18n()
 const tabVal = ref('products')
