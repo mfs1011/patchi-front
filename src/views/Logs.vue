@@ -8,7 +8,7 @@ import NoData from "@/components/UI/NoData.vue";
 import Card from "@/volt/Card.vue";
 import Column from "primevue/column";
 import Skeleton from "@/volt/Skeleton.vue";
-import {computed, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
 import {formatCurrency, getFormattedDate, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
@@ -18,19 +18,11 @@ import {useLogStore} from "@/stores/log.js";
 import {formatPhoneByCountry} from "@/helpers/phoneFormat.js";
 import Select from "@/volt/Select.vue";
 import Dialog from "@/volt/Dialog.vue";
-import SecondaryButton from "@/volt/SecondaryButton.vue";
-import {STATUSES} from "@/helpers/constants.js";
-import InputNumber from "@/volt/InputNumber.vue";
-import Tab from "@/volt/Tab.vue";
-import TabPanel from "@/volt/TabPanel.vue";
-import TabPanels from "@/volt/TabPanels.vue";
-import Tabs from "@/volt/Tabs.vue";
-import Row from "primevue/row";
-import ColumnGroup from "primevue/columngroup";
-import TabList from "@/volt/TabList.vue";
 import LogsInventoryCreateDetail from "@/components/LogsInventoryCreateDetail.vue";
 import LogsInventoryUpdateDetail from "@/components/LogsInventoryUpdateDetail.vue";
 import LogsInventoryDeleteDetail from "@/components/LogsInventoryDeleteDetail.vue";
+import InputText from "@/volt/InputText.vue";
+import {useUserStore} from "@/stores/user.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -43,6 +35,7 @@ const currentLogData = ref()
 const isLoading = ref(false)
 
 const logStore = useLogStore()
+const userStore = useUserStore()
 
 const elements = computed(() => [
     {id: 1, name: t('labels.Notification'), value: 'Notification'},
@@ -120,13 +113,14 @@ const entityTypeToPropertyMap = {
     Inventory: 'inventoryProducts',
 }
 
-const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
+const debouncedFilter = useDebouncedRef(route.query.entityId || null, 500);
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
     entityType: parseInt(route.query.entityType) || null,
     action: parseInt(route.query.action) || null,
+    createdBy: parseInt(route.query.createdBy) || null,
     'date-from': route.query['date-from'] || null,
     'date-to': route.query['date-to'] || null
 });
@@ -140,11 +134,11 @@ watch(
         };
 
         if (debouncedFilter.value !== null) {
-            queryFilter.name = debouncedFilter.value;
+            queryFilter.entityId = debouncedFilter.value;
         }
 
         if (debouncedFilter.value === "") {
-            delete queryFilter.name;
+            delete queryFilter.entityId;
         }
 
         if (filters.value.entityType !== null) {
@@ -157,6 +151,12 @@ watch(
             queryFilter.action = filters.value.action;
         } else {
             delete queryFilter.action;
+        }
+
+        if (filters.value.createdBy !== null) {
+            queryFilter.createdBy = filters.value.createdBy;
+        } else {
+            delete queryFilter.createdBy;
         }
 
         if (filters.value['date-from']) {
@@ -196,6 +196,12 @@ watch(() => visible.value.detailVisible, val => {
         currentLogData.value = null
     }
 })
+
+onMounted(() => {
+    if(!userStore.getUsers.models.length) {
+        userStore.fetchUsers({ page: 1, 'items-per-page': 100 })
+    }
+})
 </script>
 
 <template>
@@ -232,6 +238,17 @@ watch(() => visible.value.detailVisible, val => {
                 class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
             >
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
+                    <div class="col-span-2 sm:col-span-1">
+                        <label class="relative max-w-full w-full">
+                            <i class="pi pi-search absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1"/>
+                            <InputText
+                                pt:root="dark:bg-surface-800 ps-10"
+                                v-model="debouncedFilter"
+                                class="w-full"
+                                :placeholder="t('placeholders.search.byElementId')"
+                            />
+                        </label>
+                    </div>
                     <Select
                         v-model="filters.entityType"
                         :options="elements"
@@ -247,6 +264,15 @@ watch(() => visible.value.detailVisible, val => {
                         option-label="name"
                         option-value="value"
                         :placeholder="t('placeholders.search.byAction')"
+                        showClear
+                        class="min-w-50 max-w-full w-full"
+                    />
+                    <Select
+                        v-model="filters.createdBy"
+                        :options="userStore.getUsers.models"
+                        option-label="name"
+                        option-value="id"
+                        :placeholder="t('placeholders.search.byUser')"
                         showClear
                         class="min-w-50 max-w-full w-full"
                     />

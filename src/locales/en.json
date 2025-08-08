@@ -305,6 +305,8 @@
             "byStatus": "Search by status",
             "byLocation": "Search by location",
             "byProduct": "Search by product",
+            "byUser": "Search by responsible",
+            "byElementId": "Search by element ID",
             "byElement": "Search by element",
             "byAction": "Search by action"
         },
