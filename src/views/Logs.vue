@@ -17,11 +17,30 @@ import DatePicker from "@/volt/DatePicker.vue";
 import {useLogStore} from "@/stores/log.js";
 import {formatPhoneByCountry} from "@/helpers/phoneFormat.js";
 import Select from "@/volt/Select.vue";
+import Dialog from "@/volt/Dialog.vue";
+import SecondaryButton from "@/volt/SecondaryButton.vue";
+import {STATUSES} from "@/helpers/constants.js";
+import InputNumber from "@/volt/InputNumber.vue";
+import Tab from "@/volt/Tab.vue";
+import TabPanel from "@/volt/TabPanel.vue";
+import TabPanels from "@/volt/TabPanels.vue";
+import Tabs from "@/volt/Tabs.vue";
+import Row from "primevue/row";
+import ColumnGroup from "primevue/columngroup";
+import TabList from "@/volt/TabList.vue";
+import LogsInventoryCreateDetail from "@/components/LogsInventoryCreateDetail.vue";
+import LogsInventoryUpdateDetail from "@/components/LogsInventoryUpdateDetail.vue";
+import LogsInventoryDeleteDetail from "@/components/LogsInventoryDeleteDetail.vue";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const isVisibleSectionHeader = ref(false);
+const visible = ref({
+    detailVisible: false
+});
+const currentLogData = ref()
+const isLoading = ref(false)
 
 const logStore = useLogStore()
 
@@ -82,7 +101,10 @@ function hasAnyLength(log) {
 }
 
 function modal(log) {
-    console.log('modalka chiqshi kerak bolalari uchun')
+    isLoading.value = true
+    currentLogData.value = log
+    visible.value.detailVisible = true;
+    isLoading.value = false
 }
 
 function computePropertyByEntityType(entityType) {
@@ -168,6 +190,12 @@ watch(
     },
     { immediate: true, deep: true },
 );
+
+watch(() => visible.value.detailVisible, val => {
+    if (!val) {
+        currentLogData.value = null
+    }
+})
 </script>
 
 <template>
@@ -511,7 +539,14 @@ watch(
                         <Column field="actionType" :header="t('labels.actionType')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="logStore.getIsLoadingLogs"/>
-                                <p v-else>{{ t(`labels.${data.action}`) }}</p>
+                                <p
+                                    v-else
+                                    :class="{
+                                        'text-teal-500': data.action === 'create',
+                                        'text-amber-500': data.action === 'update',
+                                        'text-red-500': data.action === 'delete',
+                                    }"
+                                >{{ t(`labels.${data.action}`) }}</p>
                             </template>
                         </Column>
                         <Column field="responsible" :header="t('labels.responsible')">
@@ -555,6 +590,52 @@ watch(
                     </DataTable>
                 </template>
             </Card>
+            <!-- DETAILS DIALOG -->
+            <Dialog
+                v-model:visible="visible.detailVisible"
+                modal
+                :header="t('details')"
+                class="sm:min-w-100 sm:w-9/10 h-11/12"
+                pt:root="mx-2 sm:mx-4"
+                pt:header="border-b border-surface-300 dark:border-surface-600/50 px-2 sm:px-4"
+                pt:content="px-2 sm:px-4 h-full"
+            >
+                <div class="h-full">
+                    <p
+                        class="text-lg font-medium mt-4"
+                        :class="{
+                            'text-teal-500': currentLogData.action === 'create',
+                            'text-amber-500': currentLogData.action === 'update',
+                            'text-red-500': currentLogData.action === 'delete',
+                        }"
+                    >
+                        {{ t(`labels.${currentLogData.action}d`) }}
+                    </p>
+
+                    <LogsInventoryCreateDetail
+                        v-if="currentLogData.action === 'create'"
+                        :inventory-products="currentLogData.newData.inventoryProducts"
+                        :inventory-kits="currentLogData.newData.inventoryKits"
+                        :is-loading="isLoading"
+                    />
+
+                    <LogsInventoryUpdateDetail
+                        v-if="currentLogData.action === 'update'"
+                        :old-inventory-products="currentLogData.oldData.inventoryProducts.changed ?? []"
+                        :new-inventory-products="currentLogData.newData.inventoryProducts.changed ?? []"
+                        :old-inventory-kits="currentLogData.oldData.inventoryKits?.changed ?? []"
+                        :new-inventory-kits="currentLogData.newData.inventoryKits?.changed ?? []"
+                        :is-loading="isLoading"
+                    />
+
+                    <LogsInventoryDeleteDetail
+                        v-if="currentLogData.action === 'delete'"
+                        :order-invoice-products="currentLogData.oldData.orderInvoiceProducts"
+                        :order-invoice-kits="currentLogData.oldData.orderInvoiceKits"
+                        :is-loading="isLoading"
+                    />
+                </div>
+            </Dialog>
         </template>
     </Section>
 </template>
