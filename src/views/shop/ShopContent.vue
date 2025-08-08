@@ -4,12 +4,10 @@ import { useI18n } from "vue-i18n";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import Button from "@/volt/Button.vue";
-import DatePicker from "@/volt/DatePicker.vue";
 import {useRoute, useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
 import updateQuery from "@/helpers/updateQuery.js";
 import {useLocationQuantityStore} from "@/stores/locationQuantity.js";
-import Select from "@/volt/Select.vue";
 import {useLocationStore} from "@/stores/location.js";
 import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
 import Skeleton from "@/volt/Skeleton.vue";
@@ -25,7 +23,6 @@ import Tabs from "@/volt/Tabs.vue";
 import TabPanels from "@/volt/TabPanels.vue";
 import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
 import {useProductStore} from "@/stores/product.js";
-import SearchSelect from "@/components/UI/SearchSelect.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -87,7 +84,6 @@ watch(
 
         if (tabVal.value === 'product') {
             filters.value.kit = null
-            filters.value.page = 1
 
             if (filters.value.product !== null) {
                 queryFilter.product = filters.value.product;
@@ -96,7 +92,6 @@ watch(
 
         if (tabVal.value === 'kit') {
             filters.value.product = null
-            filters.value.page = 1
 
             if (filters.value.kit !== null) {
                 queryFilter.kit = filters.value.kit;
@@ -123,12 +118,17 @@ watch(
 
         if (tabVal.value === 'product') {
             await locationQuantityStore.fetchLocationQuantities(route.query);
-        } else {
+        }
+        if (tabVal.value === 'kit') {
             await locationQuantityKitStore.fetchLocationQuantityKits(route.query)
         }
     },
     { immediate: true, deep: true },
 );
+
+watch(tabVal, () => {
+    filters.value.page = 1
+})
 
 onMounted(() => {
     if (!locationStore.getLocations.models.length) {

@@ -4,16 +4,13 @@ import { useI18n } from "vue-i18n";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import Button from "@/volt/Button.vue";
-import DatePicker from "@/volt/DatePicker.vue";
 import {useRoute, useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
 import updateQuery from "@/helpers/updateQuery.js";
 import {useLocationQuantityStore} from "@/stores/locationQuantity.js";
-import Select from "@/volt/Select.vue";
 import {useLocationStore} from "@/stores/location.js";
 import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
 import Skeleton from "@/volt/Skeleton.vue";
-import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import DataTable from "@/volt/DataTable.vue";
 import Tab from "@/volt/Tab.vue";
 import TabPanel from "@/volt/TabPanel.vue";
@@ -25,7 +22,7 @@ import Tabs from "@/volt/Tabs.vue";
 import TabPanels from "@/volt/TabPanels.vue";
 import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
 import {useProductStore} from "@/stores/product.js";
-import SearchSelect from "@/components/UI/SearchSelect.vue";
+import PaginatorComponent from "@/components/PaginatorComponent.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -82,12 +79,10 @@ watch(
 
         if (filters.value.location !== null) {
             queryFilter.location = filters.value.location;
-            console.log(queryFilter)
         }
 
         if (tabVal.value === 'product') {
             filters.value.kit = null
-            filters.value.page = 1
 
             if (filters.value.product !== null) {
                 queryFilter.product = filters.value.product;
@@ -96,7 +91,6 @@ watch(
 
         if (tabVal.value === 'kit') {
             filters.value.product = null
-            filters.value.page = 1
 
             if (filters.value.kit !== null) {
                 queryFilter.kit = filters.value.kit;
@@ -119,6 +113,8 @@ watch(
             queryFilter.expired = filters.value.expired;
         }
 
+        console.log(filters.value.page)
+
         await updateQuery(router, queryFilter);
 
         if (tabVal.value === 'product') {
@@ -129,6 +125,10 @@ watch(
     },
     { immediate: true, deep: true },
 );
+
+watch(tabVal, () => {
+    filters.value.page = 1
+})
 
 onMounted(() => {
     if (!locationStore.getLocations.models.length) {
