@@ -1,89 +1,63 @@
 <script setup>
-import { useI18n } from "vue-i18n";
 import Section from "@/components/UI/Section.vue";
-import NoData from "@/components/UI/NoData.vue";
-import Dialog from "@/volt/Dialog.vue";
-import Button from "@/volt/Button.vue";
-import Card from "@/volt/Card.vue";
-import DataTable from "@/volt/DataTable.vue";
-import Column from "primevue/column";
-import PaginatorComponent from "@/components/PaginatorComponent.vue";
-import SecondaryButton from "@/volt/SecondaryButton.vue";
-import InputText from "@/volt/InputText.vue";
-import SelectButton from "@/volt/SelectButton.vue";
-import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
+import { useI18n } from "vue-i18n";
 import {computed, onMounted, ref, watch} from "vue";
-import useDebouncedRef from "@/composables/useDebouncedRef.js";
-import {useToast} from "primevue/usetoast";
+import Breadcrumb from "@/volt/Breadcrumb.vue";
+import {formatCurrency, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
 import Skeleton from "@/volt/Skeleton.vue";
 import Avatar from "@/volt/Avatar.vue";
-import {useProductStore} from "@/stores/product.js";
+import Column from "primevue/column";
+import Button from "@/volt/Button.vue";
+import Dialog from "@/volt/Dialog.vue";
+import InputText from "@/volt/InputText.vue";
+import DataTable from "@/volt/DataTable.vue";
+import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import Select from "@/volt/Select.vue";
-import {useCategoryStore} from "@/stores/category.js";
+import Card from "@/volt/Card.vue";
+import NoData from "@/components/UI/NoData.vue";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import {useAssemblyStore} from "@/stores/assembly.js";
 import updateQuery from "@/helpers/updateQuery.js";
-import {formatCurrency} from "@/helpers/numberFormat.js";
+import useDebouncedRef from "@/composables/useDebouncedRef.js";
+import {useKitStore} from "@/stores/kit.js";
+import {useSellerStore} from "@/stores/seller.js";
+import {useLocationStore} from "@/stores/location.js";
+import DatePicker from "@/volt/DatePicker.vue";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
-const toast = useToast();
 
-const productStore = useProductStore()
-const categoryStore = useCategoryStore()
+const kitStore = useKitStore()
 const assemblyStore = useAssemblyStore()
+const sellerStore = useSellerStore()
+const locationStore = useLocationStore()
 
-// refs
 const visible = ref({
-    deleteVisible: false,
-    restoreVisible: false,
     imageVisible: false,
 });
 
+const home = computed(() => ({
+    icon: "pi pi-slash",
+    label: t("shop"),
+    route: "/shop",
+}));
+
+const items = computed(() => [{ label: t("cards.kits") }]);
+const baseUrl = computed(() => import.meta.env.VITE_APP_API_URL);
 const isVisibleSectionHeader = ref(false);
-const isDeleteLoading = ref(false);
-const currentProduct = ref();
-const currentProductId = ref();
+const currentKit = ref();
 const debouncedName = useDebouncedRef(route.query['name'] || '',  500)
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
-    isDelete: route.query['is-delete'] || false,
-    category: parseInt(route.query.category) || null,
     assembly: parseInt(route.query.assembly) || null,
+    seller: parseInt(route.query.seller) || null,
+    location: parseInt(route.query.location) || null,
+    'date-from': route.query['date-from'] || null,
+    'date-to': route.query['date-to'] || null
 });
-
-const archiveOrActive = computed({
-    get() {
-        const isDeleted = route.query['is-delete']
-        return (isDeleted === 'true' || isDeleted === true)
-            ? t('archive')
-            : t('active')
-    },
-    set(val) {
-        const query = { ...route.query }
-        query['is-delete'] = val === t('archive')
-        router.replace({ query })
-    }
-})
-
-// computed
-const home = computed(() => ({
-    icon: "pi pi-slash",
-    label: t("administration"),
-    route: "/administration",
-}));
-const items = computed(() => [{ label: t("cards.products") }]);
-const options = computed(() => [t('active'), t('archive')]);
-const baseUrl = computed(() => import.meta.env.VITE_APP_API_URL);
-// watchers
-
-watch(archiveOrActive, (newVal) => {
-    filters.value.isDelete = newVal !== t('active')
-    filters.value.page = 1
-})
 
 watch(
     [
@@ -94,7 +68,6 @@ watch(
         const queryFilter = {
             page: filters.value.page,
             "items-per-page": filters.value.itemsPerPage,
-            "is-delete": filters.value.isDelete,
         };
 
         if (debouncedName.value !== null) {
@@ -105,61 +78,64 @@ watch(
             delete queryFilter.name;
         }
 
-        if (filters.value.category !== null) {
-            queryFilter.category = filters.value.category;
-        } else {
-            delete queryFilter.category;
-        }
-
         if (filters.value.assembly !== null) {
             queryFilter.assembly = filters.value.assembly;
         } else {
             delete queryFilter.assembly;
         }
 
+        if (filters.value.seller !== null) {
+            queryFilter.seller = filters.value.seller;
+        } else {
+            delete queryFilter.seller;
+        }
+
+        if (filters.value.location !== null) {
+            queryFilter.location = filters.value.location;
+        } else {
+            delete queryFilter.location;
+        }
+
+        if (filters.value['date-from']) {
+            if (filters.value['date-from'] !== null) {
+                const date = new Date(filters.value['date-from']);
+                date.setHours(date.getHours() + 5);
+                queryFilter['date-from'] = date.toISOString();
+            }
+
+
+            if (filters.value['date-from'] === "") {
+                delete queryFilter['date-from'];
+            }
+        }
+
+        if (filters.value['date-to']) {
+            if (filters.value['date-to'] !== null) {
+                const date = new Date(filters.value['date-to']);
+                date.setHours(date.getHours() + 5);
+                queryFilter['date-to'] = date.toISOString();
+            }
+
+            if (filters.value['date-to'] === "") {
+                delete queryFilter['date-to'];
+            }
+        }
+
         await updateQuery(router, queryFilter);
 
-        await productStore.fetchProducts(route.query);
+        await kitStore.fetchKits(route.query);
     },
     { immediate: true, deep: true },
 );
 
-const deleteAction = (id) => {
-    currentProductId.value = id;
-    visible.value.deleteVisible = true;
-};
-
-const setCurrentProduct = (product) => {
-    currentProduct.value = product;
+const setCurrentKit = (kit) => {
+    currentKit.value = kit;
     visible.value.imageVisible = true;
 };
 
-const restoreAction = (id) => {
-    currentProductId.value = id;
-    visible.value.restoreVisible = true;
-};
-
-const deleteLocation = async () => {
-    try {
-        isDeleteLoading.value = true;
-
-        await productStore.deleteProduct(currentProductId.value);
-        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('product.nominativeCapitalize') }), life: 3000 })
-    } catch (err) {
-        toast.add({ severity: 'error', summary: t('toast.cannot_delete_product_in_stock'), life: 3000 })
-    } finally {
-        isDeleteLoading.value = false;
-        visible.value.deleteVisible = false;
-    }
-};
-
-const restoreLocation = async () => {
-    isDeleteLoading.value = true;
-    await productStore.restoreProduct(currentProductId.value);
-    isDeleteLoading.value = false;
-    visible.value.restoreVisible = false;
-    toast.add({ severity: 'success', summary: t('toast.restored', { name: t('product.nominativeCapitalize') }), life: 3000 })
-};
+function rollback(id) {
+    console.log(`Kit id: ${id} rollback qilinishi kerak. Modalka chiqib ogohlantiradi.`);
+}
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
 const eventSource = ref(null)
@@ -172,19 +148,23 @@ function connectMercure() {
     eventSource.value.addEventListener('message', async (event) => {
         const eventDataId = JSON.parse(event.data).eventId
 
-        if (eventDataId === 6) {
-            await productStore.fetchProducts(route.query);
+        if (eventDataId === 7) {
+            await kitStore.fetchKits(route.query);
         }
     })
 }
 
 onMounted(async () => {
-    if(!categoryStore.getCategories.models.length) {
-        await categoryStore.fetchCategories()
-    }
-
     if(!assemblyStore.getAssemblies.models.length) {
         await assemblyStore.fetchAssemblies()
+    }
+
+    if(!sellerStore.getSellers.models.length) {
+        sellerStore.fetchSellers()
+    }
+
+    if(!locationStore.getLocations.models.length) {
+        locationStore.fetchLocations()
     }
 
     connectMercure()
@@ -227,9 +207,9 @@ onBeforeRouteLeave(() => {
     </Breadcrumb>
 
     <Section
-        :add-button-name="t('buttons.newProduct')"
-        :section-name="t('cards.products')"
-        back-route-name="administration"
+        :add-button-name="t('buttons.newCollection')"
+        :section-name="t('cards.kits')"
+        back-route-name="shop"
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end">
@@ -240,10 +220,10 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    @click="router.push({ name: 'add-product' })"
+                    @click="router.push({ name: 'add-kit' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >
-                    {{ t("buttons.newProduct") }}
+                    {{ t("buttons.newKit") }}
                 </Button>
             </div>
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
@@ -285,15 +265,6 @@ onBeforeRouteLeave(() => {
                     </div>
 
                     <Select
-                        v-model="filters.category"
-                        :options="categoryStore.getCategories.models"
-                        option-label="name"
-                        option-value="id"
-                        :placeholder="t('placeholders.search.byCategory')"
-                        showClear
-                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
-                    />
-                    <Select
                         v-model="filters.assembly"
                         :options="assemblyStore.getAssemblies.models"
                         option-label="name"
@@ -302,22 +273,54 @@ onBeforeRouteLeave(() => {
                         showClear
                         class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
                     />
-
-                    <div class="flex justify-end col-span-1 lg:col-span-3 xl:col-span-1">
-                        <SelectButton v-model="archiveOrActive" :options="options" />
-                    </div>
+                    <Select
+                        v-model="filters.seller"
+                        :options="sellerStore.getSellers.models"
+                        option-label="name"
+                        option-value="id"
+                        :placeholder="t('placeholders.search.bySeller')"
+                        showClear
+                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                    />
+                    <Select
+                        v-model="filters.location"
+                        :options="locationStore.getLocations.models"
+                        option-label="name"
+                        option-value="id"
+                        :placeholder="t('placeholders.search.byLocation')"
+                        showClear
+                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                    />
+                    <DatePicker
+                        v-model.trim="filters['date-from']"
+                        dateFormat="dd.mm.yy"
+                        showIcon
+                        fluid
+                        iconDisplay="input"
+                        :placeholder="t('placeholders.search.byDateFrom')"
+                        show-button-bar
+                    />
+                    <DatePicker
+                        v-model.trim="filters['date-to']"
+                        dateFormat="dd.mm.yy"
+                        showIcon
+                        fluid
+                        iconDisplay="input"
+                        :placeholder="t('placeholders.search.byDateTo')"
+                        show-button-bar
+                    />
                 </div>
             </div>
         </template>
 
         <template #sectionBody>
-            <NoData v-if="!productStore.getProducts.totalItems && !productStore.getIsLoadingProducts" class="text-surface-400 mx-auto my-auto">
+            <NoData v-if="!kitStore.getKits.totalItems && !kitStore.getIsLoadingKits" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
 
             <!-- TABLE OF USERS -->
             <Card
-                v-if="productStore.getIsLoadingProducts || productStore.getProducts.totalItems > 0"
+                v-if="kitStore.getIsLoadingKits || kitStore.getKits.totalItems > 0"
                 pt:root="overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
@@ -326,8 +329,8 @@ onBeforeRouteLeave(() => {
                 <template #content>
                     <DataTable
                         ref="dt"
-                        :value="productStore.getIsLoadingProducts ?  Array(10).fill({}) : productStore.getProducts.models"
-                        :total-records="productStore.getProducts.totalItems"
+                        :value="kitStore.getIsLoadingKits ?  Array(10).fill({}) : kitStore.getKits.models"
+                        :total-records="kitStore.getKits.totalItems"
                         :rows="filters.itemsPerPage"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
@@ -335,14 +338,14 @@ onBeforeRouteLeave(() => {
                     >
                         <Column field="id" :header="t('labels.id')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                 <p v-else>{{ data.id }}</p>
                             </template>
                         </Column>
                         <Column field="photo" :header="t('labels.photo')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <Button @click="setCurrentProduct(data)" pt:root="bg-[#ffffff] enabled:hover:bg-[#ffffff] p-0 border-none" v-else-if="data.photo">
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                <Button @click="setCurrentKit(data)" pt:root="bg-[#ffffff] enabled:hover:bg-[#ffffff] p-0 border-none" v-else-if="data.photo">
                                     <Avatar :image="baseUrl + data.photo?.contentUrl" size="large" class="rounded overflow-hidden cursor-pointer hover:scale-110 transition-all"/>
                                 </Button>
                                 <div v-else> - </div>
@@ -350,46 +353,46 @@ onBeforeRouteLeave(() => {
                         </Column>
                         <Column field="name" :header="t('labels.name')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                 <p v-else>{{ data.name }}</p>
                             </template>
                         </Column>
                         <Column field="code" :header="t('labels.code')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                 <p v-else>{{ data.code }}</p>
                             </template>
                         </Column>
                         <Column field="qr" :header="t('labels.qr')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                 <p v-else>{{ data.qr || '-' }}</p>
-                            </template>
-                        </Column>
-                        <Column field="category" :header="t('labels.category')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.category.name }}</p>
-                            </template>
-                        </Column>
-                        <Column field="categoryType" :header="t('labels.type')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.category.categoryType.name }}</p>
                             </template>
                         </Column>
                         <Column field="collection" :header="t('labels.collection')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                 <p v-else>{{ data.assembly?.name || '-' }}</p>
+                            </template>
+                        </Column>
+                        <Column field="seller" :header="t('labels.seller')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                <p v-else>{{ data.seller.name }}</p>
+                            </template>
+                        </Column>
+                        <Column field="locations" :header="t('labels.locations')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                <p v-else>{{ data.seller.location.name }}</p>
                             </template>
                         </Column>
                         <Column field="costPrice" :header="t('labels.costPrice')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                 <p
                                     v-else
-                                   :class="{
+                                    :class="{
                                         'text-green-600': data.costPrice < data.wholesalePrice,
                                         'text-red-600': data.costPrice >= data.wholesalePrice
                                    }"
@@ -400,31 +403,37 @@ onBeforeRouteLeave(() => {
                         </Column>
                         <Column field="retailPrice" :header="t('labels.retailPrice')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                 <p v-else>{{ data.retailPrice ? `${formatCurrency(data.retailPrice)}$` : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                 <p v-else>{{ data.wholesalePrice ? `${formatCurrency(data.wholesalePrice)}$` : '-' }}</p>
                             </template>
                         </Column>
-                        <Column field="minQty" :header="t('labels.minQty')">
+                        <Column field="amount" :header="t('labels.amount')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ formatCurrency(data.minQty) }} {{ t(`labels.${data.category.unit.name}`) }}</p>
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                <p v-else>{{ formatCurrency(data.qty) }} {{ t('labels.pcs') }}</p>
+                            </template>
+                        </Column>
+                        <Column field="createdAt" :header="t('labels.createdAt')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                <p v-else>{{ getFormattedDateWithTime(data.createdAt) }}</p>
                             </template>
                         </Column>
                         <Column field="actions" :header="t('actions')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
 
-                                <div v-else class="flex justify-end w-full">
-                                    <div v-if="route.query['is-delete'] === 'false'" class="flex items-center gap-2">
+                                <div v-else>
+                                    <div class="flex items-center gap-2">
                                         <Button
                                             @click="router.push({
-                                                name: 'edit-product',
+                                                name: 'edit-kit',
                                                 params: { id: data.id },
                                             })"
                                             icon="pi pi-pencil"
@@ -432,17 +441,18 @@ onBeforeRouteLeave(() => {
                                             size="small"
                                         />
                                         <Button
-                                            @click="deleteAction(data.id)"
-                                            icon="pi pi-trash"
-                                            pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
-                                            size="small"
-                                        />
-                                    </div>
-                                    <div v-else class="flex items-center gap-2">
-                                        <Button
-                                            @click="restoreAction(data.id)"
+                                            @click="rollback(data.id)"
                                             icon="pi pi-replay"
                                             pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                                            size="small"
+                                        />
+                                        <Button
+                                            @click="router.push({
+                                                name: 'kit',
+                                                params: { id: data.id },
+                                            })"
+                                            icon="pi pi-eye"
+                                            pt:root="rounded-full size-8! bg-blue-400 dark:bg-blue-400 enabled:hover:bg-blue-300 dark:enabled:hover:bg-blue-300 border-blue-400 dark:border-blue-400 enabled:hover:border-blue-300 dark:enabled:hover:border-blue-300 focus-visible:outline-blue-400 dark:focus-visible:outline-blue-400"
                                             size="small"
                                         />
                                     </div>
@@ -451,7 +461,7 @@ onBeforeRouteLeave(() => {
                         </Column>
 
                         <template #footer>
-                            <div v-if="productStore.getIsLoadingProducts" class="flex justify-between">
+                            <div v-if="kitStore.getIsLoadingKits" class="flex justify-between">
                                 <Skeleton height="2rem" width="10rem" />
                                 <Skeleton height="2rem" width="5rem"/>
                             </div>
@@ -459,76 +469,17 @@ onBeforeRouteLeave(() => {
                                 <PaginatorComponent
                                     v-model="filters.page"
                                     v-model:items-per-page="filters.itemsPerPage"
-                                    :total-items="productStore.getProducts.totalItems"
+                                    :total-items="kitStore.getKits.totalItems"
                                 />
                             </div>
                         </template>
                     </DataTable>
                 </template>
             </Card>
-            <!-- DELETE B2B DIALOG -->
-            <Dialog
-                v-model:visible="visible.deleteVisible"
-                modal
-                :closable="false"
-                class="sm:min-w-100 sm:w-fit w-9/10"
-                pt:root="px-2"
-            >
-                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                    {{ t('dialog.deleteConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
-                </span>
 
-                <template #footer>
-                    <div class="flex justify-end gap-2">
-                        <SecondaryButton
-                            type="button"
-                            :label="t('dialog.cancel')"
-                            @click="visible.deleteVisible = false"
-                        />
-                        <Button
-                            type="button"
-                            :label="t('dialog.confirm')"
-                            @click="deleteLocation"
-                            :loading="isDeleteLoading"
-                            class="px-5"
-                        />
-                    </div>
-                </template>
-            </Dialog>
-
-            <!-- RECOVER B2B DIALOG -->
-            <Dialog
-                v-model:visible="visible.restoreVisible"
-                modal
-                :closable="false"
-                class="sm:min-w-100 sm:w-fit w-9/10"
-                pt:root="px-2"
-            >
-                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                    {{ t('dialog.recoverConfirmation', { name: t('product.accusative'), id: currentProductId }) }}
-                </span>
-
-                <template #footer>
-                    <div class="flex justify-end gap-2">
-                        <SecondaryButton
-                            type="button"
-                            :label="t('dialog.cancel')"
-                            @click="visible.restoreVisible = false"
-                        />
-                        <Button
-                            type="button"
-                            :label="t('dialog.confirm')"
-                            @click="restoreLocation"
-                            :loading="isDeleteLoading"
-                            class="px-5"
-                        />
-                    </div>
-                </template>
-            </Dialog>
-
-            <Dialog v-model:visible="visible.imageVisible" maximizable modal :header="currentProduct?.name" class="md:w-200 w-9/10 ">
+            <Dialog v-model:visible="visible.imageVisible" maximizable modal :header="currentKit?.name" class="md:w-200 w-9/10 ">
                 <div class="w-full h-fit">
-                    <img class="object-cover w-full sm:h-full" :src="baseUrl + currentProduct.photo.contentUrl" :alt="currentProduct.name">
+                    <img class="object-cover w-full sm:h-full" :src="baseUrl + currentKit.photo.contentUrl" :alt="currentKit.name">
                 </div>
             </Dialog>
         </template>

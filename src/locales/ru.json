@@ -180,6 +180,8 @@
         "warehouseName": "Имя склада",
         "locations": "Локация",
         "location": "Объект",
+        "seller": "Продавец",
+        "client": "Клиент",
         "supplierName": "Имя поставщика",
         "colorName": "Название цвета",
         "categoryType": "Тип категории",
@@ -200,7 +202,7 @@
         "costPrice": "Себестоимость",
         "retailPrice": "Розничная цена",
         "wholesalePrice": "Оптовая цена",
-        "assembly": "Сборка",
+        "collection": "Коллекция",
         "title": "Название",
         "minQty": "Мин. количество",
         "product": "Продукт",
@@ -288,7 +290,7 @@
         "search": {
             "byName": "Поиск по имени",
             "byTitle": "Поиск по названию",
-            "byTitleAndQRAndCode": "Поиск по названию, QR или коду",
+            "byTitleAndQRAndCode": "Поиск по названию или коду",
             "byNameAndPhone": "Поиск по имени или номеру телефона",
             "byRole": "Поиск по роли",
             "byWarehouse": "Поиск по складу",
@@ -303,12 +305,13 @@
             "byDateFrom": "Дата с",
             "byDateTo": "Дата по",
             "byStatus": "Поиск по статусу",
-            "byLocation": "Поиск по объекту",
+            "byLocation": "Поиск по локацию",
             "byProduct": "Поиск по продукту",
             "byUser": "Поиск по ответственному",
             "byElementId": "Поиск по элементу ID",
             "byElement": "Поиск по элементу",
-            "byAction": "Поиск по действию"
+            "byAction": "Поиск по действию",
+            "bySeller": "Поиск по продавцу"
         },
         "select": {
             "role": "Выберите роль",
@@ -317,7 +320,7 @@
             "categoryType": "Выберите тип категории",
             "unit": "Выберите единицу",
             "category": "Выберите категорию",
-            "assembly": "Выберите комплект",
+            "collection": "Выберите коллекцию",
             "paymentType": "Выберите тип оплаты",
             "location": "Выберите объект"
         },
@@ -343,6 +346,7 @@
         "newClient": "Новый клиент",
         "newSupplier": "Новый поставщик",
         "newProduct": "Новый продукт",
+        "newKit": "Новая композиция",
         "newWarehouse": "Новый склад",
         "newShop": "Новый магазин",
         "newCollection": "Новая коллекция",
@@ -422,6 +426,7 @@
         "sellerKpi": "KPI продавца",
         "abc": "АВС-анализ",
         "residualByDate": "Остаток по дате",
+        "franchiseFee": "Плата за франшизу",
         "payments": "Оплаты",
         "collections": "Коллекции",
         "productsInWarehouse": "Продукты на складе",
@@ -485,6 +490,10 @@
         "products": {
             "add": "Добавить",
             "edit": "Изменить"
+        },
+        "kits": {
+          "add": "Добавить",
+          "edit": "Изменить"
         },
         "payments": {
             "add": "Добавить",

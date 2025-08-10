@@ -199,8 +199,12 @@ const pushChanges = async () => {
                                 v-if="tabVal === 'products'"
                                 value="products"
                             >
-                                <DataTable
+                                <NoData v-if="!inventoryProducts?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
+                                    <p class="text-xl font-normal">{{ t("noResults") }}</p>
+                                </NoData>
 
+                                <DataTable
+                                    v-if="isLoading || inventoryProducts?.length > 0"
                                     :rowClass="rowClassProducts"
                                     ref="dt"
                                     :value="isLoading ? Array(10).fill({}) : inventoryProducts"
@@ -333,7 +337,7 @@ const pushChanges = async () => {
 
                                     <ColumnGroup type="footer">
                                         <Row>
-                                            <Column :colspan="11" footerStyle="text-align:right">
+                                            <Column :colspan="12" footerStyle="text-align:right">
                                                 <template #footer>
                                                     <Skeleton height="2rem" v-if="isLoading"/>
                                                     <p v-else class="font-semibold">{{ t('labels.totals') }}:</p>
@@ -373,10 +377,6 @@ const pushChanges = async () => {
                                         </div>
                                     </template>
                                 </DataTable>
-
-                                <NoData v-if="!inventoryProducts?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
-                                    <p class="text-xl font-normal">{{ t("noResults") }}</p>
-                                </NoData>
                             </TabPanel>
 
                             <TabPanel
@@ -384,7 +384,12 @@ const pushChanges = async () => {
                                 v-if="tabVal === 'kits'"
                                 value="kits"
                             >
+                                <NoData v-if="!inventoryKits?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
+                                    <p class="text-xl font-normal">{{ t("noResults") }}</p>
+                                </NoData>
+
                                 <DataTable
+                                    v-if="isLoading || inventoryKits?.length > 0"
                                     :rowClass="rowClassKits"
                                     ref="dt"
                                     :value="isLoading ? Array(10).fill({}) : inventoryKits"
@@ -410,16 +415,10 @@ const pushChanges = async () => {
                                             <p v-else>{{ data.locationQuantityKit?.kit.code }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="color" :header="t('labels.color')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.locationQuantity?.color ? data.locationQuantity.color.name : '-' }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.locationQuantity?.expiryDate ? getFormattedDate(data.locationQuantity?.expiryDate) : '-' }}</p>
+                                            <p v-else>{{ data.locationQuantityKit?.expiryDate ? getFormattedDate(data.locationQuantityKit?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="income" :header="t('labels.initial')">
@@ -502,6 +501,27 @@ const pushChanges = async () => {
                                             </p>
                                         </template>
                                     </Column>
+                                    <Column field="id" style="width: 60px;">  <!-- Fixed width for the column -->
+                                        <template #header>
+                                            <p class="font-semibold">{{ t('details') }}</p>
+                                        </template>
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <div v-else>
+                                                <div class="flex justify-center w-full">
+                                                    <Button
+                                                        @click="router.push({
+                                                            name: 'kit',
+                                                            params: { id: data.locationQuantityKit?.kit.id },
+                                                        })"
+                                                        icon="pi pi-eye"
+                                                        pt:root="rounded-full size-8! min-w-8! h-8! bg-blue-400 dark:bg-blue-400 enabled:hover:bg-blue-300 dark:enabled:hover:bg-blue-300 border-blue-400 dark:border-blue-400 enabled:hover:border-blue-300 dark:enabled:hover:border-blue-300 focus-visible:outline-blue-400 dark:focus-visible:outline-blue-400"
+                                                        size="small"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </Column>
 
                                     <ColumnGroup type="footer">
                                         <Row>
@@ -545,10 +565,6 @@ const pushChanges = async () => {
                                         </div>
                                     </template>
                                 </DataTable>
-
-                                <NoData v-if="!inventoryKits?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
-                                    <p class="text-xl font-normal">{{ t("noResults") }}</p>
-                                </NoData>
                             </TabPanel>
                         </TabPanels>
                     </Tabs>

@@ -102,10 +102,33 @@ export const routes = [
                         component: () => import('@/views/shop/ShopContent.vue')
                     },
                     {
-                        path: 'shop-kits',
-                        name: 'shop-kits',
-                        meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/shop/ShopKits.vue')
+                        path: 'kits',
+                        children: [
+                            {
+                                path: '',
+                                name: 'kits',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/kit/Kits.vue')
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-kit',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/kit/KitsAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-kit',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/kit/KitsEdit.vue')
+                            },
+                            {
+                                path: 'kit/:id',
+                                name: 'kit',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/kit/Kit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'transfer-invoices',
@@ -525,6 +548,11 @@ export const routes = [
                         path: 'residual',
                         name: 'residual',
                         component: () => import('@/views/report/residual/Residual.vue')
+                    },
+                    {
+                        path: 'franchise_fee',
+                        name: 'franchise_fee',
+                        component: () => import('@/views/report/franchiseFee/FranchiseFee.vue')
                     },
                 ]
             },

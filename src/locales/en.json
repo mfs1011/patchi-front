@@ -180,6 +180,8 @@
         "warehouseName": "Warehouse name",
         "locations": "Location",
         "location": "Location",
+        "seller": "Seller",
+        "client": "Client",
         "supplierName": "Supplier name",
         "colorName": "Color name",
         "categoryType": "Category type",
@@ -196,7 +198,7 @@
         "costPrice": "Cost price",
         "retailPrice": "Retail price",
         "wholesalePrice": "Wholesale price",
-        "assembly": "Assembly",
+        "collection": "Collection",
         "title": "Title",
         "minQty": "Minimum quantity",
         "product": "Product",
@@ -288,7 +290,7 @@
         "search": {
             "byName": "Search by name",
             "byTitle": "Search by name",
-            "byTitleAndQRAndCode": "Search by name, QR or code",
+            "byTitleAndQRAndCode": "Search by name or code",
             "byNameAndPhone": "Search by name or phone number",
             "byRole": "Search by role",
             "byWarehouse": "Search by warehouse",
@@ -308,7 +310,8 @@
             "byUser": "Search by responsible",
             "byElementId": "Search by element ID",
             "byElement": "Search by element",
-            "byAction": "Search by action"
+            "byAction": "Search by action",
+            "bySeller": "Search by seller"
         },
         "select": {
             "role": "Select role",
@@ -317,7 +320,7 @@
             "categoryType": "Select category type",
             "unit": "Select unit",
             "category": "Select category",
-            "assembly": "Select assembly",
+            "collection": "Select collection",
             "paymentType": "Select payment type",
             "location": "Select location"
         },
@@ -343,6 +346,7 @@
         "newClient": "New client",
         "newSupplier": "New supplier",
         "newProduct": "New product",
+        "newKit": "New composition",
         "newWarehouse": "New warehouse",
         "newShop": "New shop",
         "newCollection": "New collection",
@@ -422,6 +426,7 @@
         "sellerKpi": "Seller KPI",
         "abc": "ABC analysis",
         "residualByDate": "Residual by date",
+        "franchiseFee": "Franchise fee",
         "payments": "Payments",
         "collections": "Collections",
         "productsInWarehouse": "Products in warehouse",
@@ -485,6 +490,10 @@
         "products": {
             "add": "Add",
             "edit": "Edit"
+        },
+        "kits": {
+          "add": "Add",
+          "edit": "Edit"
         },
         "payments": {
             "add": "Add",

@@ -16,6 +16,13 @@ export const useProductStore = defineStore('product', () => {
             models: [],
             totalItems: 0,
         },
+        franchiseFeeProducts: {
+            models: [],
+            totalItems: 0,
+            totalPrice: 0,
+            totalCostPrice: 0,
+            totalBenefit: 0,
+        },
         product: {},
         isLoadingProducts: false,
     })
@@ -86,6 +93,25 @@ export const useProductStore = defineStore('product', () => {
         }
     }
 
+    const fetchFranchiseFeeProducts = async (params = { page: 1 }) => {
+        try {
+            state.isLoadingProducts = true
+
+            const { data } = await authorizedClient.get('/products/franchise_fee', { params })
+            state.franchiseFeeProducts.models = data.member
+            state.franchiseFeeProducts.totalItems = data.totalItems
+            state.franchiseFeeProducts.totalPrice = data.totalPrice
+            state.franchiseFeeProducts.totalCostPrice = data.totalCostPrice
+            state.franchiseFeeProducts.totalBenefit = data.totalBenefit
+
+            return data
+        } catch (error) {
+            throw error
+        } finally {
+            state.isLoadingProducts = false
+        }
+    }
+
     const fetchProduct = async id => {
         try {
             const { data } = await authorizedClient.get(`/products/${id}`)
@@ -119,12 +145,14 @@ export const useProductStore = defineStore('product', () => {
         fetchProducts,
         fetchABCProducts,
         fetchResidualProducts,
+        fetchFranchiseFeeProducts,
         fetchProduct,
         deleteProduct,
         restoreProduct,
         getProducts: computed(() => state.products),
         getABCProducts: computed(() => state.abcProducts),
         getResidualProducts: computed(() => state.residualProducts),
+        getFranchiseFeeProducts: computed(() => state.franchiseFeeProducts),
         getProduct: computed(() => state.product),
         getIsLoadingProducts: computed(() => state.isLoadingProducts),
     }

@@ -9,7 +9,7 @@ import Card from "@/volt/Card.vue";
 import NoData from "@/components/UI/NoData.vue";
 import Column from "primevue/column";
 import DataTable from "@/volt/DataTable.vue";
-import {formatCurrency} from "@/helpers/numberFormat.js";
+import {formatCurrency, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
 import Tab from "@/volt/Tab.vue";
 import TabPanel from "@/volt/TabPanel.vue";
 import TabList from "@/volt/TabList.vue";
@@ -26,6 +26,10 @@ import {useCategoryStore} from "@/stores/category.js";
 import {useLocationStore} from "@/stores/location.js";
 import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import {useKitStore} from "@/stores/kit.js";
+import ColumnGroup from "primevue/columngroup";
+import Row from "primevue/row";
+import {useUserStore} from "@/stores/user.js";
+import {useSellerStore} from "@/stores/seller.js";
 
 const { t } = useI18n();
 const route = useRoute()
@@ -37,6 +41,8 @@ const productStore = useProductStore()
 const kitStore = useKitStore()
 const categoryStore = useCategoryStore()
 const locationStore = useLocationStore()
+const sellerStore = useSellerStore()
+const userStore = useUserStore()
 
 const home = ref({
     icon: 'pi pi-home',
@@ -49,21 +55,23 @@ const exportCSV = () => {
     dt.value.exportCSV();
 };
 
-const items = computed(() => [{ label: t('cards.residualByDate') }]);
+const items = computed(() => [{ label: t('cards.franchiseFee') }]);
 const tabList = computed(() => [
     { value: 'products', label: t('cards.products')},
     { value: 'kits', label: t('cards.kits')},
 ])
 
 const debouncedName = useDebouncedRef(route.query['name'] || '',  500)
-const today = new Date();
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
     category: parseInt(route.query.category) || null,
     location: parseInt(route.query.location) || null,
-    'date-to': route.query['date-to'] || today.toISOString(),
+    seller: parseInt(route.query.seller) || null,
+    createdBy: parseInt(route.query.createdBy) || null,
+    'date-from': route.query['date-from'] || null,
+    'date-to': route.query['date-to'] || null
 });
 
 watch(
@@ -98,18 +106,49 @@ watch(
             delete queryFilter.location;
         }
 
+        if (filters.value.seller !== null) {
+            queryFilter.seller = filters.value.seller;
+        } else {
+            delete queryFilter.seller;
+        }
+
+        if (filters.value.createdBy !== null) {
+            queryFilter.createdBy = filters.value.createdBy;
+        } else {
+            delete queryFilter.createdBy;
+        }
+
+        if (filters.value['date-from']) {
+            if (filters.value['date-from'] !== null) {
+                const date = new Date(filters.value['date-from']);
+                date.setHours(date.getHours() + 5);
+                queryFilter['date-from'] = date.toISOString();
+            }
+
+
+            if (filters.value['date-from'] === "") {
+                delete queryFilter['date-from'];
+            }
+        }
+
         if (filters.value['date-to']) {
-            const toDate = new Date(filters.value['date-to']);
-            toDate.setHours(5, 0, 0, 0);
-            queryFilter['date-to'] = toDate.toISOString();
+            if (filters.value['date-to'] !== null) {
+                const date = new Date(filters.value['date-to']);
+                date.setHours(date.getHours() + 5);
+                queryFilter['date-to'] = date.toISOString();
+            }
+
+            if (filters.value['date-to'] === "") {
+                delete queryFilter['date-to'];
+            }
         }
 
         await updateQuery(router, queryFilter);
 
         if (tabVal.value === 'products') {
-            await productStore.fetchResidualProducts(route.query);
+            await productStore.fetchFranchiseFeeProducts(route.query);
         } else {
-            await kitStore.fetchResidualKits(route.query);
+            await kitStore.fetchFranchiseFeeKits(route.query);
         }
     },
     { immediate: true, deep: true }
@@ -126,6 +165,14 @@ onMounted(() => {
 
     if(!locationStore.getLocations.models.length) {
         locationStore.fetchLocations()
+    }
+
+    if(!sellerStore.getSellers.models.length) {
+        sellerStore.fetchSellers()
+    }
+
+    if(!userStore.getUsers.models.length) {
+        userStore.fetchUsers()
     }
 })
 </script>
@@ -153,7 +200,7 @@ onMounted(() => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('cards.residualByDate')"
+        :section-name="t('cards.franchiseFee')"
         back-route-name="reports"
         without-buttons
     >
@@ -217,6 +264,33 @@ onMounted(() => {
                         showClear
                         class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
                     />
+                    <Select
+                        v-model="filters.seller"
+                        :options="sellerStore.getSellers.models"
+                        option-label="name"
+                        option-value="id"
+                        :placeholder="t('placeholders.search.bySeller')"
+                        showClear
+                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                    />
+                    <Select
+                        v-model="filters.createdBy"
+                        :options="userStore.getUsers.models"
+                        option-label="name"
+                        option-value="id"
+                        :placeholder="t('placeholders.search.byUser')"
+                        showClear
+                        class="min-w-50 max-w-full w-full"
+                    />
+                    <DatePicker
+                        v-model.trim="filters['date-from']"
+                        dateFormat="dd.mm.yy"
+                        showIcon
+                        fluid
+                        iconDisplay="input"
+                        :placeholder="t('placeholders.search.byDateFrom')"
+                        show-button-bar
+                    />
                     <DatePicker
                         v-model.trim="filters['date-to']"
                         dateFormat="dd.mm.yy"
@@ -259,14 +333,14 @@ onMounted(() => {
                                 v-if="tabVal === 'products'"
                                 value="products"
                             >
-                                <NoData v-if="!productStore.getResidualProducts.totalItems && !productStore.getIsLoadingProducts" class="text-surface-400 mx-auto my-auto h-full">
+                                <NoData v-if="!productStore.getFranchiseFeeProducts.totalItems && !productStore.getIsLoadingProducts" class="text-surface-400 mx-auto my-auto h-full">
                                     <p class="text-xl font-normal">{{ t("noResults") }}</p>
                                 </NoData>
 
                                 <DataTable
-                                    v-if="productStore.getIsLoadingProducts || productStore.getResidualProducts.totalItems > 0"
+                                    v-if="productStore.getIsLoadingProducts || productStore.getFranchiseFeeProducts.totalItems > 0"
                                     ref="dt"
-                                    :value="productStore.getIsLoadingProducts ? Array(10).fill({}) : productStore.getResidualProducts.models"
+                                    :value="productStore.getIsLoadingProducts ? Array(10).fill({}) : productStore.getFranchiseFeeProducts.models"
                                     scrollable
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50"
@@ -274,37 +348,43 @@ onMounted(() => {
                                     <Column field="id" :header="t('labels.id')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                            <p v-else>{{ data.product.id }}</p>
+                                            <p v-else>{{ data.item.product.id }}</p>
                                         </template>
                                     </Column>
                                     <Column field="name" :header="t('labels.name')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                            <p v-else>{{ data.product.name }}</p>
+                                            <p v-else>{{ data.item.product.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                            <p v-else>{{ data.product.code }}</p>
+                                            <p v-else>{{ data.item.product.code }}</p>
                                         </template>
                                     </Column>
                                     <Column field="category" :header="t('labels.category')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                            <p v-else>{{ data.product.category.name }}</p>
+                                            <p v-else>{{ data.item.product.category.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="type" :header="t('labels.type')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                            <p v-else>{{ data.product.category.categoryType.name }}</p>
+                                            <p v-else>{{ data.item.product.category.categoryType.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="amount" :header="t('labels.amount')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                            <p v-else>{{ formatCurrency(data.amount) }} {{ t(`labels.${data.product.category.unit.name}`) }}</p>
+                                            <p v-else>{{ formatCurrency(data.item.qty) }} {{ t(`labels.${data.item.product.category.unit.name}`) }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="price" :header="t('labels.price')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                            <p v-else>{{ formatCurrency(data.price) }}$</p>
                                         </template>
                                     </Column>
                                     <Column field="costPrice" :header="t('labels.costPrice')">
@@ -313,18 +393,65 @@ onMounted(() => {
                                             <p v-else>{{ formatCurrency(data.costPrice) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                                    <Column field="benefit" :header="t('labels.benefit')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                            <p v-else>{{ formatCurrency(data.wholesalePrice) }}$</p>
+                                            <p v-else>{{ formatCurrency(data.benefit) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
+                                    <Column field="locations" :header="t('labels.locations')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                            <p v-else>{{ formatCurrency(data.retailPrice) }}$</p>
+                                            <p v-else>{{ data.location.name }}</p>
                                         </template>
                                     </Column>
+                                    <Column field="seller" :header="t('labels.seller')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                            <p v-else>{{ data.seller?.name || '-' }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="createdAt" :header="t('labels.createdAt')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                            <p v-else>{{ getFormattedDateWithTime(data.createdAt) }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="responsible" :header="t('labels.responsible')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                            <p v-else>{{ data.createdBy.name }}</p>
+                                        </template>
+                                    </Column>
+
+                                    <ColumnGroup type="footer">
+                                        <Row>
+                                            <Column :colspan="6" footerStyle="text-align:right">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                                    <p v-else class="font-semibold">{{ t('labels.totals') }}:</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(productStore.getFranchiseFeeProducts.totalPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(productStore.getFranchiseFeeProducts.totalCostPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column :colspan="3">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(productStore.getFranchiseFeeProducts.totalBenefit) }}$</p>
+                                                </template>
+                                            </Column>
+                                        </Row>
+                                    </ColumnGroup>
 
                                     <template #footer>
                                         <div v-if="productStore.getIsLoadingProducts" class="flex justify-between">
@@ -335,7 +462,7 @@ onMounted(() => {
                                             <PaginatorComponent
                                                 v-model="filters.page"
                                                 v-model:items-per-page="filters.itemsPerPage"
-                                                :total-items="productStore.getResidualProducts.totalItems"
+                                                :total-items="productStore.getFranchiseFeeProducts.totalItems"
                                             />
                                         </div>
                                     </template>
@@ -347,14 +474,14 @@ onMounted(() => {
                                 v-if="tabVal === 'kits'"
                                 value="kits"
                             >
-                                <NoData v-if="!kitStore.getResidualKits.totalItems && !kitStore.getIsLoadingKits" class="text-surface-400 mx-auto my-auto h-full">
+                                <NoData v-if="!kitStore.getFranchiseFeeKits.totalItems && !kitStore.getIsLoadingKits" class="text-surface-400 mx-auto my-auto h-full">
                                     <p class="text-xl font-normal">{{ t("noResults") }}</p>
                                 </NoData>
 
                                 <DataTable
-                                    v-if="kitStore.getIsLoadingKits || kitStore.getResidualKits.totalItems > 0"
+                                    v-if="kitStore.getIsLoadingKits || kitStore.getFranchiseFeeKits.totalItems > 0"
                                     ref="dt"
-                                    :value="kitStore.getIsLoadingKits ? Array(10).fill({}) : kitStore.getResidualKits.models"
+                                    :value="kitStore.getIsLoadingKits ? Array(10).fill({}) : kitStore.getFranchiseFeeKits.models"
                                     scrollable
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50"
@@ -362,25 +489,31 @@ onMounted(() => {
                                     <Column field="id" :header="t('labels.id')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
-                                            <p v-else>{{ data.kit.id }}</p>
+                                            <p v-else>{{ data.item.kit.id }}</p>
                                         </template>
                                     </Column>
                                     <Column field="name" :header="t('labels.name')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
-                                            <p v-else>{{ data.kit.name }}</p>
+                                            <p v-else>{{ data.item.kit.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
-                                            <p v-else>{{ data.kit.code }}</p>
+                                            <p v-else>{{ data.item.kit.code }}</p>
                                         </template>
                                     </Column>
                                     <Column field="amount" :header="t('labels.amount')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
-                                            <p v-else>{{ formatCurrency(data.amount) }} {{ t(`labels.pcs`) }}</p>
+                                            <p v-else>{{ formatCurrency(data.item.qty) }} {{ t('labels.pcs') }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="price" :header="t('labels.price')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                            <p v-else>{{ formatCurrency(data.price) }}$</p>
                                         </template>
                                     </Column>
                                     <Column field="costPrice" :header="t('labels.costPrice')">
@@ -389,16 +522,34 @@ onMounted(() => {
                                             <p v-else>{{ formatCurrency(data.costPrice) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                                    <Column field="benefit" :header="t('labels.benefit')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
-                                            <p v-else>{{ formatCurrency(data.wholesalePrice) }}$</p>
+                                            <p v-else>{{ formatCurrency(data.benefit) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
+                                    <Column field="locations" :header="t('labels.locations')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
-                                            <p v-else>{{ formatCurrency(data.retailPrice) }}$</p>
+                                            <p v-else>{{ data.location.name }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="seller" :header="t('labels.seller')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                            <p v-else>{{ data.seller?.name || '-' }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="createdAt" :header="t('labels.createdAt')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                            <p v-else>{{ getFormattedDateWithTime(data.createdAt) }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="responsible" :header="t('labels.responsible')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                            <p v-else>{{ data.createdBy.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="id" style="width: 60px;">  <!-- Fixed width for the column -->
@@ -412,7 +563,7 @@ onMounted(() => {
                                                     <Button
                                                         @click="router.push({
                                                             name: 'kit',
-                                                            params: { id: data.kit.id },
+                                                            params: { id: data.item.kit.id },
                                                         })"
                                                         icon="pi pi-eye"
                                                         pt:root="rounded-full size-8! min-w-8! h-8! bg-blue-400 dark:bg-blue-400 enabled:hover:bg-blue-300 dark:enabled:hover:bg-blue-300 border-blue-400 dark:border-blue-400 enabled:hover:border-blue-300 dark:enabled:hover:border-blue-300 focus-visible:outline-blue-400 dark:focus-visible:outline-blue-400"
@@ -423,6 +574,35 @@ onMounted(() => {
                                         </template>
                                     </Column>
 
+                                    <ColumnGroup type="footer">
+                                        <Row>
+                                            <Column :colspan="4" footerStyle="text-align:right">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                                    <p v-else class="font-semibold">{{ t('labels.totals') }}:</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(kitStore.getFranchiseFeeKits.totalPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(kitStore.getFranchiseFeeKits.totalCostPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column :colspan="3">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(kitStore.getFranchiseFeeKits.totalBenefit) }}$</p>
+                                                </template>
+                                            </Column>
+                                        </Row>
+                                    </ColumnGroup>
+
                                     <template #footer>
                                         <div v-if="kitStore.getIsLoadingKits" class="flex justify-between">
                                             <Skeleton height="2rem" width="10rem" />
@@ -432,7 +612,7 @@ onMounted(() => {
                                             <PaginatorComponent
                                                 v-model="filters.page"
                                                 v-model:items-per-page="filters.itemsPerPage"
-                                                :total-items="kitStore.getResidualKits.totalItems"
+                                                :total-items="kitStore.getFranchiseFeeKits.totalItems"
                                             />
                                         </div>
                                     </template>
