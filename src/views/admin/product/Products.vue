@@ -139,7 +139,7 @@ const restoreAction = (id) => {
     visible.value.restoreVisible = true;
 };
 
-const deleteLocation = async () => {
+const deleteProduct = async () => {
     try {
         isDeleteLoading.value = true;
 
@@ -153,7 +153,7 @@ const deleteLocation = async () => {
     }
 };
 
-const restoreLocation = async () => {
+const restoreProduct = async () => {
     isDeleteLoading.value = true;
     await productStore.restoreProduct(currentProductId.value);
     isDeleteLoading.value = false;
@@ -488,7 +488,7 @@ onBeforeRouteLeave(() => {
                         <Button
                             type="button"
                             :label="t('dialog.confirm')"
-                            @click="deleteLocation"
+                            @click="deleteProduct"
                             :loading="isDeleteLoading"
                             class="px-5"
                         />
@@ -518,7 +518,7 @@ onBeforeRouteLeave(() => {
                         <Button
                             type="button"
                             :label="t('dialog.confirm')"
-                            @click="restoreLocation"
+                            @click="restoreProduct"
                             :loading="isDeleteLoading"
                             class="px-5"
                         />

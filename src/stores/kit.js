@@ -104,6 +104,15 @@ export const useKitStore = defineStore('kit', () => {
         }
     }
 
+    const rollbackKit = async (id) => {
+        try {
+            const { data } = await authorizedClient.put(`/kits/rollback/${id}`, {})
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
     return {
         pushKit,
         putKit,
@@ -111,6 +120,7 @@ export const useKitStore = defineStore('kit', () => {
         fetchResidualKits,
         fetchFranchiseFeeKits,
         fetchKit,
+        rollbackKit,
         getKits: computed(() => state.kits),
         getResidualKits: computed(() => state.residualKits),
         getFranchiseFeeKits: computed(() => state.franchiseFeeKits),

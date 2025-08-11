@@ -111,6 +111,12 @@
         "accusative": "продукта",
         "accusativeCapitalize": "Продукта"
     },
+    "kit": {
+      "nominative": "композиция",
+      "nominativeCapitalize": "Композиция",
+      "accusative": "композицию",
+      "accusativeCapitalize": "Композицию"
+    },
     "inventory": {
         "nominative": "инвентарь",
         "nominativeCapitalize": "Инвентарь",
@@ -404,7 +410,8 @@
         "addConfirmation": "Добавить {name}",
         "editConfirmation": "Изменить {name}",
         "recoverConfirmation": "Вы действительно хотите восстановить {name} с ID {id}?",
-        "leaveFromEditMessage": "Внесенные изменения будут потеряны. Вы уверены, что хотите выйти?"
+        "leaveFromEditMessage": "Внесенные изменения будут потеряны. Вы уверены, что хотите выйти?",
+        "rollbackConfirmation": "Вы действительно хотите откат {name} с ID {id}?"
     },
     "authErrorMessage": "Имя пользователя или пароль указаны неверно.",
     "internalErrorMessage": "Произошла ошибка, пожалуйста, попробуйте позже.",
@@ -523,10 +530,12 @@
         "accepted": "{name} успешно подтвержден!",
         "deleted": "{name} успешно удален!",
         "restored": "{name} успешно восстановлен!",
+        "rollback": "{name} успешно откатен!",
         "internalServerError": "Внутренняя ошибка сервера.",
         "already_exists_error": "{field} уже существует",
         "already_exists_error_named": "\"{name}\" с таким именем уже существует",
         "cannot_delete_product_in_stock": "Невозможно удалить продукт, который есть на складе",
+        "notEnoughKit": "На складе недостаточно этой композиции",
         "cannot_edit_kpi_used_in_sales": "KPI, используемые в продажах, не могут быть изменены",
         "unconfirmedExists": "Имеется неподтверждённая инвентаризация",
         "noIncomingToLocation": "На этот объект не было ни одного поступления"

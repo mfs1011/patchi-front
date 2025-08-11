@@ -117,6 +117,12 @@
         "accusative": "inventory",
         "accusativeCapitalize": "Inventory"
     },
+    "kit": {
+      "nominative": "kit",
+      "nominativeCapitalize": "Kit",
+      "accusative": "kit",
+      "accusativeCapitalize": "Kit"
+    },
     "code": {
         "nominative": "code",
         "nominativeCapitalize": "Code",
@@ -404,7 +410,8 @@
         "addConfirmation": "Add {name}",
         "editConfirmation": "Edit {name}",
         "recoverConfirmation": "Are you sure you want to recover {name} with ID {id}?",
-        "leaveFromEditMessage": "Your unsaved changes will be lost. Do you really want to leave?"
+        "leaveFromEditMessage": "Your unsaved changes will be lost. Do you really want to leave?",
+        "rollbackConfirmation": "Are you sure you want to rollback {name} with ID {id}?"
     },
     "authErrorMessage": "Username or password is incorrect.",
     "internalErrorMessage": "An error occurred, please try again later.",
@@ -523,10 +530,12 @@
         "accepted": "{name} successfully accepted!",
         "deleted": "{name} successfully deleted!",
         "restored": "{name} successfully restored!",
+        "rollback": "{name} successfully rolled back!",
         "internalServerError": "Internal server error.",
         "already_exists_error": "{field} already exists",
         "already_exists_error_named": "\"{name}\" with this name already exists",
         "cannot_delete_product_in_stock": "Cannot delete a product that is in stock",
+        "notEnoughKit": "There is not enough of this composition in stock",
         "cannot_edit_kpi_used_in_sales": "The KPI used in sales cannot be changed",
         "unconfirmedExists": "There is an unconfirmed inventory",
         "noIncomingToLocation": "There have been no incoming entries to this location"
