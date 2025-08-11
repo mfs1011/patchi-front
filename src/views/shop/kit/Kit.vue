@@ -140,6 +140,12 @@ onMounted(async () => {
                                 <p v-else>{{ data.product.wholesalePrice ? `${formatCurrency(data.product.wholesalePrice)}$` : '-' }}</p>
                             </template>
                         </Column>
+                        <Column field="exclude" header="exclude">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="isLoading"/>
+                                <p v-else>{{ data.exclude }}</p>
+                            </template>
+                        </Column>
                     </DataTable>
                 </template>
             </Card>
