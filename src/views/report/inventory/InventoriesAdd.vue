@@ -133,7 +133,7 @@ onMounted(async () => {
                 <template #content>
                     <form @submit.prevent="onSubmit" class="grid grid-cols-1  gap-2 sm:gap-4 md:min-w-100 w-full">
                         <div>
-                            <p>{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
+                            <p>{{ t('labels.locations') }}<span class="text-red-500"> *</span></p>
 
                             <Select
                                 v-model="location"

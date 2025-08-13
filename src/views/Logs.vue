@@ -34,6 +34,12 @@ const visible = ref({
 const currentLogData = ref()
 const isLoading = ref(false)
 
+const selectedEntityType = ref('')
+const selectedAdded = ref([])
+const selectedOldChanged = ref([])
+const selectedNewChanged = ref([])
+const selectedRemoved = ref([])
+
 const logStore = useLogStore()
 const userStore = useUserStore()
 
@@ -63,54 +69,103 @@ const actions = computed(() => [
     {id: 4, name: t('labels.restore'), value: 'restore'},
 ]);
 
-function hasAnyLength(log) {
-    let added
-    let oldChanged
-    let newChanged
-    let removed
-
-    const propertyName = computePropertyByEntityType(log.entityType)
-
-    if (log.action === 'create') {
-        added = log.newData[propertyName] || []
-    } else if (log.action === 'update') {
-        added = log.newData[propertyName]?.added || []
-    } else {
-        added = []
-    }
-
-    if (log.action === 'delete') {
-        removed = log.oldData[propertyName] || []
-    } else if (log.action === 'update') {
-        removed = log.oldData[propertyName]?.removed || []
-    } else {
-        removed = []
-    }
-
-    oldChanged = log.action === 'update' ? log.oldData[propertyName]?.changed || [] : []
-    newChanged = log.action === 'update' ? log.newData[propertyName]?.changed || [] : []
-
-    return [...added, ...removed, ...oldChanged, ...newChanged].length
-}
-
-function modal(log) {
+function showDetailDialogFunc(log) {
     isLoading.value = true
     currentLogData.value = log
-    visible.value.detailVisible = true;
+    selectedEntityType.value = log.entityType
+
+    const propertyNames = computePropertyByEntityType(log.entityType) || []
+
+    propertyNames.forEach(prop => {
+        const base = capitalize(
+            prop.replace(new RegExp(`^${log.entityType}`, 'i'), '')
+        )
+
+        const addedVar = `selectedAdded${base}`
+        const removedVar = `selectedRemoved${base}`
+        const oldChangedVar = `selectedOldChanged${base}`
+        const newChangedVar = `selectedNewChanged${base}`
+
+        if (!refs[addedVar]) refs[addedVar] = ref([])
+        if (!refs[removedVar]) refs[removedVar] = ref([])
+        if (!refs[oldChangedVar]) refs[oldChangedVar] = ref([])
+        if (!refs[newChangedVar]) refs[newChangedVar] = ref([])
+
+        if (log.action === 'create') {
+            refs[addedVar].value = log.newData[prop] || []
+        } else if (log.action === 'update') {
+            refs[addedVar].value = log.newData[prop]?.added || []
+        }
+
+        if (log.action === 'delete') {
+            refs[removedVar].value = log.oldData[prop] || []
+        } else if (log.action === 'update') {
+            refs[removedVar].value = log.oldData[prop]?.removed || []
+        }
+
+        refs[oldChangedVar].value = log.action === 'update'
+            ? log.oldData[prop]?.changed || []
+            : []
+
+        refs[newChangedVar].value = log.action === 'update'
+            ? log.newData[prop]?.changed || []
+            : []
+    })
+
+    console.log(refs)
+    visible.value.detailVisible = true
     isLoading.value = false
 }
 
+const refs = {}
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+function hasAnyLength(log) {
+    const propertyNames = computePropertyByEntityType(log.entityType) || [];
+    let total = 0;
+
+    propertyNames.forEach(propertyName => {
+        let added = [];
+        let removed = [];
+        let oldChanged = [];
+        let newChanged = [];
+
+        if (log.action === 'create') {
+            added = log.newData[propertyName] || [];
+        } else if (log.action === 'update') {
+            added = log.newData[propertyName]?.added || [];
+        }
+
+        if (log.action === 'delete') {
+            removed = log.oldData[propertyName] || [];
+        } else if (log.action === 'update') {
+            removed = log.oldData[propertyName]?.removed || [];
+        }
+
+        if (log.action === 'update') {
+            oldChanged = log.oldData[propertyName]?.changed || [];
+            newChanged = log.newData[propertyName]?.changed || [];
+        }
+
+        total += added.length + removed.length + oldChanged.length + newChanged.length;
+    });
+
+    return total;
+}
+
 function computePropertyByEntityType(entityType) {
-    return entityTypeToPropertyMap[entityType] || null
+    return entityTypeToPropertyMap[entityType] || [];
 }
 
 const entityTypeToPropertyMap = {
-    IncomeInvoice: 'incomeInvoiceProducts',
-    TransferInvoice: 'transferInvoiceProducts',
-    OrderInvoice: 'orderInvoiceProducts',
-    ReturnInvoice: 'returnInvoiceProducts',
-    WriteOffInvoice: 'writeOffInvoiceProducts',
-    Inventory: 'inventoryProducts',
+    IncomeInvoice: ['incomeInvoiceProducts'],
+    TransferInvoice: ['transferInvoiceProducts'],
+    OrderInvoice: ['orderInvoiceProducts'],
+    ReturnInvoice: ['returnInvoiceProducts'],
+    WriteOffInvoice: ['writeOffInvoiceProducts'],
+    Inventory: ['inventoryProducts', 'inventoryKits']
 }
 
 const debouncedFilter = useDebouncedRef(route.query.entityId || null, 500);
@@ -590,7 +645,7 @@ onMounted(() => {
                                 <div v-else>
                                     <div v-if="hasAnyLength(data)" class="flex justify-center w-full">
                                         <Button
-                                            @click="modal(data)"
+                                            @click="showDetailDialogFunc(data)"
                                             icon="pi pi-eye"
                                             pt:root="rounded-full size-8! min-w-8! h-8! bg-blue-400 dark:bg-blue-400 enabled:hover:bg-blue-300 dark:enabled:hover:bg-blue-300 border-blue-400 dark:border-blue-400 enabled:hover:border-blue-300 dark:enabled:hover:border-blue-300 focus-visible:outline-blue-400 dark:focus-visible:outline-blue-400"
                                             size="small"
@@ -640,8 +695,8 @@ onMounted(() => {
 
                     <LogsInventoryCreateDetail
                         v-if="currentLogData.action === 'create'"
-                        :inventory-products="currentLogData.newData.inventoryProducts"
-                        :inventory-kits="currentLogData.newData.inventoryKits"
+                        :added="refs"
+                        :entityType="selectedEntityType"
                         :is-loading="isLoading"
                     />
 

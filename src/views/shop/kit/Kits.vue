@@ -23,13 +23,10 @@ import {useKitStore} from "@/stores/kit.js";
 import {useSellerStore} from "@/stores/seller.js";
 import {useLocationStore} from "@/stores/location.js";
 import DatePicker from "@/volt/DatePicker.vue";
-import SecondaryButton from "@/volt/SecondaryButton.vue";
-import {useToast} from "primevue/usetoast";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
-const toast = useToast();
 
 const kitStore = useKitStore()
 const assemblyStore = useAssemblyStore()
@@ -38,7 +35,6 @@ const locationStore = useLocationStore()
 
 const visible = ref({
     imageVisible: false,
-    rollbackVisible: false,
 });
 
 const home = computed(() => ({
@@ -50,9 +46,7 @@ const home = computed(() => ({
 const items = computed(() => [{ label: t("cards.kits") }]);
 const baseUrl = computed(() => import.meta.env.VITE_APP_API_URL);
 const isVisibleSectionHeader = ref(false);
-const isRollbackLoading = ref(false);
 const currentKit = ref();
-const currentKitId = ref();
 const debouncedName = useDebouncedRef(route.query['name'] || '',  500)
 
 const filters = ref({
@@ -137,25 +131,6 @@ watch(
 const setCurrentKit = (kit) => {
     currentKit.value = kit;
     visible.value.imageVisible = true;
-};
-
-function rollback(id) {
-    currentKitId.value = id;
-    visible.value.rollbackVisible = true;
-}
-
-const rollbackKit = async () => {
-    try {
-        isRollbackLoading.value = true;
-
-        await kitStore.rollbackKit(currentKitId.value);
-        toast.add({ severity: 'success', summary: t('toast.rollback', { name: t('kit.nominativeCapitalize') }), life: 3000 })
-    } catch (err) {
-        toast.add({ severity: 'error', summary: t('toast.notEnoughKit'), life: 3000 })
-    } finally {
-        isRollbackLoading.value = false;
-        visible.value.rollbackVisible = false;
-    }
 };
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
@@ -462,12 +437,6 @@ onBeforeRouteLeave(() => {
                                             size="small"
                                         />
                                         <Button
-                                            @click="rollback(data.id)"
-                                            icon="pi pi-replay"
-                                            pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
-                                            size="small"
-                                        />
-                                        <Button
                                             @click="router.push({
                                                 name: 'kit',
                                                 params: { id: data.id },
@@ -497,36 +466,6 @@ onBeforeRouteLeave(() => {
                     </DataTable>
                 </template>
             </Card>
-
-            <!-- Rollback DIALOG -->
-            <Dialog
-                v-model:visible="visible.rollbackVisible"
-                modal
-                :closable="false"
-                class="sm:min-w-100 sm:w-fit w-9/10"
-                pt:root="px-2"
-            >
-                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                    {{ t('dialog.rollbackConfirmation', { name: t('kit.accusative'), id: currentKitId }) }}
-                </span>
-
-                <template #footer>
-                    <div class="flex justify-end gap-2">
-                        <SecondaryButton
-                            type="button"
-                            :label="t('dialog.cancel')"
-                            @click="visible.rollbackVisible = false"
-                        />
-                        <Button
-                            type="button"
-                            :label="t('dialog.confirm')"
-                            @click="rollbackKit"
-                            :loading="isRollbackLoading"
-                            class="px-5"
-                        />
-                    </div>
-                </template>
-            </Dialog>
 
             <Dialog v-model:visible="visible.imageVisible" maximizable modal :header="currentKit?.name" class="md:w-200 w-9/10 ">
                 <div class="w-full h-fit">

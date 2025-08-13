@@ -21,17 +21,17 @@ const tabList = computed(() => [
 ])
 
 defineProps({
-    inventoryProducts: {
-        type: Array,
-        default: []
-    },
-    inventoryKits: {
-        type: Array,
-        default: []
-    },
     isLoading: {
         type: Boolean,
         default: false
+    },
+    added: {
+        type: Object,
+        required: true
+    },
+    entityType: {
+        type: String,
+        required: true
     }
 })
 </script>
@@ -49,7 +49,7 @@ defineProps({
             >
                 <DataTable
                     ref="dt"
-                    :value="isLoading ? Array(10).fill({}) : inventoryProducts"
+                    :value="isLoading ? Array(10).fill({}) : added.selectedAddedProducts.value"
                     scrollable
                     pt:footer="border-none dark:bg-surface-800"
                     pt:root="border border-surface-300 dark:border-surface-600/50"
@@ -141,7 +141,7 @@ defineProps({
                     </Column>
                 </DataTable>
 
-                <NoData v-if="!inventoryProducts?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
+                <NoData v-if="!added.selectedAddedProducts.value?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
                     <p class="text-xl font-normal">{{ t("noResults") }}</p>
                 </NoData>
             </TabPanel>
@@ -153,7 +153,7 @@ defineProps({
             >
                 <DataTable
                     ref="dt"
-                    :value="isLoading ? Array(10).fill({}) : inventoryKits"
+                    :value="isLoading ? Array(10).fill({}) : added.selectedAddedKits.value"
                     scrollable
                     pt:footer="border-none dark:bg-surface-800"
                     pt:root="border border-surface-300 dark:border-surface-600/50"
@@ -174,12 +174,6 @@ defineProps({
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.locationQuantityKit?.kit.code }}</p>
-                        </template>
-                    </Column>
-                    <Column field="color" :header="t('labels.color')">
-                        <template #body="{ data }">
-                            <Skeleton height="2rem" v-if="isLoading"/>
-                            <p v-else>{{ data.locationQuantityKit?.color ? data.locationQuantityKit.color.name : '-' }}</p>
                         </template>
                     </Column>
                     <Column field="expiryDate" :header="t('labels.expiryDate')">
@@ -232,7 +226,7 @@ defineProps({
                     </Column>
                 </DataTable>
 
-                <NoData v-if="!inventoryKits?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
+                <NoData v-if="!added.selectedAddedKits.value?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
                     <p class="text-xl font-normal">{{ t("noResults") }}</p>
                 </NoData>
             </TabPanel>

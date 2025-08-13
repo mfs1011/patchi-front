@@ -326,7 +326,7 @@
             "category": "Kategoriyani tanlang",
             "collection": "To‘plamni tanlang",
             "paymentType": "To‘lov turini tanlang",
-            "location": "Obyektni tanlang"
+            "location": "Joylashuvni tanlang"
         },
         "shopName": "Do‘kon nomini kiriting...",
         "warehouseName": "Ombor nomini kiriting...",
@@ -396,7 +396,7 @@
         "kpiPercentRequired": "KPI foizini kiritish majburiy",
         "dateRequired": "Sanani kiritish majburiy",
         "notificationDayRequired": "Kun kiritish majburiy",
-        "locationRequired": "Obyekt kiritish majburiy"
+        "locationRequired": "Joylashuvni kiritish majburiy"
     },
     "dialog": {
         "confirm": "Tasdiqlash",
@@ -538,7 +538,7 @@
         "notEnoughKit": "Omborda bu kompozitsiyadan yetarli emas",
         "cannot_edit_kpi_used_in_sales": "Sotuvda ishlatilgan KPI ni o'zgartirib bo'lmaydi",
         "unconfirmedExists": "Tasdiqlanmagan inventarizatsiya mavjud",
-        "noIncomingToLocation": "Bu obyektga umuman kirim bo‘lmagan"
+        "noIncomingToLocation": "Bu joylashuvga umuman kirim bo‘lmagan"
     },
     "choosePhoto": "Rasm tanlang",
     "changePhoto": "Rasmni o'zgartirish",

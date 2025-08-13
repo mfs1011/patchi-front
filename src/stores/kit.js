@@ -104,9 +104,9 @@ export const useKitStore = defineStore('kit', () => {
         }
     }
 
-    const rollbackKit = async (id) => {
+    const rollbackKit = async (kitData, id) => {
         try {
-            const { data } = await authorizedClient.put(`/kits/rollback/${id}`, {})
+            const { data } = await authorizedClient.put(`/kits/rollback/${id}`, kitData)
             return data
         } catch (error) {
             throw error

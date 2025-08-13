@@ -328,7 +328,7 @@
             "category": "Выберите категорию",
             "collection": "Выберите коллекцию",
             "paymentType": "Выберите тип оплаты",
-            "location": "Выберите объект"
+            "location": "Выберите локацию"
         },
         "supplierName": "Введите имя поставщика...",
         "colorName": "Введите название цвета...",
@@ -396,7 +396,7 @@
         "kpiPercentRequired": "Процент KPI обязателен",
         "dateRequired": "Дата обязателен",
         "notificationDayRequired": "День обязателен",
-        "locationRequired": "Объект обязателен"
+        "locationRequired": "Локация обязательна"
     },
     "dialog": {
         "confirm": "Подтвердить",
@@ -538,7 +538,7 @@
         "notEnoughKit": "На складе недостаточно этой композиции",
         "cannot_edit_kpi_used_in_sales": "KPI, используемые в продажах, не могут быть изменены",
         "unconfirmedExists": "Имеется неподтверждённая инвентаризация",
-        "noIncomingToLocation": "На этот объект не было ни одного поступления"
+        "noIncomingToLocation": "На эту локацию не было ни одного поступления"
     },
     "choosePhoto": "Выберите фото",
     "changePhoto": "Изменить фото",
