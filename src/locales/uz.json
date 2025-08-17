@@ -283,7 +283,8 @@
         "Payment": "To‘lov",
         "Assembly": "To‘plam",
         "Inventory": "Inventarizatsiya",
-        "OrderInvoice": "Buyurtma"
+        "OrderInvoice": "Buyurtma",
+        "IncomeInvoice": "Kirim hujjati"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",

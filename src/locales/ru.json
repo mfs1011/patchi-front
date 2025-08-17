@@ -283,7 +283,8 @@
         "Payment": "Платёж",
         "Assembly": "Сборка",
         "Inventory": "Инвентарь",
-        "OrderInvoice": "Заказ"
+        "OrderInvoice": "Заказ",
+        "IncomeInvoice": "Поступления"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",

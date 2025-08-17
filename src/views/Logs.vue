@@ -18,9 +18,7 @@ import {useLogStore} from "@/stores/log.js";
 import {formatPhoneByCountry} from "@/helpers/phoneFormat.js";
 import Select from "@/volt/Select.vue";
 import Dialog from "@/volt/Dialog.vue";
-import LogsInventoryCreateDetail from "@/components/LogsInventoryCreateDetail.vue";
-import LogsInventoryUpdateDetail from "@/components/LogsInventoryUpdateDetail.vue";
-import LogsInventoryDeleteDetail from "@/components/LogsInventoryDeleteDetail.vue";
+import LogDetails from "@/components/LogDetails.vue";
 import InputText from "@/volt/InputText.vue";
 import {useUserStore} from "@/stores/user.js";
 
@@ -33,12 +31,7 @@ const visible = ref({
 });
 const currentLogData = ref()
 const isLoading = ref(false)
-
 const selectedEntityType = ref('')
-const selectedAdded = ref([])
-const selectedOldChanged = ref([])
-const selectedNewChanged = ref([])
-const selectedRemoved = ref([])
 
 const logStore = useLogStore()
 const userStore = useUserStore()
@@ -60,6 +53,7 @@ const elements = computed(() => [
     {id: 14, name: t('labels.Assembly'), value: 'Assembly'},
     {id: 15, name: t('labels.Inventory'), value: 'Inventory'},
     {id: 16, name: t('labels.OrderInvoice'), value: 'OrderInvoice'},
+    {id: 17, name: t('labels.IncomeInvoice'), value: 'IncomeInvoice'},
 ]);
 
 const actions = computed(() => [
@@ -161,10 +155,10 @@ function computePropertyByEntityType(entityType) {
 
 const entityTypeToPropertyMap = {
     IncomeInvoice: ['incomeInvoiceProducts'],
-    TransferInvoice: ['transferInvoiceProducts'],
-    OrderInvoice: ['orderInvoiceProducts'],
-    ReturnInvoice: ['returnInvoiceProducts'],
-    WriteOffInvoice: ['writeOffInvoiceProducts'],
+    TransferInvoice: ['transferInvoiceProducts', 'transferInvoiceKits'],
+    OrderInvoice: ['orderInvoiceProducts', 'orderInvoiceKits'],
+    ReturnInvoice: ['returnInvoiceProducts', 'returnInvoiceKits'],
+    WriteOffInvoice: ['writeOffInvoiceProducts', 'writeOffInvoiceKits'],
     Inventory: ['inventoryProducts', 'inventoryKits']
 }
 
@@ -504,6 +498,13 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.status">{{ t('labels.status') }}: <b>{{ t(data.oldData.status) }}</b></h6>
                                         <h6 v-if="data.oldData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
                                     </div>
+                                    <div v-if="data.entityType === 'IncomeInvoice'">
+                                        <h6 v-if="data.oldData?.supplier">{{ t('labels.Supplier') }}: <b>{{ data.oldData.supplier.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.location">{{ t('labels.locations') }}: <b>{{ data.oldData.location.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.comment">{{ t('labels.comment') }}: <b>{{ data.oldData.comment }}</b></h6>
+                                        <h6 v-if="data.oldData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.oldData.createdAt) }}</b></h6>
+                                    </div>
                                 </div>
                             </template>
                         </Column>
@@ -614,6 +615,13 @@ onMounted(() => {
                                         <h6 v-if="data.newData?.status">{{ t('labels.status') }}: <b>{{ t(data.newData.status) }}</b></h6>
                                         <h6 v-if="data.newData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
                                     </div>
+                                    <div v-if="data.entityType === 'IncomeInvoice'">
+                                        <h6 v-if="data.newData?.supplier">{{ t('labels.Supplier') }}: <b>{{ data.newData.supplier.name }}</b></h6>
+                                        <h6 v-if="data.newData?.location">{{ t('labels.locations') }}: <b>{{ data.newData.location.name }}</b></h6>
+                                        <h6 v-if="data.newData?.comment">{{ t('labels.comment') }}: <b>{{ data.newData.comment }}</b></h6>
+                                        <h6 v-if="data.newData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.newData.createdAt) }}</b></h6>
+                                    </div>
                                 </div>
                             </template>
                         </Column>
@@ -682,38 +690,10 @@ onMounted(() => {
                 pt:content="px-2 sm:px-4 h-full"
             >
                 <div class="h-full">
-                    <p
-                        class="text-lg font-medium mt-4"
-                        :class="{
-                            'text-teal-500': currentLogData.action === 'create',
-                            'text-amber-500': currentLogData.action === 'update',
-                            'text-red-500': currentLogData.action === 'delete',
-                        }"
-                    >
-                        {{ t(`labels.${currentLogData.action}d`) }}
-                    </p>
-
-                    <LogsInventoryCreateDetail
-                        v-if="currentLogData.action === 'create'"
-                        :added="refs"
+                    <LogDetails
+                        :is-loading="isLoading"
+                        :refs="refs"
                         :entityType="selectedEntityType"
-                        :is-loading="isLoading"
-                    />
-
-                    <LogsInventoryUpdateDetail
-                        v-if="currentLogData.action === 'update'"
-                        :old-inventory-products="currentLogData.oldData.inventoryProducts.changed ?? []"
-                        :new-inventory-products="currentLogData.newData.inventoryProducts.changed ?? []"
-                        :old-inventory-kits="currentLogData.oldData.inventoryKits?.changed ?? []"
-                        :new-inventory-kits="currentLogData.newData.inventoryKits?.changed ?? []"
-                        :is-loading="isLoading"
-                    />
-
-                    <LogsInventoryDeleteDetail
-                        v-if="currentLogData.action === 'delete'"
-                        :order-invoice-products="currentLogData.oldData.orderInvoiceProducts"
-                        :order-invoice-kits="currentLogData.oldData.orderInvoiceKits"
-                        :is-loading="isLoading"
                     />
                 </div>
             </Dialog>

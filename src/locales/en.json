@@ -283,7 +283,8 @@
         "Payment": "Payment",
         "Assembly": "Assembly",
         "Inventory": "Inventory",
-        "OrderInvoice": "Order"
+        "OrderInvoice": "Order",
+        "IncomeInvoice": "Income invoice"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
