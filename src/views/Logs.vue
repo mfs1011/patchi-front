@@ -29,6 +29,8 @@ const isVisibleSectionHeader = ref(false);
 const visible = ref({
     detailVisible: false
 });
+
+const refs = ref({})
 const currentLogData = ref()
 const isLoading = ref(false)
 const selectedEntityType = ref('')
@@ -80,38 +82,37 @@ function showDetailDialogFunc(log) {
         const oldChangedVar = `selectedOldChanged${base}`
         const newChangedVar = `selectedNewChanged${base}`
 
-        if (!refs[addedVar]) refs[addedVar] = ref([])
-        if (!refs[removedVar]) refs[removedVar] = ref([])
-        if (!refs[oldChangedVar]) refs[oldChangedVar] = ref([])
-        if (!refs[newChangedVar]) refs[newChangedVar] = ref([])
+        if (!refs.value[addedVar]) refs.value[addedVar] = ref([])
+        if (!refs.value[removedVar]) refs.value[removedVar] = ref([])
+        if (!refs.value[oldChangedVar]) refs.value[oldChangedVar] = ref([])
+        if (!refs[newChangedVar]) refs.value[newChangedVar] = ref([])
 
         if (log.action === 'create') {
-            refs[addedVar].value = log.newData[prop] || []
+            refs.value[addedVar].value = log.newData[prop] || []
         } else if (log.action === 'update') {
-            refs[addedVar].value = log.newData[prop]?.added || []
+            refs.value[addedVar].value = log.newData[prop]?.added || []
         }
 
         if (log.action === 'delete') {
-            refs[removedVar].value = log.oldData[prop] || []
+            refs.value[removedVar].value = log.oldData[prop] || []
         } else if (log.action === 'update') {
-            refs[removedVar].value = log.oldData[prop]?.removed || []
+            refs.value[removedVar].value = log.oldData[prop]?.removed || []
         }
 
-        refs[oldChangedVar].value = log.action === 'update'
+        refs.value[oldChangedVar].value = log.action === 'update'
             ? log.oldData[prop]?.changed || []
             : []
 
-        refs[newChangedVar].value = log.action === 'update'
+        refs.value[newChangedVar].value = log.action === 'update'
             ? log.newData[prop]?.changed || []
             : []
     })
 
-    console.log(refs)
+    console.log(refs.value)
     visible.value.detailVisible = true
     isLoading.value = false
 }
 
-const refs = {}
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1)
 }
@@ -243,6 +244,7 @@ watch(
 watch(() => visible.value.detailVisible, val => {
     if (!val) {
         currentLogData.value = null
+        refs.value = {}
     }
 })
 

@@ -82,7 +82,7 @@ defineProps({
                             <p v-else>{{ data.locationQuantity?.product.name }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="name" :header="t('labels.title')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="name" :header="t('labels.title')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.product.name }}</p>
@@ -94,7 +94,7 @@ defineProps({
                             <p v-else>{{ data.locationQuantity?.product.code }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="code" :header="t('labels.code')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="code" :header="t('labels.code')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.product.code }}</p>
@@ -106,19 +106,19 @@ defineProps({
                             <p v-else>{{ data.locationQuantity?.color ? data.locationQuantity.color.name : '-' }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="color" :header="t('labels.color')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="color" :header="t('labels.color')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.color ? data.color.name : '-' }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="category" :header="t('labels.category')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="category" :header="t('labels.category')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.product.category.name }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="type" :header="t('labels.type')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="type" :header="t('labels.type')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.product.category.categoryType.name }}</p>
@@ -142,7 +142,7 @@ defineProps({
                             <p v-else>{{ formatCurrency(data.initialQty) }} {{ t(`labels.${data.locationQuantity?.product?.category?.unit?.name}`) }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="amount" :header="t('labels.amount')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="amount" :header="t('labels.amount')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ formatCurrency(data.qty) }} {{ t(`labels.${data.product?.category?.unit?.name}`) }}</p>
@@ -178,7 +178,7 @@ defineProps({
                             <p v-else>{{ formatCurrency(data.costPrice) }}$</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="price" :header="t('labels.price')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="price" :header="t('labels.price')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ formatCurrency(data.price) }}$</p>
@@ -242,31 +242,31 @@ defineProps({
                             <p v-else>{{ data.id }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="name" :header="t('labels.title')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="name" :header="t('labels.title')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.product.name }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="code" :header="t('labels.code')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="code" :header="t('labels.code')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.product.code }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="color" :header="t('labels.color')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="color" :header="t('labels.color')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.color ? data.color.name : '-' }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="category" :header="t('labels.category')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="category" :header="t('labels.category')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.product.category.name }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="type" :header="t('labels.type')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="type" :header="t('labels.type')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.product.category.categoryType.name }}</p>
@@ -278,13 +278,13 @@ defineProps({
                             <p v-else>{{ data.expiryDate ? getFormattedDate(data.expiryDate) : '-' }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="amount" :header="t('labels.amount')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="amount" :header="t('labels.amount')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ formatCurrency(data.qty) }} {{ t(`labels.${data.product?.category?.unit?.name}`) }}</p>
                         </template>
                     </Column>
-                    <Column v-if="entityType === 'IncomeInvoice'" field="price" :header="t('labels.price')">
+                    <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="price" :header="t('labels.price')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ formatCurrency(data.price) }}$</p>
@@ -325,61 +325,81 @@ defineProps({
                             <Column field="id" :header="t('labels.id')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-else>{{ data.id }}</p>
+                                    <div v-else>
+                                        <div v-if="data.id">{{ data.id }}</div>
+                                    </div>
                                 </template>
                             </Column>
                             <Column v-if="entityType === 'Inventory'" field="factQty" :header="t('labels.factQty')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p>{{ formatCurrency(data.factQty) }}</p>
+                                    <div v-else>
+                                        <div v-if="data.factQty">{{ formatCurrency(data.factQty) }}</div>
+                                    </div>
                                 </template>
                             </Column>
-                            <Column v-if="entityType === 'IncomeInvoice'" field="product" :header="t('labels.product')">
+                            <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="product" :header="t('labels.product')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.product">{{ data.product.name }}</p>
+                                    <div v-else>
+                                        <div v-if="data.product">{{ data.product.name }}</div>
+                                    </div>
                                 </template>
                             </Column>
-                            <Column v-if="entityType === 'IncomeInvoice'" field="color" :header="t('labels.color')">
+                            <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="color" :header="t('labels.color')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.color">{{ data.color.name }}</p>
+                                    <div v-else>
+                                        <div v-if="data.color">{{ data.color.name }}</div>
+                                    </div>
                                 </template>
                             </Column>
                             <Column v-if="entityType === 'IncomeInvoice'" field="expiryDate" :header="t('labels.expiryDate')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.expiryDate">{{ getFormattedDate(data.expiryDate) }}</p>
+                                    <div v-else>
+                                        <div v-if="data.expiryDate">{{ getFormattedDate(data.expiryDate) }}</div>
+                                    </div>
                                 </template>
                             </Column>
-                            <Column v-if="entityType === 'IncomeInvoice'" field="amount" :header="t('labels.amount')">
+                            <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="amount" :header="t('labels.amount')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.qty">{{ formatCurrency(data.qty) }}</p>
+                                    <div v-else>
+                                        <div v-if="data.qty">{{ formatCurrency(data.qty) }}</div>
+                                    </div>
                                 </template>
                             </Column>
-                            <Column v-if="entityType === 'IncomeInvoice'" field="price" :header="t('labels.price')">
+                            <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="price" :header="t('labels.price')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.price">{{ formatCurrency(data.price) }}$</p>
+                                    <div v-else>
+                                        <div v-if="data.price">{{ formatCurrency(data.price) }}$</div>
+                                    </div>
                                 </template>
                             </Column>
                             <Column v-if="entityType === 'IncomeInvoice'" field="transportationFee" :header="t('labels.transportationFee')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.transportationFee">{{ formatCurrency(data.transportationFee) }}$</p>
+                                    <div v-else>
+                                        <div v-if="data.transportationFee">{{ formatCurrency(data.transportationFee) }}$</div>
+                                    </div>
                                 </template>
                             </Column>
                             <Column v-if="entityType === 'IncomeInvoice'" field="customsFee" :header="t('labels.customsFee')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.customsFee">{{ formatCurrency(data.customsFee) }}$</p>
+                                    <div v-else>
+                                        <div v-if="data.customsFee">{{ formatCurrency(data.customsFee) }}$</div>
+                                    </div>
                                 </template>
                             </Column>
                             <Column v-if="entityType === 'IncomeInvoice'" field="costPrice" :header="t('labels.costPrice')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.costPrice">{{ formatCurrency(data.costPrice) }}$</p>
+                                    <div v-else>
+                                        <div v-if="data.costPrice">{{ formatCurrency(data.costPrice) }}$</div>
+                                    </div>
                                 </template>
                             </Column>
                         </DataTable>
@@ -409,61 +429,81 @@ defineProps({
                             <Column field="id" :header="t('labels.id')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-else>{{ data.id }}</p>
+                                    <div v-else>
+                                        <div v-if="data.id">{{ data.id }}</div>
+                                    </div>
                                 </template>
                             </Column>
                             <Column v-if="entityType === 'Inventory'" field="factQty" :header="t('labels.factQty')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p>{{ formatCurrency(data.factQty) }}</p>
+                                    <div v-else>
+                                        <div v-if="data.factQty">{{ formatCurrency(data.factQty) }}</div>
+                                    </div>
                                 </template>
                             </Column>
-                            <Column v-if="entityType === 'IncomeInvoice'" field="product" :header="t('labels.product')">
+                            <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="product" :header="t('labels.product')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.product">{{ data.product.name }}</p>
+                                    <div v-else>
+                                        <div v-if="data.product">{{ data.product.name }}</div>
+                                    </div>
                                 </template>
                             </Column>
-                            <Column v-if="entityType === 'IncomeInvoice'" field="color" :header="t('labels.color')">
+                            <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" :header="t('labels.color')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.color">{{ data.color.name }}</p>
+                                    <div v-else>
+                                        <div v-if="data.color">{{ data.color.name }}</div>
+                                    </div>
                                 </template>
                             </Column>
                             <Column v-if="entityType === 'IncomeInvoice'" field="expiryDate" :header="t('labels.expiryDate')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.expiryDate">{{ getFormattedDate(data.expiryDate) }}</p>
+                                    <div v-else>
+                                        <div v-if="data.expiryDate">{{ getFormattedDate(data.expiryDate) }}</div>
+                                    </div>
                                 </template>
                             </Column>
-                            <Column v-if="entityType === 'IncomeInvoice'" field="amount" :header="t('labels.amount')">
+                            <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="amount" :header="t('labels.amount')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.qty">{{ formatCurrency(data.qty) }}</p>
+                                    <div v-else>
+                                        <div v-if="data.qty">{{ formatCurrency(data.qty) }}</div>
+                                    </div>
                                 </template>
                             </Column>
-                            <Column v-if="entityType === 'IncomeInvoice'" field="price" :header="t('labels.price')">
+                            <Column v-if="entityType === 'IncomeInvoice' || entityType === 'OrderInvoice'" field="price" :header="t('labels.price')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.price">{{ formatCurrency(data.price) }}$</p>
+                                    <div v-else>
+                                        <div v-if="data.price">{{ formatCurrency(data.price) }}$</div>
+                                    </div>
                                 </template>
                             </Column>
                             <Column v-if="entityType === 'IncomeInvoice'" field="transportationFee" :header="t('labels.transportationFee')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.transportationFee">{{ formatCurrency(data.transportationFee) }}$</p>
+                                    <div v-else>
+                                        <div v-if="data.transportationFee">{{ formatCurrency(data.transportationFee) }}$</div>
+                                    </div>
                                 </template>
                             </Column>
                             <Column v-if="entityType === 'IncomeInvoice'" field="customsFee" :header="t('labels.customsFee')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.customsFee">{{ formatCurrency(data.customsFee) }}$</p>
+                                    <div v-else>
+                                        <div v-if="data.customsFee">{{ formatCurrency(data.customsFee) }}$</div>
+                                    </div>
                                 </template>
                             </Column>
                             <Column v-if="entityType === 'IncomeInvoice'" field="costPrice" :header="t('labels.costPrice')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p v-if="data.costPrice">{{ formatCurrency(data.costPrice) }}$</p>
+                                    <div v-else>
+                                        <div v-if="data.costPrice">{{ formatCurrency(data.costPrice) }}$</div>
+                                    </div>
                                 </template>
                             </Column>
                         </DataTable>
@@ -499,7 +539,7 @@ defineProps({
                         {{ t(`labels.created`) }}
                     </p>
 
-                    <Column v-if="entityType === 'Inventory'" field="id" :header="t('labels.id')">
+                    <Column field="id" :header="t('labels.id')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.id }}</p>
@@ -511,10 +551,34 @@ defineProps({
                             <p v-else>{{ data.locationQuantityKit?.kit.name }}</p>
                         </template>
                     </Column>
+                    <Column v-if="entityType === 'OrderInvoice'" field="name" :header="t('labels.title')">
+                        <template #body="{ data }">
+                            <Skeleton height="2rem" v-if="isLoading"/>
+                            <p v-else>{{ data.kit.name }}</p>
+                        </template>
+                    </Column>
                     <Column v-if="entityType === 'Inventory'" field="code" :header="t('labels.code')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.locationQuantityKit?.kit.code }}</p>
+                        </template>
+                    </Column>
+                    <Column v-if="entityType === 'OrderInvoice'" field="code" :header="t('labels.code')">
+                        <template #body="{ data }">
+                            <Skeleton height="2rem" v-if="isLoading"/>
+                            <p v-else>{{ data.kit.code }}</p>
+                        </template>
+                    </Column>
+                    <Column v-if="entityType === 'OrderInvoice'" field="amount" :header="t('labels.amount')">
+                        <template #body="{ data }">
+                            <Skeleton height="2rem" v-if="isLoading"/>
+                            <p v-else>{{ formatCurrency(data.qty) }} {{ t(`labels.pcs`) }}</p>
+                        </template>
+                    </Column>
+                    <Column v-if="entityType === 'OrderInvoice'" field="price" :header="t('labels.price')">
+                        <template #body="{ data }">
+                            <Skeleton height="2rem" v-if="isLoading"/>
+                            <p v-else>{{ formatCurrency(data.price) }}$</p>
                         </template>
                     </Column>
                     <Column v-if="entityType === 'Inventory'" field="expiryDate" :header="t('labels.expiryDate')">
@@ -575,40 +639,38 @@ defineProps({
                     pt:footer="border-none dark:bg-surface-800"
                     pt:root="border border-surface-300 dark:border-surface-600/50"
                 >
+                    <p class="text-lg font-medium text-red-500">
+                        {{ t(`labels.deleted`) }}
+                    </p>
+
                     <Column field="id" :header="t('labels.id')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.id }}</p>
                         </template>
                     </Column>
-                    <Column field="name" :header="t('labels.title')">
+                    <Column v-if="entityType === 'OrderInvoice'" field="name" :header="t('labels.title')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.kit.name }}</p>
                         </template>
                     </Column>
-                    <Column field="code" :header="t('labels.code')">
+                    <Column v-if="entityType === 'OrderInvoice'" field="code" :header="t('labels.code')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
                             <p v-else>{{ data.kit.code }}</p>
                         </template>
                     </Column>
-                    <Column field="qr" :header="t('labels.qr')">
+                    <Column v-if="entityType === 'OrderInvoice'" field="qty" :header="t('labels.qty')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
-                            <p v-else>{{ data.kit.qr || '-' }}</p>
+                            <p v-else>{{ formatCurrency(data.qty) }} {{ t(`labels.pcs`) }}</p>
                         </template>
                     </Column>
-                    <Column field="qty" :header="t('labels.qty')">
+                    <Column v-if="entityType === 'OrderInvoice'" field="price" :header="t('labels.price')">
                         <template #body="{ data }">
                             <Skeleton height="2rem" v-if="isLoading"/>
-                            <p v-else>{{ formatCurrency(data.qty) }}</p>
-                        </template>
-                    </Column>
-                    <Column field="price" :header="t('labels.price')">
-                        <template #body="{ data }">
-                            <Skeleton height="2rem" v-if="isLoading"/>
-                            <p v-else>{{ formatCurrency(data.price) }}</p>
+                            <p v-else>{{ formatCurrency(data.price) }}$</p>
                         </template>
                     </Column>
                 </DataTable>
@@ -630,10 +692,34 @@ defineProps({
                                     <p v-else>{{ data.id }}</p>
                                 </template>
                             </Column>
-                            <Column field="factQty" :header="t('labels.factQty')">
+                            <Column v-if="entityType === 'Inventory'" field="factQty" :header="t('labels.factQty')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p>{{ formatCurrency(data.factQty) }}</p>
+                                    <p v-else>{{ formatCurrency(data.factQty) }}</p>
+                                </template>
+                            </Column>
+                            <Column v-if="entityType === 'OrderInvoice'" field="kit" :header="t('labels.kit')">
+                                <template #body="{ data }">
+                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                    <div v-else>
+                                        <div v-if="data.kit">{{ data.kit.name }}</div>
+                                    </div>
+                                </template>
+                            </Column>
+                            <Column v-if="entityType === 'OrderInvoice'" field="amount" :header="t('labels.amount')">
+                                <template #body="{ data }">
+                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                    <div v-else>
+                                        <div v-if="data.qty">{{ formatCurrency(data.qty) }}</div>
+                                    </div>
+                                </template>
+                            </Column>
+                            <Column v-if="entityType === 'OrderInvoice'" field="price" :header="t('labels.price')">
+                                <template #body="{ data }">
+                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                    <div v-else>
+                                        <div v-if="data.price">{{ formatCurrency(data.price) }}$</div>
+                                    </div>
                                 </template>
                             </Column>
                         </DataTable>
@@ -654,7 +740,7 @@ defineProps({
                         <DataTable
                             v-if="refs.selectedNewChangedKits?.value?.length"
                             ref="dt"
-                            :value="isLoading ? Array(10).fill({}) : refs.selectedNewChangedKits.value.length"
+                            :value="isLoading ? Array(10).fill({}) : refs.selectedNewChangedKits.value"
                             scrollable
                             pt:footer="border-none dark:bg-surface-800"
                             pt:root="border border-surface-300 dark:border-surface-600/50"
@@ -665,10 +751,34 @@ defineProps({
                                     <p v-else>{{ data.id }}</p>
                                 </template>
                             </Column>
-                            <Column field="factQty" :header="t('labels.factQty')">
+                            <Column v-if="entityType === 'Inventory'" field="factQty" :header="t('labels.factQty')">
                                 <template #body="{ data }">
                                     <Skeleton height="2rem" v-if="isLoading"/>
-                                    <p>{{ formatCurrency(data.factQty) }}</p>
+                                    <p v-else>{{ formatCurrency(data.factQty) }}</p>
+                                </template>
+                            </Column>
+                            <Column v-if="entityType === 'OrderInvoice'" field="kit" :header="t('labels.kit')">
+                                <template #body="{ data }">
+                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                    <div v-else>
+                                        <div v-if="data.kit">{{ data.kit.name }}</div>
+                                    </div>
+                                </template>
+                            </Column>
+                            <Column v-if="entityType === 'OrderInvoice'" field="amount" :header="t('labels.amount')">
+                                <template #body="{ data }">
+                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                    <div v-else>
+                                        <div v-if="data.qty">{{ formatCurrency(data.qty) }}</div>
+                                    </div>
+                                </template>
+                            </Column>
+                            <Column v-if="entityType === 'OrderInvoice'" field="price" :header="t('labels.price')">
+                                <template #body="{ data }">
+                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                    <div v-else>
+                                        <div v-if="data.price">{{ formatCurrency(data.price) }}$</div>
+                                    </div>
                                 </template>
                             </Column>
                         </DataTable>
