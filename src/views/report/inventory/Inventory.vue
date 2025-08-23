@@ -369,23 +369,6 @@ const pushChanges = async () => {
                                             <p v-else>{{ formatCurrency(data.costPrice * data.factQty) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column field="difference" :header="t('labels.difference')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <div v-else>
-                                                <p
-                                                    v-if="data.factQty"
-                                                    :class="{
-                                                    'text-green-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) >= 0,
-                                                    'text-red-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) < 0
-                                                }"
-                                                >
-                                                    {{ formatCurrency((data.costPrice * data.factQty) - (data.costPrice * data.currentQty)) }}$
-                                                </p>
-                                                <p v-else>-</p>
-                                            </div>
-                                        </template>
-                                    </Column>
                                     <Column field="differenceUnit" :header="t('labels.differenceUnit')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
@@ -398,6 +381,23 @@ const pushChanges = async () => {
                                                 }"
                                                 >
                                                     {{ formatCurrency(data.factQty - data.currentQty) }} {{ t(`labels.${data.locationQuantity?.product.category.unit.name}`) }}
+                                                </p>
+                                                <p v-else>-</p>
+                                            </div>
+                                        </template>
+                                    </Column>
+                                    <Column field="difference" :header="t('labels.difference')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <div v-else>
+                                                <p
+                                                    v-if="data.factQty"
+                                                    :class="{
+                                                    'text-green-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) >= 0,
+                                                    'text-red-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) < 0
+                                                }"
+                                                >
+                                                    {{ formatCurrency((data.costPrice * data.factQty) - (data.costPrice * data.currentQty)) }}$
                                                 </p>
                                                 <p v-else>-</p>
                                             </div>
@@ -579,23 +579,6 @@ const pushChanges = async () => {
                                             <p v-else>{{ formatCurrency(data.costPrice * data.factQty) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column field="difference" :header="t('labels.difference')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <div v-else>
-                                                <p
-                                                    v-if="data.factQty"
-                                                    :class="{
-                                                    'text-green-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) >= 0,
-                                                    'text-red-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) < 0
-                                                }"
-                                                >
-                                                    {{ formatCurrency((data.costPrice * data.factQty) - (data.costPrice * data.currentQty)) }}$
-                                                </p>
-                                                <p v-else>-</p>
-                                            </div>
-                                        </template>
-                                    </Column>
                                     <Column field="differenceUnit" :header="t('labels.differenceUnit')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
@@ -608,6 +591,23 @@ const pushChanges = async () => {
                                                 }"
                                                 >
                                                     {{ formatCurrency(data.factQty - data.currentQty) }} {{ t('labels.pcs') }}
+                                                </p>
+                                                <p v-else>-</p>
+                                            </div>
+                                        </template>
+                                    </Column>
+                                    <Column field="difference" :header="t('labels.difference')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <div v-else>
+                                                <p
+                                                    v-if="data.factQty"
+                                                    :class="{
+                                                    'text-green-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) >= 0,
+                                                    'text-red-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) < 0
+                                                }"
+                                                >
+                                                    {{ formatCurrency((data.costPrice * data.factQty) - (data.costPrice * data.currentQty)) }}$
                                                 </p>
                                                 <p v-else>-</p>
                                             </div>
