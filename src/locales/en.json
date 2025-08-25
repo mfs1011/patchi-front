@@ -269,6 +269,8 @@
         "passwordUpdated": "Password updated",
         "clientB2B": "Corporate Client",
         "clientB2C": "Boutique Client",
+        "fromLocation": "From location",
+        "toLocation": "To location",
         "Notification": "Notification",
         "User": "User",
         "Seller": "Seller",
@@ -285,7 +287,9 @@
         "Assembly": "Assembly",
         "Inventory": "Inventory",
         "OrderInvoice": "Order",
-        "IncomeInvoice": "Income invoice"
+        "IncomeInvoice": "Income invoice",
+        "Kit": "Composition",
+        "TransferInvoice": "Transfer"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
