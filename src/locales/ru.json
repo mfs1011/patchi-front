@@ -269,6 +269,8 @@
         "passwordUpdated": "Пароль обновлено",
         "clientB2B": "Корпоративный клиент",
         "clientB2C": "Клиент бутика",
+        "fromLocation": "Из локации",
+        "toLocation": "В локацию",
         "Notification": "Уведомление",
         "User": "Пользователь",
         "Seller": "Продавец",
@@ -285,7 +287,9 @@
         "Assembly": "Сборка",
         "Inventory": "Инвентарь",
         "OrderInvoice": "Заказ",
-        "IncomeInvoice": "Поступления"
+        "IncomeInvoice": "Поступления",
+        "Kit": "Композиция",
+        "TransferInvoice": "Перемещение"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",

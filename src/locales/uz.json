@@ -269,6 +269,8 @@
         "passwordUpdated": "Parol yangilandi",
         "clientB2B": "Korporativ mijoz",
         "clientB2C": "Butik mijoz",
+        "fromLocation": "Joylashuvdan",
+        "toLocation": "Joylashuvga",
         "Notification": "Bildirishnoma",
         "User": "Foydalanuvchi",
         "Seller": "Sotuvchi",
@@ -285,7 +287,9 @@
         "Assembly": "To‘plam",
         "Inventory": "Inventarizatsiya",
         "OrderInvoice": "Buyurtma",
-        "IncomeInvoice": "Kirim hujjati"
+        "IncomeInvoice": "Kirim hujjati",
+        "Kit": "Kompozitsiya",
+        "TransferInvoice": "Ko‘chirish"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
