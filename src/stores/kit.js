@@ -12,7 +12,14 @@ export const useKitStore = defineStore('kit', () => {
             models: [],
             totalItems: 0,
         },
-        kit: {},
+        franchiseFeeKits: {
+            models: [],
+            totalItems: 0,
+        },
+        kit: {
+            models: [],
+            totalItems: 0,
+        },
         isLoadingKits: false,
     })
 
@@ -66,11 +73,40 @@ export const useKitStore = defineStore('kit', () => {
         }
     }
 
+    const fetchFranchiseFeeKits = async (params = { page: 1 }) => {
+        try {
+            state.isLoadingKits = true
+
+            const { data } = await authorizedClient.get('/kits/franchise_fee', { params })
+            state.franchiseFeeKits.models = data.member
+            state.franchiseFeeKits.totalItems = data.totalItems
+            state.franchiseFeeKits.totalPrice = data.totalPrice
+            state.franchiseFeeKits.totalCostPrice = data.totalCostPrice
+            state.franchiseFeeKits.totalBenefit = data.totalBenefit
+
+            return data
+        } catch (error) {
+            throw error
+        } finally {
+            state.isLoadingKits = false
+        }
+    }
+
     const fetchKit = async id => {
         try {
             const { data } = await authorizedClient.get(`/kits/${id}`)
-            state.kit = data
+            state.kit.models = data.member
+            state.kit.totalItems = data.totalItems
 
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
+    const rollbackKit = async (kitData, id) => {
+        try {
+            const { data } = await authorizedClient.put(`/kits/rollback/${id}`, kitData)
             return data
         } catch (error) {
             throw error
@@ -82,9 +118,12 @@ export const useKitStore = defineStore('kit', () => {
         putKit,
         fetchKits,
         fetchResidualKits,
+        fetchFranchiseFeeKits,
         fetchKit,
+        rollbackKit,
         getKits: computed(() => state.kits),
         getResidualKits: computed(() => state.residualKits),
+        getFranchiseFeeKits: computed(() => state.franchiseFeeKits),
         getKit: computed(() => state.kit),
         getIsLoadingKits: computed(() => state.isLoadingKits),
     }

@@ -219,7 +219,7 @@ onBeforeRouteLeave(() => {
                             :options="locationStore.getLocations.models"
                             option-label="name"
                             option-value="id"
-                            :placeholder="t('placeholders.search.byShop')"
+                            :placeholder="t('placeholders.search.byLocation')"
                             showClear
                             class="w-full"
                         />
@@ -230,7 +230,7 @@ onBeforeRouteLeave(() => {
                             :options="years"
                             option-label="name"
                             option-value="id"
-                            :placeholder="t('placeholders.search.byShop')"
+                            :placeholder="t('placeholders.search.byDateFrom')"
                             class="w-full"
                         />
                     </div>

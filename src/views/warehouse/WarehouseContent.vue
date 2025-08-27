@@ -4,7 +4,8 @@ import { useI18n } from "vue-i18n";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import Button from "@/volt/Button.vue";
-import {useRoute, useRouter} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
+import {useToast} from "primevue/usetoast";
 import updateQuery from "@/helpers/updateQuery.js";
 import {useLocationQuantityStore} from "@/stores/locationQuantity.js";
 import {useLocationStore} from "@/stores/location.js";
@@ -27,10 +28,14 @@ import SearchSelect from "@/components/UI/SearchSelect.vue";
 import {useKitStore} from "@/stores/kit.js";
 import ColumnGroup from "primevue/columngroup";
 import Row from "primevue/row";
+import InputNumber from "@/volt/InputNumber.vue";
+import SecondaryButton from "@/volt/SecondaryButton.vue";
+import Dialog from "@/volt/Dialog.vue";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const toast = useToast()
 
 const locationQuantityStore = useLocationQuantityStore()
 const locationQuantityKitStore = useLocationQuantityKitStore()
@@ -43,6 +48,31 @@ const isVisibleSectionHeader = ref(false);
 const productSelectPage = ref(1)
 const tabVal = ref('product');
 const productsForSelect = ref([])
+const isRollbackLoading = ref(false);
+const rollbackVisible = ref(false);
+const locationQuantityKit = ref();
+const rollbackCount = ref(1);
+
+function rollback(data) {
+    locationQuantityKit.value = data;
+    rollbackVisible.value = true;
+}
+
+const rollbackKit = async () => {
+    try {
+        isRollbackLoading.value = true;
+
+        const kitData = {locationQuantityKit: '/api/location_quantity_kits/' + locationQuantityKit.value.id, qty: rollbackCount.value}
+        await kitStore.rollbackKit(kitData, locationQuantityKit.value.kit.id);
+
+        toast.add({ severity: 'success', summary: t('toast.rollback', { name: t('kit.nominativeCapitalize') }), life: 3000 })
+    } catch (err) {
+        toast.add({ severity: 'error', summary: t('toast.notEnoughKit'), life: 3000 })
+    } finally {
+        isRollbackLoading.value = false;
+        rollbackVisible.value = false;
+    }
+};
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
@@ -127,6 +157,32 @@ watch(tabVal, () => {
     filters.value.page = 1
 })
 
+const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
+const eventSource = ref(null)
+
+function connectMercure() {
+    const url = new URL(mercureUrl)
+    url.searchParams.append('topic', '')
+    eventSource.value = new EventSource(url)
+
+    eventSource.value.addEventListener('message', async (event) => {
+        const eventDataId = JSON.parse(event.data).eventId
+
+        if (eventDataId === 7) {
+            await locationQuantityKitStore.fetchLocationQuantityKits(route.query)
+        }
+    })
+}
+
+const clearFilters = () => {
+    filters.value.location = null;
+    filters.value.product = null;
+    filters.value.kit = null;
+    filters.value['is-desc'] = null;
+    filters.value['is-zero'] = null;
+    filters.value.expired = null;
+}
+
 onMounted(() => {
     if (!productsForSelect.value.length) {
         productStore.fetchProducts({ page: productSelectPage.value, 'items-per-page': 7, name: filters.value.product })
@@ -138,16 +194,15 @@ onMounted(() => {
     if (route.params.product) {
         filters.value.product = productsForSelect.value.find(item => item.id === route.params.product)
     }
+
+    connectMercure()
 })
 
-const clearFilters = () => {
-    filters.value.location = null;
-    filters.value.product = null;
-    filters.value.kit = null;
-    filters.value['is-desc'] = null;
-    filters.value['is-zero'] = null;
-    filters.value.expired = null;
-}
+onBeforeRouteLeave(() => {
+    if (eventSource.value) {
+        eventSource.value.close()
+    }
+})
 </script>
 
 <template>
@@ -310,7 +365,7 @@ const clearFilters = () => {
                                     <Column field="id" :header="t('labels.id')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
-                                            <p v-else>{{ data.id }}</p>
+                                            <p v-else>{{ data.product.id }}</p>
                                         </template>
                                     </Column>
                                     <Column field="product" :header="t('labels.name')">
@@ -420,7 +475,7 @@ const clearFilters = () => {
                                     <Column field="id" :header="t('labels.id')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.id }}</p>
+                                            <p v-else>{{ data.kit.id }}</p>
                                         </template>
                                     </Column>
                                     <Column field="kit" :header="t('labels.name')">
@@ -459,7 +514,31 @@ const clearFilters = () => {
                                             <p v-else>{{ formatCurrency(data.kit?.wholesalePrice) }}$</p>
                                         </template>
                                     </Column>
+                                    <Column field="actions" :header="t('actions')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
 
+                                            <div v-else>
+                                                <div class="flex items-center gap-2">
+                                                    <Button
+                                                        @click="rollback(data)"
+                                                        icon="pi pi-replay"
+                                                        pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                                                        size="small"
+                                                    />
+                                                    <Button
+                                                        @click="router.push({
+                                                        name: 'kit',
+                                                        params: { id: data.kit.id },
+                                                    })"
+                                                        icon="pi pi-eye"
+                                                        pt:root="rounded-full size-8! bg-blue-400 dark:bg-blue-400 enabled:hover:bg-blue-300 dark:enabled:hover:bg-blue-300 border-blue-400 dark:border-blue-400 enabled:hover:border-blue-300 dark:enabled:hover:border-blue-300 focus-visible:outline-blue-400 dark:focus-visible:outline-blue-400"
+                                                        size="small"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </Column>
                                     <ColumnGroup type="footer">
                                         <Row>
                                             <Column :colspan="5" footerStyle="text-align:right">
@@ -508,6 +587,49 @@ const clearFilters = () => {
                     </Tabs>
                 </template>
             </Card>
+
+            <!-- Rollback DIALOG -->
+            <Dialog
+                v-model:visible="rollbackVisible"
+                modal
+                :closable="false"
+                class="sm:min-w-100 sm:w-fit w-9/10"
+                pt:root="px-2"
+            >
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.rollbackConfirmation', { name: t('kit.accusative'), id: locationQuantityKit.kit.id }) }}
+                </span>
+
+                <div class="mt-4">
+                    <label class="block mb-1 text-sm text-gray-500">
+                        {{ t('placeholders.qty') }}
+                    </label>
+                    <InputNumber
+                        v-model="rollbackCount"
+                        :max="locationQuantityKit.qty"
+                        class="w-full"
+                        :placeholder="t('placeholders.qty')"
+                    />
+                </div>
+
+                <template #footer>
+                    <div class="flex justify-end gap-2">
+                        <SecondaryButton
+                            type="button"
+                            :label="t('dialog.cancel')"
+                            @click="rollbackVisible = false"
+                        />
+                        <Button
+                            v-if="rollbackCount"
+                            type="button"
+                            :label="t('dialog.confirm')"
+                            @click="rollbackKit"
+                            :loading="isRollbackLoading"
+                            class="px-5"
+                        />
+                    </div>
+                </template>
+            </Dialog>
         </template>
     </Section>
 </template>

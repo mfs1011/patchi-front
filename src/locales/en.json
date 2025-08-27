@@ -117,6 +117,12 @@
         "accusative": "inventory",
         "accusativeCapitalize": "Inventory"
     },
+    "kit": {
+      "nominative": "kit",
+      "nominativeCapitalize": "Kit",
+      "accusative": "kit",
+      "accusativeCapitalize": "Kit"
+    },
     "code": {
         "nominative": "code",
         "nominativeCapitalize": "Code",
@@ -186,6 +192,8 @@
         "warehouseName": "Warehouse name",
         "locations": "Location",
         "location": "Location",
+        "seller": "Seller",
+        "client": "Client",
         "supplierName": "Supplier name",
         "colorName": "Color name",
         "categoryType": "Category type",
@@ -202,7 +210,7 @@
         "costPrice": "Cost price",
         "retailPrice": "Retail price",
         "wholesalePrice": "Wholesale price",
-        "assembly": "Assembly",
+        "collection": "Collection",
         "title": "Title",
         "minQty": "Minimum quantity",
         "product": "Product",
@@ -214,10 +222,11 @@
         "currentQty": "Current",
         "factQty": "Fact",
         "price": "Price",
-        "currentPrice": "Current price",
-        "factPrice": "Fact price",
-        "difference": "Difference",
-        "forTheKit": "For the composition",
+        "currentPrice": "Current amount",
+        "factPrice": "Fact amount",
+        "difference": "Difference $",
+        "differenceUnit": "Difference unit",
+        "forTheKit": "Inside composition",
         "forTheOrder": "For the order",
         "forTheCategory": "For the category",
         "month": "Month",
@@ -270,6 +279,8 @@
         "passwordUpdated": "Password updated",
         "clientB2B": "Corporate Client",
         "clientB2C": "Boutique Client",
+        "fromLocation": "From location",
+        "toLocation": "To location",
         "Notification": "Notification",
         "User": "User",
         "Seller": "Seller",
@@ -286,6 +297,9 @@
         "Assembly": "Assembly",
         "Inventory": "Inventory",
         "OrderInvoice": "Order",
+        "IncomeInvoice": "Income invoice",
+        "Kit": "Composition",
+        "TransferInvoice": "Transfer",
         "customsFee": "Customs fee",
         "transportationFee": "Transportation fee"
     },
@@ -300,7 +314,7 @@
         "search": {
             "byName": "Search by name",
             "byTitle": "Search by name",
-            "byTitleAndQRAndCode": "Search by name, QR or code",
+            "byTitleAndQRAndCode": "Search by name or code",
             "byNameAndPhone": "Search by name or phone number",
             "byRole": "Search by role",
             "byWarehouse": "Search by warehouse",
@@ -325,7 +339,8 @@
             "byAction": "Search by action",
             "byExpiry": "Search by expiry date",
             "byQty": "Search by quantity",
-            "orderByExpiry": "Order by expiry date"
+            "orderByExpiry": "Order by expiry date",
+            "bySeller": "Search by seller"
         },
         "select": {
             "role": "Select role",
@@ -334,7 +349,7 @@
             "categoryType": "Select category type",
             "unit": "Select unit",
             "category": "Select category",
-            "assembly": "Select assembly",
+            "collection": "Select collection",
             "paymentType": "Select payment type",
             "location": "Select location",
             "supplier": "Select supplier",
@@ -367,6 +382,7 @@
         "newClient": "New client",
         "newSupplier": "New supplier",
         "newProduct": "New product",
+        "newKit": "New composition",
         "newWarehouse": "New warehouse",
         "newShop": "New shop",
         "newCollection": "New collection",
@@ -429,7 +445,8 @@
         "addConfirmation": "Add {name}",
         "editConfirmation": "Edit {name}",
         "recoverConfirmation": "Are you sure you want to recover {name} with ID {id}?",
-        "leaveFromEditMessage": "Your unsaved changes will be lost. Do you really want to leave?"
+        "leaveFromEditMessage": "Your unsaved changes will be lost. Do you really want to leave?",
+        "rollbackConfirmation": "Are you sure you want to rollback {name} with ID {id}?"
     },
     "authErrorMessage": "Username or password is incorrect.",
     "internalErrorMessage": "An error occurred, please try again later.",
@@ -451,6 +468,7 @@
         "sellerKpi": "Seller KPI",
         "abc": "ABC analysis",
         "residualByDate": "Residual by date",
+        "franchiseFee": "Franchise fee",
         "payments": "Payments",
         "collections": "Collections",
         "productsInWarehouse": "Products in warehouse",
@@ -516,6 +534,10 @@
             "add": "Add",
             "edit": "Edit"
         },
+        "kits": {
+          "add": "Add",
+          "edit": "Edit"
+        },
         "payments": {
             "add": "Add",
             "edit": "Edit"
@@ -548,11 +570,13 @@
         "accepted": "{name} successfully accepted!",
         "deleted": "{name} successfully deleted!",
         "restored": "{name} successfully restored!",
+        "rollback": "{name} successfully rolled back!",
         "internalServerError": "Internal server error.",
         "already_exists_error": "{field} already exists",
         "already_exists_error_named": "\"{name}\" with this name already exists",
         "already_added": "\"{name}\" already added",
         "cannot_delete_product_in_stock": "Cannot delete a product that is in stock",
+        "notEnoughKit": "There is not enough of this composition in stock",
         "cannot_edit_kpi_used_in_sales": "The KPI used in sales cannot be changed",
         "unconfirmedExists": "There is an unconfirmed inventory",
         "noIncomingToLocation": "There have been no incoming entries to this location"

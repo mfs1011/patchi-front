@@ -12,7 +12,7 @@ import Column from "primevue/column";
 import ColumnGroup from 'primevue/columngroup';
 import Row from "primevue/row"
 import DataTable from "@/volt/DataTable.vue";
-import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
+import {formatCurrency, getFormattedDate, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
 import Button from "@/volt/Button.vue";
 import Tab from "@/volt/Tab.vue";
 import TabPanel from "@/volt/TabPanel.vue";
@@ -78,10 +78,56 @@ const changedInventoryKits = computed(() =>
 
 const totalProductCurrentPrice = computed(() => inventoryProducts.value.reduce((total, current) => total + (current.costPrice * current.currentQty), 0))
 const totalProductFactPrice = computed(() => inventoryProducts.value.reduce((total, current) => total + (current.costPrice * current.factQty), 0))
-const totalProductDifferencePrice = computed(() => inventoryProducts.value.reduce((total, current) => total + ((current.costPrice * current.factQty) - (current.costPrice * current.currentQty)), 0))
 const totalKitCurrentPrice = computed(() => inventoryKits.value.reduce((total, current) => total + (current.costPrice * current.currentQty), 0))
 const totalKitFactPrice = computed(() => inventoryKits.value.reduce((total, current) => total + (current.costPrice * current.factQty), 0))
-const totalKitDifferencePrice = computed(() => inventoryKits.value.reduce((total, current) => total + ((current.costPrice * current.factQty) - (current.costPrice * current.currentQty)), 0))
+
+const totalNegativeDifference = computed(() => {
+    return inventoryProducts.value.reduce((sum, current) => {
+        const factSum = current.costPrice * current.factQty
+        if (factSum <= 0) return sum
+
+        const diff = factSum - (current.costPrice * current.currentQty)
+        return diff < 0 ? sum + diff : sum
+    }, 0)
+})
+
+const totalPositiveDifference = computed(() => {
+    return inventoryProducts.value.reduce((sum, current) => {
+        const factSum = current.costPrice * current.factQty
+        if (factSum <= 0) return sum
+
+        const diff = factSum - (current.costPrice * current.currentQty)
+        return diff > 0 ? sum + diff : sum
+    }, 0)
+})
+
+const totalProductDifferencePrice = computed(() => {
+    return totalNegativeDifference.value + totalPositiveDifference.value
+})
+
+const totalKitNegativeDifference = computed(() => {
+    return inventoryKits.value.reduce((sum, current) => {
+        const factSum = current.costPrice * current.factQty
+        if (factSum <= 0) return sum
+
+        const diff = factSum - (current.costPrice * current.currentQty)
+        return diff < 0 ? sum + diff : sum
+    }, 0)
+})
+
+const totalKitPositiveDifference = computed(() => {
+    return inventoryKits.value.reduce((sum, current) => {
+        const factSum = current.costPrice * current.factQty
+        if (factSum <= 0) return sum
+
+        const diff = factSum - (current.costPrice * current.currentQty)
+        return diff > 0 ? sum + diff : sum
+    }, 0)
+})
+
+const totalKitDifferencePrice = computed(() => {
+    return totalKitNegativeDifference.value + totalKitPositiveDifference.value
+})
 
 const rowClassProducts = (row) => {
     return !(row?.factQty !== inventoryStore.getInventory?.inventoryProducts.find(x => x.id === row?.id)?.factQty)
@@ -189,6 +235,22 @@ const pushChanges = async () => {
 <!--                    </div>-->
 <!--                </template>-->
                 <template #content>
+                    <Skeleton height="2rem" v-if="isLoading"/>
+                    <div class="row g-2" v-else>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <span>{{ t('labels.id') }}: {{ inventoryStore.getInventory.id }}</span>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <span>{{ t('labels.locations') }}: {{ inventoryStore.getInventory.location.name }}</span>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <span>{{ t('labels.dateFrom') }}: {{ getFormattedDateWithTime(inventoryStore.getInventory.dateFrom) }}</span>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <span>{{ t('labels.dateTo') }}: {{ getFormattedDateWithTime(inventoryStore.getInventory.dateTo) }}</span>
+                        </div>
+                    </div>
+
                     <Tabs v-model:value="tabVal" scrollable :showNavigators="false">
                         <TabList>
                             <Tab pt:root="font-medium dark:text-surface-0" v-for="tab of tabList" :key="tab.value" :value="tab.value">{{ tab.label }}</Tab>
@@ -199,8 +261,12 @@ const pushChanges = async () => {
                                 v-if="tabVal === 'products'"
                                 value="products"
                             >
-                                <DataTable
+                                <NoData v-if="!inventoryProducts?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
+                                    <p class="text-xl font-normal">{{ t("noResults") }}</p>
+                                </NoData>
 
+                                <DataTable
+                                    v-if="isLoading || inventoryProducts?.length > 0"
                                     :rowClass="rowClassProducts"
                                     ref="dt"
                                     :value="isLoading ? Array(10).fill({}) : inventoryProducts"
@@ -279,14 +345,13 @@ const pushChanges = async () => {
                                                 v-model.number="inventoryProducts[index].factQty"
                                                 :placeholder="t('placeholders.qty')"
                                                 class="min-w-26!"
-                                                show-buttons
                                                 :min="0"
                                                 :minFractionDigits="1"
                                                 :maxFractionDigits="2"
                                             />
                                         </template>
                                     </Column>
-                                    <Column field="price" :header="t('labels.price')">
+                                    <Column field="costPrice" :header="t('labels.costPrice')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ formatCurrency(data.costPrice) }}$</p>
@@ -304,18 +369,38 @@ const pushChanges = async () => {
                                             <p v-else>{{ formatCurrency(data.costPrice * data.factQty) }}$</p>
                                         </template>
                                     </Column>
+                                    <Column field="differenceUnit" :header="t('labels.differenceUnit')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <div v-else>
+                                                <p
+                                                    v-if="data.factQty"
+                                                    :class="{
+                                                    'text-green-600': data.factQty - data.currentQty >= 0,
+                                                    'text-red-600': data.factQty - data.currentQty < 0
+                                                }"
+                                                >
+                                                    {{ formatCurrency(data.factQty - data.currentQty) }} {{ t(`labels.${data.locationQuantity?.product.category.unit.name}`) }}
+                                                </p>
+                                                <p v-else>-</p>
+                                            </div>
+                                        </template>
+                                    </Column>
                                     <Column field="difference" :header="t('labels.difference')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p
-                                                v-else
-                                                :class="{
+                                            <div v-else>
+                                                <p
+                                                    v-if="data.factQty"
+                                                    :class="{
                                                     'text-green-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) >= 0,
                                                     'text-red-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) < 0
                                                 }"
-                                            >
-                                                {{ formatCurrency((data.costPrice * data.factQty) - (data.costPrice * data.currentQty)) }}$
-                                            </p>
+                                                >
+                                                    {{ formatCurrency((data.costPrice * data.factQty) - (data.costPrice * data.currentQty)) }}$
+                                                </p>
+                                                <p v-else>-</p>
+                                            </div>
                                         </template>
                                     </Column>
                                     <Column field="forTheKit" :header="t('labels.forTheKit')">
@@ -333,7 +418,7 @@ const pushChanges = async () => {
 
                                     <ColumnGroup type="footer">
                                         <Row>
-                                            <Column :colspan="11" footerStyle="text-align:right">
+                                            <Column :colspan="12" footerStyle="text-align:right">
                                                 <template #footer>
                                                     <Skeleton height="2rem" v-if="isLoading"/>
                                                     <p v-else class="font-semibold">{{ t('labels.totals') }}:</p>
@@ -351,10 +436,22 @@ const pushChanges = async () => {
                                                     <p v-else class="font-semibold">{{ formatCurrency(totalProductFactPrice) }}$</p>
                                                 </template>
                                             </Column>
-                                            <Column :colspan="3">
+                                            <Column>
                                                 <template #footer>
                                                     <Skeleton height="2rem" v-if="isLoading"/>
                                                     <p v-else class="font-semibold">{{ formatCurrency(totalProductDifferencePrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold text-red-600">{{ formatCurrency(totalNegativeDifference) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold text-green-600">{{ formatCurrency(totalPositiveDifference) }}$</p>
                                                 </template>
                                             </Column>
                                         </Row>
@@ -373,10 +470,6 @@ const pushChanges = async () => {
                                         </div>
                                     </template>
                                 </DataTable>
-
-                                <NoData v-if="!inventoryProducts?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
-                                    <p class="text-xl font-normal">{{ t("noResults") }}</p>
-                                </NoData>
                             </TabPanel>
 
                             <TabPanel
@@ -384,7 +477,12 @@ const pushChanges = async () => {
                                 v-if="tabVal === 'kits'"
                                 value="kits"
                             >
+                                <NoData v-if="!inventoryKits?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
+                                    <p class="text-xl font-normal">{{ t("noResults") }}</p>
+                                </NoData>
+
                                 <DataTable
+                                    v-if="isLoading || inventoryKits?.length > 0"
                                     :rowClass="rowClassKits"
                                     ref="dt"
                                     :value="isLoading ? Array(10).fill({}) : inventoryKits"
@@ -410,16 +508,10 @@ const pushChanges = async () => {
                                             <p v-else>{{ data.locationQuantityKit?.kit.code }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="color" :header="t('labels.color')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.locationQuantity?.color ? data.locationQuantity.color.name : '-' }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.locationQuantity?.expiryDate ? getFormattedDate(data.locationQuantity?.expiryDate) : '-' }}</p>
+                                            <p v-else>{{ data.locationQuantityKit?.expiryDate ? getFormattedDate(data.locationQuantityKit?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="income" :header="t('labels.initial')">
@@ -463,14 +555,13 @@ const pushChanges = async () => {
                                                 v-model.number="inventoryKits[index].factQty"
                                                 :placeholder="t('placeholders.kpiPercent')"
                                                 class="min-w-26!"
-                                                show-buttons
                                                 :min="0"
                                                 :minFractionDigits="1"
                                                 :maxFractionDigits="2"
                                             />
                                         </template>
                                     </Column>
-                                    <Column field="price" :header="t('labels.price')">
+                                    <Column field="costPrice" :header="t('labels.costPrice')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ formatCurrency(data.costPrice) }}$</p>
@@ -488,18 +579,59 @@ const pushChanges = async () => {
                                             <p v-else>{{ formatCurrency(data.costPrice * data.factQty) }}$</p>
                                         </template>
                                     </Column>
+                                    <Column field="differenceUnit" :header="t('labels.differenceUnit')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <div v-else>
+                                                <p
+                                                    v-if="data.factQty"
+                                                    :class="{
+                                                    'text-green-600': data.factQty - data.currentQty >= 0,
+                                                    'text-red-600': data.factQty - data.currentQty < 0
+                                                }"
+                                                >
+                                                    {{ formatCurrency(data.factQty - data.currentQty) }} {{ t('labels.pcs') }}
+                                                </p>
+                                                <p v-else>-</p>
+                                            </div>
+                                        </template>
+                                    </Column>
                                     <Column field="difference" :header="t('labels.difference')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p
-                                                v-else
-                                                :class="{
-                                                'text-green-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) >= 0,
-                                                'text-red-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) < 0
-                                            }"
-                                            >
-                                                {{ formatCurrency((data.costPrice * data.factQty) - (data.costPrice * data.currentQty)) }}$
-                                            </p>
+                                            <div v-else>
+                                                <p
+                                                    v-if="data.factQty"
+                                                    :class="{
+                                                    'text-green-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) >= 0,
+                                                    'text-red-600': (data.costPrice * data.factQty) - (data.costPrice * data.currentQty) < 0
+                                                }"
+                                                >
+                                                    {{ formatCurrency((data.costPrice * data.factQty) - (data.costPrice * data.currentQty)) }}$
+                                                </p>
+                                                <p v-else>-</p>
+                                            </div>
+                                        </template>
+                                    </Column>
+                                    <Column field="details" style="width: 60px;">  <!-- Fixed width for the column -->
+                                        <template #header>
+                                            <p class="font-semibold">{{ t('details') }}</p>
+                                        </template>
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <div v-else>
+                                                <div class="flex justify-center w-full">
+                                                    <Button
+                                                        @click="router.push({
+                                                            name: 'kit',
+                                                            params: { id: data.locationQuantityKit?.kit.id },
+                                                        })"
+                                                        icon="pi pi-eye"
+                                                        pt:root="rounded-full size-8! min-w-8! h-8! bg-blue-400 dark:bg-blue-400 enabled:hover:bg-blue-300 dark:enabled:hover:bg-blue-300 border-blue-400 dark:border-blue-400 enabled:hover:border-blue-300 dark:enabled:hover:border-blue-300 focus-visible:outline-blue-400 dark:focus-visible:outline-blue-400"
+                                                        size="small"
+                                                    />
+                                                </div>
+                                            </div>
                                         </template>
                                     </Column>
 
@@ -523,10 +655,22 @@ const pushChanges = async () => {
                                                     <p v-else class="font-semibold">{{ formatCurrency(totalKitFactPrice) }}$</p>
                                                 </template>
                                             </Column>
-                                            <Column :colspan="3">
+                                            <Column>
                                                 <template #footer>
                                                     <Skeleton height="2rem" v-if="isLoading"/>
                                                     <p v-else class="font-semibold">{{ formatCurrency(totalKitDifferencePrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold text-red-600">{{ formatCurrency(totalKitNegativeDifference) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="isLoading"/>
+                                                    <p v-else class="font-semibold text-green-600">{{ formatCurrency(totalKitPositiveDifference) }}$</p>
                                                 </template>
                                             </Column>
                                         </Row>
@@ -545,10 +689,6 @@ const pushChanges = async () => {
                                         </div>
                                     </template>
                                 </DataTable>
-
-                                <NoData v-if="!inventoryKits?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
-                                    <p class="text-xl font-normal">{{ t("noResults") }}</p>
-                                </NoData>
                             </TabPanel>
                         </TabPanels>
                     </Tabs>

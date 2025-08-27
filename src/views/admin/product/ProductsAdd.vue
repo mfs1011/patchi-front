@@ -178,8 +178,8 @@ onMounted(async () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.sellers.add')"
-        back-route-name="sellers"
+        :section-name="t('sections.products.add')"
+        back-route-name="products"
         without-buttons
     >
         <template #sectionBody>
@@ -244,14 +244,14 @@ onMounted(async () => {
                         </div>
 
                         <div>
-                            <p>{{ t('labels.assembly') }}</p>
+                            <p>{{ t('labels.collection') }}</p>
 
                             <Select
                                 v-model="assembly"
                                 :options="assemblyStore.getAssemblies.models"
                                 option-label="name"
                                 option-value="id"
-                                :placeholder="t('placeholders.select.assembly')"
+                                :placeholder="t('placeholders.select.collection')"
                                 showClear
                                 size="large"
                                 pt:root="w-full dark:bg-surface-700"

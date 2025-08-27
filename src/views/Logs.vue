@@ -18,9 +18,7 @@ import {useLogStore} from "@/stores/log.js";
 import {formatPhoneByCountry} from "@/helpers/phoneFormat.js";
 import Select from "@/volt/Select.vue";
 import Dialog from "@/volt/Dialog.vue";
-import LogsInventoryCreateDetail from "@/components/LogsInventoryCreateDetail.vue";
-import LogsInventoryUpdateDetail from "@/components/LogsInventoryUpdateDetail.vue";
-import LogsInventoryDeleteDetail from "@/components/LogsInventoryDeleteDetail.vue";
+import LogDetails from "@/components/LogDetails.vue";
 import InputText from "@/volt/InputText.vue";
 import {useUserStore} from "@/stores/user.js";
 
@@ -31,8 +29,11 @@ const isVisibleSectionHeader = ref(false);
 const visible = ref({
     detailVisible: false
 });
+
+const refs = ref({})
 const currentLogData = ref()
 const isLoading = ref(false)
+const selectedEntityType = ref('')
 
 const logStore = useLogStore()
 const userStore = useUserStore()
@@ -54,6 +55,9 @@ const elements = computed(() => [
     {id: 14, name: t('labels.Assembly'), value: 'Assembly'},
     {id: 15, name: t('labels.Inventory'), value: 'Inventory'},
     {id: 16, name: t('labels.OrderInvoice'), value: 'OrderInvoice'},
+    {id: 17, name: t('labels.IncomeInvoice'), value: 'IncomeInvoice'},
+    {id: 18, name: t('labels.Kit'), value: 'Kit'},
+    {id: 19, name: t('labels.TransferInvoice'), value: 'TransferInvoice'},
 ]);
 
 const actions = computed(() => [
@@ -63,54 +67,103 @@ const actions = computed(() => [
     {id: 4, name: t('labels.restore'), value: 'restore'},
 ]);
 
-function hasAnyLength(log) {
-    let added
-    let oldChanged
-    let newChanged
-    let removed
-
-    const propertyName = computePropertyByEntityType(log.entityType)
-
-    if (log.action === 'create') {
-        added = log.newData[propertyName] || []
-    } else if (log.action === 'update') {
-        added = log.newData[propertyName]?.added || []
-    } else {
-        added = []
-    }
-
-    if (log.action === 'delete') {
-        removed = log.oldData[propertyName] || []
-    } else if (log.action === 'update') {
-        removed = log.oldData[propertyName]?.removed || []
-    } else {
-        removed = []
-    }
-
-    oldChanged = log.action === 'update' ? log.oldData[propertyName]?.changed || [] : []
-    newChanged = log.action === 'update' ? log.newData[propertyName]?.changed || [] : []
-
-    return [...added, ...removed, ...oldChanged, ...newChanged].length
-}
-
-function modal(log) {
+function showDetailDialogFunc(log) {
     isLoading.value = true
     currentLogData.value = log
-    visible.value.detailVisible = true;
+    selectedEntityType.value = log.entityType
+
+    const propertyNames = computePropertyByEntityType(log.entityType) || []
+
+    propertyNames.forEach(prop => {
+        const base = capitalize(
+            prop.replace(new RegExp(`^${log.entityType}`, 'i'), '')
+        )
+
+        const addedVar = `selectedAdded${base}`
+        const removedVar = `selectedRemoved${base}`
+        const oldChangedVar = `selectedOldChanged${base}`
+        const newChangedVar = `selectedNewChanged${base}`
+
+        if (!refs.value[addedVar]) refs.value[addedVar] = ref([])
+        if (!refs.value[removedVar]) refs.value[removedVar] = ref([])
+        if (!refs.value[oldChangedVar]) refs.value[oldChangedVar] = ref([])
+        if (!refs[newChangedVar]) refs.value[newChangedVar] = ref([])
+
+        if (log.action === 'create') {
+            refs.value[addedVar].value = log.newData[prop] || []
+        } else if (log.action === 'update') {
+            refs.value[addedVar].value = log.newData[prop]?.added || []
+        }
+
+        if (log.action === 'delete') {
+            refs.value[removedVar].value = log.oldData[prop] || []
+        } else if (log.action === 'update') {
+            refs.value[removedVar].value = log.oldData[prop]?.removed || []
+        }
+
+        refs.value[oldChangedVar].value = log.action === 'update'
+            ? log.oldData[prop]?.changed || []
+            : []
+
+        refs.value[newChangedVar].value = log.action === 'update'
+            ? log.newData[prop]?.changed || []
+            : []
+    })
+
+    console.log(refs.value)
+    visible.value.detailVisible = true
     isLoading.value = false
 }
 
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+function hasAnyLength(log) {
+    const propertyNames = computePropertyByEntityType(log.entityType) || [];
+    let total = 0;
+
+    propertyNames.forEach(propertyName => {
+        let added = [];
+        let removed = [];
+        let oldChanged = [];
+        let newChanged = [];
+
+        if (log.action === 'create') {
+            added = log.newData[propertyName] || [];
+        } else if (log.action === 'update') {
+            added = log.newData[propertyName]?.added || [];
+        }
+
+        if (log.action === 'delete') {
+            removed = log.oldData[propertyName] || [];
+        } else if (log.action === 'update') {
+            removed = log.oldData[propertyName]?.removed || [];
+        }
+
+        if (log.action === 'update') {
+            oldChanged = log.oldData[propertyName]?.changed || [];
+            newChanged = log.newData[propertyName]?.changed || [];
+        }
+
+        total += added.length + removed.length + oldChanged.length + newChanged.length;
+    });
+
+    return total;
+}
+
 function computePropertyByEntityType(entityType) {
-    return entityTypeToPropertyMap[entityType] || null
+    return entityTypeToPropertyMap[entityType] || [];
 }
 
 const entityTypeToPropertyMap = {
-    IncomeInvoice: 'incomeInvoiceProducts',
-    TransferInvoice: 'transferInvoiceProducts',
-    OrderInvoice: 'orderInvoiceProducts',
-    ReturnInvoice: 'returnInvoiceProducts',
-    WriteOffInvoice: 'writeOffInvoiceProducts',
-    Inventory: 'inventoryProducts',
+    IncomeInvoice: ['incomeInvoiceProducts'],
+    Kit: ['kitProducts'],
+    TransferInvoice: ['transferInvoiceProducts', 'transferInvoiceKits'],
+    OrderInvoice: ['orderInvoiceProducts', 'orderInvoiceKits'],
+    ReturnInvoice: ['returnInvoiceProducts', 'returnInvoiceKits'],
+    WriteOffInvoice: ['writeOffInvoiceProducts', 'writeOffInvoiceKits'],
+    Inventory: ['inventoryProducts', 'inventoryKits']
 }
 
 const debouncedFilter = useDebouncedRef(route.query.entityId || null, 500);
@@ -194,6 +247,7 @@ watch(
 watch(() => visible.value.detailVisible, val => {
     if (!val) {
         currentLogData.value = null
+        refs.value = {}
     }
 })
 
@@ -400,7 +454,7 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.code">{{ t('labels.code') }}: <b>{{ data.oldData.code }}</b></h6>
                                         <h6 v-if="data.oldData?.qr">{{ t('labels.qr') }}: <b>{{ data.oldData.qr }}</b></h6>
                                         <h6 v-if="data.oldData?.category">{{ t('labels.category') }}: <b>{{ data.oldData.category.name }}</b></h6>
-                                        <h6 v-if="data.oldData?.assembly">{{ t('labels.assembly') }}: <b>{{ data.oldData.assembly.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.oldData.assembly.name }}</b></h6>
                                         <h6 v-if="data.oldData?.wholesalePrice">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.oldData.wholesalePrice) }}$</b></h6>
                                         <h6 v-if="data.oldData?.retailPrice">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.oldData.retailPrice) }}$</b></h6>
                                         <h6 v-if="data.oldData?.minQty">{{ t('labels.minQty') }}: <b>{{ formatCurrency(data.oldData.minQty) }}</b></h6>
@@ -448,6 +502,28 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.customer">{{ t('labels.Customer') }}: <b>{{ data.oldData.customer.name }}</b></h6>
                                         <h6 v-if="data.oldData?.status">{{ t('labels.status') }}: <b>{{ t(data.oldData.status) }}</b></h6>
                                         <h6 v-if="data.oldData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'IncomeInvoice'">
+                                        <h6 v-if="data.oldData?.supplier">{{ t('labels.Supplier') }}: <b>{{ data.oldData.supplier.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.location">{{ t('labels.locations') }}: <b>{{ data.oldData.location.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.comment">{{ t('labels.comment') }}: <b>{{ data.oldData.comment }}</b></h6>
+                                        <h6 v-if="data.oldData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.oldData.createdAt) }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Kit'">
+                                        <h6 v-if="data.oldData?.seller">{{ t('labels.Seller') }}: <b>{{ data.oldData.seller.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.code">{{ t('labels.code') }}: <b>{{ data.oldData.code }}</b></h6>
+                                        <h6 v-if="data.oldData?.qr">{{ t('labels.qr') }}: <b>{{ data.oldData.qr }}</b></h6>
+                                        <h6 v-if="data.oldData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.oldData.assembly.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.wholesalePrice">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.oldData.wholesalePrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.retailPrice">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.oldData.retailPrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.qty">{{ t('labels.qty') }}: <b>{{ formatCurrency(data.oldData.qty) }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'TransferInvoice'">
+                                        <h6 v-if="data.oldData?.fromLocation">{{ t('labels.fromLocation') }}: <b>{{ data.oldData.fromLocation.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.toLocation">{{ t('labels.toLocation') }}: <b>{{ data.oldData.toLocation.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.status">{{ t('labels.status') }}: <b>{{ t(data.oldData.status) }}</b></h6>
                                     </div>
                                 </div>
                             </template>
@@ -509,7 +585,7 @@ onMounted(() => {
                                         <h6 v-if="data.newData?.code">{{ t('labels.code') }}: <b>{{ data.newData.code }}</b></h6>
                                         <h6 v-if="data.newData?.qr">{{ t('labels.qr') }}: <b>{{ data.newData.qr }}</b></h6>
                                         <h6 v-if="data.newData?.category">{{ t('labels.category') }}: <b>{{ data.newData.category.name }}</b></h6>
-                                        <h6 v-if="data.newData?.assembly">{{ t('labels.assembly') }}: <b>{{ data.newData.assembly.name }}</b></h6>
+                                        <h6 v-if="data.newData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.newData.assembly.name }}</b></h6>
                                         <h6 v-if="data.newData?.wholesalePrice">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.newData.wholesalePrice) }}$</b></h6>
                                         <h6 v-if="data.newData?.retailPrice">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.newData.retailPrice) }}$</b></h6>
                                         <h6 v-if="data.newData?.minQty">{{ t('labels.minQty') }}: <b>{{ formatCurrency(data.newData.minQty) }}</b></h6>
@@ -559,6 +635,29 @@ onMounted(() => {
                                         <h6 v-if="data.newData?.status">{{ t('labels.status') }}: <b>{{ t(data.newData.status) }}</b></h6>
                                         <h6 v-if="data.newData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
                                     </div>
+                                    <div v-if="data.entityType === 'IncomeInvoice'">
+                                        <h6 v-if="data.newData?.supplier">{{ t('labels.Supplier') }}: <b>{{ data.newData.supplier.name }}</b></h6>
+                                        <h6 v-if="data.newData?.location">{{ t('labels.locations') }}: <b>{{ data.newData.location.name }}</b></h6>
+                                        <h6 v-if="data.newData?.comment">{{ t('labels.comment') }}: <b>{{ data.newData.comment }}</b></h6>
+                                        <h6 v-if="data.newData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.newData.createdAt) }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'Kit'">
+                                        <h6 v-if="data.newData?.seller">{{ t('labels.Seller') }}: <b>{{ data.newData.seller.name }}</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                        <h6 v-if="data.newData?.code">{{ t('labels.code') }}: <b>{{ data.newData.code }}</b></h6>
+                                        <h6 v-if="data.newData?.qr">{{ t('labels.qr') }}: <b>{{ data.newData.qr }}</b></h6>
+                                        <h6 v-if="data.newData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.newData.assembly.name }}</b></h6>
+                                        <h6 v-if="data.newData?.wholesalePrice">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.newData.wholesalePrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.retailPrice">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.newData.retailPrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.qty">{{ t('labels.qty') }}: <b>{{ formatCurrency(data.newData.qty) }}</b></h6>
+                                        <h6 v-if="data.action === 'update' && data.newData?.photo">{{ t('labels.photo') }}: <b>{{ t('labels.imageUpdated') }}</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'TransferInvoice'">
+                                        <h6 v-if="data.newData?.fromLocation">{{ t('labels.fromLocation') }}: <b>{{ data.newData.fromLocation.name }}</b></h6>
+                                        <h6 v-if="data.newData?.toLocation">{{ t('labels.toLocation') }}: <b>{{ data.newData.toLocation.name }}</b></h6>
+                                        <h6 v-if="data.newData?.status">{{ t('labels.status') }}: <b>{{ t(data.newData.status) }}</b></h6>
+                                    </div>
                                 </div>
                             </template>
                         </Column>
@@ -590,7 +689,7 @@ onMounted(() => {
                                 <div v-else>
                                     <div v-if="hasAnyLength(data)" class="flex justify-center w-full">
                                         <Button
-                                            @click="modal(data)"
+                                            @click="showDetailDialogFunc(data)"
                                             icon="pi pi-eye"
                                             pt:root="rounded-full size-8! min-w-8! h-8! bg-blue-400 dark:bg-blue-400 enabled:hover:bg-blue-300 dark:enabled:hover:bg-blue-300 border-blue-400 dark:border-blue-400 enabled:hover:border-blue-300 dark:enabled:hover:border-blue-300 focus-visible:outline-blue-400 dark:focus-visible:outline-blue-400"
                                             size="small"
@@ -627,38 +726,10 @@ onMounted(() => {
                 pt:content="px-2 sm:px-4 h-full"
             >
                 <div class="h-full">
-                    <p
-                        class="text-lg font-medium mt-4"
-                        :class="{
-                            'text-teal-500': currentLogData.action === 'create',
-                            'text-amber-500': currentLogData.action === 'update',
-                            'text-red-500': currentLogData.action === 'delete',
-                        }"
-                    >
-                        {{ t(`labels.${currentLogData.action}d`) }}
-                    </p>
-
-                    <LogsInventoryCreateDetail
-                        v-if="currentLogData.action === 'create'"
-                        :inventory-products="currentLogData.newData.inventoryProducts"
-                        :inventory-kits="currentLogData.newData.inventoryKits"
+                    <LogDetails
                         :is-loading="isLoading"
-                    />
-
-                    <LogsInventoryUpdateDetail
-                        v-if="currentLogData.action === 'update'"
-                        :old-inventory-products="currentLogData.oldData.inventoryProducts.changed ?? []"
-                        :new-inventory-products="currentLogData.newData.inventoryProducts.changed ?? []"
-                        :old-inventory-kits="currentLogData.oldData.inventoryKits?.changed ?? []"
-                        :new-inventory-kits="currentLogData.newData.inventoryKits?.changed ?? []"
-                        :is-loading="isLoading"
-                    />
-
-                    <LogsInventoryDeleteDetail
-                        v-if="currentLogData.action === 'delete'"
-                        :order-invoice-products="currentLogData.oldData.orderInvoiceProducts"
-                        :order-invoice-kits="currentLogData.oldData.orderInvoiceKits"
-                        :is-loading="isLoading"
+                        :refs="refs"
+                        :entityType="selectedEntityType"
                     />
                 </div>
             </Dialog>

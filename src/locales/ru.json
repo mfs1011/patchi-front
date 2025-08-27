@@ -111,6 +111,12 @@
         "accusative": "продукта",
         "accusativeCapitalize": "Продукта"
     },
+    "kit": {
+      "nominative": "композиция",
+      "nominativeCapitalize": "Композиция",
+      "accusative": "композицию",
+      "accusativeCapitalize": "Композицию"
+    },
     "inventory": {
         "nominative": "инвентарь",
         "nominativeCapitalize": "Инвентарь",
@@ -186,6 +192,8 @@
         "warehouseName": "Имя склада",
         "locations": "Локация",
         "location": "Локация",
+        "seller": "Продавец",
+        "client": "Клиент",
         "supplierName": "Имя поставщика",
         "colorName": "Название цвета",
         "categoryType": "Тип категории",
@@ -206,7 +214,7 @@
         "costPrice": "Себестоимость",
         "retailPrice": "Розничная цена",
         "wholesalePrice": "Оптовая цена",
-        "assembly": "Сборка",
+        "collection": "Коллекция",
         "title": "Название",
         "minQty": "Мин. количество",
         "product": "Продукт",
@@ -218,10 +226,11 @@
         "currentQty": "Текущее",
         "factQty": "Факт",
         "price": "Цена",
-        "currentPrice": "Текущее цена",
-        "factPrice": "Факт цена",
-        "difference": "Разница",
-        "forTheKit": "Для композиции",
+        "currentPrice": "Сумма текущий",
+        "factPrice": "Сумма факта",
+        "difference": "Разница $",
+        "differenceUnit": "Единица разницы",
+        "forTheKit": "Внутри композиции",
         "forTheOrder": "Для заказа",
         "forTheCategory": "Для категории",
         "month": "Месяц",
@@ -270,6 +279,8 @@
         "passwordUpdated": "Пароль обновлено",
         "clientB2B": "Корпоративный клиент",
         "clientB2C": "Клиент бутика",
+        "fromLocation": "Из локации",
+        "toLocation": "В локацию",
         "Notification": "Уведомление",
         "User": "Пользователь",
         "Seller": "Продавец",
@@ -286,6 +297,9 @@
         "Assembly": "Сборка",
         "Inventory": "Инвентарь",
         "OrderInvoice": "Заказ",
+        "IncomeInvoice": "Поступления",
+        "Kit": "Композиция",
+        "TransferInvoice": "Перемещение",
         "customsFee": "Таможенные расходы",
         "transportationFee": "Транспортные расходы"
     },
@@ -300,7 +314,7 @@
         "search": {
             "byName": "Поиск по имени",
             "byTitle": "Поиск по названию",
-            "byTitleAndQRAndCode": "Поиск по названию, QR или коду",
+            "byTitleAndQRAndCode": "Поиск по названию или коду",
             "byNameAndPhone": "Поиск по имени или номеру телефона",
             "byRole": "Поиск по роли",
             "byWarehouse": "Поиск по складу",
@@ -315,7 +329,7 @@
             "byDateFrom": "Дата с",
             "byDateTo": "Дата по",
             "byStatus": "Поиск по статусу",
-            "byLocation": "Поиск по локации",
+            "byLocation": "Поиск по локацию",
             "byProduct": "Поиск по продукту",
             "byKit": "Поиск по композиции",
             "byUser": "Поиск по ответственному",
@@ -324,6 +338,7 @@
             "byElementId": "Поиск по элементу ID",
             "byElement": "Поиск по элементу",
             "byAction": "Поиск по действию",
+            "bySeller": "Поиск по продавцу",
             "byExpiry": "Поиск по сроку годности",
             "byQty": "Поиск по количеству",
             "orderByExpiry": "Сортировка по сроку годности"
@@ -335,7 +350,7 @@
             "categoryType": "Выберите тип категории",
             "unit": "Выберите единицу",
             "category": "Выберите категорию",
-            "assembly": "Выберите комплект",
+            "collection": "Выберите коллекцию",
             "paymentType": "Выберите тип оплаты",
             "location": "Выберите локацию",
             "supplier": "Выберите поставщика",
@@ -368,6 +383,7 @@
         "newClient": "Новый клиент",
         "newSupplier": "Новый поставщик",
         "newProduct": "Новый продукт",
+        "newKit": "Новая композиция",
         "newWarehouse": "Новый склад",
         "newShop": "Новый магазин",
         "newCollection": "Новая коллекция",
@@ -430,7 +446,8 @@
         "addConfirmation": "Добавить {name}",
         "editConfirmation": "Изменить {name}",
         "recoverConfirmation": "Вы действительно хотите восстановить {name} с ID {id}?",
-        "leaveFromEditMessage": "Внесенные изменения будут потеряны. Вы уверены, что хотите выйти?"
+        "leaveFromEditMessage": "Внесенные изменения будут потеряны. Вы уверены, что хотите выйти?",
+        "rollbackConfirmation": "Вы действительно хотите откат {name} с ID {id}?"
     },
     "authErrorMessage": "Имя пользователя или пароль указаны неверно.",
     "internalErrorMessage": "Произошла ошибка, пожалуйста, попробуйте позже.",
@@ -452,6 +469,7 @@
         "sellerKpi": "KPI продавца",
         "abc": "АВС-анализ",
         "residualByDate": "Остаток по дате",
+        "franchiseFee": "Плата за франшизу",
         "payments": "Оплаты",
         "collections": "Коллекции",
         "productsInWarehouse": "Продукты на складе",
@@ -517,6 +535,10 @@
             "add": "Добавить",
             "edit": "Изменить"
         },
+        "kits": {
+          "add": "Добавить",
+          "edit": "Изменить"
+        },
         "payments": {
             "add": "Добавить",
             "edit": "Изменить"
@@ -549,11 +571,13 @@
         "accepted": "{name} успешно подтвержден!",
         "deleted": "{name} успешно удален!",
         "restored": "{name} успешно восстановлен!",
+        "rollback": "{name} успешно откатен!",
         "internalServerError": "Внутренняя ошибка сервера.",
         "already_exists_error": "{field} уже существует",
         "already_exists_error_named": "\"{name}\" с таким именем уже существует",
         "already_added": "\"{name}\" уже добавлено",
         "cannot_delete_product_in_stock": "Невозможно удалить продукт, который есть на складе",
+        "notEnoughKit": "На складе недостаточно этой композиции",
         "cannot_edit_kpi_used_in_sales": "KPI, используемые в продажах, не могут быть изменены",
         "unconfirmedExists": "Имеется неподтверждённая инвентаризация",
         "noIncomingToLocation": "На эту локацию не было ни одного поступления"

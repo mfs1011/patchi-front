@@ -28,7 +28,7 @@ const getCategoryClass = (category) => {
         case 'A':
             return 'text-green-600 font-semibold';
         case 'B':
-            return 'text-yellow-600 font-semibold';
+            return 'text-yellow-400 font-semibold';
         case 'C':
             return 'text-red-600 font-semibold';
         default:
@@ -234,22 +234,10 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ formatCurrency(data.ordersQty) }} {{ t(`labels.${data.unit}`) }}</p>
                             </template>
                         </Column>
-                        <Column field="salesPercent" :header="t('labels.salesPercent')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.ordersQtyPercent.toFixed(2) }}%</p>
-                            </template>
-                        </Column>
                         <Column field="revenue" :header="t('labels.revenue')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts" />
                                 <p v-else>{{ formatCurrency(data.ordersPrice) }}$</p>
-                            </template>
-                        </Column>
-                        <Column field="revenuePercent" :header="t('labels.revenuePercent')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.ordersPricePercent.toFixed(2) }}%</p>
                             </template>
                         </Column>
                         <Column field="benefit" :header="t('labels.benefit')">
@@ -258,17 +246,11 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ formatCurrency(data.benefit) }}$</p>
                             </template>
                         </Column>
-                        <Column field="benefitPercent" :header="t('labels.benefitPercent')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.benefitPercent.toFixed(2) }}%</p>
-                            </template>
-                        </Column>
                         <Column field="salesCategory" :header="t('labels.sales')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts" />
                                 <p v-else :class="getCategoryClass(data.qtyCategory)">
-                                    {{ data.qtyCategory }} {{ Math.round(data.qtyCumulativePercent) }}%
+                                    {{ data.qtyCategory }} {{ data.ordersQtyPercent.toFixed(2) }}%
                                 </p>
                             </template>
                         </Column>
@@ -277,7 +259,7 @@ onBeforeRouteLeave(() => {
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts" />
                                 <p v-else :class="getCategoryClass(data.priceCategory)">
-                                    {{ data.priceCategory }} {{ Math.round(data.priceCumulativePercent) }}%
+                                    {{ data.priceCategory }} {{ data.ordersPricePercent.toFixed(2) }}%
                                 </p>
                             </template>
                         </Column>
@@ -286,7 +268,7 @@ onBeforeRouteLeave(() => {
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts" />
                                 <p v-else :class="getCategoryClass(data.benefitCategory)">
-                                    {{ data.benefitCategory }} {{ Math.round(data.benefitCumulativePercent)}}%
+                                    {{ data.benefitCategory }} {{ data.benefitPercent.toFixed(2) }}%
                                 </p>
                             </template>
                         </Column>

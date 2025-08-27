@@ -332,7 +332,7 @@ const confirmLeave = () => {
                         </div>
 
                         <div>
-                            <p>{{ t('labels.assembly') }}</p>
+                            <p>{{ t('labels.collection') }}</p>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="3.1rem" width="22rem" v-if="isLoading"/>
 
@@ -342,7 +342,7 @@ const confirmLeave = () => {
                                 :options="assemblyStore.getAssemblies.models"
                                 option-label="name"
                                 option-value="id"
-                                :placeholder="t('placeholders.select.assembly')"
+                                :placeholder="t('placeholders.select.collection')"
                                 showClear
                                 size="large"
                                 pt:root="w-full dark:bg-surface-700"
