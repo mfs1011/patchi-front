@@ -159,6 +159,12 @@
         "accusative": "data",
         "accusativeCapitalize": "Data"
     },
+    "incomeInvoice": {
+        "nominative": "income invoice",
+        "nominativeCapitalize": "Income invoice",
+        "accusative": "income invoice",
+        "accusativeCapitalize": "Income invoice"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
@@ -216,6 +222,7 @@
         "forTheCategory": "For the category",
         "month": "Month",
         "totalFact": "Total fact",
+        "totalPrice": "Total price",
         "total": "Total",
         "status": "Status",
         "dateFrom": "Date from",
@@ -228,6 +235,9 @@
         "Card": "Card",
         "Bank": "Bank account",
         "createdAt": "Date",
+        "createdBy": "Created by",
+        "updatedAt": "Updated date",
+        "updatedBy": "Updated by",
         "usdRate": "USD Rate",
         "categoryKpiPercent": "Category KPI percent",
         "kitKpiPercent": "Composition KPI percent",
@@ -275,7 +285,9 @@
         "Payment": "Payment",
         "Assembly": "Assembly",
         "Inventory": "Inventory",
-        "OrderInvoice": "Order"
+        "OrderInvoice": "Order",
+        "customsFee": "Customs fee",
+        "transportationFee": "Transportation fee"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",
@@ -306,9 +318,14 @@
             "byLocation": "Search by location",
             "byProduct": "Search by product",
             "byUser": "Search by responsible",
+            "byCreatedBy": "Search by created user",
+            "bySupplier": "Search by supplier",
             "byElementId": "Search by element ID",
             "byElement": "Search by element",
-            "byAction": "Search by action"
+            "byAction": "Search by action",
+            "byExpiry": "Search by expiry date",
+            "byQty": "Search by quantity",
+            "orderByExpiry": "Order by expiry date"
         },
         "select": {
             "role": "Select role",
@@ -319,7 +336,10 @@
             "category": "Select category",
             "assembly": "Select assembly",
             "paymentType": "Select payment type",
-            "location": "Select location"
+            "location": "Select location",
+            "supplier": "Select supplier",
+            "product": "Select product",
+            "color": "Select color"
         },
         "supplierName": "Enter supplier name...",
         "colorName": "Enter color name...",
@@ -333,7 +353,11 @@
         "kpiPercent": "Enter KPI percent...",
         "date": "Enter date...",
         "notificationDay": "Enter number of days...",
-        "qty": "Enter quantity..."
+        "qty": "Enter quantity...",
+        "expiryDate": "Enter expiry date...",
+        "price": "Enter price...",
+        "transportationFee": "Enter transportation fee...",
+        "customsFee": "Enter customs fee..."
     },
     "buttons": {
         "login": "Login",
@@ -350,8 +374,12 @@
         "newPayment": "New payment",
         "newKpi": "New KPI",
         "newInventory": "New inventory",
+        "newIncomeInvoice": "New income",
         "filters": "Filters",
-        "saveAndExit": "Save and exit"
+        "saveAndExit": "Save and exit",
+        "add": "Add",
+        "save": "Save",
+        "edit": "Edit"
     },
     "errorMessages": {
         "usernameRequired": "Username is required",
@@ -395,6 +423,7 @@
         "clear": "Clear",
         "logoutConfirmation": "Are you sure you want to log out?",
         "deleteConfirmation": "Are you sure you want to delete {name} with ID {id}?",
+        "deleteConfirm": "Are you sure you want to delete {name}?",
         "acceptConfirmation": "Are you sure you want to accept {name} with ID {id}?",
         "editedConfirmation": "Are you sure you want to edit {name} with ID {id}?",
         "addConfirmation": "Add {name}",
@@ -428,7 +457,8 @@
         "productsInShop": "Products in shop",
         "warehouseContent": "Warehouse content",
         "shopContent": "Shop content",
-        "incomeInvoices": "Incoming",
+        "incomeInvoices": "Income invoices",
+        "incomeInvoice": "Income invoice",
         "transferInvoices": "Transfer",
         "orders": "Orders",
         "returnInvoices": "Returns",
@@ -501,6 +531,10 @@
         "expiryDateNotificationDay": {
             "add": "Add",
             "edit": "Edit"
+        },
+        "incomeInvoices": {
+            "add": "Add",
+            "edit": "Edit"
         }
     },
     "pagination": {
@@ -517,6 +551,7 @@
         "internalServerError": "Internal server error.",
         "already_exists_error": "{field} already exists",
         "already_exists_error_named": "\"{name}\" with this name already exists",
+        "already_added": "\"{name}\" already added",
         "cannot_delete_product_in_stock": "Cannot delete a product that is in stock",
         "cannot_edit_kpi_used_in_sales": "The KPI used in sales cannot be changed",
         "unconfirmedExists": "There is an unconfirmed inventory",
@@ -528,5 +563,13 @@
     "clear": "Clear",
     "notifyPrefix": "Will notify in ",
     "notifySuffix": " days",
-    "day": "day"
+    "day": "day",
+    "incomingData": "Incoming data",
+    "addProduct": "Add product",
+    "zero": "Out of stock",
+    "notZero": "Available",
+    "desc": "Newest",
+    "asc": "Oldest",
+    "expired": "Expired",
+    "notExpired": "Not expired"
 }

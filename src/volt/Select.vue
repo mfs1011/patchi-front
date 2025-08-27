@@ -42,7 +42,7 @@ const selectRef = ref<SelectMethods | null>(null);
 
 function handleClear(clearCallback: () => void) {
     clearCallback();
-    selectRef.value?.hide(); // Dropdownga show bo'lishni bloklaydi
+    selectRef.value?.hide();// Dropdownga show bo'lishni bloklaydi
 }
 
 const theme = ref<SelectPassThroughOptions>({

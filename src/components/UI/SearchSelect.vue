@@ -1,132 +1,168 @@
 <script setup>
+import { ref, watch } from "vue";
+import { vIntersectionObserver } from "@vueuse/components";
 import Select from "@/volt/Select.vue";
-import {ref, useTemplateRef, watch} from "vue";
+import Skeleton from "@/volt/Skeleton.vue";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
-import { vIntersectionObserver } from '@vueuse/components'
-import {useI18n} from "vue-i18n";
-import TimesIcon from '@primevue/icons/times';
-import {useRoute} from "vue-router";
 
 const props = defineProps({
-    items: {
-        type: Array,
-        required: true
-    },
-    totalItems: {
-        type: Number,
-        required: true
-    },
-    itemsPerPage: {
-        type: Number,
-        default: 7
-    },
-    fetch: {
-        type: Function,
-        required: true
-    },
-    firstFetch: {
-        type: Function,
-        required: true
-    }
-})
-
-const { t } = useI18n()
-const product = defineModel()
-const route = useRoute()
-
-const productSelect = useTemplateRef('productSelect')
-const isVisible = ref(false);
-const isLoadingNextPartProduct = ref(false);
-const filterForSelect = ref({
-    page: 1,
-    itemsPerPage: props.itemsPerPage,
-    product: null,
+    modelValue: { required: true },
+    fetchFn: { type: Function, required: true },
+    itemsPerPage: { type: Number, default: 10 },
+    optionLabel: { type: Function, default: (opt) => opt?.name },
+    optionValue: { type: Function, default: (opt) => opt?.id },
+    returnValue: { type: Function, default: (opt) => opt },
+    placeholder: String,
+    loading: Boolean,
+    totalItems: { type: Number, default: 0 },
+    options: { type: Array, required: true },
+    invalid: { type: Boolean },
 });
-const debouncedNameForSelect = useDebouncedRef(props.items.find(item => item.id === route.params.product) || null,  500)
+
+const emit = defineEmits(["update:modelValue", "loadMore"]);
+
+const debouncedValue = useDebouncedRef("", 300); // v-model: string (qidiruv) YOKI object (tanlov)
+const page = ref(1);
+const items = ref([]);
+const isVisible = ref(false);
+
+// Qidiruv YOZILGANDA (string bo'lgandagina) fetch qilamiz
+watch(
+    debouncedValue,
+    async (newVal) => {
+        page.value = 1;
+
+        if (typeof newVal === "string") {
+            // faqat qidiruvda ro'yxatni reset qilamiz
+            items.value = [];
+
+            const query = {
+                page: page.value,
+                "items-per-page": props.itemsPerPage,
+            };
+
+            if (newVal) query.name = newVal;
+
+            await props.fetchFn(query);
+            items.value = props.options;
+        }
+        // agar newVal object bo'lsa — bu tanlovni qo'lda set qilish; bu yerda itemsni o'chirmaymiz!
+    },
+    { immediate: true }
+);
+
+// Infinite scroll
+watch(isVisible, async (newValue) => {
+    if (props.totalItems > items.value.length && newValue) {
+        const query = {
+            page: ++page.value,
+            "items-per-page": props.itemsPerPage,
+            name: typeof debouncedValue.value === "string" ? debouncedValue.value : "",
+        };
+        await props.fetchFn(query);
+        items.value = [...items.value, ...props.options];
+        emit("loadMore", items.value);
+        isVisible.value = false; // qayta-qayta trigger bo'lmasin
+    }
+});
 
 function onIntersectionObserver([entry]) {
-    isVisible.value = entry?.isIntersecting || false
+    if (entry?.isIntersecting) isVisible.value = true;
 }
 
-function setProduct(id) {
-    if(id) {
-        product.value = id
-    } else {
-        product.value = null
+function onChange(item) {
+    if (item && typeof item === "object") {
+        // Tanlangan option
+        debouncedValue.value = item;
+        emit("update:modelValue", props.returnValue(item));
+    } else if (item == null) {
+        // Clear bosilganda
+        debouncedValue.value = null;
+        emit("update:modelValue", null);
     }
 }
 
-watch([() => debouncedNameForSelect.value], async () => {
-    const queryFilter = {
-        page: filterForSelect.value.page,
-        "items-per-page": filterForSelect.value.itemsPerPage,
-    };
+// Parent modelValue o'zgarganda (edit bosilganda)
+watch(
+    () => props.modelValue,
+    async (newVal) => {
+        if (newVal == null) {
+            // reset
+            debouncedValue.value = null;
+            return;
+        }
 
-    if(debouncedNameForSelect.value) {
-        queryFilter.name = debouncedNameForSelect.value
-    }
+        const byId = (x) => props.optionValue(x) === props.optionValue(newVal);
 
-    isLoadingNextPartProduct.value = true
+        // 1) items ichidan izlaymiz
+        let found = items.value.find(byId);
 
-    await props.firstFetch(queryFilter)
+        // 2) topilmasa — id bo'yicha fetch qilib kelamiz (backendda id bo'yicha filter bo'lsin)
+        if (!found) {
+            const query = {
+                page: 1,
+                "items-per-page": 1,
+                id: props.optionValue(newVal),
+            };
+            await props.fetchFn(query);
 
-    isLoadingNextPartProduct.value = false
-})
+            found = props.options.find(byId);
+            if (found) {
+                const exists = items.value.some(byId);
+                if (!exists) items.value = [found, ...items.value]; // tepa qismga qo'shib qo'yamiz
+            }
+        }
 
-watch(isVisible, async newVal => {
-    if(newVal) {
-        isLoadingNextPartProduct.value = true
-        filterForSelect.value.page++;
-
-        await props.fetch({ page: filterForSelect.value.page, 'items-per-page': filterForSelect.value.itemsPerPage, name: product.value })
-        // await productStore.fetchProducts({ page: productSelectPage.value, 'items-per-page': 7, name: filters.value.product })
-        //     .then(() => {
-        //         items.value = [...items.value, ...productStore.getProducts.models]
-        //     })
-
-        isLoadingNextPartProduct.value = false
-    }
-})
-
-const selectRef = ref('selectRef');
-
-function handleClear(clearCallback) {
-    clearCallback();
-    setProduct(null)
-    selectRef.value?.clear(); // Dropdownga show bo'lishni bloklaydi
-}
-
+        // 3) Topilgan bo'lsa, selektga obyekt sifatida yozamiz
+        if (found) debouncedValue.value = found;
+    },
+    { immediate: false }
+);
 </script>
 
 <template>
-    {{debouncedNameForSelect}} product: {{product}}
     <Select
-        ref="selectRef"
-        v-model="debouncedNameForSelect"
+        v-model="debouncedValue"
         :options="items"
-        option-label="name"
-        option-value="id"
-        :placeholder="t('placeholders.search.byProduct')"
+        :option-label="optionLabel"
+        :placeholder="placeholder"
         showClear
-        :loading="isLoadingNextPartProduct"
-        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
         editable
-        @hide="() => filterForSelect.page = 1"
-        @value-change="setProduct"
-        @change="event => debouncedNameForSelect = event.value ? event.value.name : null"
+        :loading="loading"
+        @value-change="onChange"
+        pt:root="w-full dark:bg-surface-700"
+        :invalid="props.invalid"
     >
-        <template #clearicon="{ clearCallback }">
-            <TimesIcon @click="handleClear(clearCallback)" class="text-surface-400 absolute top-1/2 -mt-2 end-10" />
+        <template #value="slotProps">
+            <slot name="value" v-bind="slotProps">
+                <div v-if="slotProps.value && typeof slotProps.value === 'object'">
+                    {{ optionLabel(slotProps.value) }}
+                </div>
+                <span v-else>{{ placeholder }}</span>
+            </slot>
         </template>
 
-        <template #option="{option, index}">
-            <div>
-                {{option.name}}
-                <div
-                    v-intersection-observer="[onIntersectionObserver, { productSelect }]"
-                    v-if="index + 1 === items.length && totalItems > items.length && items.length"
-                ></div>
-            </div>
+        <template #empty>
+            <Skeleton v-if="loading" width="100%" height="2rem" />
+            <p v-else>No results</p>
+        </template>
+
+        <template #option="{ option, index }">
+            <slot name="option" :option="option" :index="index">
+                <div class="w-full">
+                    {{ optionLabel(option) }}
+                    <div
+                        v-intersection-observer="onIntersectionObserver"
+                        v-if="index + 1 === items.length && totalItems > items.length && items.length"
+                    >
+                        <Skeleton v-if="loading" width="100%" height="2rem" />
+                    </div>
+                </div>
+            </slot>
+        </template>
+
+        <template v-for="(_, slotName) in $slots" v-slot:[slotName]="slotProps">
+            <slot :name="slotName" v-bind="slotProps ?? {}" />
         </template>
     </Select>
 </template>

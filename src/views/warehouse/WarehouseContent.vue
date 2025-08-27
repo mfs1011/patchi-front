@@ -5,7 +5,6 @@ import Breadcrumb from "@/volt/Breadcrumb.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import Button from "@/volt/Button.vue";
 import {useRoute, useRouter} from "vue-router";
-import {useToast} from "primevue/usetoast";
 import updateQuery from "@/helpers/updateQuery.js";
 import {useLocationQuantityStore} from "@/stores/locationQuantity.js";
 import {useLocationStore} from "@/stores/location.js";
@@ -15,6 +14,7 @@ import DataTable from "@/volt/DataTable.vue";
 import Tab from "@/volt/Tab.vue";
 import TabPanel from "@/volt/TabPanel.vue";
 import TabList from "@/volt/TabList.vue";
+import Select from "@/volt/Select.vue";
 import Column from "primevue/column";
 import Card from "@/volt/Card.vue";
 import NoData from "@/components/UI/NoData.vue";
@@ -23,20 +23,23 @@ import TabPanels from "@/volt/TabPanels.vue";
 import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
 import {useProductStore} from "@/stores/product.js";
 import PaginatorComponent from "@/components/PaginatorComponent.vue";
+import SearchSelect from "@/components/UI/SearchSelect.vue";
+import {useKitStore} from "@/stores/kit.js";
+import ColumnGroup from "primevue/columngroup";
+import Row from "primevue/row";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
-const toast = useToast()
 
 const locationQuantityStore = useLocationQuantityStore()
 const locationQuantityKitStore = useLocationQuantityKitStore()
 const locationStore = useLocationStore()
 const productStore = useProductStore()
+const kitStore = useKitStore()
 
 // refs
 const isVisibleSectionHeader = ref(false);
-const isVisible = ref(false);
 const productSelectPage = ref(1)
 const tabVal = ref('product');
 const productsForSelect = ref([])
@@ -44,12 +47,12 @@ const productsForSelect = ref([])
 const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
-    location: route.query.location || null,
-    product: route.query.product || null,
-    kit: route.query.kit || null,
-    'is-desc': route.query['is-desc'] || null,
-    'is-zero': route.query['is-zero'] || null,
-    expired: route.query.expired || null,
+    location: null,
+    product: null,
+    kit: null,
+    'is-desc': null,
+    'is-zero': null,
+    expired: null,
 });
 
 // computed
@@ -97,10 +100,6 @@ watch(
             }
         }
 
-        if(filters.value.product !== null) {
-            queryFilter.product = +filters.value.product;
-        }
-
         if (filters.value['is-desc'] !== null) {
             queryFilter['is-desc'] = filters.value['is-desc'];
         }
@@ -112,8 +111,6 @@ watch(
         if (filters.value.expired !== null) {
             queryFilter.expired = filters.value.expired;
         }
-
-        console.log(filters.value.page)
 
         await updateQuery(router, queryFilter);
 
@@ -131,10 +128,6 @@ watch(tabVal, () => {
 })
 
 onMounted(() => {
-    if (!locationStore.getLocations.models.length) {
-        locationStore.fetchLocations({page: 1, 'items-per-page': 100, isWarehouse: true })
-    }
-
     if (!productsForSelect.value.length) {
         productStore.fetchProducts({ page: productSelectPage.value, 'items-per-page': 7, name: filters.value.product })
             .then(() => {
@@ -147,19 +140,13 @@ onMounted(() => {
     }
 })
 
-async function fetchProduct(queryFilters) {
-    console.log('fetch')
-    await productStore.fetchProducts(queryFilters)
-        .then(() => {
-            productsForSelect.value = [...productsForSelect.value, ...productStore.getProducts.models]
-        })
-}
-async function firstFetchProduct(queryFilters) {
-    console.log('firstFetch')
-    await productStore.fetchProducts(queryFilters)
-        .then(() => {
-            productsForSelect.value = [...productStore.getProducts.models]
-        })
+const clearFilters = () => {
+    filters.value.location = null;
+    filters.value.product = null;
+    filters.value.kit = null;
+    filters.value['is-desc'] = null;
+    filters.value['is-zero'] = null;
+    filters.value.expired = null;
 }
 </script>
 
@@ -223,80 +210,77 @@ async function firstFetchProduct(queryFilters) {
                 }"
                 class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
             >
-<!--                <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-4 items-center">-->
-<!--                    <Select-->
-<!--                        v-model="filters.location"-->
-<!--                        :options="locationStore.getLocations.models"-->
-<!--                        option-label="name"-->
-<!--                        option-value="id"-->
-<!--                        :placeholder="t('placeholders.search.byLocation')"-->
-<!--                        showClear-->
-<!--                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"-->
-<!--                    />-->
-<!--                    filters:{{filters.product}}-->
-<!--                    <SearchSelect-->
-<!--                        :total-items="productStore.getProducts.totalItems"-->
-<!--                        :items="productsForSelect"-->
-<!--                        v-model="filters.product"-->
-<!--                        :fetch="fetchProduct"-->
-<!--                        :firstFetch="firstFetchProduct"-->
-<!--                    />-->
-<!--                    <Select-->
-<!--                        v-if="tabVal === 'product'"-->
-<!--                        v-model="debouncedNameForSelect"-->
-<!--                        ref="productsSelect"-->
-<!--                        :options="productsForSelect"-->
-<!--                        option-label="name"-->
-<!--                        option-value="name"-->
-<!--                        :placeholder="t('placeholders.search.byProduct')"-->
-<!--                        showClear-->
-<!--                        :loading="isLoadingNextPartProduct"-->
-<!--                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"-->
-<!--                        editable-->
-<!--                        @hide="() => {console.log('show');productSelectPage = 1}"-->
-<!--                    >-->
-<!--                        <template #option="{option, index}">-->
-<!--                            <div @click="setProduct">-->
-<!--                                {{option.name}}-->
-<!--                                <div-->
-<!--                                    v-intersection-observer="[onIntersectionObserver, { productSelect }]"-->
-<!--                                    v-if="index + 1 === productsForSelect.length && productStore.getProducts.totalItems > productsForSelect.length && productsForSelect.length"-->
-<!--                                ></div>-->
-<!--                            </div>-->
-<!--                        </template>-->
-<!--                    </Select>-->
+                <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
+                    <SearchSelect
+                        v-model="filters.location"
+                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, isWarehouse: true})"
+                        :options="locationStore.getLocations.models"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
+                        :placeholder="t('placeholders.search.byLocation')"
+                        :loading="locationStore.getIsLoadingLocation"
+                        :total-items="locationStore.getLocations.totalItems"
+                    />
+                    <SearchSelect
+                        v-if="tabVal === 'product'"
+                        v-model="filters.product"
+                        :fetchFn="productStore.fetchProducts"
+                        :options="productStore.getProducts.models"
+                        :option-label="opt => `${opt?.name} | ${opt?.code} | ${opt?.qr || '-'}`"
+                        :option-value="opt => `${opt?.name} | ${opt?.code} | ${opt?.qr || '-'}`"
+                        :return-value="opt => opt?.id"
+                        :placeholder="t('placeholders.search.byProduct')"
+                        :loading="productStore.getIsLoadingProducts"
+                        :total-items="productStore.getProducts.totalItems"
+                    >
+                        <template #header>
+                            <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }} | {{t('labels.qr')}}</div>
+                        </template>
+                    </SearchSelect>
+                    <SearchSelect
+                        v-if="tabVal === 'kit'"
+                        v-model="filters.kit"
+                        :fetchFn="kitStore.fetchKits"
+                        :options="kitStore.getKits.models"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
+                        :placeholder="t('placeholders.search.byKit')"
+                        :loading="kitStore.getIsLoadingKits"
+                        :total-items="kitStore.getKits.totalItems"
+                    />
 
-<!--                    <Select-->
-<!--                        v-if="tabVal === 'kit'"-->
-<!--                        v-model="filters.kit"-->
-<!--                        :options="locationStore.getLocations.models"-->
-<!--                        option-label="name"-->
-<!--                        option-value="id"-->
-<!--                        :placeholder="t('placeholders.search.byKit')"-->
-<!--                        showClear-->
-<!--                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"-->
-<!--                    />-->
+                    <Select
+                        v-model="filters.expired"
+                        :options="[{id: 1, value: true, name: t('expired')}, {id: 2, value: false, name: t('notExpired')}]"
+                        option-label="name"
+                        option-value="value"
+                        showClear
+                        :placeholder="t('placeholders.search.byExpiry')"
+                    />
 
-<!--                    <DatePicker-->
-<!--                        v-model.trim="filters['date-from']"-->
-<!--                        dateFormat="dd.mm.yy"-->
-<!--                        showIcon-->
-<!--                        fluid-->
-<!--                        iconDisplay="input"-->
-<!--                        :placeholder="t('placeholders.search.byDateFrom')"-->
-<!--                        show-button-bar-->
-<!--                    />-->
-<!--                    <DatePicker-->
-<!--                        v-model.trim="filters['date-to']"-->
-<!--                        dateFormat="dd.mm.yy"-->
-<!--                        showIcon-->
-<!--                        fluid-->
-<!--                        iconDisplay="input"-->
-<!--                        :placeholder="t('placeholders.search.byDateTo')"-->
-<!--                        show-button-bar-->
-<!--                    />-->
-<!--                </div>-->
-                <p>Bu yeri keyinroq qilinadi</p>
+                    <Select
+                        v-model="filters['is-desc']"
+                        :options="[{id: 1, value: true, name: t('desc')}, {id: 2, value: false, name: t('asc')}]"
+                        option-label="name"
+                        option-value="value"
+                        showClear
+                        :placeholder="t('placeholders.search.orderByExpiry')"
+                    />
+
+                    <Select
+                        v-model="filters['is-zero']"
+                        :options="[{id: 1, value: true, name: t('zero')}, {id: 2, value: false, name: t('notZero')}]"
+                        option-label="name"
+                        option-value="value"
+                        showClear
+                        :placeholder="t('placeholders.search.byQty')"
+                    />
+                    <div class="xl:col-span-3 flex justify-end">
+                        <Button @click="clearFilters" :label="t('clear')" icon="pi pi-trash" class="bg-surface-500 border-surface-500 enabled:hover:border-surface-400 enabled:hover:bg-surface-400 dark:bg-surface-500 dark:border-surface-500 dark:enabled:hover:border-surface-400 dark:enabled:hover:bg-surface-400 w-fit px-4"/>
+                    </div>
+                </div>
             </div>
         </template>
 
@@ -371,6 +355,38 @@ async function firstFetchProduct(queryFilters) {
                                             <p v-else>{{ formatCurrency(data.qty) }} {{ t(`labels.${data.product.category.unit.name}`) }}</p>
                                         </template>
                                     </Column>
+                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                            <p v-else>{{ formatCurrency(data.product.wholesalePrice) }}$</p>
+                                        </template>
+                                    </Column>
+
+                                    <ColumnGroup type="footer">
+                                        <Row>
+                                            <Column :colspan="7" footerStyle="text-align:right">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                                    <p v-else class="font-semibold">{{ t('labels.totals') }}:</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                                    <div v-else>
+                                                        <p class="font-semibold">{{ formatCurrency(locationQuantityStore.getLocationQuantities.totalQtyKg) }} {{ t('labels.kg') }}</p>
+                                                        <p class="font-semibold">{{ formatCurrency(locationQuantityStore.getLocationQuantities.totalQtyPcs) }}  {{ t('labels.pcs') }}</p>
+                                                    </div>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(locationQuantityStore.getLocationQuantities.totalWholesalePrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                        </Row>
+                                    </ColumnGroup>
 
                                     <template #footer>
                                         <div v-if="locationQuantityStore.getIsLoadingLocationQuantity" class="flex justify-between">
@@ -410,19 +426,19 @@ async function firstFetchProduct(queryFilters) {
                                     <Column field="kit" :header="t('labels.name')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.kit.name }}</p>
+                                            <p v-else>{{ data.kit?.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="kit" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.kit.code }}</p>
+                                            <p v-else>{{ data.kit?.code }}</p>
                                         </template>
                                     </Column>
                                     <Column field="location" :header="t('labels.locations')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.location.name }}</p>
+                                            <p v-else>{{ data.location?.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
@@ -437,6 +453,37 @@ async function firstFetchProduct(queryFilters) {
                                             <p v-else>{{ formatCurrency(data.qty) }} {{ t('labels.pcs')}}</p>
                                         </template>
                                     </Column>
+                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                            <p v-else>{{ formatCurrency(data.kit?.wholesalePrice) }}$</p>
+                                        </template>
+                                    </Column>
+
+                                    <ColumnGroup type="footer">
+                                        <Row>
+                                            <Column :colspan="5" footerStyle="text-align:right">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                                    <p v-else class="font-semibold">{{ t('labels.totals') }}:</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                                    <div v-else>
+                                                        <p class="font-semibold">{{ formatCurrency(locationQuantityKitStore.getLocationQuantityKits.totalQty) }} {{ t('labels.pcs') }}</p>
+                                                    </div>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(locationQuantityKitStore.getLocationQuantityKits.totalWholesalePrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                        </Row>
+                                    </ColumnGroup>
 
                                     <template #footer>
                                         <div v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit" class="flex justify-between">

@@ -159,6 +159,12 @@
         "accusative": "данные",
         "accusativeCapitalize": "Данные"
     },
+    "incomeInvoice": {
+        "nominative": "поступлениe",
+        "nominativeCapitalize": "Поступлениe",
+        "accusative": "поступлению",
+        "accusativeCapitalize": "Поступлению"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",
@@ -179,7 +185,7 @@
         "shopName": "Имя магазина",
         "warehouseName": "Имя склада",
         "locations": "Локация",
-        "location": "Объект",
+        "location": "Локация",
         "supplierName": "Имя поставщика",
         "colorName": "Название цвета",
         "categoryType": "Тип категории",
@@ -220,6 +226,7 @@
         "forTheCategory": "Для категории",
         "month": "Месяц",
         "totalFact": "Общий факт",
+        "totalPrice": "Общий стоимость",
         "total": "Общий",
         "photoPreview": "Предпросмотр изображения",
         "changePhoto": "Изменить фото",
@@ -228,6 +235,9 @@
         "Card": "Карта",
         "Bank": "Банковский счёт",
         "createdAt": "Дата",
+        "createdBy": "Создал",
+        "updatedAt": "Дата изменения",
+        "updatedBy": "Изменил",
         "usdRate": "Курс USD",
         "categoryKpiPercent": "Процент KPI по категориям",
         "kitKpiPercent": "Процент KPI по композициям",
@@ -275,7 +285,9 @@
         "Payment": "Платёж",
         "Assembly": "Сборка",
         "Inventory": "Инвентарь",
-        "OrderInvoice": "Заказ"
+        "OrderInvoice": "Заказ",
+        "customsFee": "Таможенные расходы",
+        "transportationFee": "Транспортные расходы"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",
@@ -303,12 +315,18 @@
             "byDateFrom": "Дата с",
             "byDateTo": "Дата по",
             "byStatus": "Поиск по статусу",
-            "byLocation": "Поиск по объекту",
+            "byLocation": "Поиск по локации",
             "byProduct": "Поиск по продукту",
+            "byKit": "Поиск по композиции",
             "byUser": "Поиск по ответственному",
+            "byCreatedBy": "Поиск по создателю",
+            "bySupplier": "Поиск по поставщику",
             "byElementId": "Поиск по элементу ID",
             "byElement": "Поиск по элементу",
-            "byAction": "Поиск по действию"
+            "byAction": "Поиск по действию",
+            "byExpiry": "Поиск по сроку годности",
+            "byQty": "Поиск по количеству",
+            "orderByExpiry": "Сортировка по сроку годности"
         },
         "select": {
             "role": "Выберите роль",
@@ -319,7 +337,10 @@
             "category": "Выберите категорию",
             "assembly": "Выберите комплект",
             "paymentType": "Выберите тип оплаты",
-            "location": "Выберите объект"
+            "location": "Выберите локацию",
+            "supplier": "Выберите поставщика",
+            "product": "Выберите продукт",
+            "color": "Выберите цвет"
         },
         "supplierName": "Введите имя поставщика...",
         "colorName": "Введите название цвета...",
@@ -333,7 +354,11 @@
         "kpiPercent": "Введите процент KPI...",
         "date": "Введите дату...",
         "notificationDay": "Введите количество дней...",
-        "qty": "Введите количество..."
+        "qty": "Введите количество...",
+        "expiryDate": "Введите срок годности...",
+        "price": "Введите цену...",
+        "transportationFee": "Введите транспортные расходы...",
+        "customsFee": "Введите таможенные расходы..."
     },
     "buttons": {
         "login": "Войти",
@@ -350,8 +375,12 @@
         "newPayment": "Новая оплата",
         "newKpi": "Новый KPI",
         "newInventory": "Новая инвентаризация",
+        "newIncomeInvoice": "Новое поступление",
         "filters": "Фильтры",
-        "saveAndExit": "Сохранить и выйти"
+        "saveAndExit": "Сохранить и выйти",
+        "add": "Добавить",
+        "save": "Сохранить",
+        "edit": "Изменить"
     },
     "errorMessages": {
         "usernameRequired": "Имя пользователя обязательно",
@@ -386,7 +415,7 @@
         "kpiPercentRequired": "Процент KPI обязателен",
         "dateRequired": "Дата обязателен",
         "notificationDayRequired": "День обязателен",
-        "locationRequired": "Объект обязателен"
+        "locationRequired": "Локация обязательна"
     },
     "dialog": {
         "confirm": "Подтвердить",
@@ -395,6 +424,7 @@
         "clear": "Очистить",
         "logoutConfirmation": "Вы действительно хотите выйти из системы?",
         "deleteConfirmation": "Вы действительно хотите удалить {name} с ID {id}?",
+        "deleteConfirm": "Вы действительно хотите удалить {name}?",
         "acceptConfirmation": "Вы действительно хотите подтвердить {name} с ID {id}?",
         "editedConfirmation": "Вы действительно хотите изменить {name} с ID {id}?",
         "addConfirmation": "Добавить {name}",
@@ -429,6 +459,7 @@
         "warehouseContent": "Состав склада",
         "shopContent": "Состав магазина",
         "incomeInvoices": "Поступления",
+        "incomeInvoice": "Поступление",
         "transferInvoices": "Перемещение",
         "orders": "Заказы",
         "returnInvoices": "Возвраты",
@@ -501,6 +532,10 @@
         "expiryDateNotificationDay": {
             "add": "Добавить",
             "edit": "Изменить"
+        },
+        "incomeInvoices": {
+            "add": "Добавить",
+            "edit": "Изменить"
         }
     },
     "pagination": {
@@ -517,10 +552,11 @@
         "internalServerError": "Внутренняя ошибка сервера.",
         "already_exists_error": "{field} уже существует",
         "already_exists_error_named": "\"{name}\" с таким именем уже существует",
+        "already_added": "\"{name}\" уже добавлено",
         "cannot_delete_product_in_stock": "Невозможно удалить продукт, который есть на складе",
         "cannot_edit_kpi_used_in_sales": "KPI, используемые в продажах, не могут быть изменены",
         "unconfirmedExists": "Имеется неподтверждённая инвентаризация",
-        "noIncomingToLocation": "На этот объект не было ни одного поступления"
+        "noIncomingToLocation": "На эту локацию не было ни одного поступления"
     },
     "choosePhoto": "Выберите фото",
     "changePhoto": "Изменить фото",
@@ -528,5 +564,13 @@
     "clear": "Очистить",
     "notifyPrefix": "Уведомит за ",
     "notifySuffix": " дней до окончания",
-    "day": "день"
+    "day": "день",
+    "incomingData": "Данные поступления",
+    "addProduct": "Добавление продукта",
+    "zero": "Нет в наличии",
+    "notZero": "В наличии",
+    "desc": "Новые",
+    "asc": "Старые",
+    "expired": "Просрочено",
+    "notExpired": "Не просрочено"
 }
