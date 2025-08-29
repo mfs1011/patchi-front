@@ -4,6 +4,7 @@ import Toast from "@/volt/Toast.vue";
 import {useSidebarStore} from "@/stores/sidebar.js";
 import {onBeforeUnmount, onMounted, ref} from "vue";
 import {useUserStore} from "@/stores/user.js";
+import {number} from "yup";
 const sidebar = useSidebarStore()
 const userStore = useUserStore()
 

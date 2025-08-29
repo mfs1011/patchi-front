@@ -165,6 +165,12 @@
         "accusative": "ma'lumotlarni",
         "accusativeCapitalize": "Ma'lumotlarni"
     },
+    "incomeInvoice": {
+        "nominative": "kirim",
+        "nominativeCapitalize": "Kirim",
+        "accusative": "kirimni",
+        "accusativeCapitalize": "Kirimni"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Sotuvchi",
@@ -185,9 +191,9 @@
         "warehouseName": "Ombor nomi",
         "comment": "Izoh",
         "locations": "Joylashuvi",
-        "location": "Obyekt",
         "seller": "Sotuvchi",
         "client": "Mijoz",
+        "location": "Joylashuv",
         "supplierName": "Ta'minotchi nomi",
         "colorName": "Rang nomi",
         "categoryType": "Kategoriya turi",
@@ -229,6 +235,7 @@
         "forTheCategory": "Kategoriya uchun",
         "month": "Oy",
         "totalFact": "Umumiy fakt",
+        "totalPrice": "Umumiy narx",
         "total": "Umumiy",
         "photoPreview": "Rasm ko‘rinishi",
         "changePhoto": "Rasmni o‘zgartirish",
@@ -237,6 +244,9 @@
         "Card": "Karta",
         "Bank": "Bank hisob raqami",
         "createdAt": "Sana",
+        "createdBy": "Yaratuvchi",
+        "updatedAt": "O‘zgartirilgan sana",
+        "updatedBy": "O‘zgartiruvchi",
         "usdRate": "USD kursi",
         "categoryKpiPercent": "Kategoriya KPI foizi",
         "kitKpiPercent": "Kompozitsiya KPI foizi",
@@ -289,7 +299,10 @@
         "OrderInvoice": "Buyurtma",
         "IncomeInvoice": "Kirim hujjati",
         "Kit": "Kompozitsiya",
-        "TransferInvoice": "Ko‘chirish"
+        "TransferInvoice": "Ko‘chirish",
+        "customsFee": "Bojxona xarajatlari",
+        "transportationFee": "Transport xarajatlari",
+        "supplier": "Ta'minotchi"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",
@@ -317,10 +330,16 @@
             "byStatus": "Statusi bo‘yicha qidiruv",
             "byLocation": "Joylashuvi bo‘yicha qidiruv",
             "byProduct": "Mahsulot bo‘yicha qidiruv",
+            "byKit": "Kompozitsiya bo‘yicha qidiruv",
             "byUser": "Mas'ul bo'yicha qidiruv",
+            "byCreatedBy": "Yaratuvchi bo‘yicha qidiruv",
+            "bySupplier": "Ta'minotchi bo‘yicha qidiruv",
             "byElementId": "Element ID bo'yicha qidiruv",
             "byElement": "Element bo'yicha qidiruv",
             "byAction": "Harakat bo'yicha qidiruv",
+            "byExpiry": "Yaroqlilik muddati bo'yicha tartiblash",
+            "byQty": "Miqdori bo'yicha",
+            "orderByExpiry": "Yaroqlilik muddati bo'yicha",
             "bySeller": "Sotuvchi bo'yicha qidiruv"
         },
         "select": {
@@ -332,7 +351,10 @@
             "category": "Kategoriyani tanlang",
             "collection": "To‘plamni tanlang",
             "paymentType": "To‘lov turini tanlang",
-            "location": "Joylashuvni tanlang"
+            "location": "Joylashuvni tanlang",
+            "supplier": "Ta'minotchini tanlang",
+            "product": "Mahsulotni tanlang",
+            "color": "Rangni tanlang"
         },
         "shopName": "Do‘kon nomini kiriting...",
         "warehouseName": "Ombor nomini kiriting...",
@@ -348,7 +370,11 @@
         "kpiPercent": "KPI foizni kiriting...",
         "date": "Sanani kiriting...",
         "notificationDay": "Kunni kiriting...",
-        "qty": "Miqdor kiriting..."
+        "qty": "Miqdor kiriting...",
+        "expiryDate": "Yaroqlilik muddatini kiriting...",
+        "price": "Narxni kiriting...",
+        "transportationFee": "Transport xarajatlarini kiriting...",
+        "customsFee": "Bojxona xarajatlarini kiriting..."
     },
     "buttons": {
         "login": "Kirish",
@@ -366,8 +392,12 @@
         "newPayment": "Yangi to‘lov",
         "newKpi": "Yangi KPI",
         "newInventory": "Yangi inventarizatisya",
+        "newIncomeInvoice": "Yangi kirim",
         "filters": "Filterlar",
-        "saveAndExit": "Saqlash va chiqish"
+        "saveAndExit": "Saqlash va chiqish",
+        "add": "Qo'shish",
+        "save": "Saqlash",
+        "edit": "O'zgartirish"
     },
     "errorMessages": {
         "usernameRequired": "Username kiritish majburiy",
@@ -411,6 +441,7 @@
         "clear": "Tozalash",
         "logoutConfirmation": "Rostdan ham tizimdan chiqmoqchimisiz?",
         "deleteConfirmation": "Rostdan ham {id} id'lik {name} o‘chirmoqchimisiz?",
+        "deleteConfirm": "Rostdan ham {name} o‘chirmoqchimisiz?",
         "acceptConfirmation": "Rostdan ham {id} id'lik {name} tasdiqlamoqchimisiz?",
         "editedConfirmation": "Rostdan ham {id} id'lik {name} o'zgartirmoqchimisiz?",
         "addConfirmation": "{name} qo‘shish",
@@ -446,7 +477,8 @@
         "productsInShop": "Do‘kondagi mahsulotlar",
         "warehouseContent": "Ombor tarkibi",
         "shopContent": "Do'kon tarkibi",
-        "incomeInvoices": "Kirim",
+        "incomeInvoices": "Kirimlar",
+        "incomeInvoice": "Kirim",
         "transferInvoices": "Ko‘chirish",
         "orders": "Buyurtmalar",
         "returnInvoices": "Qaytarilganlar",
@@ -523,6 +555,10 @@
         "expiryDateNotificationDay": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
+        },
+        "incomeInvoices": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
         }
     },
     "pagination": {
@@ -540,6 +576,7 @@
         "internalServerError": "Ichki server xatoligi.",
         "already_exists_error": "{field} allaqachon mavjud",
         "already_exists_error_named": "Bunday nomli \"{name}\" allaqachon mavjud",
+        "already_added": "\"{name}\" allaqachon qo'shilgan",
         "cannot_delete_product_in_stock": "Omborda mavjud mahsulotni o'chirib bo'lmaydi",
         "notEnoughKit": "Omborda bu kompozitsiyadan yetarli emas",
         "cannot_edit_kpi_used_in_sales": "Sotuvda ishlatilgan KPI ni o'zgartirib bo'lmaydi",
@@ -552,5 +589,13 @@
     "clear": "Tozalash",
     "notifyPrefix": "Xabar beradi: ",
     "notifySuffix": " kun qolganda",
-    "day": "kun"
+    "day": "kun",
+    "incomingData": "Kirim ma'lumotlari",
+    "addProduct": "Mahsulot qo'shish",
+    "zero": "Tugagan",
+    "notZero": "Mavjud",
+    "desc": "Yangilari",
+    "asc": "Eskilari",
+    "expired": "Muddati o'tgan",
+    "notExpired": "Muddati o'tmagan"
 }

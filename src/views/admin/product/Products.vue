@@ -466,7 +466,7 @@ onBeforeRouteLeave(() => {
                     </DataTable>
                 </template>
             </Card>
-            <!-- DELETE B2B DIALOG -->
+            <!-- DELETE PRODUCT DIALOG -->
             <Dialog
                 v-model:visible="visible.deleteVisible"
                 modal
@@ -496,7 +496,7 @@ onBeforeRouteLeave(() => {
                 </template>
             </Dialog>
 
-            <!-- RECOVER B2B DIALOG -->
+            <!-- RECOVER PRODUCT DIALOG -->
             <Dialog
                 v-model:visible="visible.restoreVisible"
                 modal

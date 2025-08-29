@@ -1,25 +1,31 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
+import PhoneInput from "@/components/PhoneInput.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, useTemplateRef} from "vue";
 import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
 import Message from "@/volt/Message.vue";
 import Card from "@/volt/Card.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
+import InputText from "@/volt/InputText.vue";
+import Select from "@/volt/Select.vue";
+import {useLocationStore} from "@/stores/location.js";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import * as yup from "yup";
+import {useSellerStore} from "@/stores/seller.js";
 import {useField, useForm} from "vee-validate";
 import Dialog from "@/volt/Dialog.vue";
 import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
-import {useNotificationDayStore} from "@/stores/expiryDateNotificationDay.js";
-import InputNumber from "@/volt/InputNumber.vue";
+import {buildChangedPayload} from "@/helpers/payloadUtils.js";
 
 const toast = useToast();
 const { t } = useI18n()
 
-const notificationDay = useNotificationDayStore();
+const phoneLength = ref();
+const sellerStore = useSellerStore();
+const locationStore = useLocationStore()
 const router = useRouter()
 const route = useRoute()
 const isLoading = ref(false)
@@ -27,6 +33,7 @@ const showLeaveDialog = ref(false)
 const isEdited = ref(false)
 const pendingNavigation = ref(false)
 const isConfirmLoading = ref(false)
+const phoneInput = useTemplateRef('phoneInput')
 const initialValues = ref({})
 
 const home = ref({
@@ -35,44 +42,63 @@ const home = ref({
     route: '/administration'
 });
 
-const items = computed(() => [{ label: t('cards.expiryDateNotificationDay'), route: { name: 'expiry-date-notification-day'} }, { label: t('sections.expiryDateNotificationDay.edit') }]);
+const items = computed(() => [{ label: t('cards.sellers'), route: { name: 'sellers'} }, { label: t('sections.sellers.edit') }]);
 
 // VeeValidate formani sozlash
 const schema = computed(() => yup.object({
-    day: yup.number().required(t('errorMessages.notificationDayRequired'))
+    name: yup.string().required(t('errorMessages.nameRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    telephone: yup.string().required().length(phoneLength.value, t('errorMessages.phoneNumberMustBeExactlyCharacters', { count: phoneLength.value })),
+    location: yup.number().required(t('errorMessages.shopRequired'))
 }))
 
 const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
     validationSchema: schema
 })
 
-const { value: day } = useField('day');
+const { value: name } = useField('name');
+const { value: telephone } = useField('telephone', undefined, { validateOnValueUpdate: false });
+const { value: location } = useField('location')
 
 const onSubmit = handleSubmit(async values => {
-    const payload = { day: values.day}
+    const uriKeys = {
+        location: '/api/locations/',
+    };
+
+    const payload = buildChangedPayload({ ...values, telephone: values.telephone.replace(/\D/g, '')}, initialValues.value, uriKeys);
+
+    if (Object.keys(payload).length === 0) {
+        return // hech narsa o'zgarmasa shunchaki to'xtatish
+    }
 
     try {
-        await notificationDay.putNotificationDay(payload, route.params.id)
+        const response = await sellerStore.putSeller(payload, route.params.id)
         isEdited.value = true
 
-        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('expiryDateNotificationDay.nominativeCapitalize') }), life: 3000 })
+        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('seller.nominativeCapitalize') }), life: 3000 })
 
         resetForm()
         router.back()
+
+        return response;
     } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('phone.nominativeCapitalize') }), life: 3000 })
     }
 })
 
 onMounted(async () => {
     isLoading.value = true
 
-    await notificationDay.fetchNotificationDay(route.params.id)
+    await Promise.allSettled([
+        locationStore.fetchLocations({ page: 1, isWarehouse: false }),
+        sellerStore.fetchSeller(route.params.id)
+    ])
 
-    isLoading.value = false
+    phoneInput.value.setPhone(await sellerStore.getSeller.telephone.slice(0, 3), await sellerStore.getSeller.telephone.slice(3))
 
     initialValues.value = {
-        day : notificationDay.getNotificationDay.day,
+        name : sellerStore.getSeller.name,
+        location : sellerStore.getSeller.location.id,
+        telephone: sellerStore.getSeller.telephone.replace(/\D/g, '')
     }
 
     resetForm({
@@ -80,9 +106,16 @@ onMounted(async () => {
             ...initialValues.value
         }
     })
+
+    isLoading.value = false
 })
 
-const isChanged = computed(() => day.value !== notificationDay.getNotificationDay.day)
+const isChanged = computed(() => {
+    if (name.value !== sellerStore.getSeller.name) return true
+    if (telephone.value?.replace(/\D/g, '') !== sellerStore.getSeller.telephone) return true
+    return sellerStore.getSeller.location?.id !== location.value;
+})
+
 
 onBeforeRouteLeave((to, from, next) => {
     if (isChanged.value && !isEdited.value) {
@@ -125,8 +158,8 @@ const confirmLeave = () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.expiryDateNotificationDay.edit')"
-        back-route-name="expiryDateNotificationDay"
+        :section-name="t('sections.sellers.edit')"
+        back-route-name="sellers"
         without-buttons
     >
         <template #sectionBody>
@@ -137,26 +170,50 @@ const confirmLeave = () => {
                 pt:title="font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
                 <template #content>
-                    <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-100 gap-2 sm:gap-4">
+                    <form @submit.prevent="onSubmit" class="grid grid-cols-1 sm:w-fit gap-2 sm:gap-4">
                         <label class="block">
-                            <span>{{ t('labels.notificationDay') }}</span><span class="text-red-500"> *</span>
+                            <span>{{ t('labels.name') }}</span><span class="text-red-500"> *</span>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
-                            <Skeleton class="hidden sm:block" height="3.1rem" width="25rem" v-if="isLoading"/>
-                            <InputNumber
-                                v-if="!isLoading"
-                                v-model="day"
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <InputText
+                                v-show="!isLoading"
+                                v-model.trim="name"
                                 fluid
-                                showButtons
-                                :placeholder="t('placeholders.notificationDay')"
+                                :placeholder="t('placeholders.fullName')"
                                 size="large"
-                                :prefix="t('notifyPrefix')"
-                                :suffix="t('notifySuffix')"
+                                :class="{ 'p-invalid': errors.name }"
                             />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.day }}</Message>
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.name }}</Message>
                         </label>
 
+                        <label class="block">
+                            <span>{{ t('labels.phoneNumber') }}</span><span class="text-red-500"> *</span>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <PhoneInput v-show="!isLoading" ref="phoneInput" v-model="telephone" v-model:phone-length="phoneLength" />
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.telephone }}</Message>
+                        </label>
+
+                        <div>
+                            <p>{{ t('labels.shop') }}<span class="text-red-500"> *</span></p>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <Select
+                                v-show="!isLoading"
+                                v-model="location"
+                                :options="locationStore.getLocations.models"
+                                option-label="name"
+                                option-value="id"
+                                :placeholder="t('placeholders.select.shop')"
+                                showClear
+                                size="large"
+                                pt:root="w-full dark:bg-surface-700"
+                            />
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.location }}</Message>
+                        </div>
+
                         <div class="flex justify-end gap-2 mt-5">
-                            <Skeleton height="2.7rem" width="7.5rem" v-if="isLoading"/>
+                            <Skeleton height="2.7rem" width="6.5rem" v-if="isLoading"/>
                             <Button v-else type="submit" :label="t('dialog.confirm')" class="px-5" :loading="isSubmitting" :disabled="!isChanged || isSubmitting"/>
                         </div>
                     </form>

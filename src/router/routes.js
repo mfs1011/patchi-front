@@ -54,9 +54,33 @@ export const routes = [
                     },
                     {
                         path: 'income-invoices',
-                        name: 'warehouse-income-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/warehouse/WarehouseIncomeInvoice.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'warehouse-income-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/incomeInvoice/WarehouseIncomeInvoices.vue'),
+                            },
+                            {
+                                path: 'income-invoice/:id',
+                                name: 'income-invoice',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/incomeInvoice/WarehouseIncomeInvoice.vue'),
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-income-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/incomeInvoice/WarehouseIncomeInvoiceAdd.vue')
+                            },
+                            {
+                                path: 'edit/:id',
+                                name: 'edit-income-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/incomeInvoice/WarehouseIncomeInvoiceEdit.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'transfer-invoices',

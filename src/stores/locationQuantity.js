@@ -8,7 +8,8 @@ export const useLocationQuantityStore = defineStore('locationQuantity', () => {
             models: [],
             totalItems: 0,
             totalCostPrice: 0,
-            totalQty: 0,
+            totalQtyKg: 0,
+            totalQtyPcs: 0,
             totalRetailPrice: 0,
             totalWholesalePrice: 0,
         },
@@ -24,7 +25,8 @@ export const useLocationQuantityStore = defineStore('locationQuantity', () => {
             state.locationQuantities.models = data.member
             state.locationQuantities.totalItems = data.totalItems
             state.locationQuantities.totalCostPrice = data.totalCostPrice
-            state.locationQuantities.totalQty = data.totalQty
+            state.locationQuantities.totalQtyKg = data.totalQtyKg
+            state.locationQuantities.totalQtyPcs = data.totalQtyPcs
             state.locationQuantities.totalRetailPrice = data.totalRetailPrice
             state.locationQuantities.totalWholesalePrice = data.totalWholesalePrice
 

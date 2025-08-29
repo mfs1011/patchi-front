@@ -455,9 +455,9 @@ const confirmLeave = () => {
                 class="sm:min-w-100 sm:w-fit w-9/10"
                 pt:root="px-2"
             >
-            <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                {{ t('dialog.leaveFromEditMessage') }}
-            </span>
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.leaveFromEditMessage') }}
+                </span>
 
                 <template #footer>
                     <div class="flex justify-end gap-2">
