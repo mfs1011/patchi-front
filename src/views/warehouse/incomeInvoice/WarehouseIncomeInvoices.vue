@@ -2,9 +2,9 @@
 import Section from "@/components/UI/Section.vue";
 import { useI18n } from "vue-i18n";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {computed, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import Button from "@/volt/Button.vue";
-import {useRoute, useRouter} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
 import updateQuery from "@/helpers/updateQuery.js";
 import {useLocationStore} from "@/stores/location.js";
@@ -21,6 +21,8 @@ import SearchSelect from "@/components/UI/SearchSelect.vue";
 import DatePicker from "@/volt/DatePicker.vue";
 import {useSupplierStore} from "@/stores/supplier.js";
 import {useUserStore} from "@/stores/user.js";
+import SecondaryButton from "@/volt/SecondaryButton.vue";
+import Dialog from "@/volt/Dialog.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -32,6 +34,9 @@ const locationStore = useLocationStore()
 const productStore = useProductStore()
 const supplierStore = useSupplierStore()
 const userStore = useUserStore()
+const deleteVisible = ref(false)
+const isDeleteLoading = ref(false)
+const currentIncomeInvoiceId = ref(null)
 
 // refs
 const isVisibleSectionHeader = ref(false);
@@ -141,6 +146,52 @@ const clearFilters = () => {
 const isAdminAndCreatedBy = createdById => (
     userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
 )
+
+const deleteAction = (id) => {
+    currentIncomeInvoiceId.value = id;
+    deleteVisible.value = true;
+};
+
+const deleteIncomeInvoice = async () => {
+    try {
+        isDeleteLoading.value = true;
+
+        await incomeInvoiceStore.deleteIncomeInvoice(currentIncomeInvoiceId.value);
+        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('product.nominativeCapitalize') }), life: 3000 })
+    } catch (err) {
+        toast.add({ severity: 'error', summary: t('toast.cannot_delete_product_in_stock'), life: 3000 })
+    } finally {
+        isDeleteLoading.value = false;
+        deleteVisible.value = false;
+    }
+};
+
+const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
+const eventSource = ref(null)
+
+function connectMercure() {
+    const url = new URL(mercureUrl)
+    url.searchParams.append('topic', '')
+    eventSource.value = new EventSource(url)
+
+    eventSource.value.addEventListener('message', async (event) => {
+        const eventDataId = JSON.parse(event.data).eventId
+
+        if (eventDataId === 9) {
+            await incomeInvoiceStore.fetchIncomeInvoices(route.query);
+        }
+    })
+}
+
+onMounted(async () => {
+    connectMercure()
+})
+
+onBeforeRouteLeave(() => {
+    if (eventSource.value) {
+        eventSource.value.close()
+    }
+})
 </script>
 
 <template>
@@ -251,15 +302,15 @@ const isAdminAndCreatedBy = createdById => (
                         v-model="filters.product"
                         :fetchFn="productStore.fetchProducts"
                         :options="productStore.getProducts.models"
-                        :option-label="opt => `${opt?.name} | ${opt?.code} | ${opt?.qr || '-'}`"
-                        :option-value="opt => `${opt?.name} | ${opt?.code} | ${opt?.qr || '-'}`"
+                        :option-label="opt => `${opt?.name} | ${opt?.code}`"
+                        :option-value="opt => `${opt?.name} | ${opt?.code}`"
                         :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.byProduct')"
                         :loading="productStore.getIsLoadingProducts"
                         :total-items="productStore.getProducts.totalItems"
                     >
                         <template #header>
-                            <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }} | {{t('labels.qr')}}</div>
+                            <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }}</div>
                         </template>
                     </SearchSelect>
 
@@ -422,6 +473,36 @@ const isAdminAndCreatedBy = createdById => (
                     </DataTable>
                 </template>
             </Card>
+
+            <!-- DELETE ICOME_INVOICE DIALOG -->
+            <Dialog
+                v-model:visible="deleteVisible"
+                modal
+                :closable="false"
+                class="sm:min-w-100 sm:w-fit w-9/10"
+                pt:root="px-2"
+            >
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.deleteConfirmation', { name: t('incomeInvoice.accusative'), id: currentIncomeInvoiceId }) }}
+                </span>
+
+                <template #footer>
+                    <div class="flex justify-end gap-2">
+                        <SecondaryButton
+                            type="button"
+                            :label="t('dialog.cancel')"
+                            @click="deleteVisible = false"
+                        />
+                        <Button
+                            type="button"
+                            :label="t('dialog.confirm')"
+                            @click="deleteIncomeInvoice"
+                            :loading="isDeleteLoading"
+                            class="px-5"
+                        />
+                    </div>
+                </template>
+            </Dialog>
         </template>
     </Section>
 </template>

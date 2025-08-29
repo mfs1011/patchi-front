@@ -70,7 +70,8 @@ function onIntersectionObserver([entry]) {
     if (entry?.isIntersecting) isVisible.value = true;
 }
 
-function onChange(item) {
+async function onChange(item) {
+    console.log(item)
     if (item && typeof item === "object") {
         // Tanlangan option
         debouncedValue.value = item;
@@ -79,6 +80,15 @@ function onChange(item) {
         // Clear bosilganda
         debouncedValue.value = null;
         emit("update:modelValue", null);
+
+        page.value = 1;
+        items.value = [];
+        const query = {
+            page: page.value,
+            "items-per-page": props.itemsPerPage,
+        };
+        await props.fetchFn(query);
+        items.value = props.options;
     }
 }
 
@@ -101,15 +111,15 @@ watch(
         if (!found) {
             const query = {
                 page: 1,
-                "items-per-page": 1,
-                id: props.optionValue(newVal),
+                "items-per-page": 10,
+                name: newVal.code,
             };
             await props.fetchFn(query);
 
             found = props.options.find(byId);
             if (found) {
                 const exists = items.value.some(byId);
-                if (!exists) items.value = [found, ...items.value]; // tepa qismga qo'shib qo'yamiz
+                if (!exists) items.value = props.options; // tepa qismga qo'shib qo'yamiz
             }
         }
 

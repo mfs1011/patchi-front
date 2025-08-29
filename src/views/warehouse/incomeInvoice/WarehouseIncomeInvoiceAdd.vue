@@ -1,7 +1,7 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
 import Card from "@/volt/Card.vue";
@@ -9,7 +9,7 @@ import InputText from "@/volt/InputText.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {useField, useForm} from "vee-validate";
 import * as yup from "yup";
-import {useRouter} from "vue-router";
+import {onBeforeRouteLeave, useRouter} from "vue-router";
 import {useLocationStore} from "@/stores/location.js";
 import {useToast} from "primevue/usetoast";
 import InputNumber from "@/volt/InputNumber.vue";
@@ -39,6 +39,9 @@ const currentProduct = ref({})
 const deleteVisible = ref(false)
 const isDeleteLoading = ref(false)
 const isEditing = ref(false)
+const showLeaveDialog = ref(false)
+const isConfirmLoading = ref(false)
+const pendingNavigation = ref(false)
 const editingProductIndex = ref(null)
 const dateFrom = ref();
 
@@ -62,6 +65,21 @@ const isProductTypeNonFood = computed(() => {
     }
 })
 
+const isChanged = computed(() => (
+    !!supplier.value ||
+    !!location.value ||
+    !!comment.value ||
+    !!createdAt.value ||
+    !!incomeInvoiceProducts.value.length ||
+    !!product.value ||
+    !!color.value ||
+    !!expiryDate.value ||
+    !!qty.value ||
+    !!price.value ||
+    !!transportationFee.value ||
+    !!customsFee.value
+))
+
 // VeeValidate formani sozlash
 const incomeInvoiceInfoSchema = computed(() => yup.object({
     supplier: yup.object().required(),
@@ -74,7 +92,16 @@ const incomeInvoiceInfoSchema = computed(() => yup.object({
 const productSchema = computed(() => yup.object({
     product: yup.object().required(),
     color: yup.object().notRequired(),
-    expiryDate: yup.date().notRequired(),
+    expiryDate: yup
+        .date()
+        .nullable()
+        .when("product", {
+            is: (product) =>
+                product?.category?.categoryType?.name &&
+                product.category.categoryType.name.toLowerCase() === 'food',
+            then: (schema) => schema.required("Expiry date is required for food"),
+            otherwise: (schema) => schema.notRequired(),
+        }),
     qty: yup.number().required(),
     price: yup.number().required(),
     transportationFee: yup.number().required(),
@@ -101,7 +128,11 @@ const {
     resetForm: productResetForm,
     ...productFormCtx
 } = useForm({
-    validationSchema: productSchema
+    validationSchema: productSchema,
+    initialValues: {
+        transportationFee: 0,
+        customsFee: 0
+    }
 })
 
 const { value: supplier } = useField('supplier', undefined, { form: incomeInvoiceFormCtx });
@@ -192,7 +223,7 @@ const deleteAction = data => {
 const deleteProduct = () => {
     isDeleteLoading.value = true;
 
-    incomeInvoiceProducts.value = incomeInvoiceProducts.value.filter(p => p.product !== currentProduct.value.product);
+    incomeInvoiceProducts.value = incomeInvoiceProducts.value.filter(p => p.product.id !== currentProduct.value.product.id);
     currentProduct.value = {}
     isDeleteLoading.value = false;
     deleteVisible.value = false;
@@ -208,6 +239,11 @@ const editProduct = (data, index) => {
     price.value = data.price
     transportationFee.value = data.transportationFee
     customsFee.value = data.customsFee
+}
+
+const clearProductForm = () => {
+    isEditing.value = false
+    productResetForm()
 }
 
 const saveEditing = () => {
@@ -238,7 +274,7 @@ watch(location, async () => {
             createdAt.value = null
         } else {
             const date = new Date(inventoryStore.getLastInventoryDateTo);
-            date.setDate(date.getDate() + 1);
+            date.setDate(date.getDate());
             dateFrom.value = date;
             createdAt.value = date
         }
@@ -247,6 +283,22 @@ watch(location, async () => {
         createdAt.value = null
     }
 })
+
+onBeforeRouteLeave((to, from, next) => {
+    if (isChanged.value) {
+        showLeaveDialog.value = true
+        pendingNavigation.value = next
+    } else {
+        next()
+    }
+})
+
+const confirmLeave = () => {
+    showLeaveDialog.value = false
+    if (pendingNavigation.value) {
+        pendingNavigation.value()
+    }
+}
 </script>
 
 <template>
@@ -388,8 +440,8 @@ watch(location, async () => {
                                 v-model="product"
                                 :fetchFn="productStore.fetchProducts"
                                 :options="productStore.getProducts.models"
-                                :option-label="opt => `${opt?.name} | ${opt?.code} | ${opt?.qr || '-'}`"
-                                :option-value="opt => `${opt?.name} | ${opt?.code} | ${opt?.qr || '-'}`"
+                                :option-label="opt => `${opt?.name} | ${opt?.code}`"
+                                :option-value="opt => `${opt?.name} | ${opt?.code}`"
                                 :return-value="opt => opt"
                                 :placeholder="t('placeholders.select.product')"
                                 :loading="productStore.getIsLoadingProducts"
@@ -397,7 +449,7 @@ watch(location, async () => {
                                 :invalid="!!productErrors.product"
                             >
                                 <template #header>
-                                    <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }} | {{t('labels.qr')}}</div>
+                                    <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }}</div>
                                 </template>
                             </SearchSelect>
                         </div>
@@ -420,7 +472,7 @@ watch(location, async () => {
                         </div>
 
                         <div v-if="!isProductTypeNonFood">
-                            <p class="text-sm">{{ t('labels.expiryDate') }}</p>
+                            <p class="text-sm">{{ t('labels.expiryDate') }}<span class="text-red-500"> *</span></p>
 
                             <DatePicker
                                 v-model="expiryDate"
@@ -499,7 +551,7 @@ watch(location, async () => {
                     </div>
 
                     <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
-                        <SecondaryButton type="button" :label="t('dialog.clear')" @click="productResetForm" />
+                        <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearProductForm" />
                         <Button v-if="!isEditing" @click="onSubmitProduct" :label="t('buttons.add')" class="px-5" :loading="productIsSubmitting"/>
                         <Button v-else @click="saveEditing" :label="t('buttons.edit')" class="px-5"/>
                     </div>
@@ -523,8 +575,7 @@ watch(location, async () => {
                     >
                         <Column field="product" :header="t('labels.product')">
                             <template #body="{ data }">
-<!--                                <p>{{ productStore.getProducts.models.find(item => item.id === data.product)?.name }}</p>-->
-                                <p>{{ data.product.name }}</p>
+                                <p>{{ data.product?.name }}</p>
                             </template>
                         </Column>
                         <Column field="color" :header="t('labels.color')">
@@ -608,6 +659,31 @@ watch(location, async () => {
                             @click="deleteProduct"
                             :loading="isDeleteLoading"
                             class="px-5"
+                        />
+                    </div>
+                </template>
+            </Dialog>
+            <!-- CANCEL CHANGES BEFORE LEAVE CURRENT ROUTE DIALOG -->
+            <Dialog
+                v-model:visible="showLeaveDialog"
+                modal
+                :closable="false"
+                class="sm:min-w-100 sm:w-fit w-9/10"
+                pt:root="px-2"
+            >
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.leaveFromEditMessage') }}
+                </span>
+
+                <template #footer>
+                    <div class="flex justify-end gap-2">
+                        <SecondaryButton type="button" :label="t('dialog.cancel')" @click="showLeaveDialog = false" />
+                        <Button
+                            type="button"
+                            :label="t('dialog.confirm')"
+                            @click="confirmLeave"
+                            class="px-5"
+                            :loading="isConfirmLoading"
                         />
                     </div>
                 </template>

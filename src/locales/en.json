@@ -331,6 +331,7 @@
             "byStatus": "Search by status",
             "byLocation": "Search by location",
             "byProduct": "Search by product",
+            "byKit": "Search by kit",
             "byUser": "Search by responsible",
             "byCreatedBy": "Search by created user",
             "bySupplier": "Search by supplier",

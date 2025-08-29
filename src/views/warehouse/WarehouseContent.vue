@@ -282,15 +282,15 @@ onBeforeRouteLeave(() => {
                         v-model="filters.product"
                         :fetchFn="productStore.fetchProducts"
                         :options="productStore.getProducts.models"
-                        :option-label="opt => `${opt?.name} | ${opt?.code} | ${opt?.qr || '-'}`"
-                        :option-value="opt => `${opt?.name} | ${opt?.code} | ${opt?.qr || '-'}`"
+                        :option-label="opt => `${opt?.name} | ${opt?.code}`"
+                        :option-value="opt => `${opt?.name} | ${opt?.code}`"
                         :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.byProduct')"
                         :loading="productStore.getIsLoadingProducts"
                         :total-items="productStore.getProducts.totalItems"
                     >
                         <template #header>
-                            <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }} | {{t('labels.qr')}}</div>
+                            <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }}</div>
                         </template>
                     </SearchSelect>
                     <SearchSelect
