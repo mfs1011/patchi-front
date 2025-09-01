@@ -1,9 +1,9 @@
 <script setup>
-import { ref, watch } from "vue";
+import {ref, useTemplateRef, watch} from "vue";
 import { vIntersectionObserver } from "@vueuse/components";
-import Select from "@/volt/Select.vue";
 import Skeleton from "@/volt/Skeleton.vue";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
+import SelectForSearch from "@/volt/SelectForSearch.vue";
 
 const props = defineProps({
     modelValue: { required: true },
@@ -25,6 +25,7 @@ const debouncedValue = useDebouncedRef("", 300); // v-model: string (qidiruv) YO
 const page = ref(1);
 const items = ref([]);
 const isVisible = ref(false);
+const selectRef = useTemplateRef('selectRef');
 
 // Qidiruv YOZILGANDA (string bo'lgandagina) fetch qilamiz
 watch(
@@ -71,7 +72,6 @@ function onIntersectionObserver([entry]) {
 }
 
 async function onChange(item) {
-    console.log(item)
     if (item && typeof item === "object") {
         // Tanlangan option
         debouncedValue.value = item;
@@ -90,6 +90,9 @@ async function onChange(item) {
         await props.fetchFn(query);
         items.value = props.options;
     }
+
+    console.log(selectRef.value)
+    selectRef.value.hide()
 }
 
 // Parent modelValue o'zgarganda (edit bosilganda)
@@ -131,7 +134,8 @@ watch(
 </script>
 
 <template>
-    <Select
+    <SelectForSearch
+        ref="selectRef"
         v-model="debouncedValue"
         :options="items"
         :option-label="optionLabel"
@@ -174,5 +178,5 @@ watch(
         <template v-for="(_, slotName) in $slots" v-slot:[slotName]="slotProps">
             <slot :name="slotName" v-bind="slotProps ?? {}" />
         </template>
-    </Select>
+    </SelectForSearch>
 </template>
