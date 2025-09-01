@@ -300,9 +300,9 @@
         "IncomeInvoice": "Kirim hujjati",
         "Kit": "Kompozitsiya",
         "TransferInvoice": "Ko‘chirish",
+        "ReturnInvoice": "Qaytarilganlar",
         "customsFee": "Bojxona xarajatlari",
-        "transportationFee": "Transport xarajatlari",
-        "supplier": "Ta'minotchi"
+        "transportationFee": "Transport xarajatlari"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",

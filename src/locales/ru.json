@@ -300,6 +300,7 @@
         "IncomeInvoice": "Поступления",
         "Kit": "Композиция",
         "TransferInvoice": "Перемещение",
+        "ReturnInvoice": "Возвраты",
         "customsFee": "Таможенные расходы",
         "transportationFee": "Транспортные расходы"
     },
