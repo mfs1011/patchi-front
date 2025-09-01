@@ -59,6 +59,7 @@ const elements = computed(() => [
     {id: 18, name: t('labels.Kit'), value: 'Kit'},
     {id: 19, name: t('labels.TransferInvoice'), value: 'TransferInvoice'},
     {id: 20, name: t('labels.ReturnInvoice'), value: 'ReturnInvoice'},
+    {id: 21, name: t('labels.WriteOffInvoice'), value: 'WriteOffInvoice'},
 ]);
 
 const actions = computed(() => [
@@ -456,9 +457,9 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.qr">{{ t('labels.qr') }}: <b>{{ data.oldData.qr }}</b></h6>
                                         <h6 v-if="data.oldData?.category">{{ t('labels.category') }}: <b>{{ data.oldData.category.name }}</b></h6>
                                         <h6 v-if="data.oldData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.oldData.assembly.name }}</b></h6>
-                                        <h6 v-if="data.oldData?.wholesalePrice">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.oldData.wholesalePrice) }}$</b></h6>
-                                        <h6 v-if="data.oldData?.retailPrice">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.oldData.retailPrice) }}$</b></h6>
-                                        <h6 v-if="data.oldData?.minQty">{{ t('labels.minQty') }}: <b>{{ formatCurrency(data.oldData.minQty) }}</b></h6>
+                                        <h6 v-if="data.oldData?.wholesalePrice !== undefined">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.oldData.wholesalePrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.retailPrice !== undefined">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.oldData.retailPrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.minQty !== undefined">{{ t('labels.minQty') }}: <b>{{ formatCurrency(data.oldData.minQty) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Location'">
                                         <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
@@ -472,15 +473,15 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'OrderKpiPercent'">
-                                        <h6 v-if="data.oldData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.oldData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.oldData?.kpiPercent !== undefined">{{ t('labels.kpiPercent') }}: <b>{{ data.oldData.kpiPercent }}%</b></h6>
                                         <h6 v-if="data.oldData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.oldData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'KitKpiPercent'">
-                                        <h6 v-if="data.oldData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.oldData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.oldData?.kpiPercent !== undefined">{{ t('labels.kpiPercent') }}: <b>{{ data.oldData.kpiPercent }}%</b></h6>
                                         <h6 v-if="data.oldData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.oldData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'CategoryKpiPercent'">
-                                        <h6 v-if="data.oldData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.oldData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.oldData?.kpiPercent !== undefined">{{ t('labels.kpiPercent') }}: <b>{{ data.oldData.kpiPercent }}%</b></h6>
                                         <h6 v-if="data.oldData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.oldData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Payment'">
@@ -495,20 +496,20 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.dateFrom">{{ t('labels.dateFrom') }}: <b>{{ getFormattedDateWithTime(data.oldData.dateFrom) }}</b></h6>
                                         <h6 v-if="data.oldData?.dateTo">{{ t('labels.dateTo') }}: <b>{{ getFormattedDateWithTime(data.oldData.dateTo) }}</b></h6>
                                         <h6 v-if="data.oldData?.status">{{ t('labels.status') }}: <b>{{ t(data.oldData.status) }}</b></h6>
-                                        <h6 v-if="data.oldData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.totalPrice !== undefined">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'OrderInvoice'">
                                         <h6 v-if="data.oldData?.location">{{ t('labels.locations') }}: <b>{{ data.oldData.location.name }}</b></h6>
                                         <h6 v-if="data.oldData?.seller">{{ t('labels.Seller') }}: <b>{{ data.oldData.seller.name }}</b></h6>
                                         <h6 v-if="data.oldData?.customer">{{ t('labels.Customer') }}: <b>{{ data.oldData.customer.name }}</b></h6>
                                         <h6 v-if="data.oldData?.status">{{ t('labels.status') }}: <b>{{ t(data.oldData.status) }}</b></h6>
-                                        <h6 v-if="data.oldData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.totalPrice !== undefined">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'IncomeInvoice'">
                                         <h6 v-if="data.oldData?.supplier">{{ t('labels.Supplier') }}: <b>{{ data.oldData.supplier.name }}</b></h6>
                                         <h6 v-if="data.oldData?.location">{{ t('labels.locations') }}: <b>{{ data.oldData.location.name }}</b></h6>
                                         <h6 v-if="data.oldData?.comment" class="truncate max-w-xs">{{ t('labels.comment') }}: <b>{{ data.oldData.comment }}</b></h6>
-                                        <h6 v-if="data.oldData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.totalPrice !== undefined">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
                                         <h6 v-if="data.oldData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.oldData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Kit'">
@@ -517,17 +518,21 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.code">{{ t('labels.code') }}: <b>{{ data.oldData.code }}</b></h6>
                                         <h6 v-if="data.oldData?.qr">{{ t('labels.qr') }}: <b>{{ data.oldData.qr }}</b></h6>
                                         <h6 v-if="data.oldData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.oldData.assembly.name }}</b></h6>
-                                        <h6 v-if="data.oldData?.wholesalePrice">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.oldData.wholesalePrice) }}$</b></h6>
-                                        <h6 v-if="data.oldData?.retailPrice">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.oldData.retailPrice) }}$</b></h6>
-                                        <h6 v-if="data.oldData?.qty">{{ t('labels.qty') }}: <b>{{ formatCurrency(data.oldData.qty) }}</b></h6>
+                                        <h6 v-if="data.oldData?.wholesalePrice !== undefined">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.oldData.wholesalePrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.retailPrice !== undefined">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.oldData.retailPrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.qty !== undefined">{{ t('labels.qty') }}: <b>{{ formatCurrency(data.oldData.qty) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'TransferInvoice'">
                                         <h6 v-if="data.oldData?.fromLocation">{{ t('labels.fromLocation') }}: <b>{{ data.oldData.fromLocation.name }}</b></h6>
                                         <h6 v-if="data.oldData?.toLocation">{{ t('labels.toLocation') }}: <b>{{ data.oldData.toLocation.name }}</b></h6>
                                         <h6 v-if="data.oldData?.status">{{ t('labels.status') }}: <b>{{ t(data.oldData.status) }}</b></h6>
+                                        <h6 v-if="data.oldData?.totalCostPrice !== undefined">{{ t('labels.costPrice') }}: <b>{{ formatCurrency(data.oldData.totalCostPrice) }}$</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'ReturnInvoice'">
-                                        <h6 v-if="data.oldData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.oldData?.totalPrice !== undefined">{{ t('labels.total') }}: <b>{{ formatCurrency(data.oldData.totalPrice) }}$</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'WriteOffInvoice'">
+                                        <h6 v-if="data.oldData?.totalCostPrice !== undefined">{{ t('labels.costPrice') }}: <b>{{ formatCurrency(data.oldData.totalCostPrice) }}$</b></h6>
                                     </div>
                                 </div>
                             </template>
@@ -590,9 +595,9 @@ onMounted(() => {
                                         <h6 v-if="data.newData?.qr">{{ t('labels.qr') }}: <b>{{ data.newData.qr }}</b></h6>
                                         <h6 v-if="data.newData?.category">{{ t('labels.category') }}: <b>{{ data.newData.category.name }}</b></h6>
                                         <h6 v-if="data.newData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.newData.assembly.name }}</b></h6>
-                                        <h6 v-if="data.newData?.wholesalePrice">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.newData.wholesalePrice) }}$</b></h6>
-                                        <h6 v-if="data.newData?.retailPrice">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.newData.retailPrice) }}$</b></h6>
-                                        <h6 v-if="data.newData?.minQty">{{ t('labels.minQty') }}: <b>{{ formatCurrency(data.newData.minQty) }}</b></h6>
+                                        <h6 v-if="data.newData?.wholesalePrice !== undefined">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.newData.wholesalePrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.retailPrice !== undefined">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.newData.retailPrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.minQty !== undefined">{{ t('labels.minQty') }}: <b>{{ formatCurrency(data.newData.minQty) }}</b></h6>
                                         <h6 v-if="data.action === 'update' && data.newData?.photo">{{ t('labels.photo') }}: <b>{{ t('labels.imageUpdated') }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Location'">
@@ -607,15 +612,15 @@ onMounted(() => {
                                         <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'OrderKpiPercent'">
-                                        <h6 v-if="data.newData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.newData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.newData?.kpiPercent !== undefined">{{ t('labels.kpiPercent') }}: <b>{{ data.newData.kpiPercent }}%</b></h6>
                                         <h6 v-if="data.newData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.newData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'KitKpiPercent'">
-                                        <h6 v-if="data.newData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.newData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.newData?.kpiPercent !== undefined">{{ t('labels.kpiPercent') }}: <b>{{ data.newData.kpiPercent }}%</b></h6>
                                         <h6 v-if="data.newData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.newData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'CategoryKpiPercent'">
-                                        <h6 v-if="data.newData?.kpiPercent">{{ t('labels.kpiPercent') }}: <b>{{ data.newData.kpiPercent }}%</b></h6>
+                                        <h6 v-if="data.newData?.kpiPercent !== undefined">{{ t('labels.kpiPercent') }}: <b>{{ data.newData.kpiPercent }}%</b></h6>
                                         <h6 v-if="data.newData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.newData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Payment'">
@@ -630,20 +635,20 @@ onMounted(() => {
                                         <h6 v-if="data.newData?.dateFrom">{{ t('labels.dateFrom') }}: <b>{{ getFormattedDateWithTime(data.newData.dateFrom) }}</b></h6>
                                         <h6 v-if="data.newData?.dateTo">{{ t('labels.dateTo') }}: <b>{{ getFormattedDateWithTime(data.newData.dateTo) }}</b></h6>
                                         <h6 v-if="data.newData?.status">{{ t('labels.status') }}: <b>{{ t(data.newData.status) }}</b></h6>
-                                        <h6 v-if="data.newData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.totalPrice !== undefined">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'OrderInvoice'">
                                         <h6 v-if="data.newData?.location">{{ t('labels.locations') }}: <b>{{ data.newData.location.name }}</b></h6>
                                         <h6 v-if="data.newData?.seller">{{ t('labels.Seller') }}: <b>{{ data.newData.seller.name }}</b></h6>
                                         <h6 v-if="data.newData?.customer">{{ t('labels.Customer') }}: <b>{{ data.newData.customer.name }}</b></h6>
                                         <h6 v-if="data.newData?.status">{{ t('labels.status') }}: <b>{{ t(data.newData.status) }}</b></h6>
-                                        <h6 v-if="data.newData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.totalPrice !== undefined">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'IncomeInvoice'">
                                         <h6 v-if="data.newData?.supplier">{{ t('labels.Supplier') }}: <b>{{ data.newData.supplier.name }}</b></h6>
                                         <h6 v-if="data.newData?.location">{{ t('labels.locations') }}: <b>{{ data.newData.location.name }}</b></h6>
                                         <h6 v-if="data.newData?.comment" class="truncate max-w-xs">{{ t('labels.comment') }}: <b>{{ data.newData.comment }}</b></h6>
-                                        <h6 v-if="data.newData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.totalPrice !== undefined">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
                                         <h6 v-if="data.newData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.newData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Kit'">
@@ -652,21 +657,26 @@ onMounted(() => {
                                         <h6 v-if="data.newData?.code">{{ t('labels.code') }}: <b>{{ data.newData.code }}</b></h6>
                                         <h6 v-if="data.newData?.qr">{{ t('labels.qr') }}: <b>{{ data.newData.qr }}</b></h6>
                                         <h6 v-if="data.newData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.newData.assembly.name }}</b></h6>
-                                        <h6 v-if="data.newData?.wholesalePrice">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.newData.wholesalePrice) }}$</b></h6>
-                                        <h6 v-if="data.newData?.retailPrice">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.newData.retailPrice) }}$</b></h6>
-                                        <h6 v-if="data.newData?.qty">{{ t('labels.qty') }}: <b>{{ formatCurrency(data.newData.qty) }}</b></h6>
+                                        <h6 v-if="data.newData?.wholesalePrice !== undefined">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.newData.wholesalePrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.retailPrice !== undefined">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.newData.retailPrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.qty !== undefined">{{ t('labels.qty') }}: <b>{{ formatCurrency(data.newData.qty) }}</b></h6>
                                         <h6 v-if="data.action === 'update' && data.newData?.photo">{{ t('labels.photo') }}: <b>{{ t('labels.imageUpdated') }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'TransferInvoice'">
                                         <h6 v-if="data.newData?.fromLocation">{{ t('labels.fromLocation') }}: <b>{{ data.newData.fromLocation.name }}</b></h6>
                                         <h6 v-if="data.newData?.toLocation">{{ t('labels.toLocation') }}: <b>{{ data.newData.toLocation.name }}</b></h6>
                                         <h6 v-if="data.newData?.status">{{ t('labels.status') }}: <b>{{ t(data.newData.status) }}</b></h6>
+                                        <h6 v-if="data.newData?.totalCostPrice !== undefined">{{ t('labels.costPrice') }}: <b>{{ formatCurrency(data.newData.totalCostPrice) }}$</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'ReturnInvoice'">
                                         <h6 v-if="data.newData?.orderInvoice?.location">{{ t('labels.locations') }}: <b>{{ data.newData.orderInvoice.location.name }}</b></h6>
                                         <h6 v-if="data.newData?.orderInvoice?.seller">{{ t('labels.Seller') }}: <b>{{ data.newData.orderInvoice.seller.name }}</b></h6>
                                         <h6 v-if="data.newData?.orderInvoice?.customer">{{ t('labels.Customer') }}: <b>{{ data.newData.orderInvoice.customer.name }}</b></h6>
-                                        <h6 v-if="data.newData?.totalPrice">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
+                                        <h6 v-if="data.newData?.totalPrice !== undefined">{{ t('labels.total') }}: <b>{{ formatCurrency(data.newData.totalPrice) }}$</b></h6>
+                                    </div>
+                                    <div v-if="data.entityType === 'WriteOffInvoice'">
+                                        <h6 v-if="data.newData?.location">{{ t('labels.locations') }}: <b>{{ data.newData.location.name }}</b></h6>
+                                        <h6 v-if="data.newData?.totalCostPrice !== undefined">{{ t('labels.costPrice') }}: <b>{{ formatCurrency(data.newData.totalCostPrice) }}$</b></h6>
                                     </div>
                                 </div>
                             </template>

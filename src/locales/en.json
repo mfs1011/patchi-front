@@ -300,7 +300,8 @@
         "IncomeInvoice": "Income invoice",
         "Kit": "Composition",
         "TransferInvoice": "Transfer",
-        "ReturnInvoice": "Returns",
+        "ReturnInvoice": "Return",
+        "WriteOffInvoice": "Write-off",
         "customsFee": "Customs fee",
         "transportationFee": "Transportation fee"
     },

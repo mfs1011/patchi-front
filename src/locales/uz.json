@@ -300,7 +300,8 @@
         "IncomeInvoice": "Kirim hujjati",
         "Kit": "Kompozitsiya",
         "TransferInvoice": "Ko‘chirish",
-        "ReturnInvoice": "Qaytarilganlar",
+        "ReturnInvoice": "Qaytarilgan",
+        "WriteOffInvoice": "Chiqarish",
         "customsFee": "Bojxona xarajatlari",
         "transportationFee": "Transport xarajatlari"
     },
