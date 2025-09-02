@@ -73,13 +73,7 @@ export const routes = [
                                 name: 'add-income-invoices',
                                 meta: { requiresAuth: true, roles: []},
                                 component: () => import('@/views/warehouse/incomeInvoice/WarehouseIncomeInvoiceAdd.vue')
-                            },
-                            {
-                                path: 'edit/:id',
-                                name: 'edit-income-invoices',
-                                meta: { requiresAuth: true, roles: []},
-                                component: () => import('@/views/warehouse/incomeInvoice/WarehouseIncomeInvoiceEdit.vue')
-                            },
+                            }
                         ]
                     },
                     {
