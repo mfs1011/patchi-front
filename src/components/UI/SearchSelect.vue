@@ -17,6 +17,7 @@ const props = defineProps({
     totalItems: { type: Number, default: 0 },
     options: { type: Array, required: true },
     invalid: { type: Boolean },
+    showClear: { type: Boolean, default: true },
 });
 
 const emit = defineEmits(["update:modelValue", "loadMore"]);
@@ -91,7 +92,6 @@ async function onChange(item) {
         items.value = props.options;
     }
 
-    console.log(selectRef.value)
     selectRef.value.hide()
 }
 
@@ -140,7 +140,7 @@ watch(
         :options="items"
         :option-label="optionLabel"
         :placeholder="placeholder"
-        showClear
+        :showClear="props.showClear"
         editable
         :loading="loading"
         @value-change="onChange"

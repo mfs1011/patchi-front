@@ -9,7 +9,7 @@ import InputText from "@/volt/InputText.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {useField, useForm} from "vee-validate";
 import * as yup from "yup";
-import {useRoute, useRouter} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import {useLocationStore} from "@/stores/location.js";
 import {useToast} from "primevue/usetoast";
 import InputNumber from "@/volt/InputNumber.vue";
@@ -49,6 +49,9 @@ const pendingNavigation = ref(false)
 const isLoading = ref(true)
 const editingProductIndex = ref(null)
 const dateFrom = ref();
+const newData = ref({
+    incomeInvoiceProducts: []
+});
 
 const home = computed(() => ({
     icon: 'pi pi-home',
@@ -57,11 +60,7 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t("cards.incomeInvoices"), route: { name: 'warehouse-income-invoices'} }, { label: t('cards.incomeInvoice') }]);
-const hasIncomeInvoiceData = computed(() => (
-    !!supplier.value &&
-    !!location.value &&
-    !!createdAt.value
-))
+
 const isProductTypeNonFood = computed(() => {
     if (!product.value) {
         return false
@@ -70,20 +69,12 @@ const isProductTypeNonFood = computed(() => {
     }
 })
 
-// const isChanged = computed(() => (
-//     !!supplier.value ||
-//     !!location.value ||
-//     !!comment.value ||
-//     !!createdAt.value ||
-//     !!incomeInvoiceProducts.value.length ||
-//     !!product.value ||
-//     !!color.value ||
-//     !!expiryDate.value ||
-//     !!qty.value ||
-//     !!price.value ||
-//     !!transportationFee.value ||
-//     !!customsFee.value
-// ))
+const isChanged = computed(() => (
+    !!newData.value.incomeInvoiceProducts.length ||
+    !!newData.value.supplier ||
+    !!newData.value.comment ||
+    !!newData.value.createdAt
+))
 
 // VeeValidate formani sozlash
 const incomeInvoiceInfoSchema = computed(() => yup.object({
@@ -140,33 +131,42 @@ const { value: price } = useField('price', undefined, { form: productFormCtx });
 const { value: transportationFee } = useField('transportationFee', undefined, { form: productFormCtx });
 const { value: customsFee } = useField('customsFee', undefined, { form: productFormCtx });
 
-const sumPriceOfIncomeInvoiceProducts = computed(() => (
-    incomeInvoiceStore.getIncomeInvoice.totalPrice +
-    incomeInvoiceStore.getIncomeInvoice.transportationFee +
-    incomeInvoiceStore.getIncomeInvoice.customsFee
-))
+const visibleProducts = computed(() =>
+    incomeInvoiceProducts.value.filter(p => !('isDelete' in p))
+);
+
+const sumPriceOfIncomeInvoiceProducts = computed(() => {
+    return visibleProducts.value.length === 0
+        ? 0
+        : visibleProducts.value.reduce((acc, incomeInvoiceProduct) => {
+            return acc
+                + (incomeInvoiceProduct?.price * incomeInvoiceProduct.qty)
+                + (incomeInvoiceProduct?.transportationFee * incomeInvoiceProduct.qty)
+                + (incomeInvoiceProduct?.customsFee * incomeInvoiceProduct.qty)
+        }, 0)
+})
 
 const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
-    const payload = {
-        supplier: values.supplier['@id'],
-        location: values.location['@id'],
-        comment: values.comment,
-        createdAt: values.createdAt,
-        incomeInvoiceProducts: values.incomeInvoiceProducts.map(incomeInvoiceProduct => ({
-            product: incomeInvoiceProduct.product['@id'],
-            color: incomeInvoiceProduct.color['@id'],
-            expiryDate: incomeInvoiceProduct.expiryDate,
-            qty: incomeInvoiceProduct.qty,
-            price: incomeInvoiceProduct.price,
-            transportationFee: incomeInvoiceProduct.transportationFee,
-            customsFee: incomeInvoiceProduct.customsFee
-        }))
-    };
+    if (supplier.value.id !== values.supplier.id) {
+        newData.value.supplier = values.supplier['@id']
+    }
+
+    if (location.value.id !== values.location.id) {
+        newData.value.location = values.location['@id']
+    }
+
+    if (comment.value !== values.comment) {
+        newData.value.comment = values.comment['@id']
+    }
+
+    if (normalizeDate(createdAt.value) !== normalizeDate(values.createdAt)) {
+        newData.value.createdAt = values.createdAt['@id']
+    }
 
     try {
-        await incomeInvoiceStore.pushIncomeInvoice(payload)
+        await incomeInvoiceStore.putIncomeInvoice(newData.value, route.params.id)
 
-        toast.add({ severity: 'success', summary: t('toast.created', { name: t('incomeInvoice.nominativeCapitalize') }), life: 3000 })
+        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('incomeInvoice.nominativeCapitalize') }), life: 3000 })
         incomeInvoiceResetForm()
         productResetForm()
         router.back()
@@ -175,9 +175,9 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
         toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
     }
 })
+const normalizeDate = date => date ? new Date(date).getTime() : null
 
 const onSubmitProduct = productHandleSubmit(async values => {
-    const normalizeDate = date => date ? new Date(date).getTime() : null
 
     const isInclude = incomeInvoiceProducts.value.some(incomeInvoiceProduct => {
         return (
@@ -194,6 +194,7 @@ const onSubmitProduct = productHandleSubmit(async values => {
             life: 3000
         })
     } else {
+        newData.value.incomeInvoiceProducts.push(values)
         incomeInvoiceProducts.value = [...incomeInvoiceProducts.value, values]
         currentProduct.value = values
         productResetForm()
@@ -209,14 +210,38 @@ const deleteAction = data => {
 
 const deleteProduct = () => {
     isDeleteLoading.value = true;
+    console.log(currentProduct.value)
 
-    incomeInvoiceProducts.value = incomeInvoiceProducts.value.filter(p => p.product !== currentProduct.value.product);
+    if (currentProduct.value.id) {
+        const foundIndex = incomeInvoiceProducts.value.findIndex(p => p.id === currentProduct.value.id)
+
+        const deletedData = {
+            incomeInvoiceProduct: incomeInvoiceProducts.value[foundIndex]['@id'],
+            isDelete: true
+        }
+
+        newData.value.incomeInvoiceProducts.push(deletedData)
+
+        incomeInvoiceProducts.value = incomeInvoiceProducts.value.filter(incomeInvoiceProduct => incomeInvoiceProduct.id !== currentProduct.value.id)
+    } else {
+        const foundIndex = incomeInvoiceProducts.value.findIndex(p => {
+            return p.color?.id === currentProduct.value.color?.id &&
+            p.product.id === currentProduct.value.product.id &&
+            normalizeDate(p.expiryDate) === normalizeDate(currentProduct.value.expiryDate)
+        })
+
+        incomeInvoiceProducts.value.splice(foundIndex, 1)
+
+        incomeInvoiceProducts.value = incomeInvoiceProducts.value.filter(p => p.id !== currentProduct.value.id);
+    }
+
     currentProduct.value = {}
     isDeleteLoading.value = false;
     deleteVisible.value = false;
 }
 
 const editProduct = (data, index) => {
+    currentProduct.value = data
     isEditing.value = true
     productResetForm()
     editingProductIndex.value = index
@@ -236,18 +261,46 @@ const clearProductForm = () => {
 
 const saveEditing = () => {
     const editedData = {
-        product: product.value,
-        color: color.value,
-        expiryDate: expiryDate.value,
-        qty: qty.value,
-        price: price.value,
-        transportationFee: transportationFee.value,
-        customsFee: customsFee.value
+        incomeInvoiceProduct: currentProduct.value['@id']
     }
 
-    incomeInvoiceProducts.value = incomeInvoiceProducts.value.map((incomeInvoiceProduct, index) => (
-        index === editingProductIndex.value ? editedData : incomeInvoiceProduct
-    ))
+    if (product.value.id !== incomeInvoiceProducts.value[editingProductIndex.value].product.id) {
+        editedData.product = product.value
+    }
+
+    if (color.value.id !== incomeInvoiceProducts.value[editingProductIndex.value].color.id) {
+        editedData.color = color.value
+    }
+
+    if (expiryDate.value !== incomeInvoiceProducts.value[editingProductIndex.value].expiryDate) {
+        editedData.expiryDate = expiryDate.value
+    }
+
+    if (qty.value !== incomeInvoiceProducts.value[editingProductIndex.value].qty) {
+        editedData.qty = qty.value
+    }
+
+    if (price.value !== incomeInvoiceProducts.value[editingProductIndex.value].price) {
+        editedData.price = price.value
+    }
+
+    if (transportationFee.value !== incomeInvoiceProducts.value[editingProductIndex.value].transportationFee) {
+        editedData.transportationFee = transportationFee.value
+    }
+
+    if (customsFee.value !== incomeInvoiceProducts.value[editingProductIndex.value].customsFee) {
+        editedData.customsFee = customsFee.value
+    }
+
+    newData.value.incomeInvoiceProducts.push(editedData)
+
+    incomeInvoiceProducts.value = incomeInvoiceProducts.value.map(
+        (incomeInvoiceProduct, index) =>
+            index === editingProductIndex.value
+                ? { ...incomeInvoiceProduct, ...editedData } // eski va yangi fieldlarni birlashtiradi
+                : incomeInvoiceProduct
+    )
+
     productResetForm()
     editingProductIndex.value = null
     isEditing.value = false
@@ -272,18 +325,17 @@ watch(location, async () => {
     }
 })
 
-// onBeforeRouteLeave((to, from, next) => {
-//     if (isChanged.value) {
-//         showLeaveDialog.value = true
-//         pendingNavigation.value = next
-//     } else {
-//         next()
-//     }
-// })
+onBeforeRouteLeave((to, from, next) => {
+    if (isChanged.value) {
+        showLeaveDialog.value = true
+        pendingNavigation.value = next
+    } else {
+        next()
+    }
+})
 
 const confirmLeave = () => {
     showLeaveDialog.value = false
-    isEdited.value = false
     if (pendingNavigation.value) {
         pendingNavigation.value()
     }
@@ -292,13 +344,18 @@ onMounted(async () => {
     isLoading.value = true
     await incomeInvoiceStore.fetchIncomeInvoice(route.params.id)
 
-    if (supplierStore.getIsLoadingSuppliers) supplier.value = incomeInvoiceStore.getIncomeInvoice.supplier
-    if (locationStore.getIsLoadingLocation) location.value = incomeInvoiceStore.getIncomeInvoice.location
+    setTimeout(() => {
+        incomeInvoiceResetForm({
+            values: {
+                supplier: incomeInvoiceStore.getIncomeInvoice.supplier,
+                location: incomeInvoiceStore.getIncomeInvoice.location,
+                comment: incomeInvoiceStore.getIncomeInvoice.comment,
+                createdAt: incomeInvoiceStore.getIncomeInvoice.createdAt,
+                incomeInvoiceProducts: incomeInvoiceStore.getIncomeInvoice.incomeInvoiceProducts,
+            }
+        })
+    })
 
-    comment.value = incomeInvoiceStore.getIncomeInvoice.comment
-    createdAt.value = incomeInvoiceStore.getIncomeInvoice.createdAt
-    incomeInvoiceProducts.value = incomeInvoiceStore.getIncomeInvoice.incomeInvoiceProducts
-    console.log(supplier.value, location.value, comment.value, createdAt.value, incomeInvoiceProducts.value)
     isLoading.value = false
 })
 </script>
@@ -345,12 +402,12 @@ onMounted(async () => {
                     :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
                     @click="editMode = false"
                     class="px-2 sm:px-5 whitespace-nowrap bg-surface-0!"
-                    :label="t('buttons.cancel')"
+                    :label="t('dialog.cancel')"
                     :loading="incomeInvoiceIsSubmitting"
                 />
                 <Button
                     v-if="editMode"
-                    :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
+                    :disabled="!isChanged"
                     icon="pi pi-save"
                     @click="onSubmitIncomeInvoice"
                     class="px-2 sm:px-5 whitespace-nowrap"
@@ -384,13 +441,13 @@ onMounted(async () => {
                     :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
                     @click="editMode = false"
                     class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0!"
-                    :label="t('buttons.cancel')"
+                    :label="t('dialog.cancel')"
                     :loading="incomeInvoiceIsSubmitting"
                 />
 
                 <Button
                     v-if="editMode"
-                    :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
+                    :disabled="!isChanged"
                     icon="pi pi-save"
                     @click="onSubmitIncomeInvoice"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
@@ -422,17 +479,18 @@ onMounted(async () => {
                                 :fetchFn="supplierStore.fetchSuppliers"
                                 :options="supplierStore.getSuppliers.models"
                                 :option-label="opt => opt?.name"
-                                :option-value="opt => opt?.id"
+                                :option-value="opt => opt?.name"
                                 :return-value="opt => opt"
                                 :placeholder="t('placeholders.select.supplier')"
                                 :loading="supplierStore.getIsLoadingSuppliers"
                                 :total-items="supplierStore.getSuppliers.totalItems"
                                 :invalid="!!incomeInvoiceErrors.supplier"
+                                :disabled="!editMode"
                             />
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
+                            <p class="text-sm">{{ t('labels.location') }}</p>
 
                             <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
@@ -443,12 +501,14 @@ onMounted(async () => {
                                 :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
-                                :option-value="opt => opt?.id"
+                                :option-value="opt => opt?.name"
                                 :return-value="opt => opt"
                                 :placeholder="t('placeholders.select.location')"
                                 :loading="locationStore.getIsLoadingLocation"
                                 :total-items="locationStore.getLocations.totalItems"
                                 :invalid="!!incomeInvoiceErrors.location"
+                                disabled
+                                :show-clear="false"
                             />
                         </div>
                         <div>
@@ -470,6 +530,7 @@ onMounted(async () => {
                                 :invalid="!!incomeInvoiceErrors.createdAt"
                                 showTime
                                 hourFormat="24"
+                                :disabled="!editMode"
                             />
 
                         </div>
@@ -486,6 +547,7 @@ onMounted(async () => {
                                 :placeholder="t('placeholders.comment')"
                                 :class="{ 'p-invalid': incomeInvoiceErrors.comment }"
                                 :invalid="!!incomeInvoiceErrors.comment"
+                                :disabled="!editMode"
                             />
                         </div>
                     </div>
@@ -638,7 +700,8 @@ onMounted(async () => {
                     </NoData>
 
                     <DataTable
-                        :value="isLoading ? Array(10).fill({}) : incomeInvoiceProducts"
+                        v-else
+                        :value="isLoading ? Array(10).fill({}) : visibleProducts"
                         scrollable
                         scroll-height="700px"
                         pt:footer="border-none dark:bg-surface-800"
