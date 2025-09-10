@@ -1,13 +1,15 @@
 import * as yup from 'yup'
 import { computed } from 'vue'
 import { useField, useForm } from 'vee-validate'
+import {useI18n} from "vue-i18n";
 
 export function useIncomeInvoiceValidation() {
+    const { t } = useI18n()
     // Main invoice schema
     const incomeInvoiceInfoSchema = computed(() => yup.object({
         supplier: yup.object().required('Supplier is required'),
         location: yup.object().required('Location is required'),
-        comment: yup.string().max(255).notRequired(),
+        comment: yup.string().max(255, t('errorMessages.maxCharacter', { count: 255 })).notRequired(),
         createdAt: yup.date().required('CreatedAt is required'),
         incomeInvoiceProducts: yup.array().required().min(1, 'At least one product required')
     }))
