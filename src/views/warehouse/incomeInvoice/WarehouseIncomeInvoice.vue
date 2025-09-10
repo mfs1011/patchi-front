@@ -1,144 +1,94 @@
 <script setup>
-import Breadcrumb from "@/volt/Breadcrumb.vue";
-import Section from "@/components/UI/Section.vue";
+import {onBeforeRouteLeave, useRoute} from "vue-router";
 import {computed, onMounted, ref, watch} from "vue";
-import {useI18n} from "vue-i18n";
-import Button from "@/volt/Button.vue";
-import Card from "@/volt/Card.vue";
-import InputText from "@/volt/InputText.vue";
-import SecondaryButton from "@/volt/SecondaryButton.vue";
-import {useField, useForm} from "vee-validate";
-import * as yup from "yup";
-import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
-import {useLocationStore} from "@/stores/location.js";
-import {useToast} from "primevue/usetoast";
-import InputNumber from "@/volt/InputNumber.vue";
-import {useSupplierStore} from "@/stores/supplier.js";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
-import {useProductStore} from "@/stores/product.js";
-import {useColorStore} from "@/stores/color.js";
-import DatePicker from "@/volt/DatePicker.vue";
-import {formatCurrency, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
-import Column from "primevue/column";
-import DataTable from "@/volt/DataTable.vue";
+import Section from "@/components/UI/Section.vue";
+import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Dialog from "@/volt/Dialog.vue";
-import {useIncomeInvoiceStore} from "@/stores/incomeInvoice.js";
-import {useInventoryStore} from "@/stores/inventory.js";
+import DataTable from "@/volt/DataTable.vue";
+import Column from "primevue/column";
+import InputNumber from "@/volt/InputNumber.vue";
+import InputText from "@/volt/InputText.vue";
 import Skeleton from "@/volt/Skeleton.vue";
+import Card from "@/volt/Card.vue";
+import DatePicker from "@/volt/DatePicker.vue";
+import SecondaryButton from "@/volt/SecondaryButton.vue";
+import Button from "@/volt/Button.vue";
 import NoData from "@/components/UI/NoData.vue";
+import {useIncomeInvoiceStore} from "@/stores/incomeInvoice.js";
+import {useIncomeInvoiceValidation} from "@/views/warehouse/incomeInvoice/useWarehouseIncomeInvoiceForm.js";
+import {useI18n} from "vue-i18n";
+import {useSupplierStore} from "@/stores/supplier.js";
+import {useLocationStore} from "@/stores/location.js";
+import {useProductStore} from "@/stores/product.js";
+import {useInventoryStore} from "@/stores/inventory.js";
+import {formatCurrency, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
+import {useColorStore} from "@/stores/color.js";
+import {useToast} from "primevue/usetoast";
 
-const { t } = useI18n()
+const route = useRoute();
 const toast = useToast()
-const route = useRoute()
-
-const locationStore = useLocationStore();
+const incomeInvoiceStore = useIncomeInvoiceStore();
 const inventoryStore = useInventoryStore();
 const supplierStore = useSupplierStore();
+const locationStore = useLocationStore();
 const productStore = useProductStore();
 const colorStore = useColorStore();
-const incomeInvoiceStore = useIncomeInvoiceStore();
-const router = useRouter();
-const currentProduct = ref({})
-const deleteVisible = ref(false)
-const isDeleteLoading = ref(false)
-const isEditing = ref(false)
-const editMode = ref(false)
-const showLeaveDialog = ref(false)
-const isConfirmLoading = ref(false)
-const pendingNavigation = ref(false)
-const isLoading = ref(true)
-const editingProductIndex = ref(null)
-const dateFrom = ref();
-const newData = ref({
-    incomeInvoiceProducts: []
-});
+const { t } = useI18n();
+const {
+    productHandleSubmit,
+    productErrors,
+    productIsSubmitting,
+    productResetForm,
+    productFormCtx,
+    product,
+    color,
+    expiryDate,
+    qty,
+    price,
+    transportationFee,
+    customsFee,
+    incomeInvoiceHandleSubmit,
+    incomeInvoiceErrors,
+    incomeInvoiceIsSubmitting,
+    incomeInvoiceResetForm,
+    incomeInvoiceFormCtx,
+    supplier,
+    location,
+    comment,
+    createdAt,
+    incomeInvoiceProducts,
+} = useIncomeInvoiceValidation();
 
+const apiData = ref(null);
+const editableData = ref(null);
+const currentProductIndex = ref(null);
+const currentDeletProduct = ref(null);
+const deletedData = ref([]);
+const createdData = ref([]);
+const updatedData = ref([]);
+const dateFrom = ref(null);
+const editMode = ref(false);
+const isLoading = ref(false);
+const deleteVisible = ref(false);
+const isDeleteLoading = ref(false);
+const showLeaveDialog = ref(false);
+const isEditing = ref(false);
+const pendingNavigation = ref(false);
+const isEdited = ref(false);
+
+// computed
 const home = computed(() => ({
-    icon: 'pi pi-home',
-    label: t('warehouse'),
-    route: '/warehouse'
+    icon: "pi pi-slash",
+    label: t("warehouse"),
+    route: "/warehouse",
 }));
 
-const items = computed(() => [{ label: t("cards.incomeInvoices"), route: { name: 'warehouse-income-invoices'} }, { label: t('cards.incomeInvoice') }]);
-
-const isProductTypeNonFood = computed(() => {
-    if (!product.value) {
-        return false
-    } else {
-        return product.value.category.categoryType.name === 'Non-food'
-    }
-})
-
-const isChanged = computed(() => (
-    !!newData.value.incomeInvoiceProducts.length ||
-    !!newData.value.supplier ||
-    !!newData.value.comment ||
-    !!newData.value.createdAt
-))
-
-// VeeValidate formani sozlash
-const incomeInvoiceInfoSchema = computed(() => yup.object({
-    supplier: yup.object().required(),
-    location: yup.object().required(),
-    comment: yup.string().max(255).notRequired(),
-    createdAt: yup.date().required(),
-    incomeInvoiceProducts: yup.array().required().min(1)
-}))
-
-const productSchema = computed(() => yup.object({
-    product: yup.object().required(),
-    color: yup.object().notRequired(),
-    expiryDate: yup.date().notRequired(),
-    qty: yup.number().required(),
-    price: yup.number().required(),
-    transportationFee: yup.number().required(),
-    customsFee: yup.number().required()
-}))
-
-const {
-    handleSubmit: incomeInvoiceHandleSubmit,
-    errors: incomeInvoiceErrors,
-    isSubmitting: incomeInvoiceIsSubmitting,
-    resetForm: incomeInvoiceResetForm,
-    ...incomeInvoiceFormCtx
-} = useForm({
-    validationSchema: incomeInvoiceInfoSchema,
-    initialValues: {
-        incomeInvoiceProducts: []
-    }
-})
-
-const {
-    handleSubmit: productHandleSubmit,
-    errors: productErrors,
-    isSubmitting: productIsSubmitting,
-    resetForm: productResetForm,
-    ...productFormCtx
-} = useForm({
-    validationSchema: productSchema
-})
-
-const { value: supplier } = useField('supplier', undefined, { form: incomeInvoiceFormCtx });
-const { value: location } = useField('location', undefined, { form: incomeInvoiceFormCtx })
-const { value: comment } = useField('comment', undefined, { form: incomeInvoiceFormCtx })
-const { value: createdAt } = useField('createdAt', undefined, { form: incomeInvoiceFormCtx})
-const { value: incomeInvoiceProducts } = useField('incomeInvoiceProducts', undefined, { validateOnMount: true, form: incomeInvoiceFormCtx })
-const { value: product } = useField('product', undefined, { validateOnValueUpdate: false, form: productFormCtx });
-const { value: color } = useField('color', undefined, { form: productFormCtx });
-const { value: expiryDate } = useField('expiryDate', undefined, { form: productFormCtx });
-const { value: qty } = useField('qty', undefined, { form: productFormCtx });
-const { value: price } = useField('price', undefined, { form: productFormCtx });
-const { value: transportationFee } = useField('transportationFee', undefined, { form: productFormCtx });
-const { value: customsFee } = useField('customsFee', undefined, { form: productFormCtx });
-
-const visibleProducts = computed(() =>
-    incomeInvoiceProducts.value.filter(p => !('isDelete' in p))
-);
-
+const items = computed(() => [{ label: t("cards.incomeInvoices"), route: { name: 'warehouse-income-invoices'} }, { label: t("cards.incomeInvoice") }]);
 const sumPriceOfIncomeInvoiceProducts = computed(() => {
-    return visibleProducts.value.length === 0
+    return editableData.value.incomeInvoiceProducts.length === 0
         ? 0
-        : visibleProducts.value.reduce((acc, incomeInvoiceProduct) => {
+        : editableData.value.incomeInvoiceProducts.reduce((acc, incomeInvoiceProduct) => {
             return acc
                 + (incomeInvoiceProduct?.price * incomeInvoiceProduct.qty)
                 + (incomeInvoiceProduct?.transportationFee * incomeInvoiceProduct.qty)
@@ -146,165 +96,232 @@ const sumPriceOfIncomeInvoiceProducts = computed(() => {
         }, 0)
 })
 
-const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
-    if (supplier.value.id !== values.supplier.id) {
-        newData.value.supplier = values.supplier['@id']
+const isProductTypeNonFood = computed(() => {
+    if (!product.value) {
+        return false
     }
 
-    if (location.value.id !== values.location.id) {
-        newData.value.location = values.location['@id']
-    }
-
-    if (comment.value !== values.comment) {
-        newData.value.comment = values.comment['@id']
-    }
-
-    if (normalizeDate(createdAt.value) !== normalizeDate(values.createdAt)) {
-        newData.value.createdAt = values.createdAt['@id']
-    }
-
-    try {
-        await incomeInvoiceStore.putIncomeInvoice(newData.value, route.params.id)
-
-        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('incomeInvoice.nominativeCapitalize') }), life: 3000 })
-        incomeInvoiceResetForm()
-        productResetForm()
-        router.back()
-
-    } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
-    }
+    return product.value.category.categoryType.name === 'Non-food'
 })
-const normalizeDate = date => date ? new Date(date).getTime() : null
 
-const onSubmitProduct = productHandleSubmit(async values => {
+const isChanged = computed(() => (
+    createdData.value.length ||
+    updatedData.value.length ||
+    deletedData.value.length ||
+    normalizeDate(incomeInvoiceStore.getIncomeInvoice.createdAt) !== normalizeDate(createdAt.value) ||
+    incomeInvoiceStore.getIncomeInvoice?.comment !== comment.value ||
+    incomeInvoiceStore.getIncomeInvoice?.supplier?.id !== supplier.value?.id
+));
+// functions
+const onSubmitProduct = productHandleSubmit((values) => {
+    addProduct(values)
+})
 
-    const isInclude = incomeInvoiceProducts.value.some(incomeInvoiceProduct => {
-        return (
-            incomeInvoiceProduct.color?.id === values.color?.id &&
-            incomeInvoiceProduct.product.id === values.product.id &&
-            normalizeDate(incomeInvoiceProduct.expiryDate) === normalizeDate(values.expiryDate)
-        )
+const onEditProduct = productHandleSubmit((values) => {
+    editProduct(values)
+})
+
+const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit((values) => {
+    const payload = {};
+
+    payload.incomeInvoiceProducts = [...createdData.value, ...updatedData.value, ...deletedData.value]
+
+    if (values.supplier.id !== apiData.value.supplier.id) {
+        payload.supplier = values.supplier['@id']
+    }
+
+    if (values.comment !== apiData.value.comment) {
+        payload.comment = values.comment
+    }
+
+    if (new Date(values.createdAt).toISOString() !== new Date(apiData.value.createdAt).toISOString()) {
+        payload.createdAt = values.createdAt
+    }
+
+    incomeInvoiceStore.putIncomeInvoice(payload, route.params.id)
+    isEditing.value = false
+    editMode.value = false
+    isEdited.value = true
+    toast.add({
+        severity: 'success',
+        summary: t('toast.successEditingSave'),
+        life: 3000
     })
-
-    if (isInclude) {
-        toast.add({
-            severity: 'error',
-            summary: t('toast.already_added', { name: t('product.nominativeCapitalize') }),
-            life: 3000
-        })
-    } else {
-        newData.value.incomeInvoiceProducts.push(values)
-        incomeInvoiceProducts.value = [...incomeInvoiceProducts.value, values]
-        currentProduct.value = values
-        productResetForm()
-        product.value = undefined
-        color.value = undefined
-    }
 })
 
-const deleteAction = data => {
-    deleteVisible.value = true
-    currentProduct.value = data
-}
-
-const deleteProduct = () => {
-    isDeleteLoading.value = true;
-    console.log(currentProduct.value)
-
-    if (currentProduct.value.id) {
-        const foundIndex = incomeInvoiceProducts.value.findIndex(p => p.id === currentProduct.value.id)
-
-        const deletedData = {
-            incomeInvoiceProduct: incomeInvoiceProducts.value[foundIndex]['@id'],
-            isDelete: true
-        }
-
-        newData.value.incomeInvoiceProducts.push(deletedData)
-
-        incomeInvoiceProducts.value = incomeInvoiceProducts.value.filter(incomeInvoiceProduct => incomeInvoiceProduct.id !== currentProduct.value.id)
-    } else {
-        const foundIndex = incomeInvoiceProducts.value.findIndex(p => {
-            return p.color?.id === currentProduct.value.color?.id &&
-            p.product.id === currentProduct.value.product.id &&
-            normalizeDate(p.expiryDate) === normalizeDate(currentProduct.value.expiryDate)
-        })
-
-        incomeInvoiceProducts.value.splice(foundIndex, 1)
-
-        incomeInvoiceProducts.value = incomeInvoiceProducts.value.filter(p => p.id !== currentProduct.value.id);
-    }
-
-    currentProduct.value = {}
-    isDeleteLoading.value = false;
-    deleteVisible.value = false;
-}
-
-const editProduct = (data, index) => {
-    currentProduct.value = data
-    isEditing.value = true
-    productResetForm()
-    editingProductIndex.value = index
-    product.value = data.product
-    color.value = data.color
-    expiryDate.value = data.expiryDate
-    qty.value = data.qty
-    price.value = data.price
-    transportationFee.value = data.transportationFee
-    customsFee.value = data.customsFee
-}
+const normalizeDate = date => date ? new Date(date).getTime() : null
 
 const clearProductForm = () => {
     isEditing.value = false
     productResetForm()
 }
 
-const saveEditing = () => {
-    const editedData = {
-        incomeInvoiceProduct: currentProduct.value['@id']
+function addProduct(newProduct) {
+    const exists = editableData.value.incomeInvoiceProducts.some(p =>
+        p.product.id === newProduct.product.id &&
+        p.color?.id === newProduct.color?.id &&
+        normalizeDate(p.expiryDate) === normalizeDate(newProduct.expiryDate)
+    );
+
+    if (exists) {
+        toast.add({
+            severity: 'error',
+            summary: t('toast.already_added', { name: t('product.nominativeCapitalize') }),
+            life: 3000
+        })
+
+        return;
     }
 
-    if (product.value.id !== incomeInvoiceProducts.value[editingProductIndex.value].product.id) {
-        editedData.product = product.value
-    }
+    editableData.value.incomeInvoiceProducts.push(newProduct);
 
-    if (color.value.id !== incomeInvoiceProducts.value[editingProductIndex.value].color.id) {
-        editedData.color = color.value
-    }
+    createdData.value.push(newProduct)
 
-    if (expiryDate.value !== incomeInvoiceProducts.value[editingProductIndex.value].expiryDate) {
-        editedData.expiryDate = expiryDate.value
-    }
+    toast.add({
+        severity: 'success',
+        summary: t('toast.added', { name: t('product.nominativeCapitalize') }),
+        life: 3000
+    })
 
-    if (qty.value !== incomeInvoiceProducts.value[editingProductIndex.value].qty) {
-        editedData.qty = qty.value
-    }
-
-    if (price.value !== incomeInvoiceProducts.value[editingProductIndex.value].price) {
-        editedData.price = price.value
-    }
-
-    if (transportationFee.value !== incomeInvoiceProducts.value[editingProductIndex.value].transportationFee) {
-        editedData.transportationFee = transportationFee.value
-    }
-
-    if (customsFee.value !== incomeInvoiceProducts.value[editingProductIndex.value].customsFee) {
-        editedData.customsFee = customsFee.value
-    }
-
-    newData.value.incomeInvoiceProducts.push(editedData)
-
-    incomeInvoiceProducts.value = incomeInvoiceProducts.value.map(
-        (incomeInvoiceProduct, index) =>
-            index === editingProductIndex.value
-                ? { ...incomeInvoiceProduct, ...editedData } // eski va yangi fieldlarni birlashtiradi
-                : incomeInvoiceProduct
-    )
-
-    productResetForm()
-    editingProductIndex.value = null
-    isEditing.value = false
+    productResetForm();
 }
+
+function deleteAction(product) {
+    deleteVisible.value = true
+    currentDeletProduct.value = product
+}
+
+function deleteProduct() {
+    const index = editableData.value.incomeInvoiceProducts.findIndex(p =>
+        p.product.id === currentDeletProduct.value.product.id &&
+        p.color?.id === currentDeletProduct.value.color?.id &&
+        normalizeDate(p.expiryDate) === normalizeDate(currentDeletProduct.value.expiryDate)
+    );
+
+    if (index === -1) return;
+
+    const current = editableData.value.incomeInvoiceProducts[index];
+
+    if (current.id) {
+        // API’dan kelgan
+        editableData.value.incomeInvoiceProducts.splice(index, 1);
+
+        deletedData.value.push({
+            incomeInvoiceProduct: current["@id"],
+            isDelete: true
+        })
+    } else {
+        // Yangi qo‘shilgan
+        editableData.value.incomeInvoiceProducts.splice(index, 1);
+    }
+    deleteVisible.value = false
+}
+
+function edit(data, index) {
+    isEditing.value = true;
+    currentProductIndex.value = index
+    product.value = data.product;
+    color.value = data.color;
+    expiryDate.value = data.expiryDate;
+    qty.value = data.qty;
+    price.value = data.price;
+    customsFee.value = data.customsFee;
+    transportationFee.value = data.transportationFee;
+}
+
+function editProduct(updatedProduct) {
+    // Duplicate check
+    const exists = editableData.value.incomeInvoiceProducts.some((p, i) =>
+        p.product.id === updatedProduct.product.id &&
+        p.color?.id === updatedProduct.color?.id &&
+        normalizeDate(p.expiryDate) === normalizeDate(updatedProduct.expiryDate)
+    );
+
+    if (exists) {
+        toast.add({
+            severity: 'error',
+            summary: t('toast.already_added', { name: t('product.nominativeCapitalize') }),
+            life: 3000
+        })
+
+        return;
+    }
+
+    const current = editableData.value.incomeInvoiceProducts[currentProductIndex.value];
+
+    const payload = {};
+
+    if (updatedProduct.product.id !== current.product.id) {
+        payload.product = updatedProduct.product
+    }
+
+    if (updatedProduct.color?.id !== current.color?.id) {
+        payload.color = updatedProduct.color
+    }
+
+    if (normalizeDate(updatedProduct.expiryDate) !== normalizeDate(current.expiryDate)) {
+        payload.expiryDate = updatedProduct.expiryDate
+    }
+
+    if (updatedProduct.qty !== current.qty) {
+        payload.qty = updatedProduct.qty
+    }
+
+    if (updatedProduct.price !== current.price) {
+        payload.price = updatedProduct.price
+    }
+
+    if (updatedProduct.customsFee !== current.customsFee) {
+        payload.customsFee = updatedProduct.customsFee
+    }
+
+    if (updatedProduct.transportationFee !== current.transportationFee) {
+        payload.transportationFee = updatedProduct.transportationFee
+    }
+
+    if (current.id) {
+        payload.incomeInvoiceProduct = current['@id']
+        const indexFromUpdatedData = updatedData.value.findIndex(data => data.incomeInvoiceProduct['@id'] === payload.incomeInvoiceProduct['@id'])
+
+        if (indexFromUpdatedData !== -1) {
+            updatedData.value[indexFromUpdatedData] = {
+                payload
+            }
+        } else {
+            updatedData.value.push(payload)
+        }
+
+        // API’dan kelgan
+        editableData.value.incomeInvoiceProducts[currentProductIndex.value] = {
+            incomeInvoiceProduct: current['@id'],
+            ...current,
+            ...payload,
+        };
+    } else {
+        // Yangi qo‘shilgan
+        editableData.value.incomeInvoiceProducts[currentProductIndex.value] = {
+            ...current,
+            ...payload
+        };
+
+        const index = createdData.value.findIndex(p => (
+            p.product.id === current.product.id &&
+            p.color?.id === current.color?.id &&
+            normalizeDate(p.expiryDate) === normalizeDate(current.expiryDate)
+        ))
+
+        if (index !== -1) {
+            // Agar mavjud bo‘lsa yangilash
+            createdData.value[index] = { ...createdData.value[index], ...updatedProduct }
+        } else {
+            // Aks holda push qilish
+            createdData.value.push(updatedProduct)
+        }
+    }
+
+    clearProductForm()
+}
+
 
 watch(location, async () => {
     if (location.value) {
@@ -317,7 +334,7 @@ watch(location, async () => {
             const date = new Date(inventoryStore.getLastInventoryDateTo);
             date.setDate(date.getDate() + 1);
             dateFrom.value = date;
-            createdAt.value = date
+            // createdAt.value = date
         }
     } else {
         dateFrom.value = null
@@ -326,7 +343,7 @@ watch(location, async () => {
 })
 
 onBeforeRouteLeave((to, from, next) => {
-    if (isChanged.value) {
+    if (isChanged.value && !isEdited.value) {
         showLeaveDialog.value = true
         pendingNavigation.value = next
     } else {
@@ -340,23 +357,27 @@ const confirmLeave = () => {
         pendingNavigation.value()
     }
 }
+
 onMounted(async () => {
-    isLoading.value = true
-    await incomeInvoiceStore.fetchIncomeInvoice(route.params.id)
+    isLoading.value = true;
+    await incomeInvoiceStore.fetchIncomeInvoice(route.params.id);
+
+    apiData.value = incomeInvoiceStore.getIncomeInvoice;
+    editableData.value = JSON.parse(JSON.stringify(incomeInvoiceStore.getIncomeInvoice));
 
     setTimeout(() => {
         incomeInvoiceResetForm({
             values: {
                 supplier: incomeInvoiceStore.getIncomeInvoice.supplier,
                 location: incomeInvoiceStore.getIncomeInvoice.location,
+                createdAt: new Date(incomeInvoiceStore.getIncomeInvoice.createdAt),
                 comment: incomeInvoiceStore.getIncomeInvoice.comment,
-                createdAt: incomeInvoiceStore.getIncomeInvoice.createdAt,
-                incomeInvoiceProducts: incomeInvoiceStore.getIncomeInvoice.incomeInvoiceProducts,
+                incomeInvoiceProducts: incomeInvoiceStore.getIncomeInvoice.incomeInvoiceProducts
             }
         })
     })
 
-    isLoading.value = false
+    isLoading.value = false;
 })
 </script>
 
@@ -573,6 +594,7 @@ onMounted(async () => {
                                 :option-label="opt => `${opt?.name} | ${opt?.code}`"
                                 :option-value="opt => `${opt?.name} | ${opt?.code}`"
                                 :return-value="opt => opt"
+                                :search-value="opt => opt.name"
                                 :placeholder="t('placeholders.select.product')"
                                 :loading="productStore.getIsLoadingProducts"
                                 :total-items="productStore.getProducts.totalItems"
@@ -594,6 +616,7 @@ onMounted(async () => {
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.name"
                                 :return-value="opt => opt"
+                                :search-value="opt => opt.name"
                                 :placeholder="t('placeholders.select.color')"
                                 :loading="colorStore.getIsLoadingColor"
                                 :total-items="colorStore.getColors.totalItems"
@@ -602,7 +625,7 @@ onMounted(async () => {
                         </div>
 
                         <div v-if="!isProductTypeNonFood">
-                            <p class="text-sm">{{ t('labels.expiryDate') }}</p>
+                            <p class="text-sm">{{ t('labels.expiryDate') }}<span class="text-red-500"> *</span></p>
 
                             <DatePicker
                                 v-model="expiryDate"
@@ -683,7 +706,7 @@ onMounted(async () => {
                     <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
                         <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearProductForm" />
                         <Button v-if="!isEditing" @click="onSubmitProduct" :label="t('buttons.add')" class="px-5" :loading="productIsSubmitting"/>
-                        <Button v-else @click="saveEditing" :label="t('buttons.edit')" class="px-5"/>
+                        <Button v-else @click="onEditProduct" :label="t('buttons.edit')" class="px-5"/>
                     </div>
 
                 </template>
@@ -695,13 +718,13 @@ onMounted(async () => {
                 pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
                 <template #content>
-                    <NoData v-if="!incomeInvoiceProducts.length && !isLoading" class="text-surface-400 mx-auto my-auto">
+                    <NoData v-if="!editableData?.incomeInvoiceProducts.length && !isLoading" class="text-surface-400 mx-auto my-auto">
                         <p class="text-xl font-normal">{{ t("noResults") }}</p>
                     </NoData>
 
                     <DataTable
                         v-else
-                        :value="isLoading ? Array(10).fill({}) : visibleProducts"
+                        :value="isLoading ? Array(10).fill({}) : editableData.incomeInvoiceProducts"
                         scrollable
                         scroll-height="700px"
                         pt:footer="border-none dark:bg-surface-800"
@@ -755,7 +778,7 @@ onMounted(async () => {
                                 <div v-else class="flex justify-end w-full">
                                     <div class="flex items-center gap-2">
                                         <Button
-                                            @click="editProduct(data, index)"
+                                            @click="edit(data, index)"
                                             icon="pi pi-pencil"
                                             pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
                                             size="small"
@@ -799,7 +822,7 @@ onMounted(async () => {
                         <Button
                             type="button"
                             :label="t('dialog.confirm')"
-                            @click="deleteProduct"
+                            @click="deleteProduct(currentProductIndex)"
                             :loading="isDeleteLoading"
                             class="px-5"
                         />
