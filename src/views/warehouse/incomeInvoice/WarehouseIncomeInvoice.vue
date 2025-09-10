@@ -25,6 +25,7 @@ import {useInventoryStore} from "@/stores/inventory.js";
 import {formatCurrency, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
 import {useColorStore} from "@/stores/color.js";
 import {useToast} from "primevue/usetoast";
+import Message from "@/volt/Message.vue";
 
 const route = useRoute();
 const toast = useToast()
@@ -63,7 +64,7 @@ const {
 const apiData = ref(null);
 const editableData = ref(null);
 const currentProductIndex = ref(null);
-const currentDeletProduct = ref(null);
+const currentDeleteProduct = ref(null);
 const deletedData = ref([]);
 const createdData = ref([]);
 const updatedData = ref([]);
@@ -76,6 +77,7 @@ const showLeaveDialog = ref(false);
 const isEditing = ref(false);
 const pendingNavigation = ref(false);
 const isEdited = ref(false);
+const isConfirmLoading = ref(false);
 
 // computed
 const home = computed(() => ({
@@ -90,9 +92,9 @@ const sumPriceOfIncomeInvoiceProducts = computed(() => {
         ? 0
         : editableData.value.incomeInvoiceProducts.reduce((acc, incomeInvoiceProduct) => {
             return acc
-                + (incomeInvoiceProduct?.price * incomeInvoiceProduct.qty)
-                + (incomeInvoiceProduct?.transportationFee * incomeInvoiceProduct.qty)
-                + (incomeInvoiceProduct?.customsFee * incomeInvoiceProduct.qty)
+                + incomeInvoiceProduct?.price
+                + incomeInvoiceProduct?.transportationFee
+                + incomeInvoiceProduct?.customsFee
         }, 0)
 })
 
@@ -188,14 +190,14 @@ function addProduct(newProduct) {
 
 function deleteAction(product) {
     deleteVisible.value = true
-    currentDeletProduct.value = product
+    currentDeleteProduct.value = product
 }
 
 function deleteProduct() {
     const index = editableData.value.incomeInvoiceProducts.findIndex(p =>
-        p.product.id === currentDeletProduct.value.product.id &&
-        p.color?.id === currentDeletProduct.value.color?.id &&
-        normalizeDate(p.expiryDate) === normalizeDate(currentDeletProduct.value.expiryDate)
+        p.product.id === currentDeleteProduct.value.product.id &&
+        p.color?.id === currentDeleteProduct.value.color?.id &&
+        normalizeDate(p.expiryDate) === normalizeDate(currentDeleteProduct.value.expiryDate)
     );
 
     if (index === -1) return;
@@ -232,6 +234,7 @@ function edit(data, index) {
 function editProduct(updatedProduct) {
     // Duplicate check
     const exists = editableData.value.incomeInvoiceProducts.some((p, i) =>
+        i !== currentProductIndex.value &&
         p.product.id === updatedProduct.product.id &&
         p.color?.id === updatedProduct.color?.id &&
         normalizeDate(p.expiryDate) === normalizeDate(updatedProduct.expiryDate)
@@ -322,6 +325,10 @@ function editProduct(updatedProduct) {
     clearProductForm()
 }
 
+function cancelEditing() {
+    editMode.value = false;
+    incomeInvoiceResetForm()
+}
 
 watch(location, async () => {
     if (location.value) {
@@ -421,7 +428,7 @@ onMounted(async () => {
                 <SecondaryButton
                     v-if="editMode"
                     :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
-                    @click="editMode = false"
+                    @click="cancelEditing"
                     class="px-2 sm:px-5 whitespace-nowrap bg-surface-0!"
                     :label="t('dialog.cancel')"
                     :loading="incomeInvoiceIsSubmitting"
@@ -460,7 +467,7 @@ onMounted(async () => {
                 <SecondaryButton
                     v-if="editMode"
                     :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
-                    @click="editMode = false"
+                    @click="cancelEditing"
                     class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0!"
                     :label="t('dialog.cancel')"
                     :loading="incomeInvoiceIsSubmitting"
@@ -570,6 +577,8 @@ onMounted(async () => {
                                 :invalid="!!incomeInvoiceErrors.comment"
                                 :disabled="!editMode"
                             />
+
+                            <Message class="h-fit mt-2" size="small" severity="error" variant="simple">{{ incomeInvoiceErrors.comment }}</Message>
                         </div>
                     </div>
                 </template>
