@@ -61,7 +61,7 @@ export const useIncomeInvoiceStore = defineStore('incomeInvoice', () => {
 
     const deleteIncomeInvoice = async id => {
         try {
-            await authorizedClient.put(`/income_invoices/delete/${id}`, JSON.stringify({}))
+            await authorizedClient.put(`/income_invoices/delete/${id}`, {})
         } catch (error) {
             throw error
         }
@@ -69,7 +69,7 @@ export const useIncomeInvoiceStore = defineStore('incomeInvoice', () => {
 
     const restoreIncomeInvoice = async id => {
         try {
-            await authorizedClient.put(`/income_invoices/restore/${id}`, JSON.stringify({}))
+            await authorizedClient.put(`/income_invoices/restore/${id}`, {})
         } catch (error) {
             throw error
         }

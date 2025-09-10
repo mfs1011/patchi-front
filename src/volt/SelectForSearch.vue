@@ -6,7 +6,6 @@
         :ptOptions="{
             mergeProps: ptViewMerge
         }"
-        @focus="onFocusOpenDropdown"
     >
         <template #dropdownicon>
             <ChevronDownIcon />
@@ -45,15 +44,6 @@ function handleClear(clearCallback: () => void): void {
     clearCallback();
     selectRef.value?.hide();// Dropdownga show bo'lishni bloklaydi
 }
-
-function onFocusOpenDropdown(): void {
-    if (document.activeElement?.tagName === 'INPUT') {
-        console.log(document.activeElement)
-        selectRef.value?.show();
-    }
-}
-
-defineExpose(selectRef.value)
 
 const theme = ref<SelectPassThroughOptions>({
     root: `inline-flex cursor-pointer relative select-none rounded-md p-fluid:flex

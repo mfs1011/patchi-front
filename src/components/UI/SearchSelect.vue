@@ -12,6 +12,7 @@ const props = defineProps({
     optionLabel: { type: Function, default: (opt) => opt?.name },
     optionValue: { type: Function, default: (opt) => opt?.id },
     returnValue: { type: Function, default: (opt) => opt },
+    searchValue: { type: Function, default: (opt) => opt.name },
     placeholder: String,
     loading: Boolean,
     totalItems: { type: Number, default: 0 },
@@ -26,7 +27,6 @@ const debouncedValue = useDebouncedRef("", 300); // v-model: string (qidiruv) YO
 const page = ref(1);
 const items = ref([]);
 const isVisible = ref(false);
-const selectRef = useTemplateRef('selectRef');
 
 // Qidiruv YOZILGANDA (string bo'lgandagina) fetch qilamiz
 watch(
@@ -91,8 +91,6 @@ async function onChange(item) {
         await props.fetchFn(query);
         items.value = props.options;
     }
-
-    selectRef.value.hide()
 }
 
 // Parent modelValue o'zgarganda (edit bosilganda)
@@ -115,7 +113,7 @@ watch(
             const query = {
                 page: 1,
                 "items-per-page": 10,
-                name: newVal.code,
+                name: props.searchValue(newVal),
             };
             await props.fetchFn(query);
 
@@ -135,7 +133,6 @@ watch(
 
 <template>
     <SelectForSearch
-        ref="selectRef"
         v-model="debouncedValue"
         :options="items"
         :option-label="optionLabel"

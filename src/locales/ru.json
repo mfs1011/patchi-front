@@ -568,7 +568,9 @@
     },
     "toast": {
         "success": "Успешно!",
+        "successEditingSave": "Изменения успешно сохранены!",
         "created": "{name} успешно создан!",
+        "added": "{name} успешно добавлено!",
         "edited": "{name} успешно изменен!",
         "accepted": "{name} успешно подтвержден!",
         "deleted": "{name} успешно удален!",
