@@ -14,8 +14,6 @@ import {useToast} from "primevue/usetoast";
 import InputNumber from "@/volt/InputNumber.vue";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
 import {useProductStore} from "@/stores/product.js";
-import {useColorStore} from "@/stores/color.js";
-import {formatCurrency} from "@/helpers/numberFormat.js";
 import Column from "primevue/column";
 import DataTable from "@/volt/DataTable.vue";
 import Dialog from "@/volt/Dialog.vue";
@@ -55,17 +53,18 @@ const hasKitData = computed(() => (
 
 const isChanged = computed(() => (
     !!seller.value ||
-    !!location.value ||
-    !!comment.value ||
-    !!createdAt.value ||
+    !!qr.value ||
+    !!code.value ||
+    !!name.value ||
+    !!assembly.value ||
+    !!wholesalePrice.value ||
+    !!retailPrice.value ||
+    !!kitQty.value ||
+    !!expiryDate.value ||
+    !!photo.value ||
     !!kitProducts.value.length ||
     !!product.value ||
-    !!color.value ||
-    !!expiryDate.value ||
-    !!qty.value ||
-    !!price.value ||
-    !!transportationFee.value ||
-    !!customsFee.value
+    !!qty.value
 ))
 
 // VeeValidate formani sozlash
@@ -75,8 +74,8 @@ const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp'];
 
 const kitInfoSchema = computed(() => yup.object({
     qr: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
-    code: yup.string().required(t('errorMessages.codeRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
-    name: yup.string().required(t('errorMessages.titleRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    code: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    name: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     assembly: yup.number().notRequired(),
     wholesalePrice: yup.number().notRequired(),
     retailPrice: yup.number().notRequired(),
@@ -134,70 +133,67 @@ const {
     ...productFormCtx
 } = useForm({
     validationSchema: productSchema,
-    initialValues: {
-        transportationFee: 0,
-        customsFee: 0
-    }
+    initialValues: {}
 })
 
-const { value: qr } = useField('qr');
-const { value: code } = useField('code');
-const { value: name } = useField('name');
-const { value: assembly } = useField('assembly'); // null
-const { value: wholesalePrice } = useField('wholesalePrice');
-const { value: retailPrice } = useField('retailPrice');
-const { value: kitQty } = useField('kitQty');
-const { value: expiryDate } = useField('expiryDate', undefined, { form: productFormCtx });
-const { value: photo } = useField('photo' ); // null
-
 const { value: seller } = useField('seller', undefined, { form: kitFormCtx });
+const { value: qr } = useField('qr', undefined, { form: kitFormCtx });
+const { value: code } = useField('code', undefined, { form: kitFormCtx });
+const { value: name } = useField('name', undefined, { form: kitFormCtx });
+const { value: assembly } = useField('assembly', undefined, { form: kitFormCtx }); // null
+const { value: wholesalePrice } = useField('wholesalePrice', undefined, { form: kitFormCtx });
+const { value: retailPrice } = useField('retailPrice', undefined, { form: kitFormCtx });
+const { value: kitQty } = useField('kitQty', undefined, { form: kitFormCtx });
+const { value: expiryDate } = useField('expiryDate', undefined, { form: kitFormCtx });
+const { value: photo } = useField('photo', undefined, { form: kitFormCtx } ); // null
+
 const { value: kitProducts } = useField('kitProducts', undefined, { validateOnMount: true, form: kitFormCtx })
 const { value: product } = useField('product', undefined, { validateOnValueUpdate: false, form: productFormCtx });
 const { value: qty } = useField('qty', undefined, { form: productFormCtx });
 
-const sumPriceOfKitProducts = computed(() => {
-    return kitProducts.value.length === 0
-        ? 0
-        : kitProducts.value.reduce((acc, kitProduct) => {
-            return acc
-                + (kitProduct?.price * kitProduct.qty)
-                + (kitProduct?.transportationFee * kitProduct.qty)
-                + (kitProduct?.customsFee * kitProduct.qty)
-        }, 0)
-})
+const onSubmitKit = kitHandleSubmit(async values => {
+    console.log(values)
+    // const payload = {
+    //     seller: values.seller['@id'],
+    //     assembly: values.assembly['@id'],
+    //     qr: values.qr,
+    //     code: values.code,
+    //     name: values.name,
+    //     wholesalePrice: values.wholesalePrice,
+    //     retailPrice: values.retailPrice,
+    //     expiryDate: values.expiryDate,
+    //     qty: values.qty,
+    //
+    //     kitProducts: values.kitProducts.map(kitProduct => {
+    //         const obj = {
+    //             product: `/api/products/${kitProduct.product.id}`,
+    //             qty: kitProduct.qty
+    //         };
+    //
+    //         if (kitProduct.product.colorId) {
+    //             obj.color = `/api/colors/${kitProduct.product.colorId}`;
+    //         }
+    //
+    //         return obj;
+    //     })
+    // };
 
-const onSubmitIncomeInvoice = kitHandleSubmit(async values => {
-    const payload = {
-        seller: values.seller['@id'],
-
-        kitProducts: values.kitProducts.map(kitProduct => ({
-            product: kitProduct.product['@id'],
-            qty: kitProduct.qty
-        }))
-    };
-
-    try {
-        // await incomeInvoiceStore.pushIncomeInvoice(payload)
-
-        toast.add({ severity: 'success', summary: t('toast.created', { name: t('incomeInvoice.nominativeCapitalize') }), life: 3000 })
-        kitResetForm()
-        productResetForm()
-        router.back()
-
-    } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
-    }
+    // try {
+    //     // await incomeInvoiceStore.pushIncomeInvoice(payload)
+    //
+    //     toast.add({ severity: 'success', summary: t('toast.created', { name: t('incomeInvoice.nominativeCapitalize') }), life: 3000 })
+    //     kitResetForm()
+    //     productResetForm()
+    //     router.back()
+    //
+    // } catch (error) {
+    //     toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+    // }
 })
 
 const onSubmitProduct = productHandleSubmit(async values => {
-    const normalizeDate = date => date ? new Date(date).getTime() : null
-
-    const isInclude = kitProducts.value.some(incomeInvoiceProduct => {
-        return (
-            incomeInvoiceProduct.color?.id === values.color?.id &&
-            incomeInvoiceProduct.product.id === values.product.id &&
-            normalizeDate(incomeInvoiceProduct.expiryDate) === normalizeDate(values.expiryDate)
-        )
+    const isInclude = kitProducts.value.some(kitProduct => {
+        return (kitProduct.product.id === values.product.id)
     })
 
     if (isInclude) {
@@ -211,7 +207,6 @@ const onSubmitProduct = productHandleSubmit(async values => {
         currentProduct.value = values
         productResetForm()
         product.value = undefined
-        color.value = undefined
     }
 })
 
@@ -275,12 +270,6 @@ const confirmLeave = () => {
         pendingNavigation.value()
     }
 }
-
-onMounted(async () => {
-    if(!assemblyStore.getAssemblies.models.length) {
-        await assemblyStore.fetchAssemblies()
-    }
-})
 </script>
 
 <template>
@@ -314,7 +303,7 @@ onMounted(async () => {
                 <Button
                     :disabled="!!kitErrors.kitProducts"
                     icon="pi pi-save"
-                    @click="onSubmitIncomeInvoice"
+                    @click="onSubmitKit"
                     class="px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
                     :loading="kitIsSubmitting"
@@ -324,7 +313,7 @@ onMounted(async () => {
                 <Button
                     :disabled="!!kitErrors.kitProducts"
                     icon="pi pi-save"
-                    @click="onSubmitIncomeInvoice"
+                    @click="onSubmitKit"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
                     :loading="kitIsSubmitting"
@@ -358,41 +347,38 @@ onMounted(async () => {
                             />
                         </div>
 
-                        <label class="block">
-                            <span>{{ t('labels.qr') }}</span>
+                        <div>
+                            <p class="text-sm">{{ t('labels.qr') }}</p>
                             <InputText
                                 v-model.trim="qr"
                                 fluid
                                 :placeholder="t('placeholders.qr')"
-                                size="large"
                                 :class="{ 'p-invalid': kitErrors.qr }"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ kitErrors.qr }}</Message>
-                        </label>
+                        </div>
 
-                        <label class="block">
-                            <span>{{ t('labels.code') }}</span><span class="text-red-500"> *</span>
+                        <div>
+                            <p class="text-sm">{{ t('labels.code') }}<span class="text-red-500"> *</span></p>
                             <InputText
                                 v-model.trim="code"
                                 fluid
                                 :placeholder="t('placeholders.code')"
-                                size="large"
                                 :class="{ 'p-invalid': kitErrors.code }"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ kitErrors.code }}</Message>
-                        </label>
+                        </div>
 
-                        <label class="block">
-                            <span>{{ t('labels.title') }}</span><span class="text-red-500"> *</span>
+                        <div>
+                            <p class="text-sm">{{ t('labels.title') }}<span class="text-red-500"> *</span></p>
                             <InputText
                                 v-model.trim="name"
                                 fluid
                                 :placeholder="t('placeholders.title')"
-                                size="large"
                                 :class="{ 'p-invalid': kitErrors.name }"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ kitErrors.name }}</Message>
-                        </label>
+                        </div>
 
                         <div>
                             <p class="text-sm">{{ t('labels.collection') }}</p>
@@ -403,45 +389,38 @@ onMounted(async () => {
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
                                 :return-value="opt => opt"
-                                :placeholder="t('placeholders.select.seller')"
+                                :placeholder="t('placeholders.select.collection')"
                                 :loading="assemblyStore.getIsLoadingAssembly"
                                 :total-items="assemblyStore.getAssemblies.totalItems"
                                 :invalid="!!kitErrors.assembly"
                             />
                         </div>
 
-                        <label class="block">
-                            <span>{{ t('labels.wholesalePrice') }}</span>
+                        <div>
+                            <p class="text-sm">{{ t('labels.wholesalePrice') }}<span class="text-red-500"> *</span></p>
                             <InputNumber
                                 v-model="wholesalePrice"
                                 fluid
-                                mode="currency"
-                                currency="USD"
-                                locale="en-US"
                                 showButtons
                                 :placeholder="t('placeholders.wholesalePrice')"
-                                size="large"
                                 :minFractionDigits="1"
                                 :maxFractionDigits="2"
+                                :invalid="!!kitErrors.wholesalePrice"
                             />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ kitErrors.wholesalePrice }}</Message>
-                        </label>
-                        <label class="block">
-                            <span>{{ t('labels.retailPrice') }}</span>
+                        </div>
+
+                        <div>
+                            <p class="text-sm">{{ t('labels.retailPrice') }}<span class="text-red-500"> *</span></p>
                             <InputNumber
                                 v-model="retailPrice"
                                 fluid
-                                mode="currency"
-                                currency="USD"
-                                locale="en-US"
                                 showButtons
                                 :placeholder="t('placeholders.retailPrice')"
-                                size="large"
                                 :minFractionDigits="1"
                                 :maxFractionDigits="2"
+                                :invalid="!!kitErrors.retailPrice"
                             />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ kitErrors.retailPrice }}</Message>
-                        </label>
+                        </div>
 
                         <div>
                             <p class="text-sm">{{ t('labels.qty') }}<span class="text-red-500"> *</span></p>
@@ -473,11 +452,11 @@ onMounted(async () => {
 
                         </div>
 
-                        <label class="block">
-                            <span>{{ t('labels.photo') }}</span>
+                        <div>
+                            <p class="text-sm">{{ t('labels.photo') }}</p>
                             <InputFile ref="fileInput" @change="setPhoto" :fileName="photoName"/>
                             <Message class="min:h-5" size="small" severity="error" variant="simple">{{ kitErrors.photo }}</Message>
-                        </label>
+                        </div>
                     </div>
                 </template>
             </Card>
@@ -491,15 +470,15 @@ onMounted(async () => {
                 <template #content>
                     <div class="font-medium mb-4">{{ t('addProduct') }}</div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm">{{ t('labels.product') }}<span class="text-red-500"> *</span></p>
                             <SearchSelect
                                 v-model="product"
-                                :fetchFn="productStore.fetchAvailableProducts"
+                                :fetchFn="(query) => productStore.fetchAvailableProducts({...query, location: seller.location.id })"
                                 :options="productStore.getAvailableProducts.models"
-                                :option-label="opt => `${opt?.name} | ${opt?.code}`"
-                                :option-value="opt => `${opt?.name} | ${opt?.code}`"
+                                :option-label="opt => `${opt?.name} | ${opt?.code} | ${opt?.color ?? '-'} | ${opt?.totalQty} ${t(`labels.${opt?.unit}`)}`"
+                                :option-value="opt => `${opt?.name} | ${opt?.code} | ${opt?.color ?? '-'} | ${opt?.totalQty} ${t(`labels.${opt?.unit}`)}`"
                                 :return-value="opt => opt"
                                 :placeholder="t('placeholders.select.product')"
                                 :loading="productStore.getIsLoadingProducts"
@@ -507,7 +486,10 @@ onMounted(async () => {
                                 :invalid="!!productErrors.product"
                             >
                                 <template #header>
-                                    <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }}</div>
+                                    <div
+                                        class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} |
+                                        {{t('labels.code') }} | {{t('labels.color') }} | {{t('labels.qty') }}
+                                    </div>
                                 </template>
                             </SearchSelect>
                         </div>
@@ -554,14 +536,19 @@ onMounted(async () => {
                                 <p>{{ data.product?.name }}</p>
                             </template>
                         </Column>
+                        <Column field="code" :header="t('labels.code')">
+                            <template #body="{ data }">
+                                <p>{{ data.product?.code }}</p>
+                            </template>
+                        </Column>
                         <Column field="color" :header="t('labels.color')">
                             <template #body="{ data }">
-                                <p>{{ data.color?.name || '-' }}</p>
+                                <p>{{ data.product?.color }}</p>
                             </template>
                         </Column>
                         <Column field="qty" :header="t('labels.qty')">
                             <template #body="{ data }">
-                                <p>{{ data.qty }} {{t(`labels.${data.product.category.unit.name}`)}}</p>
+                                <p>{{ data.qty }} {{t(`labels.${data.product.unit}`)}}</p>
                             </template>
                         </Column>
                         <Column field="actions" :header="t('actions')">
@@ -584,9 +571,6 @@ onMounted(async () => {
                                 </div>
                             </template>
                         </Column>
-                        <template #footer>
-                            <div class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(sumPriceOfKitProducts) }} $</div>
-                        </template>
                     </DataTable>
                 </template>
             </Card>
