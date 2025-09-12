@@ -165,15 +165,23 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
         location: values.location['@id'],
         comment: values.comment,
         createdAt: values.createdAt,
-        incomeInvoiceProducts: values.incomeInvoiceProducts.map(incomeInvoiceProduct => ({
-            product: incomeInvoiceProduct.product['@id'],
-            color: incomeInvoiceProduct.color['@id'],
-            expiryDate: incomeInvoiceProduct.expiryDate,
-            qty: incomeInvoiceProduct.qty,
-            price: incomeInvoiceProduct.price,
-            transportationFee: incomeInvoiceProduct.transportationFee,
-            customsFee: incomeInvoiceProduct.customsFee
-        }))
+
+        incomeInvoiceProducts: values.incomeInvoiceProducts.map(incomeInvoiceProduct => {
+            const obj = {
+                product: incomeInvoiceProduct.product['@id'],
+                expiryDate: incomeInvoiceProduct.expiryDate,
+                qty: incomeInvoiceProduct.qty,
+                price: incomeInvoiceProduct.price,
+                transportationFee: incomeInvoiceProduct.transportationFee,
+                customsFee: incomeInvoiceProduct.customsFee
+            };
+
+            if (incomeInvoiceProduct.color) {
+                obj.color = incomeInvoiceProduct.color['@id']
+            }
+
+            return obj;
+        })
     };
 
     try {

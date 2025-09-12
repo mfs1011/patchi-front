@@ -26,6 +26,13 @@ const home = ref({
 
 const items = computed(() => [{ label: t('cards.kits'), route: { name: 'kits'} }, { label: t('labels.kit') }]);
 
+const sumPriceOfKitProducts = computed(() => {
+    return kitStore.getKit.filteredKitProducts.length === 0 ? 0
+        : kitStore.getKit.filteredKitProducts.reduce((acc, kitProduct) => {
+            return acc + (kitProduct?.product.retailPrice * kitProduct.qty)
+        }, 0)
+})
+
 onMounted(async () => {
     await kitStore.fetchKit(route.params.id)
     isLoading.value = false
@@ -67,7 +74,7 @@ onMounted(async () => {
         without-buttons
     >
         <template #sectionBody>
-            <NoData v-if="!kitStore.getKit.totalItems && !isLoading" class="text-surface-400 mx-auto my-auto">
+            <NoData v-if="!kitStore.getKit.filteredKitProducts.length && !isLoading" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
 
@@ -81,7 +88,7 @@ onMounted(async () => {
                 <template #content>
                     <DataTable
                         ref="dt"
-                        :value="isLoading ?  Array(10).fill({}) : kitStore.getKit.models"
+                        :value="isLoading ?  Array(10).fill({}) : kitStore.getKit.filteredKitProducts"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
                         pt:root="border border-surface-300 dark:border-surface-600/50"
@@ -104,10 +111,10 @@ onMounted(async () => {
                                 <p v-else>{{ data.product.code }}</p>
                             </template>
                         </Column>
-                        <Column field="qr" :header="t('labels.qr')">
+                        <Column field="color" :header="t('labels.color')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.product.qr || '-' }}</p>
+                                <p v-else>{{ data.color?.name || '-' }}</p>
                             </template>
                         </Column>
                         <Column field="category" :header="t('labels.category')">
@@ -140,12 +147,15 @@ onMounted(async () => {
                                 <p v-else>{{ data.product.wholesalePrice ? `${formatCurrency(data.product.wholesalePrice)}$` : '-' }}</p>
                             </template>
                         </Column>
-                        <Column field="exclude" header="exclude">
+                        <Column field="exclude" :header="t('labels.exclude')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ data.exclude }}</p>
                             </template>
                         </Column>
+                        <template #footer>
+                            <div class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(sumPriceOfKitProducts) }} $</div>
+                        </template>
                     </DataTable>
                 </template>
             </Card>

@@ -275,6 +275,7 @@
         "updated": "Changed",
         "deleted": "Deleted",
         "restore": "Restored",
+        "exclude": "Exclude",
         "imageUpdated": "Image updated",
         "passwordUpdated": "Password updated",
         "clientB2B": "Corporate Client",

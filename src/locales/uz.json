@@ -275,6 +275,7 @@
         "updated": "O‘zgartirilganlar",
         "deleted": "Oʻchirilganlar",
         "restore": "Tiklandi",
+        "exclude": "Cheklash",
         "imageUpdated": "Rasm yangilandi",
         "passwordUpdated": "Parol yangilandi",
         "clientB2B": "Korporativ mijoz",

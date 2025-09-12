@@ -62,8 +62,8 @@ const schema = computed(() => yup.object({
     name: yup.string().required(t('errorMessages.titleRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     category: yup.number().required(t('errorMessages.categoryRequired')),
     assembly: yup.number().notRequired(),
-    wholesalePrice: yup.number().notRequired(),
-    retailPrice: yup.number().notRequired(),
+    wholesalePrice: yup.number().required(t('errorMessages.wholesalePriceRequired')),
+    retailPrice: yup.number().required(t('errorMessages.retailPriceRequired')),
     minQty: yup.number().notRequired(),
     photo: yup
         .mixed()
@@ -350,8 +350,8 @@ const confirmLeave = () => {
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.assembly }}</Message>
                         </div>
 
-                        <label class="block">
-                            <span>{{ t('labels.wholesalePrice') }}</span>
+                        <div>
+                            <p>{{ t('labels.wholesalePrice') }}<span class="text-red-500"> *</span></p>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="3.1rem" width="22rem" v-if="isLoading"/>
 
@@ -369,10 +369,10 @@ const confirmLeave = () => {
                                 :maxFractionDigits="2"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.wholesalePrice }}</Message>
-                        </label>
+                        </div>
 
-                        <label class="block">
-                            <span>{{ t('labels.retailPrice') }}</span>
+                        <div>
+                            <p>{{ t('labels.retailPrice') }}<span class="text-red-500"> *</span></p>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="3.1rem" width="22rem" v-if="isLoading"/>
 
@@ -390,7 +390,7 @@ const confirmLeave = () => {
                                 :maxFractionDigits="2"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.retailPrice }}</Message>
-                        </label>
+                        </div>
                         <label class="block">
                             <span>{{ t('labels.minQty') }}</span>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>

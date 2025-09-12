@@ -1,7 +1,7 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
 import Card from "@/volt/Card.vue";
@@ -22,6 +22,10 @@ import {useAssemblyStore} from "@/stores/assembly.js";
 import {useSellerStore} from "@/stores/seller.js";
 import InputFile from "@/components/UI/InputFile.vue";
 import DatePicker from "@/volt/DatePicker.vue";
+import {useMediaObjectStore} from "@/stores/mediaObject.js";
+import {useKitStore} from "@/stores/kit.js";
+import Select from "@/volt/Select.vue";
+import {formatCurrency} from "@/helpers/numberFormat.js";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -29,6 +33,8 @@ const toast = useToast()
 const productStore = useProductStore();
 const assemblyStore = useAssemblyStore();
 const sellerStore = useSellerStore();
+const mediaObjectStore = useMediaObjectStore();
+const kitStore = useKitStore();
 const router = useRouter();
 const currentProduct = ref({})
 const deleteVisible = ref(false)
@@ -72,24 +78,19 @@ const isChanged = computed(() => (
 const FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp'];
 
+const excludeOptions = [
+    { value: true },
+    { value: false }
+]
+
 const kitInfoSchema = computed(() => yup.object({
     qr: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
-    code: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
-    name: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
-    assembly: yup.number().notRequired(),
-    wholesalePrice: yup.number().notRequired(),
-    retailPrice: yup.number().notRequired(),
-    kitQty: yup.number().notRequired(),
-    expiryDate: yup
-        .date()
-        .nullable()
-        .when("product", {
-            is: (product) =>
-                product?.category?.categoryType?.name &&
-                product.category.categoryType.name.toLowerCase() === 'food',
-            then: (schema) => schema.required("Expiry date is required for food"),
-            otherwise: (schema) => schema.notRequired(),
-        }),
+    code: yup.string().required(t('errorMessages.codeRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    name: yup.string().required(t('errorMessages.titleRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
+    wholesalePrice: yup.number().required(t('errorMessages.wholesalePriceRequired')),
+    retailPrice: yup.number().required(t('errorMessages.retailPriceRequired')),
+    kitQty: yup.number().required(),
+    expiryDate: yup.date().required(),
     photo: yup
         .mixed()
         .test(
@@ -133,7 +134,9 @@ const {
     ...productFormCtx
 } = useForm({
     validationSchema: productSchema,
-    initialValues: {}
+    initialValues: {
+        exclude: false
+    }
 })
 
 const { value: seller } = useField('seller', undefined, { form: kitFormCtx });
@@ -150,50 +153,80 @@ const { value: photo } = useField('photo', undefined, { form: kitFormCtx } ); //
 const { value: kitProducts } = useField('kitProducts', undefined, { validateOnMount: true, form: kitFormCtx })
 const { value: product } = useField('product', undefined, { validateOnValueUpdate: false, form: productFormCtx });
 const { value: qty } = useField('qty', undefined, { form: productFormCtx });
+const { value: exclude } = useField('exclude', undefined, { form: productFormCtx });
+
+const sumPriceOfKitProducts = computed(() => {
+    return kitProducts.value.length === 0 ? 0
+        : kitProducts.value.reduce((acc, kitProduct) => {
+            return acc + (kitProduct?.product.retailPrice * kitProduct.qty)
+        }, 0)
+})
 
 const onSubmitKit = kitHandleSubmit(async values => {
-    console.log(values)
-    // const payload = {
-    //     seller: values.seller['@id'],
-    //     assembly: values.assembly['@id'],
-    //     qr: values.qr,
-    //     code: values.code,
-    //     name: values.name,
-    //     wholesalePrice: values.wholesalePrice,
-    //     retailPrice: values.retailPrice,
-    //     expiryDate: values.expiryDate,
-    //     qty: values.qty,
-    //
-    //     kitProducts: values.kitProducts.map(kitProduct => {
-    //         const obj = {
-    //             product: `/api/products/${kitProduct.product.id}`,
-    //             qty: kitProduct.qty
-    //         };
-    //
-    //         if (kitProduct.product.colorId) {
-    //             obj.color = `/api/colors/${kitProduct.product.colorId}`;
-    //         }
-    //
-    //         return obj;
-    //     })
-    // };
+    const payload = {
+        seller: values.seller['@id'],
+        code: values.code,
+        name: values.name,
+        wholesalePrice: values.wholesalePrice,
+        retailPrice: values.retailPrice,
+        expiryDate: values.expiryDate,
+        qty: values.kitQty,
 
-    // try {
-    //     // await incomeInvoiceStore.pushIncomeInvoice(payload)
-    //
-    //     toast.add({ severity: 'success', summary: t('toast.created', { name: t('incomeInvoice.nominativeCapitalize') }), life: 3000 })
-    //     kitResetForm()
-    //     productResetForm()
-    //     router.back()
-    //
-    // } catch (error) {
-    //     toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
-    // }
+        kitProducts: values.kitProducts.map(kitProduct => {
+            const obj = {
+                product: `/api/products/${kitProduct.product.id}`,
+                qty: kitProduct.qty,
+                exclude: kitProduct.exclude
+            };
+
+            if (kitProduct.product.colorId) {
+                obj.color = `/api/colors/${kitProduct.product.colorId}`;
+            }
+
+            return obj;
+        })
+    };
+
+    if (qr.value) {
+        payload.qr = values.qr
+    }
+
+    if (assembly.value) {
+        payload.assembly = values.assembly['@id']
+    }
+
+    try {
+        if (values.photo) {
+            const formData = new FormData()
+            formData.set('file', values.photo)
+
+            await mediaObjectStore.pushMediaObject(formData)
+
+            if (mediaObjectStore.getMediaObject) {
+                payload.photo = mediaObjectStore.getMediaObject['@id']
+            }
+        }
+
+        await kitStore.pushKit(payload)
+
+        toast.add({ severity: 'success', summary: t('toast.created', { name: t('kit.nominativeCapitalize') }), life: 3000 })
+        kitResetForm()
+        productResetForm()
+        router.back()
+
+    } catch (error) {
+        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
+    }
 })
 
 const onSubmitProduct = productHandleSubmit(async values => {
+    console.log(kitProducts.value)
+    console.log(values)
+
     const isInclude = kitProducts.value.some(kitProduct => {
-        return (kitProduct.product.id === values.product.id)
+        return (
+            kitProduct.product.id === values.product.id && kitProduct.product.colorId === values.product.colorId
+        )
     })
 
     if (isInclude) {
@@ -239,7 +272,8 @@ const clearProductForm = () => {
 const saveEditing = () => {
     const editedData = {
         product: product.value,
-        qty: qty.value
+        qty: qty.value,
+        exclude: exclude.value
     }
 
     kitProducts.value = kitProducts.value.map((kitProduct, index) => (
@@ -381,18 +415,30 @@ const confirmLeave = () => {
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.collection') }}</p>
-                            <SearchSelect
-                                v-model="assembly"
-                                :fetchFn="assemblyStore.fetchAssemblies"
-                                :options="assemblyStore.getAssemblies.models"
-                                :option-label="opt => opt?.name"
-                                :option-value="opt => opt?.id"
-                                :return-value="opt => opt"
-                                :placeholder="t('placeholders.select.collection')"
-                                :loading="assemblyStore.getIsLoadingAssembly"
-                                :total-items="assemblyStore.getAssemblies.totalItems"
-                                :invalid="!!kitErrors.assembly"
+                            <p class="text-sm">{{ t('labels.expiryDate') }}<span class="text-red-500"> *</span></p>
+                            <DatePicker
+                                v-model="expiryDate"
+                                dateFormat="dd.mm.yy"
+                                showIcon
+                                fluid
+                                iconDisplay="input"
+                                :placeholder="t('placeholders.expiryDate')"
+                                show-button-bar
+                                :invalid="!!kitErrors.expiryDate"
+                                :minDate="new Date()"
+                            />
+                        </div>
+
+                        <div>
+                            <p class="text-sm">{{ t('labels.qty') }}<span class="text-red-500"> *</span></p>
+                            <InputNumber
+                                v-model="kitQty"
+                                fluid
+                                showButtons
+                                :placeholder="t('placeholders.qty')"
+                                :minFractionDigits="1"
+                                :maxFractionDigits="2"
+                                :invalid="!!kitErrors.kitQty"
                             />
                         </div>
 
@@ -423,33 +469,19 @@ const confirmLeave = () => {
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.qty') }}<span class="text-red-500"> *</span></p>
-                            <InputNumber
-                                v-model="kitQty"
-                                fluid
-                                showButtons
-                                :placeholder="t('placeholders.qty')"
-                                :minFractionDigits="1"
-                                :maxFractionDigits="2"
-                                :invalid="!!kitErrors.kitQty"
+                            <p class="text-sm">{{ t('labels.collection') }}</p>
+                            <SearchSelect
+                                v-model="assembly"
+                                :fetchFn="assemblyStore.fetchAssemblies"
+                                :options="assemblyStore.getAssemblies.models"
+                                :option-label="opt => opt?.name"
+                                :option-value="opt => opt?.id"
+                                :return-value="opt => opt"
+                                :placeholder="t('placeholders.select.collection')"
+                                :loading="assemblyStore.getIsLoadingAssembly"
+                                :total-items="assemblyStore.getAssemblies.totalItems"
+                                :invalid="!!kitErrors.assembly"
                             />
-                        </div>
-
-                        <div>
-                            <p class="text-sm">{{ t('labels.expiryDate') }}<span class="text-red-500"> *</span></p>
-
-                            <DatePicker
-                                v-model="expiryDate"
-                                dateFormat="dd.mm.yy"
-                                showIcon
-                                fluid
-                                iconDisplay="input"
-                                :placeholder="t('placeholders.expiryDate')"
-                                show-button-bar
-                                :invalid="!!kitErrors.expiryDate"
-                                :minDate="new Date()"
-                            />
-
                         </div>
 
                         <div>
@@ -495,16 +527,31 @@ const confirmLeave = () => {
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.qty') }}<span class="text-red-500"> *</span></p>
-                            <InputNumber
-                                v-model="qty"
-                                fluid
-                                showButtons
-                                :placeholder="t('placeholders.qty')"
-                                :minFractionDigits="1"
-                                :maxFractionDigits="2"
-                                :invalid="!!productErrors.qty"
-                            />
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm">{{ t('labels.qty') }}<span class="text-red-500"> *</span></p>
+                                    <InputNumber
+                                        v-model="qty"
+                                        fluid
+                                        showButtons
+                                        :placeholder="t('placeholders.qty')"
+                                        :minFractionDigits="1"
+                                        :maxFractionDigits="2"
+                                        :invalid="!!productErrors.qty"
+                                    />
+                                </div>
+
+                                <div>
+                                    <p class="text-sm">{{ t('labels.exclude') }}</p>
+                                    <Select
+                                        v-model="exclude"
+                                        :options="excludeOptions"
+                                        option-label="value"
+                                        option-value="value"
+                                        pt:root="w-full dark:bg-surface-700"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -546,12 +593,27 @@ const confirmLeave = () => {
                                 <p>{{ data.product?.color }}</p>
                             </template>
                         </Column>
+                        <Column field="retailPrice" :header="t('labels.retailPrice')">
+                            <template #body="{ data }">
+                                <p>{{ data.product?.retailPrice }}$</p>
+                            </template>
+                        </Column>
                         <Column field="qty" :header="t('labels.qty')">
                             <template #body="{ data }">
                                 <p>{{ data.qty }} {{t(`labels.${data.product.unit}`)}}</p>
                             </template>
                         </Column>
-                        <Column field="actions" :header="t('actions')">
+                        <Column field="exclude" :header="t('labels.exclude')">
+                            <template #body="{ data }">
+                                <p>{{ data.exclude }}</p>
+                            </template>
+                        </Column>
+                        <Column
+                            field="actions" :header="t('actions')"
+                            bodyClass="text-center"
+                            headerClass="text-center"
+                            style="width: 120px"
+                        >
                             <template #body="{ data, index }">
                                 <div class="flex justify-end w-full">
                                     <div class="flex items-center gap-2">
@@ -571,6 +633,9 @@ const confirmLeave = () => {
                                 </div>
                             </template>
                         </Column>
+                        <template #footer>
+                            <div class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(sumPriceOfKitProducts) }} $</div>
+                        </template>
                     </DataTable>
                 </template>
             </Card>

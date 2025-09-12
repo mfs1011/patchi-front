@@ -417,13 +417,19 @@ onBeforeRouteLeave(() => {
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
-                                            <p v-else>{{ getFormattedDate(data.expiryDate) }}</p>
+                                            <p v-else>{{ data.expiryDate ? getFormattedDate(data.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qty" :header="t('labels.qty')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                             <p v-else>{{ formatCurrency(data.qty) }} {{ t(`labels.${data.product.category.unit.name}`) }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                            <p v-else>{{ formatCurrency(data.product?.retailPrice) }}$</p>
                                         </template>
                                     </Column>
 
@@ -490,6 +496,12 @@ onBeforeRouteLeave(() => {
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                             <p v-else>{{ formatCurrency(data.qty) }} {{ t('labels.pcs')}}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                            <p v-else>{{ formatCurrency(data.kit?.retailPrice) }}$</p>
                                         </template>
                                     </Column>
                                     <Column field="actions" :header="t('actions')">
