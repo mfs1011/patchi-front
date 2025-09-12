@@ -27,6 +27,8 @@ import SecondaryButton from "@/volt/SecondaryButton.vue";
 import Dialog from "@/volt/Dialog.vue";
 import {useKitStore} from "@/stores/kit.js";
 import InputNumber from "@/volt/InputNumber.vue";
+import Row from "primevue/row";
+import ColumnGroup from "primevue/columngroup";
 
 const route = useRoute();
 const router = useRouter();
@@ -433,6 +435,32 @@ onBeforeRouteLeave(() => {
                                         </template>
                                     </Column>
 
+                                    <ColumnGroup type="footer">
+                                        <Row>
+                                            <Column :colspan="7" footerStyle="text-align:right">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                                    <p v-else class="font-semibold">{{ t('labels.totals') }}:</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                                    <div v-else>
+                                                        <p class="font-semibold">{{ formatCurrency(locationQuantityStore.getLocationQuantities.totalQtyKg) }} {{ t('labels.kg') }}</p>
+                                                        <p class="font-semibold">{{ formatCurrency(locationQuantityStore.getLocationQuantities.totalQtyPcs) }}  {{ t('labels.pcs') }}</p>
+                                                    </div>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(locationQuantityStore.getLocationQuantities.totalRetailPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                        </Row>
+                                    </ColumnGroup>
+
                                     <template #footer>
                                         <div v-if="locationQuantityStore.getIsLoadingLocationQuantity" class="flex justify-between">
                                             <Skeleton height="2rem" width="10rem" />
@@ -529,6 +557,31 @@ onBeforeRouteLeave(() => {
                                             </div>
                                         </template>
                                     </Column>
+
+                                    <ColumnGroup type="footer">
+                                        <Row>
+                                            <Column :colspan="5" footerStyle="text-align:right">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                                    <p v-else class="font-semibold">{{ t('labels.totals') }}:</p>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                                    <div v-else>
+                                                        <p class="font-semibold">{{ formatCurrency(locationQuantityKitStore.getLocationQuantityKits.totalQty) }} {{ t('labels.pcs') }}</p>
+                                                    </div>
+                                                </template>
+                                            </Column>
+                                            <Column>
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(locationQuantityKitStore.getLocationQuantityKits.totalRetailPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                        </Row>
+                                    </ColumnGroup>
 
                                     <template #footer>
                                         <div v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit" class="flex justify-between">

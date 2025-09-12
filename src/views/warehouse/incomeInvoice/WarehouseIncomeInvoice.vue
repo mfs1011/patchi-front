@@ -411,8 +411,8 @@ onMounted(async () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.sellers.add')"
-        back-route-name="sellers"
+        :section-name="t('cards.incomeInvoice')"
+        back-route-name="warehouse-income-invoices"
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">

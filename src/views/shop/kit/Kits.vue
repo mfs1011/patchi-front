@@ -3,7 +3,7 @@ import Section from "@/components/UI/Section.vue";
 import { useI18n } from "vue-i18n";
 import {computed, onMounted, ref, watch} from "vue";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {formatCurrency, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
+import {formatCurrency, getFormattedDate, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
 import Skeleton from "@/volt/Skeleton.vue";
 import Avatar from "@/volt/Avatar.vue";
 import Column from "primevue/column";
@@ -418,7 +418,7 @@ onBeforeRouteLeave(() => {
                         <Column field="createdAt" :header="t('labels.createdAt')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
-                                <p v-else>{{ getFormattedDateWithTime(data.createdAt) }}</p>
+                                <p v-else>{{ getFormattedDate(data.createdAt) }}</p>
                             </template>
                         </Column>
                         <Column field="actions" :header="t('actions')">
@@ -427,15 +427,6 @@ onBeforeRouteLeave(() => {
 
                                 <div v-else>
                                     <div class="flex items-center gap-2">
-                                        <Button
-                                            @click="router.push({
-                                                name: 'edit-kit',
-                                                params: { id: data.id },
-                                            })"
-                                            icon="pi pi-pencil"
-                                            pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
-                                            size="small"
-                                        />
                                         <Button
                                             @click="router.push({
                                                 name: 'kit',

@@ -456,7 +456,7 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.code">{{ t('labels.code') }}: <b>{{ data.oldData.code }}</b></h6>
                                         <h6 v-if="data.oldData?.qr">{{ t('labels.qr') }}: <b>{{ data.oldData.qr }}</b></h6>
                                         <h6 v-if="data.oldData?.category">{{ t('labels.category') }}: <b>{{ data.oldData.category.name }}</b></h6>
-                                        <h6 v-if="data.oldData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.oldData.assembly.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.assembly">{{ t('labels.collection') }}: <b>{{ data.oldData.assembly.name }}</b></h6>
                                         <h6 v-if="data.oldData?.wholesalePrice !== undefined">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.oldData.wholesalePrice) }}$</b></h6>
                                         <h6 v-if="data.oldData?.retailPrice !== undefined">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.oldData.retailPrice) }}$</b></h6>
                                         <h6 v-if="data.oldData?.minQty !== undefined">{{ t('labels.minQty') }}: <b>{{ formatCurrency(data.oldData.minQty) }}</b></h6>
@@ -517,7 +517,7 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
                                         <h6 v-if="data.oldData?.code">{{ t('labels.code') }}: <b>{{ data.oldData.code }}</b></h6>
                                         <h6 v-if="data.oldData?.qr">{{ t('labels.qr') }}: <b>{{ data.oldData.qr }}</b></h6>
-                                        <h6 v-if="data.oldData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.oldData.assembly.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.assembly">{{ t('labels.collection') }}: <b>{{ data.oldData.assembly.name }}</b></h6>
                                         <h6 v-if="data.oldData?.wholesalePrice !== undefined">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.oldData.wholesalePrice) }}$</b></h6>
                                         <h6 v-if="data.oldData?.retailPrice !== undefined">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.oldData.retailPrice) }}$</b></h6>
                                         <h6 v-if="data.oldData?.qty !== undefined">{{ t('labels.qty') }}: <b>{{ formatCurrency(data.oldData.qty) }}</b></h6>
@@ -594,7 +594,7 @@ onMounted(() => {
                                         <h6 v-if="data.newData?.code">{{ t('labels.code') }}: <b>{{ data.newData.code }}</b></h6>
                                         <h6 v-if="data.newData?.qr">{{ t('labels.qr') }}: <b>{{ data.newData.qr }}</b></h6>
                                         <h6 v-if="data.newData?.category">{{ t('labels.category') }}: <b>{{ data.newData.category.name }}</b></h6>
-                                        <h6 v-if="data.newData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.newData.assembly.name }}</b></h6>
+                                        <h6 v-if="data.newData?.assembly">{{ t('labels.collection') }}: <b>{{ data.newData.assembly.name }}</b></h6>
                                         <h6 v-if="data.newData?.wholesalePrice !== undefined">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.newData.wholesalePrice) }}$</b></h6>
                                         <h6 v-if="data.newData?.retailPrice !== undefined">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.newData.retailPrice) }}$</b></h6>
                                         <h6 v-if="data.newData?.minQty !== undefined">{{ t('labels.minQty') }}: <b>{{ formatCurrency(data.newData.minQty) }}</b></h6>
@@ -656,7 +656,7 @@ onMounted(() => {
                                         <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
                                         <h6 v-if="data.newData?.code">{{ t('labels.code') }}: <b>{{ data.newData.code }}</b></h6>
                                         <h6 v-if="data.newData?.qr">{{ t('labels.qr') }}: <b>{{ data.newData.qr }}</b></h6>
-                                        <h6 v-if="data.newData?.assembly">{{ t('labels.Assembly') }}: <b>{{ data.newData.assembly.name }}</b></h6>
+                                        <h6 v-if="data.newData?.assembly">{{ t('labels.collection') }}: <b>{{ data.newData.assembly.name }}</b></h6>
                                         <h6 v-if="data.newData?.wholesalePrice !== undefined">{{ t('labels.wholesalePrice') }}: <b>{{ formatCurrency(data.newData.wholesalePrice) }}$</b></h6>
                                         <h6 v-if="data.newData?.retailPrice !== undefined">{{ t('labels.retailPrice') }}: <b>{{ formatCurrency(data.newData.retailPrice) }}$</b></h6>
                                         <h6 v-if="data.newData?.qty !== undefined">{{ t('labels.qty') }}: <b>{{ formatCurrency(data.newData.qty) }}</b></h6>
