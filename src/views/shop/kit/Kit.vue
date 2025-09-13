@@ -4,7 +4,7 @@ import { useI18n } from "vue-i18n";
 import {computed, onMounted, ref} from "vue";
 import {useKitStore} from "@/stores/kit.js";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {onBeforeRouteLeave, useRoute} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import NoData from "@/components/UI/NoData.vue";
 import Column from "primevue/column";
 import Skeleton from "@/volt/Skeleton.vue";
@@ -27,6 +27,7 @@ import {useToast} from "primevue/usetoast";
 
 const { t } = useI18n();
 const route = useRoute()
+const router = useRouter();
 const toast = useToast()
 const isLoading = ref(true)
 
@@ -82,10 +83,11 @@ const isChanged = computed(() => (
     kitStore.getKit?.name !== name.value ||
     kitStore.getKit?.assembly?.id !== assembly.value?.id ||
     kitStore.getKit?.wholesalePrice !== wholesalePrice.value ||
-    kitStore.getKit?.retailPrice !== retailPrice.value
+    kitStore.getKit?.retailPrice !== retailPrice.value ||
+    kitStore.getKit?.qty !== qty.value
 ));
 
-const onSubmitIncomeInvoice = kitHandleSubmit((values) => {
+const onSubmitIncomeInvoice = kitHandleSubmit(async values => {
     const payload = {};
 
     if (values.seller?.id !== kitStore.getKit?.seller?.id) {
@@ -116,14 +118,29 @@ const onSubmitIncomeInvoice = kitHandleSubmit((values) => {
         payload.retailPrice = values.retailPrice
     }
 
-    kitStore.putKit(payload, route.params.id)
-    editMode.value = false
-    isEdited.value = true
-    toast.add({
-        severity: 'success',
-        summary: t('toast.successEditingSave'),
-        life: 3000
-    })
+    if (values.qty !== kitStore.getKit?.qty) {
+        payload.qty = values.qty
+    }
+
+    try {
+        await kitStore.putKit(payload, route.params.id)
+        editMode.value = false
+        isEdited.value = true
+        toast.add({
+            severity: 'success',
+            summary: t('toast.successEditingSave'),
+            life: 3000
+        })
+        router.back()
+    } catch (error) {
+        if (error.status === 439) {
+            toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else if (error.status === 412) {
+            toast.add({ severity: 'error', summary: t('toast.notEnoughKit', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
+    }
 })
 
 onBeforeRouteLeave((to, from, next) => {
@@ -374,7 +391,7 @@ onMounted(async () => {
                                 :placeholder="t('placeholders.qty')"
                                 :minFractionDigits="1"
                                 :maxFractionDigits="2"
-                                :disabled="true"
+                                :disabled="!editMode"
                             />
                         </div>
                     </div>

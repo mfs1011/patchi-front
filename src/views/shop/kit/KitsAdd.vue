@@ -213,16 +213,18 @@ const onSubmitKit = kitHandleSubmit(async values => {
         kitResetForm()
         productResetForm()
         router.back()
-
     } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        if (error.status === 439) {
+            toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else if (error.status === 412) {
+            toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
     }
 })
 
 const onSubmitProduct = productHandleSubmit(async values => {
-    console.log(kitProducts.value)
-    console.log(values)
-
     const isInclude = kitProducts.value.some(kitProduct => {
         return (
             kitProduct.product.id === values.product.id && kitProduct.product.colorId === values.product.colorId

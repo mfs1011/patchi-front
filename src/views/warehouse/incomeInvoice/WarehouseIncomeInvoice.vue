@@ -123,7 +123,7 @@ const onEditProduct = productHandleSubmit((values) => {
     editProduct(values)
 })
 
-const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit((values) => {
+const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
     const payload = {};
 
     payload.incomeInvoiceProducts = [...createdData.value, ...updatedData.value, ...deletedData.value]
@@ -140,15 +140,20 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit((values) => {
         payload.createdAt = values.createdAt
     }
 
-    incomeInvoiceStore.putIncomeInvoice(payload, route.params.id)
-    isEditing.value = false
-    editMode.value = false
-    isEdited.value = true
-    toast.add({
-        severity: 'success',
-        summary: t('toast.successEditingSave'),
-        life: 3000
-    })
+    try {
+        await incomeInvoiceStore.putIncomeInvoice(payload, route.params.id)
+        isEditing.value = false
+        editMode.value = false
+        isEdited.value = true
+        toast.add({
+            severity: 'success',
+            summary: t('toast.successEditingSave'),
+            life: 3000
+        })
+        router.back()
+    } catch (error) {
+        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+    }
 })
 
 const normalizeDate = date => date ? new Date(date).getTime() : null

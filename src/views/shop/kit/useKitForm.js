@@ -8,7 +8,6 @@ export function useKitValidation() {
     // Main kit schema
     const kitInfoSchema = computed(() => yup.object({
         seller: yup.object().required('Seller is required'),
-        assembly: yup.object().required('Collection is required'),
         qr: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
         code: yup.string().required(t('errorMessages.codeRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
         name: yup.string().required(t('errorMessages.titleRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
