@@ -426,22 +426,7 @@ const confirmLeave = () => {
                                             :invalid="!!locationQuantityErrors.locationQuantity"
                                         >
                                             <template v-if="locationQuantityStore.getLocationQuantities.models.length" #header>
-                                                <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900 grid grid-cols-5 gap-4">
-                                                    <div>{{t('labels.title')}}</div>
-                                                    <div>{{t('labels.code') }}</div>
-                                                    <div>{{t('labels.color')}}</div>
-                                                    <div>{{t('labels.expiryDate')}}</div>
-                                                    <div>{{t('labels.qty')}}</div>
-                                                </div>
-                                            </template>
-                                            <template #option="{ option }">
-                                                <div class="grid grid-cols-5 w-full gap-4">
-                                                    <div>{{ option?.product?.name }}</div>
-                                                    <div>{{ option?.product?.code }}</div>
-                                                    <div>{{ option?.color?.name ?? '-' }}</div>
-                                                    <div>{{ getFormattedDate(option?.expiryDate) }}</div>
-                                                    <div>{{ formatCurrency(option?.qty) }} {{ t(`labels.${option?.product?.category?.unit?.name}`) }}</div>
-                                                </div>
+                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
                                             </template>
                                         </SearchSelect>
                                     </div>

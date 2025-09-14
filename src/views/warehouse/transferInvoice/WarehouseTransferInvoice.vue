@@ -1,6 +1,6 @@
 <script setup>
-import {onBeforeRouteLeave, useRoute} from "vue-router";
-import {computed, onMounted, ref, watch} from "vue";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
+import {computed, onMounted, ref} from "vue";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
 import Section from "@/components/UI/Section.vue";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
@@ -15,9 +15,7 @@ import Button from "@/volt/Button.vue";
 import NoData from "@/components/UI/NoData.vue";
 import {useI18n} from "vue-i18n";
 import {useLocationStore} from "@/stores/location.js";
-import {useInventoryStore} from "@/stores/inventory.js";
 import {formatCurrency, getFormattedDate, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
-import {useColorStore} from "@/stores/color.js";
 import {useToast} from "primevue/usetoast";
 import {useTransferInvoiceValidation} from "@/views/warehouse/transferInvoice/useWarehouseTransferInvoiceForm.js";
 import {useTransferInvoiceStore} from "@/stores/transferInvoice.js";
@@ -33,13 +31,13 @@ import Row from "primevue/row"
 import {useUserStore} from "@/stores/user.js";
 
 const route = useRoute();
+const router = useRouter();
 const toast = useToast()
 const transferInvoiceStore = useTransferInvoiceStore();
 const userStore = useUserStore();
 const locationQuantityStore = useLocationQuantityStore();
 const locationQuantityKitStore = useLocationQuantityKitStore();
 const locationStore = useLocationStore();
-const colorStore = useColorStore();
 const { t } = useI18n();
 const {
     transferInvoiceHandleSubmit,
@@ -48,19 +46,15 @@ const {
     transferInvoiceResetForm,
     fromLocation,
     toLocation,
-    transferInvoiceProducts,
-    transferInvoiceKits,
     locationQuantityHandleSubmit,
     locationQuantityErrors,
     locationQuantityIsSubmitting,
     locationQuantityResetForm,
-    locationQuantityValidate,
     locationQuantity,
     qtyLocationQuantity,
     locationQuantityKitHandleSubmit,
     locationQuantityKitErrors,
     locationQuantityKitResetForm,
-    locationQuantityKitValidate,
     locationQuantityKit,
     qtyLocationQuantityKit,
 } = useTransferInvoiceValidation()
@@ -74,7 +68,9 @@ const currentDeleteLocationQuantityKit = ref(null);
 const deletedData = ref([]);
 const createdData = ref([]);
 const updatedData = ref([]);
-const dateFrom = ref(null);
+const deletedKitData = ref([]);
+const createdKitData = ref([]);
+const updatedKitData = ref([]);
 const editMode = ref(false);
 const isLoading = ref(false);
 const deleteLocationQuantityVisible = ref(false);
@@ -86,8 +82,6 @@ const isEditing = ref(false);
 const pendingNavigation = ref(false);
 const isEdited = ref(false);
 const isConfirmLoading = ref(false);
-const editingProductIndex = ref(null)
-const editingKitIndex = ref(null)
 const tabVal = ref('products')
 
 // computed
@@ -106,6 +100,9 @@ const isChanged = computed(() => (
     createdData.value.length ||
     updatedData.value.length ||
     deletedData.value.length ||
+    createdKitData.value.length ||
+    updatedKitData.value.length ||
+    deletedKitData.value.length ||
     transferInvoiceStore.getTransferInvoice?.fromLocation?.id !== fromLocation.value?.id ||
     transferInvoiceStore.getTransferInvoice?.toLocation?.id !== toLocation.value?.id
 ));
@@ -113,58 +110,71 @@ const isAcceptedTransferInvoice = computed(() => transferInvoiceStore.getTransfe
 
 // functions
 const onSubmitLocationQuantity = locationQuantityHandleSubmit((values) => {
-    addProduct(values)
+    addLocationQuantity(values)
 })
 
 const onEditLocationQuantity = locationQuantityHandleSubmit((values) => {
-    editProduct(values)
+    editLocationQuantity(values)
 })
 
 const onSubmitLocationQuantityKit = locationQuantityKitHandleSubmit((values) => {
-    addKit(values)
+    addLocationQuantityKit(values)
 })
 
 const onEditLocationQuantityKit = locationQuantityKitHandleSubmit((values) => {
-    editKit(values)
+    editLocationQuantityKit(values)
 })
 
-const onSubmitIncomeInvoice = transferInvoiceHandleSubmit((values) => {
+const onSubmitTransferInvoice = transferInvoiceHandleSubmit((values) => {
     const payload = {};
 
     payload.transferInvoiceProducts = [...createdData.value, ...updatedData.value, ...deletedData.value]
+    payload.transferInvoiceKits = [...createdKitData.value, ...updatedKitData.value, ...deletedKitData.value]
 
-    if (values.supplier.id !== apiData.value.supplier.id) {
-        payload.supplier = values.supplier['@id']
+    if (!payload.transferInvoiceProducts.length) {
+        delete payload.transferInvoiceProducts
     }
 
-    if (values.comment !== apiData.value.comment) {
-        payload.comment = values.comment
+    if (!payload.transferInvoiceKits.length) {
+        delete payload.transferInvoiceKits
     }
 
-    if (new Date(values.createdAt).toISOString() !== new Date(apiData.value.createdAt).toISOString()) {
-        payload.createdAt = values.createdAt
+    if (values.fromLocation.id !== apiData.value.fromLocation.id) {
+        payload.fromLocation = values.fromLocation['@id']
+    }
+
+    if (values.toLocation.id !== apiData.value.toLocation.id) {
+        payload.toLocation = values.toLocation
     }
 
     transferInvoiceStore.putTransferInvoice(payload, route.params.id)
     isEditing.value = false
     editMode.value = false
     isEdited.value = true
+    createdData.value = []
+    deletedData.value = []
+    updatedData.value = []
     toast.add({
         severity: 'success',
         summary: t('toast.successEditingSave'),
         life: 3000
     })
-})
 
-const normalizeDate = date => date ? new Date(date).getTime() : null
+    router.back()
+})
 
 const clearLocationQuantityForm = () => {
     isEditing.value = false
     locationQuantityResetForm()
 }
 
-function addProduct(newProduct) {
-    const exists = editableData.value.transferInvoiceProducts.some(p => p.id === newProduct.id);
+const clearLocationQuantityKitForm = () => {
+    isEditing.value = false
+    locationQuantityKitResetForm()
+}
+
+function addLocationQuantity(newLocationQuantity) {
+    const exists = editableData.value.transferInvoiceProducts.some(p => p.locationQuantity.id === newLocationQuantity.locationQuantity.id);
 
     if (exists) {
         toast.add({
@@ -176,9 +186,10 @@ function addProduct(newProduct) {
         return;
     }
 
-    editableData.value.transferInvoiceProducts.push(newProduct);
+    const { qtyLocationQuantity, locationQuantity } = newLocationQuantity;
 
-    createdData.value.push(newProduct)
+    editableData.value.transferInvoiceProducts.push({ locationQuantity, qty: qtyLocationQuantity});
+    createdData.value.push({ locationQuantity: `/api/location_quantities/${locationQuantity.id}`, qty: qtyLocationQuantity})
 
     toast.add({
         severity: 'success',
@@ -187,6 +198,33 @@ function addProduct(newProduct) {
     })
 
     locationQuantityResetForm();
+}
+
+function addLocationQuantityKit(newLocationQuantityKit) {
+    const exists = editableData.value.transferInvoiceKits.some(p => p.locationQuantityKit.id === newLocationQuantityKit.locationQuantityKit.id);
+
+    if (exists) {
+        toast.add({
+            severity: 'error',
+            summary: t('toast.already_added', { name: t('product.nominativeCapitalize') }),
+            life: 3000
+        })
+
+        return;
+    }
+
+    const { qtyLocationQuantityKit, locationQuantityKit } = newLocationQuantityKit;
+
+    editableData.value.transferInvoiceKits.push({ locationQuantityKit, qty: qtyLocationQuantityKit });
+    createdKitData.value.push({ locationQuantityKit: `/api/location_quantity_kits/${locationQuantityKit.id}`, qty: qtyLocationQuantityKit})
+
+    toast.add({
+        severity: 'success',
+        summary: t('toast.added', { name: t('kit.nominativeCapitalize') }),
+        life: 3000
+    })
+
+    locationQuantityKitResetForm();
 }
 
 function deleteLocationQuantityAction(product) {
@@ -201,7 +239,6 @@ function deleteLocationQuantityKitAction(product) {
 
 function deleteLocationQuantity() {
     const index = editableData.value.transferInvoiceProducts.findIndex(p => p.id === currentDeleteLocationQuantity.value.id);
-    console.log('deleteLocationQuantity', editableData.value)
 
     if (index === -1) return;
 
@@ -220,7 +257,6 @@ function deleteLocationQuantity() {
         editableData.value.transferInvoiceProducts.splice(index, 1);
     }
     deleteLocationQuantityVisible.value = false
-    console.log(editableData.value.transferInvoiceProducts)
 }
 
 function deleteLocationQuantityKit() {
@@ -234,7 +270,7 @@ function deleteLocationQuantityKit() {
         // API’dan kelgan
         editableData.value.transferInvoiceProducts.splice(index, 1);
 
-        deletedData.value.push({
+        deletedKitData.value.push({
             transferInvoiceKit: current["@id"],
             isDelete: true
         })
@@ -242,22 +278,27 @@ function deleteLocationQuantityKit() {
         // Yangi qo‘shilgan
         editableData.value.transferInvoiceProducts.splice(index, 1);
     }
+
     deleteLocationQuantityKitVisible.value = false
 }
 
-function edit(data, index) {
-    console.log(data)
+function editLocationQuantityAction(data, index) {
     isEditing.value = true;
-    currentProductIndex.value = index
-    locationQuantity.value = data.locationQuantity;
+    currentLocationQuantityIndex.value = index
+    locationQuantity.value = data.locationQuantity
     qtyLocationQuantity.value = data.qty;
 }
 
+function editLocationQuantityKitAction(data, index) {
+    isEditing.value = true;
+    currentLocationQuantityKitIndex.value = index
+    locationQuantityKit.value = data.locationQuantityKit
+    qtyLocationQuantityKit.value = data.qty;
+}
+
 async function fetchLocation(query) {
-    console.log('fetch')
     const params = {
-        ...query,
-        isWarehouse: true
+        ...query
     }
 
     if (userStore.getAboutMeFromToken.role === 'ROLE_WAREHOUSE_MANAGER') {
@@ -267,13 +308,11 @@ async function fetchLocation(query) {
     await locationStore.fetchLocations(params)
 }
 
-function editProduct(updatedProduct) {
+function editLocationQuantity(updatedLocationQuantity) {
     // Duplicate check
     const exists = editableData.value.transferInvoiceProducts.some((p, i) =>
-        i !== currentProductIndex.value &&
-        p.product.id === updatedProduct.product.id &&
-        p.color?.id === updatedProduct.color?.id &&
-        normalizeDate(p.expiryDate) === normalizeDate(updatedProduct.expiryDate)
+        i !== currentLocationQuantityIndex.value &&
+        p.id === updatedLocationQuantity.locationQuantity.id
     );
 
     if (exists) {
@@ -286,79 +325,125 @@ function editProduct(updatedProduct) {
         return;
     }
 
-    const current = editableData.value.transferInvoiceProducts[currentProductIndex.value];
+    const current = editableData.value.transferInvoiceProducts[currentLocationQuantityIndex.value];
 
     const payload = {};
 
-    if (updatedProduct.product.id !== current.product.id) {
-        payload.product = updatedProduct.product
+    if (updatedLocationQuantity.locationQuantity.id !== current.locationQuantity.id) {
+        payload.locationQuantity = updatedLocationQuantity.locationQuantity
     }
 
-    if (updatedProduct.color?.id !== current.color?.id) {
-        payload.color = updatedProduct.color
-    }
-
-    if (normalizeDate(updatedProduct.expiryDate) !== normalizeDate(current.expiryDate)) {
-        payload.expiryDate = updatedProduct.expiryDate
-    }
-
-    if (updatedProduct.qty !== current.qty) {
-        payload.qty = updatedProduct.qty
-    }
-
-    if (updatedProduct.price !== current.price) {
-        payload.price = updatedProduct.price
-    }
-
-    if (updatedProduct.customsFee !== current.customsFee) {
-        payload.customsFee = updatedProduct.customsFee
-    }
-
-    if (updatedProduct.transportationFee !== current.transportationFee) {
-        payload.transportationFee = updatedProduct.transportationFee
+    if (updatedLocationQuantity.qtyLocationQuantity !== current.qty) {
+        payload.qty = updatedLocationQuantity.qtyLocationQuantity
     }
 
     if (current.id) {
         payload.transferInvoiceProduct = current['@id']
-        const indexFromUpdatedData = updatedData.value.findIndex(data => data.incomeInvoiceProduct['@id'] === payload.incomeInvoiceProduct['@id'])
+        const indexFromUpdatedData = updatedData.value.findIndex(data => data.transferInvoiceProduct['@id'] === payload.transferInvoiceProduct['@id'])
 
         if (indexFromUpdatedData !== -1) {
             updatedData.value[indexFromUpdatedData] = {
-                payload
+                ...payload
             }
         } else {
             updatedData.value.push(payload)
         }
 
         // API’dan kelgan
-        editableData.value.transferInvoiceProducts[currentProductIndex.value] = {
-            incomeInvoiceProduct: current['@id'],
+        editableData.value.transferInvoiceProducts[currentLocationQuantityIndex.value] = {
+            transferInvoiceProduct: current['@id'],
             ...current,
             ...payload,
         };
     } else {
         // Yangi qo‘shilgan
-        editableData.value.transferInvoiceProducts[currentProductIndex.value] = {
+        editableData.value.transferInvoiceProducts[currentLocationQuantityIndex.value] = {
             ...current,
             ...payload
         };
 
-        const index = createdData.value.findIndex(p => (
-            p.product.id === current.product.id &&
-            p.color?.id === current.color?.id &&
-            normalizeDate(p.expiryDate) === normalizeDate(current.expiryDate)
-        ))
+        const index = createdData.value.findIndex(p => p.locationQuantity.id === current.locationQuantity.id)
 
         if (index !== -1) {
             // Agar mavjud bo‘lsa yangilash
-            createdData.value[index] = { ...createdData.value[index], ...updatedProduct }
+            createdData.value[index] = { ...createdData.value[index], ...current, ...payload }
         } else {
             // Aks holda push qilish
-            createdData.value.push(updatedProduct)
+            const { qtyLocationQuantity, locationQuantity } = updatedLocationQuantity;
+            createdData.value.push({ locationQuantity, qty: qtyLocationQuantity})
         }
     }
 
     clearLocationQuantityForm()
+}
+
+function editLocationQuantityKit(updatedLocationQuantityKit) {
+    // Duplicate check
+    const exists = editableData.value.transferInvoiceKits.some((p, i) =>
+        i !== currentLocationQuantityKitIndex.value &&
+        p.id === updatedLocationQuantityKit.locationQuantityKit.id
+    );
+
+    if (exists) {
+        toast.add({
+            severity: 'error',
+            summary: t('toast.already_added', { name: t('kit.nominativeCapitalize') }),
+            life: 3000
+        })
+
+        return;
+    }
+
+    const current = editableData.value.transferInvoiceKits[currentLocationQuantityKitIndex.value];
+
+    const payload = {};
+
+    if (updatedLocationQuantityKit.locationQuantityKit.id !== current.locationQuantityKit.id) {
+        payload.locationQuantityKit = updatedLocationQuantityKit.locationQuantityKit
+    }
+
+    if (updatedLocationQuantityKit.qtyLocationQuantityKit !== current.qty) {
+        payload.qty = updatedLocationQuantityKit.qtyLocationQuantityKit
+    }
+
+    if (current.id) {
+        payload.transferInvoiceKit = current['@id']
+        const indexFromUpdatedData = updatedData.value.findIndex(data => data.transferInvoiceKit['@id'] === payload.transferInvoiceKit['@id'])
+
+        if (indexFromUpdatedData !== -1) {
+            updatedKitData.value[indexFromUpdatedData] = {
+                ...payload
+            }
+        } else {
+            updatedKitData.value.push(payload)
+        }
+
+        // API’dan kelgan
+        editableData.value.transferInvoiceKits[currentLocationQuantityKitIndex.value] = {
+            transferInvoiceKit: current['@id'],
+            ...current,
+            ...payload,
+        };
+    } else {
+        // Yangi qo‘shilgan
+        editableData.value.transferInvoiceKits[currentLocationQuantityKitIndex.value] = {
+            ...current,
+            ...payload
+        };
+
+        const index = createdKitData.value.findIndex(p => p.locationQuantityKit.id === current.locationQuantityKit.id)
+
+        if (index !== -1) {
+            // Agar mavjud bo‘lsa yangilash
+            createdKitData.value[index] = { ...createdData.value[index], ...current, ...payload }
+        } else {
+            // Aks holda push qilish
+            const { qtyLocationQuantityKit, locationQuantityKit } = updatedLocationQuantityKit;
+            createdKitData.value.push({ locationQuantityKit, qty: qtyLocationQuantityKit})
+        }
+    }
+
+    clearLocationQuantityKitForm()
 }
 
 function cancelEditing() {
@@ -405,7 +490,13 @@ onMounted(async () => {
 </script>
 
 <template>
-    <pre class="text-surface-0">{{editableData?.transferInvoiceProducts}}</pre>
+    <pre class="dark:text-surface-0">transferInvoiceErrors{{transferInvoiceErrors}}</pre>
+    <pre class="dark:text-surface-0">locationQuantityKitErrors{{locationQuantityKitErrors}}</pre>
+<!--    <pre class="dark:text-surface-0">createdData{{createdData}}</pre>-->
+<!--    <pre class="dark:text-surface-0">deletedData{{deletedData}}</pre>-->
+<!--    <pre class="dark:text-surface-0">updatedData{{updatedData}}</pre>-->
+<!--    <pre class="dark:text-surface-0">locationQuantity{{locationQuantity}}</pre>-->
+
     <Breadcrumb :home="home" :model="items" class="rounded-md border border-surface-300 dark:border-surface-600/50">
         <template #item="{ item, props }">
             <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom class="group hidden lg:block">
@@ -454,7 +545,7 @@ onMounted(async () => {
                     v-if="editMode"
                     :disabled="!isChanged"
                     icon="pi pi-save"
-                    @click="onSubmitIncomeInvoice"
+                    @click="onSubmitTransferInvoice"
                     class="px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
                     :loading="transferInvoiceIsSubmitting"
@@ -475,7 +566,7 @@ onMounted(async () => {
                     v-if="editMode"
                     :disabled="!!transferInvoiceErrors.incomeInvoiceProducts"
                     icon="pi pi-save"
-                    @click="onSubmitIncomeInvoice"
+                    @click="onSubmitTransferInvoice"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
                     :loading="transferInvoiceIsSubmitting"
@@ -494,7 +585,7 @@ onMounted(async () => {
                     v-if="editMode"
                     :disabled="!isChanged"
                     icon="pi pi-save"
-                    @click="onSubmitIncomeInvoice"
+                    @click="onSubmitTransferInvoice"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
                     :loading="transferInvoiceIsSubmitting"
@@ -524,7 +615,7 @@ onMounted(async () => {
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
-                                :return-value="opt => opt?.id"
+                                :return-value="opt => opt"
                                 :placeholder="t('placeholders.search.byLocation')"
                                 :loading="locationStore.getIsLoadingLocation"
                                 :total-items="locationStore.getLocations.totalItems"
@@ -544,7 +635,7 @@ onMounted(async () => {
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
-                                :return-value="opt => opt?.id"
+                                :return-value="opt => opt"
                                 :placeholder="t('placeholders.search.byLocation')"
                                 :loading="locationStore.getIsLoadingLocation"
                                 :total-items="locationStore.getLocations.totalItems"
@@ -584,30 +675,15 @@ onMounted(async () => {
                                             :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
-                                            search-key="product"
-                                            :search-value="opt => opt.product.id"
+                                            :search-value="opt => opt.id"
+                                            search-key="id"
                                             :placeholder="t('placeholders.select.product')"
                                             :loading="locationQuantityStore.getIsLoadingLocationQuantity"
                                             :total-items="locationQuantityStore.getLocationQuantities.totalItems"
                                             :invalid="!!locationQuantityErrors.locationQuantity"
                                         >
                                             <template v-if="locationQuantityStore.getLocationQuantities.models.length" #header>
-                                                <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900 grid grid-cols-5 gap-4">
-                                                    <div>{{t('labels.title')}}</div>
-                                                    <div>{{t('labels.code') }}</div>
-                                                    <div>{{t('labels.color')}}</div>
-                                                    <div>{{t('labels.expiryDate')}}</div>
-                                                    <div>{{t('labels.qty')}}</div>
-                                                </div>
-                                            </template>
-                                            <template #option="{ option }">
-                                                <div class="grid grid-cols-5 w-full gap-4">
-                                                    <div>{{ option?.product?.name }}</div>
-                                                    <div>{{ option?.product?.code }}</div>
-                                                    <div>{{ option?.color?.name ?? '-' }}</div>
-                                                    <div>{{ getFormattedDate(option?.expiryDate) }}</div>
-                                                    <div>{{ formatCurrency(option?.qty) }} {{ t(`labels.${option?.product?.category?.unit?.name}`) }}</div>
-                                                </div>
+                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
                                             </template>
                                         </SearchSelect>
                                     </div>
@@ -790,7 +866,7 @@ onMounted(async () => {
                                                 <Skeleton height="2rem" v-if="isLoading"/>
                                                 <div v-else class="flex items-center gap-2">
                                                     <Button
-                                                        @click="edit(data, index)"
+                                                        @click="editLocationQuantityAction(data, index)"
                                                         icon="pi pi-pencil"
                                                         pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
                                                         size="small"
@@ -826,9 +902,8 @@ onMounted(async () => {
                                 >
                                     <ColumnGroup type="header">
                                         <Row>
-                                            <Column :header="t('labels.kit')" :rowspan="1" :colspan="6" class="text-center!"/>
+                                            <Column :header="t('labels.kit')" :rowspan="1" :colspan="4" class="text-center!"/>
                                             <Column :header="t('labels.expiryDate')" :rowspan="2" :colspan="1" />
-                                            <Column :header="t('labels.qty')" :rowspan="2" :colspan="1" />
                                             <Column :header="t('labels.transferQty')" :rowspan="2" :colspan="1" />
                                             <Column v-if="editMode" :header="t('actions')" :rowspan="2" :colspan="1" />
                                         </Row>
@@ -837,8 +912,6 @@ onMounted(async () => {
                                             <Column field="code" :header="t('labels.code')" />
                                             <Column field="qr" :header="t('labels.qr')" />
                                             <Column field="costPrice" :header="t('labels.costPrice')" />
-                                            <Column field="wholesalePrice" :header="t('labels.wholesalePrice')" />
-                                            <Column field="retailPrice" :header="t('labels.retailPrice')" />
                                         </Row>
                                     </ColumnGroup>
                                     <Column field="kit" :header="t('labels.title')">
@@ -861,29 +934,14 @@ onMounted(async () => {
                                             <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.costPrice) + '$') || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
-                                        <template #body="{ data }">
-                                            <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.wholesalePrice) + '$') || '-' }}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
-                                        <template #body="{ data }">
-                                            <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.retailPrice) + '$') || '-' }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantityKit?.expiryDate ? getFormattedDateWithTime(data.locationQuantityKit?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="qty" :header="t('labels.qty')">
-                                        <template #body="{ data }">
-                                            <p>{{ data.locationQuantityKit.qty }} {{t(`labels.pcs`)}}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="qtyLocationQuantityKit" :header="t('labels.transferQty')">
                                         <template #body="{ data }">
-                                            <p>{{ data.qtyLocationQuantityKit }} {{t(`labels.pcs`)}}</p>
+                                            <p>{{ data.qty }} {{t(`labels.pcs`)}}</p>
                                         </template>
                                     </Column>
                                     <Column v-if="editMode" field="actions" :header="t('actions')">
@@ -891,13 +949,13 @@ onMounted(async () => {
                                             <div class="flex justify-end w-full">
                                                 <div class="flex items-center gap-2">
                                                     <Button
-                                                        @click="editKit(data, index)"
+                                                        @click="editLocationQuantityKitAction(data, index)"
                                                         icon="pi pi-pencil"
                                                         pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
                                                         size="small"
                                                     />
                                                     <Button
-                                                        @click="deleteKitAction(data)"
+                                                        @click="deleteLocationQuantityKitAction(data)"
                                                         icon="pi pi-trash"
                                                         pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
                                                         size="small"

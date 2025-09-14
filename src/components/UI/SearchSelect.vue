@@ -35,19 +35,27 @@ watch(
     async (newVal) => {
         page.value = 1;
 
+        const query = {
+            page: page.value,
+            "items-per-page": props.itemsPerPage,
+        };
+
         if (typeof newVal === "string") {
             // faqat qidiruvda ro'yxatni reset qilamiz
             items.value = [];
 
-            const query = {
-                page: page.value,
-                "items-per-page": props.itemsPerPage,
-            };
-
-            if (newVal) query.name = newVal;
+            if (newVal) {
+                query[props.query] = newVal;
+            }
 
             await props.fetchFn(query);
             items.value = props.options;
+        }
+
+        if (newVal === null) {
+            page.value = 1
+            await props.fetchFn(query);
+            items.value = props.options
         }
         // agar newVal object bo'lsa — bu tanlovni qo'lda set qilish; bu yerda itemsni o'chirmaymiz!
     },
@@ -60,8 +68,12 @@ watch(isVisible, async (newValue) => {
         const query = {
             page: ++page.value,
             "items-per-page": props.itemsPerPage,
-            [props.searchKey]: typeof debouncedValue.value === "string" ? debouncedValue.value : "",
         };
+
+        if (typeof debouncedValue.value === "string" && debouncedValue.value !== "") {
+            query[props.searchKey] = debouncedValue.value
+        }
+
         await props.fetchFn(query);
         items.value = [...items.value, ...props.options];
         emit("loadMore", items.value);
@@ -104,7 +116,7 @@ watch(
             return;
         }
 
-        const byId = (x) => props.optionValue(x) === props.optionValue(newVal);
+        const byId = (x) => props.searchValue(x) === props.searchValue(newVal);
 
         // 1) items ichidan izlaymiz
         let found = items.value.find(byId);
@@ -114,8 +126,12 @@ watch(
             const query = {
                 page: 1,
                 "items-per-page": 10,
-                [props.searchKey]: props.searchValue(newVal),
             };
+
+            if (props.searchValue(newVal)) {
+                query[props.searchKey] = props.searchValue(newVal)
+            }
+
             await props.fetchFn(query);
 
             found = props.options.find(byId);
