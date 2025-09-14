@@ -593,6 +593,7 @@
     },
     "toast": {
         "success": "Muvaffaqiyat!",
+        "successEditingSave": "O'zgarishlar mivaffaqiyatli saqlandi!",
         "created": "{name} muvaffaqiyatli yaratildi!",
         "added": "{name} muvaffaqiyatli qo‘shildi!",
         "edited": "{name} muvaffaqiyatli o‘zgartirildi!",
