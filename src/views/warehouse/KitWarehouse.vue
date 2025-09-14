@@ -60,11 +60,11 @@ const {
 
 const home = ref({
     icon: 'pi pi-home',
-    label: t('shop'),
-    route: '/shop'
+    label: t('warehouse'),
+    route: '/warehouse'
 });
 
-const items = computed(() => [{ label: t('cards.kits'), route: { name: 'kits'} }, { label: t('labels.kit') }]);
+const items = computed(() => [{ label: t('cards.warehouseContent'), route: { name: 'warehouse-content'} }, { label: t('labels.kit') }]);
 
 const sumPriceOfKitProducts = computed(() => {
     return kitStore.getKit.filteredKitProducts.length === 0 ? 0
@@ -215,7 +215,7 @@ onMounted(async () => {
 
     <Section
         :section-name="t('labels.kit')"
-        back-route-name="kits"
+        back-route-name="warehouse-content"
         without-buttons
     >
         <template #buttons>
