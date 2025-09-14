@@ -283,6 +283,7 @@
         "updated": "Изменённые",
         "deleted": "Удалённые",
         "restore": "Восстановлено",
+        "exclude": "Исключать",
         "imageUpdated": "Изображение обновлено",
         "passwordUpdated": "Пароль обновлено",
         "clientB2B": "Корпоративный клиент",
@@ -308,7 +309,8 @@
         "IncomeInvoice": "Поступления",
         "Kit": "Композиция",
         "TransferInvoice": "Перемещение",
-        "ReturnInvoice": "Возвраты",
+        "ReturnInvoice": "Возврат",
+        "WriteOffInvoice": "Списани",
         "customsFee": "Таможенные расходы",
         "transportationFee": "Транспортные расходы"
     },
@@ -364,6 +366,7 @@
             "paymentType": "Выберите тип оплаты",
             "location": "Выберите локацию",
             "supplier": "Выберите поставщика",
+            "seller": "Выберите продавца",
             "product": "Выберите продукт",
             "kit": "Выберите композицию",
             "color": "Выберите цвет"

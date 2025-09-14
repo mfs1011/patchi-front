@@ -153,12 +153,6 @@ export const routes = [
                                 component: () => import('@/views/shop/kit/KitsAdd.vue')
                             },
                             {
-                                path: 'edit/:id',
-                                name: 'edit-kit',
-                                meta: { requiresAuth: true, roles: []},
-                                component: () => import('@/views/shop/kit/KitsEdit.vue')
-                            },
-                            {
                                 path: 'kit/:id',
                                 name: 'kit',
                                 meta: { requiresAuth: true, roles: []},

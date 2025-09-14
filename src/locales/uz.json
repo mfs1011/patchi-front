@@ -283,6 +283,7 @@
         "updated": "O‘zgartirilganlar",
         "deleted": "Oʻchirilganlar",
         "restore": "Tiklandi",
+        "exclude": "Cheklash",
         "imageUpdated": "Rasm yangilandi",
         "passwordUpdated": "Parol yangilandi",
         "clientB2B": "Korporativ mijoz",
@@ -308,7 +309,8 @@
         "IncomeInvoice": "Kirim hujjati",
         "Kit": "Kompozitsiya",
         "TransferInvoice": "Ko‘chirish",
-        "ReturnInvoice": "Qaytarilganlar",
+        "ReturnInvoice": "Qaytarilgan",
+        "WriteOffInvoice": "Chiqarish",
         "customsFee": "Bojxona xarajatlari",
         "transportationFee": "Transport xarajatlari"
     },
@@ -362,6 +364,7 @@
             "paymentType": "To‘lov turini tanlang",
             "location": "Joylashuvni tanlang",
             "supplier": "Ta'minotchini tanlang",
+            "seller": "Sotuvchini tanlang",
             "product": "Mahsulotni tanlang",
             "kit": "Kompozitsiyani tanlang",
             "color": "Rangni tanlang"

@@ -17,8 +17,7 @@ export const useKitStore = defineStore('kit', () => {
             totalItems: 0,
         },
         kit: {
-            models: [],
-            totalItems: 0,
+            filteredKitProducts: [],
         },
         isLoadingKits: false,
     })
@@ -95,8 +94,7 @@ export const useKitStore = defineStore('kit', () => {
     const fetchKit = async id => {
         try {
             const { data } = await authorizedClient.get(`/kits/${id}`)
-            state.kit.models = data.member
-            state.kit.totalItems = data.totalItems
+            state.kit = data
 
             return data
         } catch (error) {

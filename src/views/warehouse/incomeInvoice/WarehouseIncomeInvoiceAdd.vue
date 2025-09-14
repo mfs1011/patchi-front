@@ -144,7 +144,6 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
         incomeInvoiceResetForm()
         productResetForm()
         router.back()
-
     } catch (error) {
         toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
     }

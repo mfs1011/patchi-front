@@ -283,6 +283,7 @@
         "updated": "Changed",
         "deleted": "Deleted",
         "restore": "Restored",
+        "exclude": "Exclude",
         "imageUpdated": "Image updated",
         "passwordUpdated": "Password updated",
         "clientB2B": "Corporate Client",
@@ -308,7 +309,8 @@
         "IncomeInvoice": "Income invoice",
         "Kit": "Composition",
         "TransferInvoice": "Transfer",
-        "ReturnInvoice": "Returns",
+        "ReturnInvoice": "Return",
+        "WriteOffInvoice": "Write-off",
         "customsFee": "Customs fee",
         "transportationFee": "Transportation fee"
     },
@@ -364,6 +366,7 @@
             "paymentType": "Select payment type",
             "location": "Select location",
             "supplier": "Select supplier",
+            "seller": "Select seller",
             "product": "Select product",
             "kit": "Select composition",
             "color": "Select color"

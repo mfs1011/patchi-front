@@ -50,8 +50,8 @@ const schema = computed(() => yup.object({
     name: yup.string().required(t('errorMessages.titleRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     category: yup.number().required(t('errorMessages.categoryRequired')),
     assembly: yup.number().notRequired(),
-    wholesalePrice: yup.number().notRequired(),
-    retailPrice: yup.number().notRequired(),
+    wholesalePrice: yup.number().required(t('errorMessages.wholesalePriceRequired')),
+    retailPrice: yup.number().required(t('errorMessages.retailPriceRequired')),
     minQty: yup.number().notRequired(),
     photo: yup
         .mixed()
@@ -91,19 +91,13 @@ const onSubmit = handleSubmit(async values => {
     const payload = {
         code: values.code,
         name: values.name,
+        wholesalePrice: values.wholesalePrice,
+        retailPrice: values.retailPrice,
         category: `/api/categories/${values.category}`
     };
 
     if (qr.value) {
         payload.qr = values.qr
-    }
-
-    if (wholesalePrice.value) {
-        payload.wholesalePrice = values.wholesalePrice
-    }
-
-    if (retailPrice.value) {
-        payload.retailPrice = values.retailPrice
     }
 
     if (minQty.value) {
@@ -259,8 +253,8 @@ onMounted(async () => {
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.assembly }}</Message>
                         </div>
 
-                        <label class="block">
-                            <span>{{ t('labels.wholesalePrice') }}</span>
+                        <div>
+                            <p>{{ t('labels.wholesalePrice') }}<span class="text-red-500"> *</span></p>
                             <InputNumber
                                 v-model="wholesalePrice"
                                 fluid
@@ -274,9 +268,9 @@ onMounted(async () => {
                                 :maxFractionDigits="2"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.wholesalePrice }}</Message>
-                        </label>
-                        <label class="block">
-                            <span>{{ t('labels.retailPrice') }}</span>
+                        </div>
+                        <div>
+                            <p>{{ t('labels.retailPrice') }}<span class="text-red-500"> *</span></p>
                             <InputNumber
                                 v-model="retailPrice"
                                 fluid
@@ -290,7 +284,7 @@ onMounted(async () => {
                                 :maxFractionDigits="2"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.retailPrice }}</Message>
-                        </label>
+                        </div>
                         <label class="block">
                             <span>{{ t('labels.minQty') }}</span>
                             <InputNumber
