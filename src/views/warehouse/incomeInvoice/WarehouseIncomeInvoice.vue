@@ -41,7 +41,6 @@ const {
     productErrors,
     productIsSubmitting,
     productResetForm,
-    productFormCtx,
     product,
     color,
     expiryDate,
@@ -53,12 +52,10 @@ const {
     incomeInvoiceErrors,
     incomeInvoiceIsSubmitting,
     incomeInvoiceResetForm,
-    incomeInvoiceFormCtx,
     supplier,
     location,
     comment,
     createdAt,
-    incomeInvoiceProducts,
 } = useIncomeInvoiceValidation();
 
 const apiData = ref(null);
@@ -220,6 +217,7 @@ function deleteProduct() {
 }
 
 function edit(data, index) {
+    console.log(data)
     isEditing.value = true;
     currentProductIndex.value = index
     product.value = data.product;
@@ -412,7 +410,7 @@ onMounted(async () => {
 
     <Section
         :section-name="t('sections.sellers.add')"
-        back-route-name="sellers"
+        back-route-name="warehouse-income-invoices"
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
@@ -429,7 +427,7 @@ onMounted(async () => {
                     v-if="editMode"
                     :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
                     @click="cancelEditing"
-                    class="px-2 sm:px-5 whitespace-nowrap bg-surface-0!"
+                    class="px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
                     :loading="incomeInvoiceIsSubmitting"
                 />
@@ -468,7 +466,7 @@ onMounted(async () => {
                     v-if="editMode"
                     :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
                     @click="cancelEditing"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0!"
+                    class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
                     :loading="incomeInvoiceIsSubmitting"
                 />

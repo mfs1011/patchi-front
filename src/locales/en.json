@@ -171,6 +171,12 @@
         "accusative": "income invoice",
         "accusativeCapitalize": "Income invoice"
     },
+    "transferInvoice": {
+        "nominative": "transfer invoice",
+        "nominativeCapitalize": "Transfer invoice",
+        "accusative": "transfer invoice",
+        "accusativeCapitalize": "Transfer invoice"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
@@ -245,6 +251,7 @@
         "Bank": "Bank account",
         "createdAt": "Date",
         "createdBy": "Created by",
+        "acceptedBy": "Accepted by",
         "updatedAt": "Updated date",
         "updatedBy": "Updated by",
         "usdRate": "USD Rate",
@@ -263,6 +270,7 @@
         "notificationDay": "Days before notification",
         "totals": "Totals",
         "qty": "Quantity",
+        "transferQty": "Transfer quantity",
         "element": "Element",
         "elementId": "Element ID",
         "actionType": "Action Type",
@@ -335,6 +343,7 @@
             "byKit": "Search by kit",
             "byUser": "Search by responsible",
             "byCreatedBy": "Search by created user",
+            "byAcceptedBy": "Search by accepted user",
             "bySupplier": "Search by supplier",
             "byElementId": "Search by element ID",
             "byElement": "Search by element",
@@ -356,6 +365,7 @@
             "location": "Select location",
             "supplier": "Select supplier",
             "product": "Select product",
+            "kit": "Select composition",
             "color": "Select color"
         },
         "supplierName": "Enter supplier name...",
@@ -393,6 +403,7 @@
         "newKpi": "New KPI",
         "newInventory": "New inventory",
         "newIncomeInvoice": "New income",
+        "newTransferInvoice": "New transfer",
         "filters": "Filters",
         "saveAndExit": "Save and exit",
         "add": "Add",
@@ -559,6 +570,18 @@
         "incomeInvoices": {
             "add": "Add",
             "edit": "Edit"
+        },
+        "transferInvoices": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "warehouseIncomeInvoice": {
+            "add": "Add",
+            "edit": "Edit"
+        },
+        "warehouseTransferInvoices": {
+            "add": "Add",
+            "edit": "Edit"
         }
     },
     "pagination": {
@@ -594,6 +617,7 @@
     "day": "day",
     "incomingData": "Incoming data",
     "addProduct": "Add product",
+    "addkit": "Add composition",
     "zero": "Out of stock",
     "notZero": "Available",
     "desc": "Newest",

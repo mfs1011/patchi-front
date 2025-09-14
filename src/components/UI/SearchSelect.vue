@@ -13,6 +13,7 @@ const props = defineProps({
     optionValue: { type: Function, default: (opt) => opt?.id },
     returnValue: { type: Function, default: (opt) => opt },
     searchValue: { type: Function, default: (opt) => opt.name },
+    searchKey: { type: String, default: "name" },
     placeholder: String,
     loading: Boolean,
     totalItems: { type: Number, default: 0 },
@@ -59,7 +60,7 @@ watch(isVisible, async (newValue) => {
         const query = {
             page: ++page.value,
             "items-per-page": props.itemsPerPage,
-            name: typeof debouncedValue.value === "string" ? debouncedValue.value : "",
+            [props.searchKey]: typeof debouncedValue.value === "string" ? debouncedValue.value : "",
         };
         await props.fetchFn(query);
         items.value = [...items.value, ...props.options];
@@ -113,11 +114,12 @@ watch(
             const query = {
                 page: 1,
                 "items-per-page": 10,
-                name: props.searchValue(newVal),
+                [props.searchKey]: props.searchValue(newVal),
             };
             await props.fetchFn(query);
 
             found = props.options.find(byId);
+            console.log(items, found)
             if (found) {
                 const exists = items.value.some(byId);
                 if (!exists) items.value = props.options; // tepa qismga qo'shib qo'yamiz

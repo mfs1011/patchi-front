@@ -7,8 +7,6 @@ import Button from "@/volt/Button.vue";
 import Card from "@/volt/Card.vue";
 import InputText from "@/volt/InputText.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
-import {useField, useForm} from "vee-validate";
-import * as yup from "yup";
 import {onBeforeRouteLeave, useRouter} from "vue-router";
 import {useLocationStore} from "@/stores/location.js";
 import {useToast} from "primevue/usetoast";
@@ -24,9 +22,33 @@ import DataTable from "@/volt/DataTable.vue";
 import Dialog from "@/volt/Dialog.vue";
 import {useIncomeInvoiceStore} from "@/stores/incomeInvoice.js";
 import {useInventoryStore} from "@/stores/inventory.js";
+import {useIncomeInvoiceValidation} from "@/views/warehouse/incomeInvoice/useWarehouseIncomeInvoiceForm.js";
 
 const { t } = useI18n()
 const toast = useToast()
+const {
+    incomeInvoiceHandleSubmit,
+    incomeInvoiceErrors,
+    incomeInvoiceIsSubmitting,
+    incomeInvoiceResetForm,
+    supplier,
+    location,
+    comment,
+    createdAt,
+    incomeInvoiceProducts,
+    productHandleSubmit,
+    productErrors,
+    productIsSubmitting,
+    productResetForm,
+    productValidate,
+    product,
+    color,
+    expiryDate,
+    qty,
+    price,
+    transportationFee,
+    customsFee,
+} = useIncomeInvoiceValidation();
 
 const locationStore = useLocationStore();
 const inventoryStore = useInventoryStore();
@@ -80,74 +102,6 @@ const isChanged = computed(() => (
     !!customsFee.value
 ))
 
-// VeeValidate formani sozlash
-const incomeInvoiceInfoSchema = computed(() => yup.object({
-    supplier: yup.object().required(),
-    location: yup.object().required(),
-    comment: yup.string().max(255).notRequired(),
-    createdAt: yup.date().required(),
-    incomeInvoiceProducts: yup.array().required().min(1)
-}))
-
-const productSchema = computed(() => yup.object({
-    product: yup.object().required(),
-    color: yup.object().notRequired(),
-    expiryDate: yup
-        .date()
-        .nullable()
-        .when("product", {
-            is: (product) =>
-                product?.category?.categoryType?.name &&
-                product.category.categoryType.name.toLowerCase() === 'food',
-            then: (schema) => schema.required("Expiry date is required for food"),
-            otherwise: (schema) => schema.notRequired(),
-        }),
-    qty: yup.number().required(),
-    price: yup.number().required(),
-    transportationFee: yup.number().required(),
-    customsFee: yup.number().required()
-}))
-
-const {
-    handleSubmit: incomeInvoiceHandleSubmit,
-    errors: incomeInvoiceErrors,
-    isSubmitting: incomeInvoiceIsSubmitting,
-    resetForm: incomeInvoiceResetForm,
-    ...incomeInvoiceFormCtx
-} = useForm({
-    validationSchema: incomeInvoiceInfoSchema,
-    initialValues: {
-        incomeInvoiceProducts: []
-    }
-})
-
-const {
-    handleSubmit: productHandleSubmit,
-    errors: productErrors,
-    isSubmitting: productIsSubmitting,
-    resetForm: productResetForm,
-    ...productFormCtx
-} = useForm({
-    validationSchema: productSchema,
-    initialValues: {
-        transportationFee: 0,
-        customsFee: 0
-    }
-})
-
-const { value: supplier } = useField('supplier', undefined, { form: incomeInvoiceFormCtx });
-const { value: location } = useField('location', undefined, { form: incomeInvoiceFormCtx })
-const { value: comment } = useField('comment', undefined, { form: incomeInvoiceFormCtx })
-const { value: createdAt } = useField('createdAt', undefined, { form: incomeInvoiceFormCtx})
-const { value: incomeInvoiceProducts } = useField('incomeInvoiceProducts', undefined, { validateOnMount: true, form: incomeInvoiceFormCtx })
-const { value: product } = useField('product', undefined, { validateOnValueUpdate: false, form: productFormCtx });
-const { value: color } = useField('color', undefined, { form: productFormCtx });
-const { value: expiryDate } = useField('expiryDate', undefined, { form: productFormCtx });
-const { value: qty } = useField('qty', undefined, { form: productFormCtx });
-const { value: price } = useField('price', undefined, { form: productFormCtx });
-const { value: transportationFee } = useField('transportationFee', undefined, { form: productFormCtx });
-const { value: customsFee } = useField('customsFee', undefined, { form: productFormCtx });
-
 const sumPriceOfIncomeInvoiceProducts = computed(() => {
     return incomeInvoiceProducts.value.length === 0
         ? 0
@@ -165,15 +119,22 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
         location: values.location['@id'],
         comment: values.comment,
         createdAt: values.createdAt,
-        incomeInvoiceProducts: values.incomeInvoiceProducts.map(incomeInvoiceProduct => ({
-            product: incomeInvoiceProduct.product['@id'],
-            color: incomeInvoiceProduct.color['@id'],
-            expiryDate: incomeInvoiceProduct.expiryDate,
-            qty: incomeInvoiceProduct.qty,
-            price: incomeInvoiceProduct.price,
-            transportationFee: incomeInvoiceProduct.transportationFee,
-            customsFee: incomeInvoiceProduct.customsFee
-        }))
+        incomeInvoiceProducts: values.incomeInvoiceProducts.map(incomeInvoiceProduct => {
+            const newVal = {
+                product: incomeInvoiceProduct.product['@id'],
+                expiryDate: incomeInvoiceProduct.expiryDate,
+                qty: incomeInvoiceProduct.qty,
+                price: incomeInvoiceProduct.price,
+                transportationFee: incomeInvoiceProduct.transportationFee,
+                customsFee: incomeInvoiceProduct.customsFee
+            }
+
+            if (incomeInvoiceProduct.color) {
+                newVal.color = incomeInvoiceProduct.color['@id']
+            }
+
+            return newVal
+        })
     };
 
     try {
@@ -246,7 +207,13 @@ const clearProductForm = () => {
     productResetForm()
 }
 
-const saveEditing = () => {
+const saveEditing = async () => {
+    const isValid = await productValidate()
+
+    if (!isValid.valid) {
+        return
+    }
+
     const editedData = {
         product: product.value,
         color: color.value,
@@ -324,8 +291,8 @@ const confirmLeave = () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.sellers.add')"
-        back-route-name="sellers"
+        :section-name="t('sections.warehouseIncomeInvoice.add')"
+        back-route-name="warehouse-income-invoices"
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
