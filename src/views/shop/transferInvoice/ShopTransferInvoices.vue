@@ -64,8 +64,8 @@ const filters = ref({
 // computed
 const home = computed(() => ({
     icon: "pi pi-slash",
-    label: t("warehouse"),
-    route: "/warehouse",
+    label: t("shop"),
+    route: "/shop",
 }));
 
 const items = computed(() => [{ label: t("cards.transferInvoices") }]);
@@ -150,7 +150,7 @@ watch(
 
         await updateQuery(router, queryFilter);
 
-        await transferInvoiceStore.fetchTransferInvoices({ ...route.query, 'is-warehouse': true });
+        await transferInvoiceStore.fetchTransferInvoices({ ...route.query, 'is-warehouse': false });
     },
     { immediate: true, deep: true },
 );
@@ -222,7 +222,7 @@ function connectMercure() {
         const eventDataId = JSON.parse(event.data).eventId
 
         if (eventDataId === 17) {
-            await transferInvoiceStore.fetchTransferInvoices({ ...route.query, 'is-warehouse': true });
+            await transferInvoiceStore.fetchTransferInvoices({ ...route.query, 'is-warehouse': false });
         }
     })
 }
@@ -268,7 +268,7 @@ onBeforeRouteLeave(() => {
     </Breadcrumb>
     <Section
         :section-name="t('cards.transferInvoices')"
-        back-route-name="warehouse"
+        back-route-name="shop"
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end">
@@ -280,7 +280,7 @@ onBeforeRouteLeave(() => {
                 />
                 <Button
                     v-if="isAdminAndWarehouseManager"
-                    @click="router.push({ name: 'warehouse-add-transfer-invoices' })"
+                    @click="router.push({ name: 'shop-add-transfer-invoices' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >{{ t("buttons.newTransferInvoice") }}</Button>
             </div>
@@ -294,7 +294,7 @@ onBeforeRouteLeave(() => {
                 />
                 <Button
                     v-if="isAdminAndWarehouseManager"
-                    @click="router.push({ name: 'warehouse-add-transfer-invoices' })"
+                    @click="router.push({ name: 'shop-add-transfer-invoices' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >{{ t("buttons.newTransferInvoice") }}</Button>
             </div>
@@ -311,7 +311,7 @@ onBeforeRouteLeave(() => {
                 <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
                     <SearchSelect
                         v-model="filters.location"
-                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, isWarehouse: true})"
+                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, isWarehouse: false })"
                         :options="locationStore.getLocations.models"
                         :option-label="opt => opt?.name"
                         :option-value="opt => opt?.id"
@@ -503,7 +503,7 @@ onBeforeRouteLeave(() => {
                                         />
                                         <Button
                                             @click="router.push({
-                                                name: 'warehouse-transfer-invoice',
+                                                name: 'shop-transfer-invoice',
                                                 params: { id: data.id },
                                             })"
                                             icon="pi pi-eye"

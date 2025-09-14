@@ -135,7 +135,7 @@ watch(
             await props.fetchFn(query);
 
             found = props.options.find(byId);
-            console.log(items, found)
+
             if (found) {
                 const exists = items.value.some(byId);
                 if (!exists) items.value = props.options; // tepa qismga qo'shib qo'yamiz

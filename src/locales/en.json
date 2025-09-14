@@ -585,6 +585,10 @@
         "warehouseTransferInvoices": {
             "add": "Add",
             "edit": "Edit"
+        },
+        "shopTransferInvoices": {
+            "add": "Add",
+            "edit": "Edit"
         }
     },
     "pagination": {
@@ -619,8 +623,9 @@
     "notifySuffix": " days",
     "day": "day",
     "incomingData": "Incoming data",
+    "transferData": "Transfer data",
     "addProduct": "Add product",
-    "addkit": "Add composition",
+    "addKit": "Add composition",
     "zero": "Out of stock",
     "notZero": "Available",
     "desc": "Newest",
