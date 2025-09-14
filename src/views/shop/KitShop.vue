@@ -64,7 +64,7 @@ const home = ref({
     route: '/shop'
 });
 
-const items = computed(() => [{ label: t('cards.kits'), route: { name: 'kits'} }, { label: t('labels.kit') }]);
+const items = computed(() => [{ label: t('cards.shopContent'), route: { name: 'shop-content'} }, { label: t('labels.kit') }]);
 
 const sumPriceOfKitProducts = computed(() => {
     return kitStore.getKit.filteredKitProducts.length === 0 ? 0
@@ -215,7 +215,7 @@ onMounted(async () => {
 
     <Section
         :section-name="t('labels.kit')"
-        back-route-name="kits"
+        back-route-name="shop-content"
         without-buttons
     >
         <template #buttons>

@@ -421,6 +421,12 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ getFormattedDate(data.createdAt) }}</p>
                             </template>
                         </Column>
+                        <Column field="expiryDate" :header="t('labels.expiryDate')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                <p v-else>{{ getFormattedDate(data.expiryDate) }}</p>
+                            </template>
+                        </Column>
                         <Column field="actions" :header="t('actions')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>

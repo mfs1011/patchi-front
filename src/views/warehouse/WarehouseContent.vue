@@ -528,7 +528,7 @@ onBeforeRouteLeave(() => {
                                                     />
                                                     <Button
                                                         @click="router.push({
-                                                        name: 'kit',
+                                                        name: 'kit_warehouse',
                                                         params: { id: data.kit.id },
                                                     })"
                                                         icon="pi pi-eye"

@@ -583,7 +583,7 @@
         "already_exists_error_named": "\"{name}\" with this name already exists",
         "already_added": "\"{name}\" already added",
         "cannot_delete_product_in_stock": "Cannot delete a product that is in stock",
-        "notEnoughKit": "There is not enough of this composition in stock",
+        "notEnough": "Not enough in stock",
         "cannot_edit_kpi_used_in_sales": "The KPI used in sales cannot be changed",
         "unconfirmedExists": "There is an unconfirmed inventory",
         "noIncomingToLocation": "There have been no incoming entries to this location"

@@ -42,9 +42,20 @@ export const routes = [
                     },
                     {
                         path: 'content',
-                        name: 'warehouse-content',
-                        meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/warehouse/WarehouseContent.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'warehouse-content',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/WarehouseContent.vue'),
+                            },
+                            {
+                                path: 'kit/:id',
+                                name: 'kit_warehouse',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/KitWarehouse.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'warehouse-kits',
@@ -115,9 +126,20 @@ export const routes = [
                     },
                     {
                         path: 'content',
-                        name: 'shop-content',
-                        meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/shop/ShopContent.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'shop-content',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/ShopContent.vue')
+                            },
+                            {
+                                path: 'kit/:id',
+                                name: 'kit_shop',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/KitShop.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'kits',
