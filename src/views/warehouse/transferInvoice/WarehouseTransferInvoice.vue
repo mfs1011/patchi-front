@@ -67,16 +67,20 @@ const {
 
 const apiData = ref(null);
 const editableData = ref(null);
-const currentProductIndex = ref(null);
-const currentDeleteProduct = ref(null);
+const currentLocationQuantityIndex = ref(null);
+const currentLocationQuantityKitIndex = ref(null);
+const currentDeleteLocationQuantity = ref(null);
+const currentDeleteLocationQuantityKit = ref(null);
 const deletedData = ref([]);
 const createdData = ref([]);
 const updatedData = ref([]);
 const dateFrom = ref(null);
 const editMode = ref(false);
 const isLoading = ref(false);
-const deleteVisible = ref(false);
-const isDeleteLoading = ref(false);
+const deleteLocationQuantityVisible = ref(false);
+const deleteLocationQuantityKitVisible = ref(false);
+const isDeleteLocationQuantityLoading = ref(false);
+const isDeleteLocationQuantityKitLoading = ref(false);
 const showLeaveDialog = ref(false);
 const isEditing = ref(false);
 const pendingNavigation = ref(false);
@@ -154,17 +158,13 @@ const onSubmitIncomeInvoice = transferInvoiceHandleSubmit((values) => {
 
 const normalizeDate = date => date ? new Date(date).getTime() : null
 
-const clearProductForm = () => {
+const clearLocationQuantityForm = () => {
     isEditing.value = false
-    productResetForm()
+    locationQuantityResetForm()
 }
 
 function addProduct(newProduct) {
-    const exists = editableData.value.transferInvoiceProducts.some(p =>
-        p.product.id === newProduct.product.id &&
-        p.color?.id === newProduct.color?.id &&
-        normalizeDate(p.expiryDate) === normalizeDate(newProduct.expiryDate)
-    );
+    const exists = editableData.value.transferInvoiceProducts.some(p => p.id === newProduct.id);
 
     if (exists) {
         toast.add({
@@ -189,17 +189,19 @@ function addProduct(newProduct) {
     locationQuantityResetForm();
 }
 
-function deleteAction(product) {
-    deleteVisible.value = true
-    currentDeleteProduct.value = product
+function deleteLocationQuantityAction(product) {
+    deleteLocationQuantityVisible.value = true
+    currentDeleteLocationQuantity.value = product
 }
 
-function deleteProduct() {
-    const index = editableData.value.transferInvoiceProducts.findIndex(p =>
-        p.product.id === currentDeleteProduct.value.product.id &&
-        p.color?.id === currentDeleteProduct.value.color?.id &&
-        normalizeDate(p.expiryDate) === normalizeDate(currentDeleteProduct.value.expiryDate)
-    );
+function deleteLocationQuantityKitAction(product) {
+    deleteLocationQuantityKitVisible.value = true
+    currentDeleteLocationQuantityKit.value = product
+}
+
+function deleteLocationQuantity() {
+    const index = editableData.value.transferInvoiceProducts.findIndex(p => p.id === currentDeleteLocationQuantity.value.id);
+    console.log('deleteLocationQuantity', editableData.value)
 
     if (index === -1) return;
 
@@ -210,14 +212,37 @@ function deleteProduct() {
         editableData.value.transferInvoiceProducts.splice(index, 1);
 
         deletedData.value.push({
-            incomeInvoiceProduct: current["@id"],
+            transferInvoiceProduct: current["@id"],
             isDelete: true
         })
     } else {
         // Yangi qo‘shilgan
         editableData.value.transferInvoiceProducts.splice(index, 1);
     }
-    deleteVisible.value = false
+    deleteLocationQuantityVisible.value = false
+    console.log(editableData.value.transferInvoiceProducts)
+}
+
+function deleteLocationQuantityKit() {
+    const index = editableData.value.transferInvoiceProducts.findIndex(p => p.id === currentDeleteLocationQuantityKit.value.id);
+
+    if (index === -1) return;
+
+    const current = editableData.value.transferInvoiceProducts[index];
+
+    if (current.id) {
+        // API’dan kelgan
+        editableData.value.transferInvoiceProducts.splice(index, 1);
+
+        deletedData.value.push({
+            transferInvoiceKit: current["@id"],
+            isDelete: true
+        })
+    } else {
+        // Yangi qo‘shilgan
+        editableData.value.transferInvoiceProducts.splice(index, 1);
+    }
+    deleteLocationQuantityKitVisible.value = false
 }
 
 function edit(data, index) {
@@ -333,7 +358,7 @@ function editProduct(updatedProduct) {
         }
     }
 
-    clearProductForm()
+    clearLocationQuantityForm()
 }
 
 function cancelEditing() {
@@ -602,7 +627,7 @@ onMounted(async () => {
                                 </div>
 
                                 <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
-                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearProductForm" />
+                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearLocationQuantityForm" />
                                     <Button v-if="!isEditing" @click="onSubmitLocationQuantity" :label="t('buttons.add')" class="px-5" :loading="locationQuantityIsSubmitting"/>
                                     <Button v-else @click="onEditLocationQuantity" :label="t('buttons.edit')" class="px-5"/>
                                 </div>
@@ -664,7 +689,7 @@ onMounted(async () => {
                                 </div>
 
                                 <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
-                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearProductForm" />
+                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearLocationQuantityForm" />
                                     <Button v-if="!isEditing" @click="onSubmitLocationQuantityKit" :label="t('buttons.add')" class="px-5" :loading="locationQuantityIsSubmitting"/>
                                     <Button v-else @click="onEditLocationQuantityKit" :label="t('buttons.edit')" class="px-5"/>
                                 </div>
@@ -771,7 +796,7 @@ onMounted(async () => {
                                                         size="small"
                                                     />
                                                     <Button
-                                                        @click="deleteProductAction(data)"
+                                                        @click="deleteLocationQuantityAction(data)"
                                                         icon="pi pi-trash"
                                                         pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
                                                         size="small"
@@ -887,9 +912,9 @@ onMounted(async () => {
                     </Tabs>
                 </template>
             </Card>
-            <!-- DELETE DIALOG -->
+            <!-- DELETE LOCATION_QUANTITY DIALOG -->
             <Dialog
-                v-model:visible="deleteVisible"
+                v-model:visible="deleteLocationQuantityVisible"
                 modal
                 :closable="false"
                 class="sm:min-w-100 sm:w-fit w-9/10"
@@ -904,13 +929,42 @@ onMounted(async () => {
                         <SecondaryButton
                             type="button"
                             :label="t('dialog.cancel')"
-                            @click="deleteVisible = false"
+                            @click="deleteLocationQuantityVisible = false"
                         />
                         <Button
                             type="button"
                             :label="t('dialog.confirm')"
-                            @click="deleteProduct(currentProductIndex)"
-                            :loading="isDeleteLoading"
+                            @click="deleteLocationQuantity"
+                            :loading="isDeleteLocationQuantityLoading"
+                            class="px-5"
+                        />
+                    </div>
+                </template>
+            </Dialog>
+            <!-- DELETE LOCATION_QUANTITY_KIT DIALOG  -->
+            <Dialog
+                v-model:visible="deleteLocationQuantityKitVisible"
+                modal
+                :closable="false"
+                class="sm:min-w-100 sm:w-fit w-9/10"
+                pt:root="px-2"
+            >
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.deleteConfirm', { name: t('product.accusative') }) }}
+                </span>
+
+                <template #footer>
+                    <div class="flex justify-end gap-2">
+                        <SecondaryButton
+                            type="button"
+                            :label="t('dialog.cancel')"
+                            @click="deleteLocationQuantityKitVisible = false"
+                        />
+                        <Button
+                            type="button"
+                            :label="t('dialog.confirm')"
+                            @click="deleteLocationQuantityKit(currentLocationQuantityKitIndex)"
+                            :loading="isDeleteLocationQuantityKitLoading"
                             class="px-5"
                         />
                     </div>
