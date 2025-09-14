@@ -50,11 +50,13 @@ const {
     locationQuantityErrors,
     locationQuantityIsSubmitting,
     locationQuantityResetForm,
+    locationQuantityValidate,
     locationQuantity,
     qtyLocationQuantity,
     locationQuantityKitHandleSubmit,
     locationQuantityKitErrors,
     locationQuantityKitResetForm,
+    locationQuantityKitValidate,
     locationQuantityKit,
     qtyLocationQuantityKit,
 } = useTransferInvoiceValidation()
@@ -113,7 +115,13 @@ const onSubmitLocationQuantity = locationQuantityHandleSubmit((values) => {
     addLocationQuantity(values)
 })
 
-const onEditLocationQuantity = locationQuantityHandleSubmit((values) => {
+const onEditLocationQuantity = locationQuantityHandleSubmit(async (values) => {
+    const isValid = await locationQuantityValidate()
+
+    if (!isValid.valid) {
+        return
+    }
+
     editLocationQuantity(values)
 })
 
@@ -121,11 +129,17 @@ const onSubmitLocationQuantityKit = locationQuantityKitHandleSubmit((values) => 
     addLocationQuantityKit(values)
 })
 
-const onEditLocationQuantityKit = locationQuantityKitHandleSubmit((values) => {
+const onEditLocationQuantityKit = locationQuantityKitHandleSubmit(async (values) => {
+    const isValid = await locationQuantityKitValidate()
+
+    if (!isValid.valid) {
+        return
+    }
+
     editLocationQuantityKit(values)
 })
 
-const onSubmitTransferInvoice = transferInvoiceHandleSubmit((values) => {
+const onSubmitTransferInvoice = transferInvoiceHandleSubmit(async (values) => {
     const payload = {};
 
     payload.transferInvoiceProducts = [...createdData.value, ...updatedData.value, ...deletedData.value]
@@ -147,20 +161,36 @@ const onSubmitTransferInvoice = transferInvoiceHandleSubmit((values) => {
         payload.toLocation = values.toLocation
     }
 
-    transferInvoiceStore.putTransferInvoice(payload, route.params.id)
-    isEditing.value = false
-    editMode.value = false
-    isEdited.value = true
-    createdData.value = []
-    deletedData.value = []
-    updatedData.value = []
-    toast.add({
-        severity: 'success',
-        summary: t('toast.successEditingSave'),
-        life: 3000
-    })
+    try {
+        await transferInvoiceStore.putTransferInvoice(payload, route.params.id)
+        isEditing.value = false
+        editMode.value = false
+        isEdited.value = true
+        toast.add({
+            severity: 'success',
+            summary: t('toast.successEditingSave'),
+            life: 3000
+        })
 
-    router.back()
+        router.back()
+    } catch (error) {
+        // todo bu yeridagi status kodlardan kelib chiqib beradigan errorMessage'ga nima deb yozishni bilmadim
+        // if (error.status === 439) {
+        //     toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        // } else if (error.status === 412) {
+        //     toast.add({ severity: 'error', summary: t('toast.notEnoughKit', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        // } else {
+        //     toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        // }
+        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+    } finally {
+        createdData.value = []
+        deletedData.value = []
+        updatedData.value = []
+        createdKitData.value = []
+        deletedKitData.value = []
+        updatedKitData.value = []
+    }
 })
 
 const clearLocationQuantityForm = () => {
@@ -283,6 +313,7 @@ function deleteLocationQuantityKit() {
 }
 
 function editLocationQuantityAction(data, index) {
+    console.log(data)
     isEditing.value = true;
     currentLocationQuantityIndex.value = index
     locationQuantity.value = data.locationQuantity
@@ -490,13 +521,6 @@ onMounted(async () => {
 </script>
 
 <template>
-    <pre class="dark:text-surface-0">transferInvoiceErrors{{transferInvoiceErrors}}</pre>
-    <pre class="dark:text-surface-0">locationQuantityKitErrors{{locationQuantityKitErrors}}</pre>
-<!--    <pre class="dark:text-surface-0">createdData{{createdData}}</pre>-->
-<!--    <pre class="dark:text-surface-0">deletedData{{deletedData}}</pre>-->
-<!--    <pre class="dark:text-surface-0">updatedData{{updatedData}}</pre>-->
-<!--    <pre class="dark:text-surface-0">locationQuantity{{locationQuantity}}</pre>-->
-
     <Breadcrumb :home="home" :model="items" class="rounded-md border border-surface-300 dark:border-surface-600/50">
         <template #item="{ item, props }">
             <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom class="group hidden lg:block">
@@ -619,7 +643,7 @@ onMounted(async () => {
                                 :placeholder="t('placeholders.search.byLocation')"
                                 :loading="locationStore.getIsLoadingLocation"
                                 :total-items="locationStore.getLocations.totalItems"
-                                :disabled="!editMode"
+                                disabled
                             />
                         </div>
                         <div>
@@ -670,7 +694,7 @@ onMounted(async () => {
                                         <p class="text-sm">{{ t('labels.product') }}<span class="text-red-500"> *</span></p>
                                         <SearchSelect
                                             v-model="locationQuantity"
-                                            :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: fromLocation.id})"
+                                            :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: fromLocation.id, isZero: true})"
                                             :options="locationQuantityStore.getLocationQuantities.models"
                                             :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"

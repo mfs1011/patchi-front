@@ -27,7 +27,7 @@ import Tab from "@/volt/Tab.vue";
 import ColumnGroup from "primevue/columngroup";
 import Row from "primevue/row";
 import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
-import {useTransferInvoiceValidation} from "@/views/warehouse/transferInvoice/useWarehouseTransferInvoiceForm.js";
+import {useTransferInvoiceValidation} from "@/views/shop/transferInvoice/useShopTransferInvoiceForm.js";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -76,11 +76,11 @@ const tabVal = ref('products')
 
 const home = computed(() => ({
     icon: 'pi pi-home',
-    label: t('warehouse'),
-    route: '/warehouse'
+    label: t('shop'),
+    route: '/shop'
 }));
 
-const items = computed(() => [{ label: t('cards.transferInvoices'), route: { name: 'warehouse-transfer-invoices'} }, { label: t('sections.transferInvoices.add') }]);
+const items = computed(() => [{ label: t('cards.transferInvoices'), route: { name: 'shop-transfer-invoices'} }, { label: t('sections.transferInvoices.add') }]);
 const hasTransferInvoiceData = computed(() => !!toLocation.value && !!fromLocation.value)
 const tabList = computed(() => [
     { value: 'products', label: t('cards.products')},
@@ -266,7 +266,7 @@ const saveEditingKit = async () => {
 async function fetchLocation(query) {
     const params = {
         ...query,
-        isWarehouse: true
+        isWarehouse: false
     }
 
     if (userStore.getAboutMeFromToken.role === 'ROLE_WAREHOUSE_MANAGER') {
@@ -318,8 +318,8 @@ const confirmLeave = () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.warehouseTransferInvoices.add')"
-        back-route-name="warehouse-transfer-invoices"
+        :section-name="t('sections.shopTransferInvoices.add')"
+        back-route-name="shop-transfer-invoices"
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
@@ -417,8 +417,8 @@ const confirmLeave = () => {
                                             v-model="locationQuantity"
                                             :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: fromLocation.id})"
                                             :options="locationQuantityStore.getLocationQuantities.models"
-                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
-                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
                                             :placeholder="t('placeholders.select.product')"
                                             :loading="locationQuantityStore.getIsLoadingLocationQuantity"

@@ -88,13 +88,13 @@ export const routes = [
                             },
                             {
                                 path: 'transfer-invoice/:id',
-                                name: 'transfer-invoice',
+                                name: 'warehouse-transfer-invoice',
                                 meta: { requiresAuth: true, roles: []},
                                 component: () => import('@/views/warehouse/transferInvoice/WarehouseTransferInvoice.vue'),
                             },
                             {
                                 path: 'add',
-                                name: 'add-transfer-invoices',
+                                name: 'warehouse-add-transfer-invoices',
                                 meta: { requiresAuth: true, roles: []},
                                 component: () => import('@/views/warehouse/transferInvoice/WarehouseTransferInvoiceAdd.vue')
                             }
@@ -162,9 +162,27 @@ export const routes = [
                     },
                     {
                         path: 'transfer-invoices',
-                        name: 'shop-transfer-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/shop/ShopTransferInvoice.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'shop-transfer-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/transferInvoice/ShopTransferInvoices.vue')
+                            },
+                            {
+                                path: 'transfer-invoice/:id',
+                                name: 'shop-transfer-invoice',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/transferInvoice/ShopTransferInvoice.vue'),
+                            },
+                            {
+                                path: 'add',
+                                name: 'shop-add-transfer-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/transferInvoice/ShopTransferInvoiceAdd.vue')
+                            }
+                        ]
                     },
                     {
                         path: 'orders',

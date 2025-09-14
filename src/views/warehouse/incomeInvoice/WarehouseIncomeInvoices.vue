@@ -62,8 +62,9 @@ const home = computed(() => ({
 
 const items = computed(() => [{ label: t("cards.incomeInvoices") }]);
 const isAdminAndWarehouseManager = computed(() => (
-    ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER'].includes(userStore.getAboutMe?.role?.name)
+    ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER'].includes(userStore.getAboutMeFromToken.role)
 ))
+const isAdmin = computed(() => userStore.getAboutMeFromToken.role === 'ROLE_ADMIN')
 
 // watchers
 watch(
@@ -227,6 +228,7 @@ onBeforeRouteLeave(() => {
         back-route-name="warehouse"
     >
         <template #buttons>
+            {{isAdminAndWarehouseManager}} {{userStore.getAboutMeFromToken.role}}
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end">
                 <Button
                     @click="isVisibleSectionHeader = !isVisibleSectionHeader"
@@ -288,6 +290,7 @@ onBeforeRouteLeave(() => {
                         :total-items="supplierStore.getSuppliers.totalItems"
                     />
                     <SearchSelect
+                        v-if="isAdmin"
                         v-model="filters.createdBy"
                         :fetchFn="userStore.fetchUsers"
                         :options="userStore.getUsers.models"
