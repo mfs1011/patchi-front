@@ -90,7 +90,7 @@ const theme = ref<SelectPassThroughOptions>({
     pcFilterIconContainer: {
         root: `absolute top-1/2 -mt-2 leading-none end-3 z-1`
     },
-    listContainer: `overflow-auto`,
+    listContainer: `overflow-scroll`,
     list: `m-0 p-1 list-none gap-[2px] flex flex-col`,
     optionGroup: `m-0 px-3 py-2 bg-transparent text-surface-500 dark:text-surface-400 font-semibold`,
     optionGroupLabel: ``,

@@ -31,11 +31,11 @@ export const useIncomeInvoiceStore = defineStore('incomeInvoice', () => {
         }
     }
 
-    const fetchIncomeInvoices = async (params = { page: 1 }, isB2B = true) => {
+    const fetchIncomeInvoices = async (params = { page: 1 }) => {
         try {
             state.isLoadingIncomeInvoices = true
 
-            const { data } = await authorizedClient.get('/income_invoices', { params: { ...params, 'is-b2b': isB2B}})
+            const { data } = await authorizedClient.get('/income_invoices', { params: { ...params}})
             state.incomeInvoices.models = data.member
             state.incomeInvoices.totalItems = data.totalItems
             state.incomeInvoices.totalPrice = data.totalPrice

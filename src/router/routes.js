@@ -78,9 +78,27 @@ export const routes = [
                     },
                     {
                         path: 'transfer-invoices',
-                        name: 'warehouse-transfer-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/warehouse/WarehouseTransferInvoice.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'warehouse-transfer-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/transferInvoice/WarehouseTransferInvoices.vue')
+                            },
+                            {
+                                path: 'transfer-invoice/:id',
+                                name: 'transfer-invoice',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/transferInvoice/WarehouseTransferInvoice.vue'),
+                            },
+                            {
+                                path: 'add',
+                                name: 'add-transfer-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/transferInvoice/WarehouseTransferInvoiceAdd.vue')
+                            }
+                        ]
                     },
                     {
                         path: 'orders',

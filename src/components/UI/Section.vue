@@ -37,7 +37,7 @@ defineEmits(["on-click-add"]);
             :withoutButtons
             @on-click-add="val => $emit('on-click-add', val)"
         >
-            <template #buttons>
+            <template v-if="!withoutButtons" #buttons>
                 <slot name="buttons"/>
             </template>
         </SectionHeader>

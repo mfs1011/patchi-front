@@ -171,6 +171,12 @@
         "accusative": "kirimni",
         "accusativeCapitalize": "Kirimni"
     },
+    "transferInvoice": {
+        "nominative": "ko‘chirish",
+        "nominativeCapitalize": "Ko‘chirish",
+        "accusative": "ko‘chirishni",
+        "accusativeCapitalize": "Ko‘chirishni"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Sotuvchi",
@@ -245,6 +251,7 @@
         "Bank": "Bank hisob raqami",
         "createdAt": "Sana",
         "createdBy": "Yaratuvchi",
+        "acceptedBy": "Qabul qiluvchi",
         "updatedAt": "O‘zgartirilgan sana",
         "updatedBy": "O‘zgartiruvchi",
         "usdRate": "USD kursi",
@@ -263,14 +270,15 @@
         "notificationDay": "Ogohlantirishga qolgan kun",
         "totals": "Jami",
         "qty": "Miqdori",
+        "transferQty": "Ko‘chirish miqdori",
         "element": "Element",
         "elementId": "Element ID",
         "actionType": "Amallar turi",
         "oldValue": "Eski qiymat",
         "newValue": "Yangi qiymat",
         "create": "Yaratildi",
-        "update": "Oʻzgartirildi",
-        "delete": "Oʻchirildi",
+        "update": "O‘zgartirildi",
+        "delete": "O‘chirildi",
         "created": "Qo‘shilganlar",
         "updated": "O‘zgartirilganlar",
         "deleted": "Oʻchirilganlar",
@@ -335,6 +343,7 @@
             "byKit": "Kompozitsiya bo‘yicha qidiruv",
             "byUser": "Mas'ul bo'yicha qidiruv",
             "byCreatedBy": "Yaratuvchi bo‘yicha qidiruv",
+            "byAcceptedBy": "Qabul qiluvchi bo‘yicha qidiruv",
             "bySupplier": "Ta'minotchi bo‘yicha qidiruv",
             "byElementId": "Element ID bo'yicha qidiruv",
             "byElement": "Element bo'yicha qidiruv",
@@ -357,6 +366,7 @@
             "supplier": "Ta'minotchini tanlang",
             "seller": "Sotuvchini tanlang",
             "product": "Mahsulotni tanlang",
+            "kit": "Kompozitsiyani tanlang",
             "color": "Rangni tanlang"
         },
         "shopName": "Do‘kon nomini kiriting...",
@@ -396,6 +406,7 @@
         "newKpi": "Yangi KPI",
         "newInventory": "Yangi inventarizatisya",
         "newIncomeInvoice": "Yangi kirim",
+        "newTransferInvoice": "Yangi ko‘chirish",
         "filters": "Filterlar",
         "saveAndExit": "Saqlash va chiqish",
         "add": "Qo'shish",
@@ -562,6 +573,18 @@
         "incomeInvoices": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
+        },
+        "transferInvoices": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "warehouseIncomeInvoice": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
+        },
+        "warehouseTransferInvoices": {
+            "add": "Qo‘shish",
+            "edit": "O‘zgartirish"
         }
     },
     "pagination": {
@@ -570,7 +593,6 @@
     },
     "toast": {
         "success": "Muvaffaqiyat!",
-        "successEditingSave": "O'zgarishlar muvaffaqiyatli saqlandi!",
         "created": "{name} muvaffaqiyatli yaratildi!",
         "added": "{name} muvaffaqiyatli qo‘shildi!",
         "edited": "{name} muvaffaqiyatli o‘zgartirildi!",
@@ -596,7 +618,9 @@
     "notifySuffix": " kun qolganda",
     "day": "kun",
     "incomingData": "Kirim ma'lumotlari",
+    "transferData": "Ko‘chiruv ma'lumotlari",
     "addProduct": "Mahsulot qo'shish",
+    "addKit": "Kompozitsiya qo'shish",
     "zero": "Tugagan",
     "notZero": "Mavjud",
     "desc": "Yangilari",

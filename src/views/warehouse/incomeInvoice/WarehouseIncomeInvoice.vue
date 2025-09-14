@@ -41,7 +41,6 @@ const {
     productErrors,
     productIsSubmitting,
     productResetForm,
-    productFormCtx,
     product,
     color,
     expiryDate,
@@ -53,12 +52,10 @@ const {
     incomeInvoiceErrors,
     incomeInvoiceIsSubmitting,
     incomeInvoiceResetForm,
-    incomeInvoiceFormCtx,
     supplier,
     location,
     comment,
     createdAt,
-    incomeInvoiceProducts,
 } = useIncomeInvoiceValidation();
 
 const apiData = ref(null);
@@ -416,7 +413,7 @@ onMounted(async () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('cards.incomeInvoice')"
+        :section-name="t('sections.sellers.add')"
         back-route-name="warehouse-income-invoices"
     >
         <template #buttons>
@@ -434,7 +431,7 @@ onMounted(async () => {
                     v-if="editMode"
                     :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
                     @click="cancelEditing"
-                    class="px-2 sm:px-5 whitespace-nowrap bg-surface-0!"
+                    class="px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
                     :loading="incomeInvoiceIsSubmitting"
                 />
@@ -473,7 +470,7 @@ onMounted(async () => {
                     v-if="editMode"
                     :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
                     @click="cancelEditing"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0!"
+                    class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
                     :loading="incomeInvoiceIsSubmitting"
                 />

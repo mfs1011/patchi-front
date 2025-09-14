@@ -53,9 +53,14 @@ export function useIncomeInvoiceValidation() {
         errors: productErrors,
         isSubmitting: productIsSubmitting,
         resetForm: productResetForm,
+        validate: productValidate,
         ...productFormCtx
     } = useForm({
-        validationSchema: productSchema
+        validationSchema: productSchema,
+        initialValues: {
+            transportationFee: 0,
+            customsFee: 0
+        }
     })
 
     // Invoice fields
@@ -96,6 +101,7 @@ export function useIncomeInvoiceValidation() {
         productIsSubmitting,
         productResetForm,
         productFormCtx,
+        productValidate,
         product,
         color,
         expiryDate,

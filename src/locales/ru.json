@@ -171,6 +171,12 @@
         "accusative": "поступлению",
         "accusativeCapitalize": "Поступлению"
     },
+    "transferInvoice": {
+        "nominative": "перемещение",
+        "nominativeCapitalize": "Перемещение",
+        "accusative": "перемещению",
+        "accusativeCapitalize": "Перемещению"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",
@@ -245,6 +251,7 @@
         "Bank": "Банковский счёт",
         "createdAt": "Дата",
         "createdBy": "Создал",
+        "acceptedBy": "Принял",
         "updatedAt": "Дата изменения",
         "updatedBy": "Изменил",
         "usdRate": "Курс USD",
@@ -263,6 +270,7 @@
         "notificationDay": "До оповещения (дней)",
         "totals": "Итого",
         "qty": "Количество",
+        "transferQty": "Количество перемещения",
         "element": "Элемент",
         "elementId": "Элемент ID",
         "actionType": "Тип операций",
@@ -337,12 +345,13 @@
             "byKit": "Поиск по композиции",
             "byUser": "Поиск по ответственному",
             "byCreatedBy": "Поиск по создателю",
+            "byAcceptedBy": "Поиск по принявшему",
             "bySupplier": "Поиск по поставщику",
             "byElementId": "Поиск по элементу ID",
             "byElement": "Поиск по элементу",
             "byAction": "Поиск по действию",
             "bySeller": "Поиск по продавцу",
-            "byExpiry": "Поиск по сроку годности",
+            "byExpiry": "Поиск сроку годности",
             "byQty": "Поиск по количеству",
             "orderByExpiry": "Сортировка по сроку годности"
         },
@@ -359,6 +368,7 @@
             "supplier": "Выберите поставщика",
             "seller": "Выберите продавца",
             "product": "Выберите продукт",
+            "kit": "Выберите композицию",
             "color": "Выберите цвет"
         },
         "supplierName": "Введите имя поставщика...",
@@ -396,6 +406,7 @@
         "newKpi": "Новый KPI",
         "newInventory": "Новая инвентаризация",
         "newIncomeInvoice": "Новое поступление",
+        "newTransferInvoice": "Новое перемещение",
         "filters": "Фильтры",
         "saveAndExit": "Сохранить и выйти",
         "add": "Добавить",
@@ -562,6 +573,18 @@
         "incomeInvoices": {
             "add": "Добавить",
             "edit": "Изменить"
+        },
+        "transferInvoices": {
+            "add": "Добавить",
+            "edit": "Изменить"
+        },
+        "warehouseIncomeInvoice": {
+            "add": "Добавить",
+            "edit": "Изменить"
+        },
+        "warehouseTransferInvoices": {
+            "add": "Добавить",
+            "edit": "Изменить"
         }
     },
     "pagination": {
@@ -597,6 +620,7 @@
     "day": "день",
     "incomingData": "Данные поступления",
     "addProduct": "Добавление продукта",
+    "addKit": "Добавление композиции",
     "zero": "Нет в наличии",
     "notZero": "В наличии",
     "desc": "Новые",
