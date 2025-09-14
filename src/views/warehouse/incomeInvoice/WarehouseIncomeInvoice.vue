@@ -1,5 +1,5 @@
 <script setup>
-import {onBeforeRouteLeave, useRoute} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import {computed, onMounted, ref, watch} from "vue";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
 import Section from "@/components/UI/Section.vue";
@@ -28,6 +28,7 @@ import {useToast} from "primevue/usetoast";
 import Message from "@/volt/Message.vue";
 
 const route = useRoute();
+const router = useRouter();
 const toast = useToast()
 const incomeInvoiceStore = useIncomeInvoiceStore();
 const inventoryStore = useInventoryStore();
@@ -147,6 +148,9 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
             summary: t('toast.successEditingSave'),
             life: 3000
         })
+        createdData.value = [];
+        updatedData.value = [];
+        deletedData.value = [];
         router.back()
     } catch (error) {
         toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
