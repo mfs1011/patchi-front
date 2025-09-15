@@ -543,7 +543,7 @@ onMounted(async () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.sellers.add')"
+        :section-name="t('cards.transferInvoice')"
         back-route-name="shop-transfer-invoices"
     >
         <template #buttons>
@@ -839,7 +839,7 @@ onMounted(async () => {
                                             <Column field="code" :header="t('labels.code')" />
                                             <Column field="color" :header="t('labels.color')" />
                                             <Column field="qr" :header="t('labels.qr')" />
-                                            <Column field="costPrice" :header="t('labels.costPrice')" />
+                                            <Column field="retailPrice" :header="t('labels.retailPrice')" />
                                         </Row>
                                     </ColumnGroup>
                                     <Column field="product" :header="t('labels.title')">
@@ -866,10 +866,10 @@ onMounted(async () => {
                                             <p v-else>{{ data.locationQuantity?.product?.qr || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="costPrice" :header="t('labels.costPrice')">
+                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ (formatCurrency(data.locationQuantity?.product?.costPrice) + '$') || '-' }}</p>
+                                            <p v-else>{{ (formatCurrency(data.locationQuantity?.product?.retailPrice) + '$') || '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
@@ -935,7 +935,7 @@ onMounted(async () => {
                                             <Column field="kit" :header="t('labels.title')" />
                                             <Column field="code" :header="t('labels.code')" />
                                             <Column field="qr" :header="t('labels.qr')" />
-                                            <Column field="costPrice" :header="t('labels.costPrice')" />
+                                            <Column field="retailPrice" :header="t('labels.retailPrice')" />
                                         </Row>
                                     </ColumnGroup>
                                     <Column field="kit" :header="t('labels.title')">
@@ -953,9 +953,9 @@ onMounted(async () => {
                                             <p>{{ data.locationQuantityKit?.kit?.qr || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="costPrice" :header="t('labels.costPrice')">
+                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
                                         <template #body="{ data }">
-                                            <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.costPrice) + '$') || '-' }}</p>
+                                            <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.retailPrice) + '$') || '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">

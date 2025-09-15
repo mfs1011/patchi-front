@@ -586,6 +586,10 @@
         "warehouseTransferInvoices": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
+        },
+        "shopTransferInvoices": {
+          "add": "Qo‘shish",
+          "edit": "O‘zgartirish"
         }
     },
     "pagination": {

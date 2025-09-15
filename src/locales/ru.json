@@ -586,6 +586,10 @@
         "warehouseTransferInvoices": {
             "add": "Добавить",
             "edit": "Изменить"
+        },
+        "shopTransferInvoices": {
+          "add": "Добавить",
+          "edit": "Изменить"
         }
     },
     "pagination": {
