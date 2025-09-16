@@ -1,10 +1,9 @@
 <script setup>
 import Button from "@/volt/Button.vue";
-import {computed, onMounted} from "vue";
+import {computed, onMounted, ref, watchEffect} from "vue";
 import LogoButton from "@/volt/LogoButton.vue";
 import {useSidebarStore} from "@/stores/sidebar.js";
 import DarkModeSwitcher from "@/components/DarkModeSwitcher.vue";
-import {useUserStore} from "@/stores/user.js";
 import {useI18n} from "vue-i18n";
 
 defineProps({
@@ -15,7 +14,6 @@ defineProps({
 })
 
 const sidebar = useSidebarStore()
-const userStore = useUserStore()
 
 const { t } = useI18n()
 
@@ -32,6 +30,20 @@ const PRETTY_ROLE_NAMES = computed(() => ({
     ROLE_DIRECTOR: t('roles.director'),
     ROLE_PARTNER: t('roles.partner'),
 }))
+
+const aboutMe = ref(null)
+
+watchEffect(() => {
+    const token = localStorage.getItem("patchi_accessToken")
+    if (token) {
+        aboutMe.value = JSON.parse(atob(token.split(".")[1]))
+    } else {
+        aboutMe.value = null
+    }
+})
+
+const userRole = computed(() => PRETTY_ROLE_NAMES.value[aboutMe.value?.role])
+const userName = computed(() => aboutMe.value?.name)
 
 </script>
 
@@ -58,8 +70,8 @@ const PRETTY_ROLE_NAMES = computed(() => ({
 
         <div class="hidden order-5 dark:text-surface-0 px-5 border-l border-surface-300 dark:border-surface-600 ml-5 sm:flex items-center gap-5">
             <div class="text-right">
-                <p class="capitalize">{{ userStore.getAboutMeFromToken.name}}</p>
-                <p class="capitalize">{{ PRETTY_ROLE_NAMES[userStore.getAboutMeFromToken.role] }}</p>
+                <p class="capitalize">{{ userName }}</p>
+                <p class="capitalize">{{ userRole }}</p>
             </div>
 
             <LogoButton class="cursor-pointer">
