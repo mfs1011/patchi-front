@@ -11,7 +11,7 @@ import {useLocationStore} from "@/stores/location.js";
 import {useToast} from "primevue/usetoast";
 import InputNumber from "@/volt/InputNumber.vue";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
-import {formatCurrency, getFormattedDate, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
+import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
 import Column from "primevue/column";
 import DataTable from "@/volt/DataTable.vue";
 import Dialog from "@/volt/Dialog.vue";
@@ -420,6 +420,8 @@ const confirmLeave = () => {
                                             :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
+                                            :search-value="opt => opt.id"
+                                            search-key="id"
                                             :placeholder="t('placeholders.select.product')"
                                             :loading="locationQuantityStore.getIsLoadingLocationQuantity"
                                             :total-items="locationQuantityStore.getLocationQuantities.totalItems"
@@ -470,6 +472,8 @@ const confirmLeave = () => {
                                             :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :return-value="opt => opt"
+                                            :search-value="opt => opt.id"
+                                            search-key="id"
                                             :placeholder="t('placeholders.select.kit')"
                                             :loading="locationQuantityKitStore.getIsLoadingLocationQuantityKit"
                                             :total-items="locationQuantityKitStore.getLocationQuantityKits.totalItems"
@@ -602,7 +606,7 @@ const confirmLeave = () => {
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
-                                            <p>{{ data.locationQuantity?.expiryDate ? getFormattedDateWithTime(data.locationQuantity?.expiryDate) : '-' }}</p>
+                                            <p>{{ data.locationQuantity?.expiryDate ? getFormattedDate(data.locationQuantity?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qty" :header="t('labels.qty')">
@@ -704,7 +708,7 @@ const confirmLeave = () => {
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
-                                            <p>{{ data.locationQuantityKit?.expiryDate ? getFormattedDateWithTime(data.locationQuantityKit?.expiryDate) : '-' }}</p>
+                                            <p>{{ data.locationQuantityKit?.expiryDate ? getFormattedDate(data.locationQuantityKit?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qty" :header="t('labels.qty')">

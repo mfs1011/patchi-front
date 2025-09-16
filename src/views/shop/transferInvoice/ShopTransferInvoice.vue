@@ -15,7 +15,7 @@ import Button from "@/volt/Button.vue";
 import NoData from "@/components/UI/NoData.vue";
 import {useI18n} from "vue-i18n";
 import {useLocationStore} from "@/stores/location.js";
-import {formatCurrency, getFormattedDate, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
+import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
 import {useToast} from "primevue/usetoast";
 import {useTransferInvoiceValidation} from "@/views/shop/transferInvoice/useShopTransferInvoiceForm.js";
 import {useTransferInvoiceStore} from "@/stores/transferInvoice.js";
@@ -563,7 +563,6 @@ onMounted(async () => {
                     @click="cancelEditing"
                     class="px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
-                    :loading="transferInvoiceIsSubmitting"
                 />
                 <Button
                     v-if="editMode"
@@ -875,7 +874,7 @@ onMounted(async () => {
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.locationQuantity?.expiryDate ? getFormattedDateWithTime(data.locationQuantity?.expiryDate) : '-' }}</p>
+                                            <p v-else>{{ data.locationQuantity?.expiryDate ? getFormattedDate(data.locationQuantity?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qty" :header="t('labels.qty')">
@@ -960,7 +959,7 @@ onMounted(async () => {
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
-                                            <p>{{ data.locationQuantityKit?.expiryDate ? getFormattedDateWithTime(data.locationQuantityKit?.expiryDate) : '-' }}</p>
+                                            <p>{{ data.locationQuantityKit?.expiryDate ? getFormattedDate(data.locationQuantityKit?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qtyLocationQuantityKit" :header="t('labels.transferQty')">

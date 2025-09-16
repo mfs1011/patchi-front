@@ -230,7 +230,6 @@ onMounted(async () => {
                     @click="cancelEditing"
                     class="px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
-                    :loading="kitIsSubmitting"
                 />
                 <Button
                     v-if="editMode"
@@ -239,7 +238,6 @@ onMounted(async () => {
                     @click="onSubmitIncomeInvoice"
                     class="px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
-                    :loading="kitIsSubmitting"
                 />
             </div>
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
