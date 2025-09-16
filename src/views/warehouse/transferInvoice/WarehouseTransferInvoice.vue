@@ -15,7 +15,7 @@ import Button from "@/volt/Button.vue";
 import NoData from "@/components/UI/NoData.vue";
 import {useI18n} from "vue-i18n";
 import {useLocationStore} from "@/stores/location.js";
-import {formatCurrency, getFormattedDate, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
+import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
 import {useToast} from "primevue/usetoast";
 import {useTransferInvoiceValidation} from "@/views/warehouse/transferInvoice/useWarehouseTransferInvoiceForm.js";
 import {useTransferInvoiceStore} from "@/stores/transferInvoice.js";
@@ -313,7 +313,6 @@ function deleteLocationQuantityKit() {
 }
 
 function editLocationQuantityAction(data, index) {
-    console.log(data)
     isEditing.value = true;
     currentLocationQuantityIndex.value = index
     locationQuantity.value = data.locationQuantity
@@ -750,6 +749,8 @@ onMounted(async () => {
                                             :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :return-value="opt => opt"
+                                            :search-value="opt => opt.id"
+                                            search-key="id"
                                             :placeholder="t('placeholders.select.kit')"
                                             :loading="locationQuantityKitStore.getIsLoadingLocationQuantityKit"
                                             :total-items="locationQuantityKitStore.getLocationQuantityKits.totalItems"
@@ -875,7 +876,7 @@ onMounted(async () => {
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.locationQuantity?.expiryDate ? getFormattedDateWithTime(data.locationQuantity?.expiryDate) : '-' }}</p>
+                                            <p v-else>{{ data.locationQuantity?.expiryDate ? getFormattedDate(data.locationQuantity?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qty" :header="t('labels.qty')">
@@ -960,7 +961,7 @@ onMounted(async () => {
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
-                                            <p>{{ data.locationQuantityKit?.expiryDate ? getFormattedDateWithTime(data.locationQuantityKit?.expiryDate) : '-' }}</p>
+                                            <p>{{ data.locationQuantityKit?.expiryDate ? getFormattedDate(data.locationQuantityKit?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qtyLocationQuantityKit" :header="t('labels.transferQty')">
