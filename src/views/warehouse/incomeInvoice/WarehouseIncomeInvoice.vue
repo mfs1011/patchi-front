@@ -22,7 +22,7 @@ import {useSupplierStore} from "@/stores/supplier.js";
 import {useLocationStore} from "@/stores/location.js";
 import {useProductStore} from "@/stores/product.js";
 import {useInventoryStore} from "@/stores/inventory.js";
-import {formatCurrency, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
+import {formatCurrency, formatDateTimeLocal, getFormattedDate} from "@/helpers/numberFormat.js";
 import {useColorStore} from "@/stores/color.js";
 import {useToast} from "primevue/usetoast";
 import Message from "@/volt/Message.vue";
@@ -118,6 +118,7 @@ const onSubmitProduct = productHandleSubmit((values) => {
 })
 
 const onEditProduct = productHandleSubmit((values) => {
+    console.log('onedit',values)
     editProduct(values)
 })
 
@@ -136,6 +137,7 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
 
     if (new Date(values.createdAt).toISOString() !== new Date(apiData.value.createdAt).toISOString()) {
         payload.createdAt = values.createdAt
+        payload.createdAt = formatDateTimeLocal(payload.createdAt)
     }
 
     try {
@@ -165,11 +167,21 @@ const clearProductForm = () => {
 }
 
 function addProduct(newProduct) {
-    const exists = editableData.value.incomeInvoiceProducts.some(p =>
-        p.product.id === newProduct.product.id &&
-        p.color?.id === newProduct.color?.id &&
-        normalizeDate(p.expiryDate) === normalizeDate(newProduct.expiryDate)
-    );
+    const exists = editableData.value.incomeInvoiceProducts.some((p, i) => {
+        const sameProduct = p.product.id === updatedProduct.product.id;
+
+        // color faqat mavjud bo‘lsa taqqoslanadi
+        const sameColor =
+            (!p.color && !updatedProduct.color) ||
+            (p.color?.id === updatedProduct.color?.id);
+
+        // expiryDate faqat mavjud bo‘lsa taqqoslanadi
+        const sameExpiry =
+            (!p.expiryDate && !updatedProduct.expiryDate) ||
+            (normalizeDate(p.expiryDate) === normalizeDate(updatedProduct.expiryDate));
+
+        return sameProduct && sameColor && sameExpiry;
+    });
 
     if (exists) {
         toast.add({
@@ -179,6 +191,10 @@ function addProduct(newProduct) {
         })
 
         return;
+    }
+
+    if (newProduct.expiryDate) {
+        newProduct.expiryDate = formatDateTimeLocal(newProduct.expiryDate)
     }
 
     editableData.value.incomeInvoiceProducts.push(newProduct);
@@ -239,12 +255,24 @@ function edit(data, index) {
 
 function editProduct(updatedProduct) {
     // Duplicate check
-    const exists = editableData.value.incomeInvoiceProducts.some((p, i) =>
-        i !== currentProductIndex.value &&
-        p.product.id === updatedProduct.product.id &&
-        p.color?.id === updatedProduct.color?.id &&
-        normalizeDate(p.expiryDate) === normalizeDate(updatedProduct.expiryDate)
-    );
+    const exists = editableData.value.incomeInvoiceProducts.some((p, i) => {
+        if (i === currentProductIndex.value) return false;
+
+        const sameProduct = p.product.id === updatedProduct.product.id;
+
+        // color faqat mavjud bo‘lsa taqqoslanadi
+        const sameColor =
+            (!p.color && !updatedProduct.color) ||
+            (p.color?.id === updatedProduct.color?.id);
+
+        // expiryDate faqat mavjud bo‘lsa taqqoslanadi
+        const sameExpiry =
+            (!p.expiryDate && !updatedProduct.expiryDate) ||
+            (normalizeDate(p.expiryDate) === normalizeDate(updatedProduct.expiryDate));
+
+        return sameProduct && sameColor && sameExpiry;
+    });
+
 
     if (exists) {
         toast.add({
@@ -268,8 +296,9 @@ function editProduct(updatedProduct) {
         payload.color = updatedProduct.color
     }
 
-    if (normalizeDate(updatedProduct.expiryDate) !== normalizeDate(current.expiryDate)) {
+    if (updatedProduct.expiryDate !== null && (normalizeDate(updatedProduct.expiryDate) !== normalizeDate(current.expiryDate))) {
         payload.expiryDate = updatedProduct.expiryDate
+        payload.expiryDate = formatDateTimeLocal(payload.expiryDate)
     }
 
     if (updatedProduct.qty !== current.qty) {
@@ -294,7 +323,7 @@ function editProduct(updatedProduct) {
 
         if (indexFromUpdatedData !== -1) {
             updatedData.value[indexFromUpdatedData] = {
-                payload
+                ...payload
             }
         } else {
             updatedData.value.push(payload)
@@ -335,6 +364,13 @@ function cancelEditing() {
     editMode.value = false;
     incomeInvoiceResetForm()
 }
+
+watch(isProductTypeNonFood, (newVal) => {
+    if (newVal) {
+        console.log('onnonfood')
+        expiryDate.value = null; // agar non_food bo‘lsa, qiymatni tozalaymiz
+    }
+});
 
 watch(location, async () => {
     if (location.value) {
@@ -437,7 +473,6 @@ onMounted(async () => {
                     @click="cancelEditing"
                     class="px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
-                    :loading="incomeInvoiceIsSubmitting"
                 />
                 <Button
                     v-if="editMode"
@@ -476,7 +511,6 @@ onMounted(async () => {
                     @click="cancelEditing"
                     class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
-                    :loading="incomeInvoiceIsSubmitting"
                 />
 
                 <Button
@@ -639,7 +673,7 @@ onMounted(async () => {
                             />
                         </div>
 
-                        <div v-if="!isProductTypeNonFood">
+                        <div >
                             <p class="text-sm">{{ t('labels.expiryDate') }}<span class="text-red-500"> *</span></p>
 
                             <DatePicker
@@ -760,7 +794,7 @@ onMounted(async () => {
                         <Column field="expiryDate" :header="t('labels.expiryDate')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.expiryDate ? getFormattedDateWithTime(data.expiryDate) : '-' }}</p>
+                                <p v-else>{{ data.expiryDate ? getFormattedDate(data.expiryDate) : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="qty" :header="t('labels.qty')">

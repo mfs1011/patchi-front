@@ -12,15 +12,12 @@ import Card from "@/volt/Card.vue";
 import DataTable from "@/volt/DataTable.vue";
 import {formatCurrency} from "@/helpers/numberFormat.js";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
-import Message from "@/volt/Message.vue";
 import InputText from "@/volt/InputText.vue";
-import DatePicker from "@/volt/DatePicker.vue";
 import {useSellerStore} from "@/stores/seller.js";
 import InputNumber from "@/volt/InputNumber.vue";
 import {useAssemblyStore} from "@/stores/assembly.js";
 import Button from "@/volt/Button.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
-import {useIncomeInvoiceValidation} from "@/views/warehouse/incomeInvoice/useWarehouseIncomeInvoiceForm.js";
 import {useKitValidation} from "@/views/shop/kit/useKitForm.js";
 import Dialog from "@/volt/Dialog.vue";
 import {useToast} from "primevue/usetoast";
@@ -216,7 +213,6 @@ onMounted(async () => {
     <Section
         :section-name="t('labels.kit')"
         back-route-name="kits"
-        without-buttons
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
@@ -232,7 +228,7 @@ onMounted(async () => {
                 <SecondaryButton
                     v-if="editMode"
                     @click="cancelEditing"
-                    class="px-2 sm:px-5 whitespace-nowrap bg-surface-0!"
+                    class="px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
                     :loading="kitIsSubmitting"
                 />
@@ -242,6 +238,33 @@ onMounted(async () => {
                     icon="pi pi-save"
                     @click="onSubmitIncomeInvoice"
                     class="px-2 sm:px-5 whitespace-nowrap"
+                    :label="t('buttons.save')"
+                    :loading="kitIsSubmitting"
+                />
+            </div>
+            <div class="sm:hidden flex grow gap-2 sm:gap-4">
+                <Button
+                    v-if="!editMode"
+                    icon="pi pi-pencil"
+                    @click="editMode = true"
+                    class="w-full px-2 sm:px-5 whitespace-nowrap"
+                    :label="t('buttons.edit')"
+                    :loading="kitIsSubmitting"
+                    :disabled="userStore.getAboutMe.role?.name !== 'ROLE_ADMIN' && userStore.getAboutMe.id !== kitStore.getKit.createdBy?.id"
+                />
+                <SecondaryButton
+                    v-if="editMode"
+                    @click="cancelEditing"
+                    class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
+                    :label="t('dialog.cancel')"
+                    :loading="kitIsSubmitting"
+                />
+                <Button
+                    v-if="editMode"
+                    :disabled="!isChanged"
+                    icon="pi pi-save"
+                    @click="onSubmitIncomeInvoice"
+                    class="w-full px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
                     :loading="kitIsSubmitting"
                 />

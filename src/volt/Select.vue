@@ -47,7 +47,7 @@ function handleClear(clearCallback: () => void) {
 
 const theme = ref<SelectPassThroughOptions>({
     root: `inline-flex cursor-pointer relative select-none rounded-md p-fluid:flex
-        bg-surface-0 dark:bg-surface-800
+        bg-surface-0 dark:bg-surface-700
         border border-surface-300 hover:border-surface-400 dark:border-surface-600/50 dark:hover:border-surface-600
         p-focus:border-primary
         p-filled:bg-surface-50 dark:p-filled:bg-surface-800

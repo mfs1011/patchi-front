@@ -25,7 +25,7 @@ import DatePicker from "@/volt/DatePicker.vue";
 import {useMediaObjectStore} from "@/stores/mediaObject.js";
 import {useKitStore} from "@/stores/kit.js";
 import Select from "@/volt/Select.vue";
-import {formatCurrency} from "@/helpers/numberFormat.js";
+import {formatCurrency, formatDateTimeLocal} from "@/helpers/numberFormat.js";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -169,7 +169,7 @@ const onSubmitKit = kitHandleSubmit(async values => {
         name: values.name,
         wholesalePrice: values.wholesalePrice,
         retailPrice: values.retailPrice,
-        expiryDate: values.expiryDate,
+        expiryDate: formatDateTimeLocal(values.expiryDate),
         qty: values.kitQty,
 
         kitProducts: values.kitProducts.map(kitProduct => {
@@ -449,6 +449,9 @@ const confirmLeave = () => {
                             <InputNumber
                                 v-model="wholesalePrice"
                                 fluid
+                                mode="currency"
+                                currency="USD"
+                                locale="en-US"
                                 showButtons
                                 :placeholder="t('placeholders.wholesalePrice')"
                                 :minFractionDigits="1"
@@ -462,6 +465,9 @@ const confirmLeave = () => {
                             <InputNumber
                                 v-model="retailPrice"
                                 fluid
+                                mode="currency"
+                                currency="USD"
+                                locale="en-US"
                                 showButtons
                                 :placeholder="t('placeholders.retailPrice')"
                                 :minFractionDigits="1"

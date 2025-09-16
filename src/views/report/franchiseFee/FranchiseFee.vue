@@ -202,7 +202,6 @@ onMounted(() => {
     <Section
         :section-name="t('cards.franchiseFee')"
         back-route-name="reports"
-        without-buttons
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
@@ -237,7 +236,7 @@ onMounted(() => {
                         <label class="relative max-w-full w-full">
                             <i class="pi pi-search absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1"/>
                             <InputText
-                                pt:root="dark:bg-surface-800 ps-10"
+                                pt:root="ps-10"
                                 v-model="debouncedName"
                                 class="w-full"
                                 :placeholder="t('placeholders.search.byTitleAndQRAndCode')"
@@ -424,7 +423,7 @@ onMounted(() => {
                                         </template>
                                     </Column>
 
-                                    <ColumnGroup type="footer">
+                                    <ColumnGroup type="footer" class="bg-surface-700!">
                                         <Row>
                                             <Column :colspan="6" footerStyle="text-align:right">
                                                 <template #footer>
