@@ -16,7 +16,7 @@ import SearchSelect from "@/components/UI/SearchSelect.vue";
 import {useProductStore} from "@/stores/product.js";
 import {useColorStore} from "@/stores/color.js";
 import DatePicker from "@/volt/DatePicker.vue";
-import {formatCurrency, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
+import {formatCurrency, formatDateTimeLocal, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
 import Column from "primevue/column";
 import DataTable from "@/volt/DataTable.vue";
 import Dialog from "@/volt/Dialog.vue";
@@ -107,9 +107,9 @@ const sumPriceOfIncomeInvoiceProducts = computed(() => {
         ? 0
         : incomeInvoiceProducts.value.reduce((acc, incomeInvoiceProduct) => {
             return acc
-                + (incomeInvoiceProduct?.price * incomeInvoiceProduct.qty)
-                + (incomeInvoiceProduct?.transportationFee * incomeInvoiceProduct.qty)
-                + (incomeInvoiceProduct?.customsFee * incomeInvoiceProduct.qty)
+                + incomeInvoiceProduct?.price
+                + incomeInvoiceProduct?.transportationFee
+                + incomeInvoiceProduct?.customsFee
         }, 0)
 })
 
@@ -122,7 +122,6 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
         incomeInvoiceProducts: values.incomeInvoiceProducts.map(incomeInvoiceProduct => {
             const newVal = {
                 product: incomeInvoiceProduct.product['@id'],
-                expiryDate: incomeInvoiceProduct.expiryDate,
                 qty: incomeInvoiceProduct.qty,
                 price: incomeInvoiceProduct.price,
                 transportationFee: incomeInvoiceProduct.transportationFee,
@@ -131,6 +130,10 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
 
             if (incomeInvoiceProduct.color) {
                 newVal.color = incomeInvoiceProduct.color['@id']
+            }
+
+            if (incomeInvoiceProduct.expiryDate) {
+                newVal.expiryDate = formatDateTimeLocal(incomeInvoiceProduct.expiryDate)
             }
 
             return newVal
@@ -409,6 +412,8 @@ const confirmLeave = () => {
                                 :option-label="opt => `${opt?.name} | ${opt?.code}`"
                                 :option-value="opt => `${opt?.name} | ${opt?.code}`"
                                 :return-value="opt => opt"
+                                search-key="name"
+                                :search-value="opt => opt.name"
                                 :placeholder="t('placeholders.select.product')"
                                 :loading="productStore.getIsLoadingProducts"
                                 :total-items="productStore.getProducts.totalItems"

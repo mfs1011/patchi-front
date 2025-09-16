@@ -141,7 +141,6 @@ onBeforeRouteLeave(() => {
     <Section
         :section-name="t('cards.abc')"
         back-route-name="reports"
-        without-buttons
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end">

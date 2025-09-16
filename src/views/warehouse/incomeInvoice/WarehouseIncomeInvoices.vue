@@ -1,6 +1,6 @@
 <script setup>
 import Section from "@/components/UI/Section.vue";
-import { useI18n } from "vue-i18n";
+import {useI18n} from "vue-i18n";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import Button from "@/volt/Button.vue";
@@ -8,7 +8,7 @@ import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
 import updateQuery from "@/helpers/updateQuery.js";
 import {useLocationStore} from "@/stores/location.js";
-import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
+import {formatCurrency, formatLocalEndOfDay, getFormattedDate} from "@/helpers/numberFormat.js";
 import Skeleton from "@/volt/Skeleton.vue";
 import DataTable from "@/volt/DataTable.vue";
 import Column from "primevue/column";
@@ -114,9 +114,7 @@ watch(
 
         if (filters.value['date-to']) {
             if (filters.value['date-to'] !== null) {
-                const date = new Date(filters.value['date-to']);
-                date.setHours(date.getHours() + 5);
-                queryFilter['date-to'] = date.toISOString();
+                queryFilter['date-to'] = formatLocalEndOfDay(new Date(filters.value['date-to']));
             }
 
             if (filters.value['date-to'] === "") {
@@ -228,7 +226,6 @@ onBeforeRouteLeave(() => {
         back-route-name="warehouse"
     >
         <template #buttons>
-            {{isAdminAndWarehouseManager}} {{userStore.getAboutMeFromToken.role}}
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end">
                 <Button
                     @click="isVisibleSectionHeader = !isVisibleSectionHeader"

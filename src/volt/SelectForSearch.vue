@@ -52,7 +52,7 @@ const theme = ref<SelectPassThroughOptions>({
         p-focus:border-primary
         p-filled:bg-surface-50 dark:p-filled:bg-surface-800
         p-invalid:border-red-400 dark:p-invalid:border-red-300
-        p-disabled:bg-surface-200 p-disabled:text-surface-500 dark:p-disabled:bg-surface-700 dark:p-disabled:text-surface-400 p-disabled:pointer-events-none
+        p-disabled:bg-surface-200 p-disabled:text-surface-500 dark:p-disabled:bg-surface-900 dark:p-disabled:text-surface-400 p-disabled:pointer-events-none
         shadow-[0_1px_2px_0_rgba(18,18,23,0.05)]
         transition-colors duration-200`,
     label: `block whitespace-nowrap overflow-hidden flex-auto w-[1%]
@@ -90,7 +90,7 @@ const theme = ref<SelectPassThroughOptions>({
     pcFilterIconContainer: {
         root: `absolute top-1/2 -mt-2 leading-none end-3 z-1`
     },
-    listContainer: `overflow-scroll`,
+    listContainer: `overflow-auto`,
     list: `m-0 p-1 list-none gap-[2px] flex flex-col`,
     optionGroup: `m-0 px-3 py-2 bg-transparent text-surface-500 dark:text-surface-400 font-semibold`,
     optionGroupLabel: ``,

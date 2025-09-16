@@ -45,7 +45,7 @@ watch(
             items.value = [];
 
             if (newVal) {
-                query[props.query] = newVal;
+                query[props.searchKey] = newVal;
             }
 
             await props.fetchFn(query);

@@ -29,6 +29,9 @@ import {useKitStore} from "@/stores/kit.js";
 import InputNumber from "@/volt/InputNumber.vue";
 import Row from "primevue/row";
 import ColumnGroup from "primevue/columngroup";
+import SearchSelect from "@/components/UI/SearchSelect.vue";
+import Select from "@/volt/Select.vue";
+import {useUserStore} from "@/stores/user.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -40,6 +43,7 @@ const locationQuantityKitStore = useLocationQuantityKitStore()
 const locationStore = useLocationStore()
 const productStore = useProductStore()
 const kitStore = useKitStore()
+const userStore = useUserStore()
 
 // refs
 const isVisibleSectionHeader = ref(false);
@@ -97,6 +101,7 @@ const tabList = computed(() => [
     { value: 'kit', label: t('labels.kit')},
 ])
 
+const isAdmin = computed(() => userStore.getAboutMeFromToken.role === 'ROLE_ADMIN')
 
 // watchers
 watch(
@@ -177,6 +182,15 @@ function connectMercure() {
             await locationQuantityKitStore.fetchLocationQuantityKits(route.query)
         }
     })
+}
+
+const clearFilters = () => {
+    filters.value.location = null;
+    filters.value.product = null;
+    filters.value.kit = null;
+    filters.value['is-desc'] = null;
+    filters.value['is-zero'] = null;
+    filters.value.expired = null;
 }
 
 async function fetchProduct(queryFilters) {
@@ -280,80 +294,77 @@ onBeforeRouteLeave(() => {
                 }"
                 class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
             >
-                <!--                <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-4 items-center">-->
-                <!--                    <Select-->
-                <!--                        v-model="filters.location"-->
-                <!--                        :options="locationStore.getLocations.models"-->
-                <!--                        option-label="name"-->
-                <!--                        option-value="id"-->
-                <!--                        :placeholder="t('placeholders.search.byLocation')"-->
-                <!--                        showClear-->
-                <!--                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"-->
-                <!--                    />-->
-                <!--                    filters:{{filters.product}}-->
-                <!--                    <SearchSelect-->
-                <!--                        :total-items="productStore.getProducts.totalItems"-->
-                <!--                        :items="productsForSelect"-->
-                <!--                        v-model="filters.product"-->
-                <!--                        :fetch="fetchProduct"-->
-                <!--                        :firstFetch="firstFetchProduct"-->
-                <!--                    />-->
-                <!--                    <Select-->
-                <!--                        v-if="tabVal === 'product'"-->
-                <!--                        v-model="debouncedNameForSelect"-->
-                <!--                        ref="productsSelect"-->
-                <!--                        :options="productsForSelect"-->
-                <!--                        option-label="name"-->
-                <!--                        option-value="name"-->
-                <!--                        :placeholder="t('placeholders.search.byProduct')"-->
-                <!--                        showClear-->
-                <!--                        :loading="isLoadingNextPartProduct"-->
-                <!--                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"-->
-                <!--                        editable-->
-                <!--                        @hide="() => {console.log('show');productSelectPage = 1}"-->
-                <!--                    >-->
-                <!--                        <template #option="{option, index}">-->
-                <!--                            <div @click="setProduct">-->
-                <!--                                {{option.name}}-->
-                <!--                                <div-->
-                <!--                                    v-intersection-observer="[onIntersectionObserver, { productSelect }]"-->
-                <!--                                    v-if="index + 1 === productsForSelect.length && productStore.getProducts.totalItems > productsForSelect.length && productsForSelect.length"-->
-                <!--                                ></div>-->
-                <!--                            </div>-->
-                <!--                        </template>-->
-                <!--                    </Select>-->
+                <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
+                    <SearchSelect
+                        v-model="filters.location"
+                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, isWarehouse: false})"
+                        :options="locationStore.getLocations.models"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
+                        :placeholder="t('placeholders.search.byLocation')"
+                        :loading="locationStore.getIsLoadingLocation"
+                        :total-items="locationStore.getLocations.totalItems"
+                    />
+                    <SearchSelect
+                        v-if="tabVal === 'product'"
+                        v-model="filters.product"
+                        :fetchFn="productStore.fetchProducts"
+                        :options="productStore.getProducts.models"
+                        :option-label="opt => `${opt?.name} | ${opt?.code}`"
+                        :option-value="opt => `${opt?.name} | ${opt?.code}`"
+                        :return-value="opt => opt?.id"
+                        :placeholder="t('placeholders.search.byProduct')"
+                        :loading="productStore.getIsLoadingProducts"
+                        :total-items="productStore.getProducts.totalItems"
+                    >
+                        <template #header>
+                            <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }}</div>
+                        </template>
+                    </SearchSelect>
+                    <SearchSelect
+                        v-if="tabVal === 'kit'"
+                        v-model="filters.kit"
+                        :fetchFn="kitStore.fetchKits"
+                        :options="kitStore.getKits.models"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
+                        :placeholder="t('placeholders.search.byKit')"
+                        :loading="kitStore.getIsLoadingKits"
+                        :total-items="kitStore.getKits.totalItems"
+                    />
 
-                <!--                    <Select-->
-                <!--                        v-if="tabVal === 'kit'"-->
-                <!--                        v-model="filters.kit"-->
-                <!--                        :options="locationStore.getLocations.models"-->
-                <!--                        option-label="name"-->
-                <!--                        option-value="id"-->
-                <!--                        :placeholder="t('placeholders.search.byKit')"-->
-                <!--                        showClear-->
-                <!--                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"-->
-                <!--                    />-->
+                    <Select
+                        v-model="filters.expired"
+                        :options="[{id: 1, value: true, name: t('expired')}, {id: 2, value: false, name: t('notExpired')}]"
+                        option-label="name"
+                        option-value="value"
+                        showClear
+                        :placeholder="t('placeholders.search.byExpiry')"
+                    />
 
-                <!--                    <DatePicker-->
-                <!--                        v-model.trim="filters['date-from']"-->
-                <!--                        dateFormat="dd.mm.yy"-->
-                <!--                        showIcon-->
-                <!--                        fluid-->
-                <!--                        iconDisplay="input"-->
-                <!--                        :placeholder="t('placeholders.search.byDateFrom')"-->
-                <!--                        show-button-bar-->
-                <!--                    />-->
-                <!--                    <DatePicker-->
-                <!--                        v-model.trim="filters['date-to']"-->
-                <!--                        dateFormat="dd.mm.yy"-->
-                <!--                        showIcon-->
-                <!--                        fluid-->
-                <!--                        iconDisplay="input"-->
-                <!--                        :placeholder="t('placeholders.search.byDateTo')"-->
-                <!--                        show-button-bar-->
-                <!--                    />-->
-                <!--                </div>-->
-                <p>Bu yeri keyinroq qilinadi</p>
+                    <Select
+                        v-model="filters['is-desc']"
+                        :options="[{id: 1, value: true, name: t('desc')}, {id: 2, value: false, name: t('asc')}]"
+                        option-label="name"
+                        option-value="value"
+                        showClear
+                        :placeholder="t('placeholders.search.orderByExpiry')"
+                    />
+
+                    <Select
+                        v-model="filters['is-zero']"
+                        :options="[{id: 1, value: true, name: t('zero')}, {id: 2, value: false, name: t('notZero')}]"
+                        option-label="name"
+                        option-value="value"
+                        showClear
+                        :placeholder="t('placeholders.search.byQty')"
+                    />
+                    <div class="xl:col-span-3 flex justify-end">
+                        <Button @click="clearFilters" :label="t('clear')" icon="pi pi-trash" class="bg-surface-500 border-surface-500 enabled:hover:border-surface-400 enabled:hover:bg-surface-400 dark:bg-surface-500 dark:border-surface-500 dark:enabled:hover:border-surface-400 dark:enabled:hover:bg-surface-400 w-fit px-4"/>
+                    </div>
+                </div>
             </div>
         </template>
 
@@ -428,10 +439,22 @@ onBeforeRouteLeave(() => {
                                             <p v-else>{{ formatCurrency(data.qty) }} {{ t(`labels.${data.product.category.unit.name}`) }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
+                                    <Column v-if="isAdmin" field="costPrice" :header="t('labels.costPrice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                            <p v-else>{{ formatCurrency(data.product?.costPrice) }}$</p>
+                                        </template>
+                                    </Column>
+                                    <Column v-if="isAdmin" field="retailPrice" :header="t('labels.retailPrice')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                             <p v-else>{{ formatCurrency(data.product?.retailPrice) }}$</p>
+                                        </template>
+                                    </Column>
+                                    <Column v-if="isAdmin" field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                            <p v-else>{{ formatCurrency(data.product?.wholesalePrice) }}$</p>
                                         </template>
                                     </Column>
 
@@ -452,10 +475,22 @@ onBeforeRouteLeave(() => {
                                                     </div>
                                                 </template>
                                             </Column>
-                                            <Column>
+                                            <Column v-if="isAdmin">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(locationQuantityStore.getLocationQuantities.totalCostPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column v-if="isAdmin">
                                                 <template #footer>
                                                     <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                                     <p v-else class="font-semibold">{{ formatCurrency(locationQuantityStore.getLocationQuantities.totalRetailPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column v-if="isAdmin">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(locationQuantityStore.getLocationQuantities.totalWholesalePrice) }}$</p>
                                                 </template>
                                             </Column>
                                         </Row>
@@ -493,25 +528,25 @@ onBeforeRouteLeave(() => {
                                     <Column field="id" :header="t('labels.id')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.kit.id }}</p>
+                                            <p v-else>{{ data.kit?.id }}</p>
                                         </template>
                                     </Column>
                                     <Column field="kit" :header="t('labels.name')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.kit.name }}</p>
+                                            <p v-else>{{ data.kit?.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="kit" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.kit.code }}</p>
+                                            <p v-else>{{ data.kit?.code }}</p>
                                         </template>
                                     </Column>
                                     <Column field="location" :header="t('labels.locations')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.location.name }}</p>
+                                            <p v-else>{{ data.location?.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
@@ -526,10 +561,22 @@ onBeforeRouteLeave(() => {
                                             <p v-else>{{ formatCurrency(data.qty) }} {{ t('labels.pcs')}}</p>
                                         </template>
                                     </Column>
-                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
+                                    <Column v-if="isAdmin" field="costPrice" :header="t('labels.costPrice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                            <p v-else>{{ formatCurrency(data.kit?.costPrice) }}$</p>
+                                        </template>
+                                    </Column>
+                                    <Column v-if="isAdmin" field="retailPrice" :header="t('labels.retailPrice')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                             <p v-else>{{ formatCurrency(data.kit?.retailPrice) }}$</p>
+                                        </template>
+                                    </Column>
+                                    <Column v-if="isAdmin" field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                            <p v-else>{{ formatCurrency(data.kit?.wholesalePrice) }}$</p>
                                         </template>
                                     </Column>
                                     <Column field="actions" :header="t('actions')">
@@ -574,10 +621,22 @@ onBeforeRouteLeave(() => {
                                                     </div>
                                                 </template>
                                             </Column>
-                                            <Column>
+                                            <Column v-if="isAdmin">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(locationQuantityKitStore.getLocationQuantityKits.totalCostPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column v-if="isAdmin">
                                                 <template #footer>
                                                     <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                                     <p v-else class="font-semibold">{{ formatCurrency(locationQuantityKitStore.getLocationQuantityKits.totalRetailPrice) }}$</p>
+                                                </template>
+                                            </Column>
+                                            <Column v-if="isAdmin">
+                                                <template #footer>
+                                                    <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(locationQuantityKitStore.getLocationQuantityKits.totalWholesalePrice) }}$</p>
                                                 </template>
                                             </Column>
                                         </Row>

@@ -3,7 +3,12 @@ import Section from "@/components/UI/Section.vue";
 import { useI18n } from "vue-i18n";
 import {computed, onMounted, ref, watch} from "vue";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
-import {formatCurrency, getFormattedDate, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
+import {
+    formatCurrency,
+    formatLocalEndOfDay,
+    getFormattedDate,
+    getFormattedDateWithTime
+} from "@/helpers/numberFormat.js";
 import Skeleton from "@/volt/Skeleton.vue";
 import Avatar from "@/volt/Avatar.vue";
 import Column from "primevue/column";
@@ -111,9 +116,7 @@ watch(
 
         if (filters.value['date-to']) {
             if (filters.value['date-to'] !== null) {
-                const date = new Date(filters.value['date-to']);
-                date.setHours(date.getHours() + 5);
-                queryFilter['date-to'] = date.toISOString();
+                queryFilter['date-to'] = formatLocalEndOfDay(new Date(filters.value['date-to']));
             }
 
             if (filters.value['date-to'] === "") {
@@ -132,6 +135,15 @@ const setCurrentKit = (kit) => {
     currentKit.value = kit;
     visible.value.imageVisible = true;
 };
+
+const clearFilters = () => {
+    debouncedName.value = null;
+    filters.value.assembly = null;
+    filters.value.seller = null;
+    filters.value.location = null;
+    filters.value['date-from'] = null;
+    filters.value['date-to'] = null;
+}
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
 const eventSource = ref(null)
@@ -252,7 +264,7 @@ onBeforeRouteLeave(() => {
                         <label class="relative max-w-full w-full">
                             <i class="pi pi-search absolute top-1/2 -mt-2 text-surface-400 leading-none start-3 z-1"/>
                             <InputText
-                                pt:root="dark:bg-surface-800 ps-10"
+                                pt:root="ps-10"
                                 v-model="debouncedName"
                                 class="w-full"
                                 :placeholder="t('placeholders.search.byTitleAndQRAndCode')"
@@ -305,6 +317,10 @@ onBeforeRouteLeave(() => {
                         :placeholder="t('placeholders.search.byDateTo')"
                         show-button-bar
                     />
+
+                    <div class="col-span-full xl:col-span-4 flex justify-end">
+                        <Button @click="clearFilters" :label="t('clear')" icon="pi pi-trash" class="bg-surface-500 border-surface-500 enabled:hover:border-surface-400 enabled:hover:bg-surface-400 dark:bg-surface-500 dark:border-surface-500 dark:enabled:hover:border-surface-400 dark:enabled:hover:bg-surface-400 w-fit px-4"/>
+                    </div>
                 </div>
             </div>
         </template>

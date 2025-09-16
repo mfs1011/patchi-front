@@ -107,7 +107,6 @@ watch(
     </Breadcrumb>
 
     <Section
-        without-buttons
         :section-name="t('cards.currencyRates')"
         back-route-name="administration"
     >
