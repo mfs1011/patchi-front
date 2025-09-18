@@ -84,7 +84,7 @@ const home = computed(() => ({
     route: "/warehouse",
 }));
 
-const items = computed(() => [{ label: t("cards.incomeInvoices"), route: { name: 'warehouse-income-invoices'} }, { label: t("cards.incomeInvoice") }]);
+const items = computed(() => [{ label: t("cards.returnInvoices"), route: { name: 'warehouse-return-invoices'} }, { label: t("cards.returnInvoice") }]);
 const sumPriceOfIncomeInvoiceProducts = computed(() => {
     return editableData.value.incomeInvoiceProducts.length === 0
         ? 0
@@ -453,8 +453,8 @@ onMounted(async () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('cards.incomeInvoice')"
-        back-route-name="warehouse-income-invoices"
+        :section-name="t('cards.returnInvoice')"
+        back-route-name="warehouse-return-invoices"
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">

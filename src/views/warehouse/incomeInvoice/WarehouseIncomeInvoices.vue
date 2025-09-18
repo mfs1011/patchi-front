@@ -64,7 +64,6 @@ const items = computed(() => [{ label: t("cards.incomeInvoices") }]);
 const isAdminAndWarehouseManager = computed(() => (
     ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER'].includes(userStore.getAboutMeFromToken.role)
 ))
-const isAdmin = computed(() => userStore.getAboutMeFromToken.role === 'ROLE_ADMIN')
 
 // watchers
 watch(
@@ -142,7 +141,7 @@ const clearFilters = () => {
     filters.value['date-to'] = null;
 }
 
-const isAdminAndCreatedBy = createdById => (
+const isAdminOrCreatedBy = createdById => (
     userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
 )
 
@@ -156,9 +155,9 @@ const deleteIncomeInvoice = async () => {
         isDeleteLoading.value = true;
 
         await incomeInvoiceStore.deleteIncomeInvoice(currentIncomeInvoiceId.value);
-        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('product.nominativeCapitalize') }), life: 3000 })
+        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('incomeInvoice.nominativeCapitalize') }), life: 3000 })
     } catch (err) {
-        toast.add({ severity: 'error', summary: t('toast.cannot_delete_product_in_stock'), life: 3000 })
+        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
     } finally {
         isDeleteLoading.value = false;
         deleteVisible.value = false;
@@ -287,7 +286,6 @@ onBeforeRouteLeave(() => {
                         :total-items="supplierStore.getSuppliers.totalItems"
                     />
                     <SearchSelect
-                        v-if="isAdmin"
                         v-model="filters.createdBy"
                         :fetchFn="userStore.fetchUsers"
                         :options="userStore.getUsers.models"
@@ -443,6 +441,7 @@ onBeforeRouteLeave(() => {
                                             size="small"
                                         />
                                         <Button
+                                            v-if="isAdminOrCreatedBy(data.createdBy.id)"
                                             @click="deleteAction(data.id)"
                                             icon="pi pi-trash"
                                             pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"

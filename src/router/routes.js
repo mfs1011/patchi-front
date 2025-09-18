@@ -119,9 +119,21 @@ export const routes = [
                     },
                     {
                         path: 'return-invoices',
-                        name: 'warehouse-return-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/warehouse/WarehouseReturnInvoice.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'warehouse-return-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/returnInvoice/WarehouseReturnInvoices.vue')
+                            },
+                            {
+                                path: 'return-invoice/:id',
+                                name: 'warehouse-return-invoice',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/returnInvoice/WarehouseReturnInvoice.vue'),
+                            },
+                        ]
                     },
                     {
                         path: 'write-off-invoices',

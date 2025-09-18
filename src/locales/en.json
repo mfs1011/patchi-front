@@ -177,6 +177,12 @@
         "accusative": "transfer invoice",
         "accusativeCapitalize": "Transfer invoice"
     },
+    "returnInvoice": {
+      "nominative": "return invoice",
+      "nominativeCapitalize": "Return invoice",
+      "accusative": "return invoice",
+      "accusativeCapitalize": "Return invoice"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
@@ -353,7 +359,8 @@
             "byExpiry": "Search by expiry date",
             "byQty": "Search by quantity",
             "orderByExpiry": "Order by expiry date",
-            "bySeller": "Search by seller"
+            "bySeller": "Search by seller",
+            "byCustomer": "Search by customer"
         },
         "select": {
             "role": "Select role",
@@ -496,6 +503,7 @@
         "transferInvoices": "Transfer",
         "orders": "Orders",
         "returnInvoices": "Returns",
+        "returnInvoice": "Return",
         "writeOffInvoices": "Write-offs",
         "salesReports": "Sales reports",
         "kitsInWarehouse": "Compositions in warehouse",
@@ -611,6 +619,7 @@
         "already_added": "\"{name}\" already added",
         "cannot_delete_product_in_stock": "Cannot delete a product that is in stock",
         "notEnough": "Not enough in stock",
+        "accessDenied": "Access denied",
         "cannot_edit_kpi_used_in_sales": "The KPI used in sales cannot be changed",
         "unconfirmedExists": "There is an unconfirmed inventory",
         "noIncomingToLocation": "There have been no incoming entries to this location"

@@ -177,6 +177,12 @@
         "accusative": "перемещению",
         "accusativeCapitalize": "Перемещению"
     },
+    "returnInvoice": {
+      "nominative": "возврат",
+      "nominativeCapitalize": "Возврат",
+      "accusative": "возврат",
+      "accusativeCapitalize": "Возврат"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",
@@ -350,10 +356,11 @@
             "byElementId": "Поиск по элементу ID",
             "byElement": "Поиск по элементу",
             "byAction": "Поиск по действию",
-            "bySeller": "Поиск по продавцу",
             "byExpiry": "Поиск сроку годности",
             "byQty": "Поиск по количеству",
-            "orderByExpiry": "Сортировка по сроку годности"
+            "orderByExpiry": "Сортировка по сроку годности",
+            "bySeller": "Поиск по продавцу",
+            "byCustomer": "Поиск по клиенту"
         },
         "select": {
             "role": "Выберите роль",
@@ -497,6 +504,7 @@
         "transferInvoice": "Перемещение",
         "orders": "Заказы",
         "returnInvoices": "Возвраты",
+        "returnInvoice": "Возврат",
         "writeOffInvoices": "Списания",
         "salesReports": "Отчеты о продажах",
         "kitsInWarehouse": "Композиции на складе",
@@ -612,6 +620,7 @@
         "already_added": "\"{name}\" уже добавлено",
         "cannot_delete_product_in_stock": "Невозможно удалить продукт, который есть на складе",
         "notEnough": "Недостаточно на складе",
+        "accessDenied": "Доступ запрещен",
         "cannot_edit_kpi_used_in_sales": "KPI, используемые в продажах, не могут быть изменены",
         "unconfirmedExists": "Имеется неподтверждённая инвентаризация",
         "noIncomingToLocation": "На эту локацию не было ни одного поступления"
