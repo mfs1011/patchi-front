@@ -372,6 +372,7 @@
             "location": "Joylashuvni tanlang",
             "supplier": "Ta'minotchini tanlang",
             "seller": "Sotuvchini tanlang",
+            "customer": "Mijozni tanlang",
             "product": "Mahsulotni tanlang",
             "kit": "Kompozitsiyani tanlang",
             "color": "Rangni tanlang"
@@ -634,6 +635,7 @@
     "day": "kun",
     "incomingData": "Kirim ma'lumotlari",
     "transferData": "Ko‘chiruv ma'lumotlari",
+    "returnData": "Qaytarilgan ma'lumotlari",
     "addProduct": "Mahsulot qo'shish",
     "addKit": "Kompozitsiya qo'shish",
     "zero": "Tugagan",

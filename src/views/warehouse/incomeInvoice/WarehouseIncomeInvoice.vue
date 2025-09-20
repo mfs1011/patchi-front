@@ -150,12 +150,20 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
             summary: t('toast.successEditingSave'),
             life: 3000
         })
-        createdData.value = [];
-        updatedData.value = [];
-        deletedData.value = [];
+
         router.back()
     } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        if (error.status === 439) {
+            toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else if (error.status === 412) {
+            toast.add({ severity: 'error', summary: t('toast.notEnoughKit', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
+    } finally {
+        createdData.value = []
+        deletedData.value = []
+        updatedData.value = []
     }
 })
 

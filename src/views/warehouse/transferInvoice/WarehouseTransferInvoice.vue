@@ -174,15 +174,13 @@ const onSubmitTransferInvoice = transferInvoiceHandleSubmit(async (values) => {
 
         router.back()
     } catch (error) {
-        // todo bu yeridagi status kodlardan kelib chiqib beradigan errorMessage'ga nima deb yozishni bilmadim
-        // if (error.status === 439) {
-        //     toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
-        // } else if (error.status === 412) {
-        //     toast.add({ severity: 'error', summary: t('toast.notEnoughKit', { field: t('code.nominativeCapitalize') }), life: 3000 })
-        // } else {
-        //     toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
-        // }
-        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        if (error.status === 439) {
+            toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else if (error.status === 412) {
+            toast.add({ severity: 'error', summary: t('toast.notEnough', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
     } finally {
         createdData.value = []
         deletedData.value = []
@@ -290,15 +288,15 @@ function deleteLocationQuantity() {
 }
 
 function deleteLocationQuantityKit() {
-    const index = editableData.value.transferInvoiceProducts.findIndex(p => p.id === currentDeleteLocationQuantityKit.value.id);
+    const index = editableData.value.transferInvoiceKits.findIndex(p => p.id === currentDeleteLocationQuantityKit.value.id);
 
     if (index === -1) return;
 
-    const current = editableData.value.transferInvoiceProducts[index];
+    const current = editableData.value.transferInvoiceKits[index];
 
     if (current.id) {
         // API’dan kelgan
-        editableData.value.transferInvoiceProducts.splice(index, 1);
+        editableData.value.transferInvoiceKits.splice(index, 1);
 
         deletedKitData.value.push({
             transferInvoiceKit: current["@id"],
@@ -306,7 +304,7 @@ function deleteLocationQuantityKit() {
         })
     } else {
         // Yangi qo‘shilgan
-        editableData.value.transferInvoiceProducts.splice(index, 1);
+        editableData.value.transferInvoiceKits.splice(index, 1);
     }
 
     deleteLocationQuantityKitVisible.value = false
@@ -578,7 +576,7 @@ onMounted(async () => {
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
                 <Button
                     v-if="!editMode"
-                    :disabled="!!transferInvoiceErrors.incomeInvoiceProducts"
+                    :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
                     icon="pi pi-pencil"
                     @click="editMode = true"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
@@ -587,7 +585,7 @@ onMounted(async () => {
                 />
                 <Button
                     v-if="editMode"
-                    :disabled="!!transferInvoiceErrors.incomeInvoiceProducts"
+                    :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
                     icon="pi pi-save"
                     @click="onSubmitTransferInvoice"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
@@ -597,7 +595,7 @@ onMounted(async () => {
 
                 <SecondaryButton
                     v-if="editMode"
-                    :disabled="!!transferInvoiceErrors.incomeInvoiceProducts"
+                    :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
                     @click="cancelEditing"
                     class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
@@ -1033,7 +1031,7 @@ onMounted(async () => {
                 pt:root="px-2"
             >
                 <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                    {{ t('dialog.deleteConfirm', { name: t('product.accusative') }) }}
+                    {{ t('dialog.deleteConfirm', { name: t('kit.accusative') }) }}
                 </span>
 
                 <template #footer>

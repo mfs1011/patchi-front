@@ -38,7 +38,7 @@ const customerStore = useCustomerStore()
 const userStore = useUserStore()
 const deleteVisible = ref(false)
 const isDeleteLoading = ref(false)
-const currentIncomeInvoiceId = ref(null)
+const currentReturnInvoiceId = ref(null)
 
 // refs
 const isVisibleSectionHeader = ref(false);
@@ -154,7 +154,7 @@ const isAdminOrCreatedBy = createdById => (
 )
 
 const deleteAction = (id) => {
-    currentIncomeInvoiceId.value = id;
+    currentReturnInvoiceId.value = id;
     deleteVisible.value = true;
 };
 
@@ -162,7 +162,7 @@ const deleteReturnInvoice = async () => {
     try {
         isDeleteLoading.value = true;
 
-        await returnInvoiceStore.deleteReturnInvoice(currentIncomeInvoiceId.value);
+        await returnInvoiceStore.deleteReturnInvoice(currentReturnInvoiceId.value);
         toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('returnInvoice.nominativeCapitalize') }), life: 3000 })
     } catch (err) {
         toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
@@ -274,7 +274,7 @@ onBeforeRouteLeave(() => {
                     />
                     <SearchSelect
                         v-model="filters.customer"
-                        :fetchFn="customerStore.fetchCustomers"
+                        :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': true})"
                         :options="customerStore.getCustomers.models"
                         :option-label="opt => opt?.name"
                         :option-value="opt => opt?.id"
@@ -478,7 +478,7 @@ onBeforeRouteLeave(() => {
                 pt:root="px-2"
             >
                 <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                    {{ t('dialog.deleteConfirmation', { name: t('incomeInvoice.accusative'), id: currentIncomeInvoiceId }) }}
+                    {{ t('dialog.deleteConfirmation', { name: t('returnInvoice.accusative'), id: currentReturnInvoiceId }) }}
                 </span>
 
                 <template #footer>

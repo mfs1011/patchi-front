@@ -374,6 +374,7 @@
             "location": "Select location",
             "supplier": "Select supplier",
             "seller": "Select seller",
+            "customer": "Select customer",
             "product": "Select product",
             "kit": "Select composition",
             "color": "Select color"
@@ -633,6 +634,7 @@
     "day": "day",
     "incomingData": "Incoming data",
     "transferData": "Transfer data",
+    "returnData": "Return data",
     "addProduct": "Add product",
     "addKit": "Add composition",
     "zero": "Out of stock",
