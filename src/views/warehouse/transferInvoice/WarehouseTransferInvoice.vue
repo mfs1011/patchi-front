@@ -234,7 +234,7 @@ function addLocationQuantityKit(newLocationQuantityKit) {
     if (exists) {
         toast.add({
             severity: 'error',
-            summary: t('toast.already_added', { name: t('product.nominativeCapitalize') }),
+            summary: t('toast.already_added', { name: t('kit.nominativeCapitalize') }),
             life: 3000
         })
 
@@ -260,9 +260,9 @@ function deleteLocationQuantityAction(product) {
     currentDeleteLocationQuantity.value = product
 }
 
-function deleteLocationQuantityKitAction(product) {
+function deleteLocationQuantityKitAction(kit) {
     deleteLocationQuantityKitVisible.value = true
-    currentDeleteLocationQuantityKit.value = product
+    currentDeleteLocationQuantityKit.value = kit
 }
 
 function deleteLocationQuantity() {
@@ -622,7 +622,7 @@ onMounted(async () => {
                 pt:title="font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
                 <template #content>
-                    <div class="font-medium mb-4">{{ t('incomingData') }}</div>
+                    <div class="font-medium mb-4">{{ t('transferData') }}</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         <div>
                             <p class="text-sm">{{ t('labels.fromLocation') }}<span class="text-red-500"> *</span></p>
@@ -652,7 +652,7 @@ onMounted(async () => {
                             <SearchSelect
                                 v-if="!isLoading"
                                 v-model="toLocation"
-                                :fetchFn="(query) => locationStore.fetchLocations({ ...query })"
+                                :fetchFn="(query) => locationStore.fetchLocations({ ...query, toLocation: true })"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
@@ -696,8 +696,7 @@ onMounted(async () => {
                                             :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
-                                            :search-value="opt => opt.id"
-                                            search-key="id"
+                                            :search-value="opt => opt.name"
                                             :placeholder="t('placeholders.select.product')"
                                             :loading="locationQuantityStore.getIsLoadingLocationQuantity"
                                             :total-items="locationQuantityStore.getLocationQuantities.totalItems"
@@ -747,8 +746,7 @@ onMounted(async () => {
                                             :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :return-value="opt => opt"
-                                            :search-value="opt => opt.id"
-                                            search-key="id"
+                                            :search-value="opt => opt.name"
                                             :placeholder="t('placeholders.select.kit')"
                                             :loading="locationQuantityKitStore.getIsLoadingLocationQuantityKit"
                                             :total-items="locationQuantityKitStore.getLocationQuantityKits.totalItems"

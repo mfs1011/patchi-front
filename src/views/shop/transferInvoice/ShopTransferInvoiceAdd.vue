@@ -376,7 +376,7 @@ const confirmLeave = () => {
 
                             <SearchSelect
                                 v-model="toLocation"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query })"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query, toLocation: true })"
                                 :options="locationStore.getLocations.models.filter(l => l.id !== fromLocation)"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.name"

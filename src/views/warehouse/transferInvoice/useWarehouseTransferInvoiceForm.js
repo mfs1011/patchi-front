@@ -163,7 +163,7 @@ export function useTransferInvoiceValidation() {
         locationQuantity,
         qtyLocationQuantity,
 
-        // Product form
+        // Kit form
         locationQuantityKitHandleSubmit,
         locationQuantityKitErrors,
         locationQuantityKitIsSubmitting,
