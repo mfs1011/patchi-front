@@ -26,6 +26,7 @@ import {formatCurrency, formatDateTimeLocal, getFormattedDate} from "@/helpers/n
 import {useColorStore} from "@/stores/color.js";
 import {useToast} from "primevue/usetoast";
 import Message from "@/volt/Message.vue";
+import {useUserStore} from "@/stores/user.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -36,6 +37,7 @@ const supplierStore = useSupplierStore();
 const locationStore = useLocationStore();
 const productStore = useProductStore();
 const colorStore = useColorStore();
+const userStore = useUserStore()
 const { t } = useI18n();
 const {
     productHandleSubmit,
@@ -68,7 +70,7 @@ const createdData = ref([]);
 const updatedData = ref([]);
 const dateFrom = ref(null);
 const editMode = ref(false);
-const isLoading = ref(false);
+const isLoading = ref(true);
 const deleteVisible = ref(false);
 const isDeleteLoading = ref(false);
 const showLeaveDialog = ref(false);
@@ -85,6 +87,10 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t("cards.incomeInvoices"), route: { name: 'warehouse-income-invoices'} }, { label: t("cards.incomeInvoice") }]);
+const isAdminOrCreatedBy = createdById => (
+    userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
+)
+
 const sumPriceOfIncomeInvoiceProducts = computed(() => {
     return editableData.value.incomeInvoiceProducts.length === 0
         ? 0
@@ -416,7 +422,6 @@ const confirmLeave = () => {
 }
 
 onMounted(async () => {
-    isLoading.value = true;
     await incomeInvoiceStore.fetchIncomeInvoice(route.params.id);
 
     apiData.value = incomeInvoiceStore.getIncomeInvoice;
@@ -465,9 +470,9 @@ onMounted(async () => {
         back-route-name="warehouse-income-invoices"
     >
         <template #buttons>
-            <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
+            <div v-if="!isLoading" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
                 <Button
-                    v-if="!editMode"
+                    v-if="!editMode && isAdminOrCreatedBy(incomeInvoiceStore.getIncomeInvoice.createdBy.id)"
                     :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
                     icon="pi pi-pencil"
                     @click="editMode = true"

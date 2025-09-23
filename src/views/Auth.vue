@@ -47,6 +47,7 @@ const { value: password } = useField('password')
 const onSubmit = handleSubmit(async values => {
     try {
         await userStore.fetchToken({ username: values.phoneNumber.replace(/\D/g, ''), password: values.password, device: getDeviceId() })
+        await userStore.fetchAboutMe()
 
         await router.push({ name: 'home' })
     } catch (error) {

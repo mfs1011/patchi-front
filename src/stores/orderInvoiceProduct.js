@@ -13,7 +13,7 @@ export const useOrderInvoiceProductStore = defineStore('orderInvoiceProduct', ()
 
     const fetchOrderInvoiceProducts = async (params = { page: 1 }) => {
         try {
-            state.isLoadingReturnInvoices = true
+            state.isLoadingOrderInvoiceProducts = true
 
             const { data } = await authorizedClient.get('/order_invoice_products', { params: { ...params}})
             state.orderInvoiceProducts.models = data.member

@@ -74,7 +74,7 @@ const deletedKitData = ref([]);
 const createdKitData = ref([]);
 const updatedKitData = ref([]);
 const editMode = ref(false);
-const isLoading = ref(false);
+const isLoading = ref(true);
 const deleteLocationQuantityVisible = ref(false);
 const deleteLocationQuantityKitVisible = ref(false);
 const isDeleteLocationQuantityLoading = ref(false);
@@ -94,6 +94,9 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t("cards.transferInvoices"), route: { name: 'shop-transfer-invoices'} }, { label: t("cards.transferInvoice") }]);
+const isAdminOrCreatedBy = createdById => (
+    userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
+)
 const tabList = computed(() => [
     { value: 'products', label: t('cards.products')},
     { value: 'kits', label: t('cards.kits')},
@@ -311,7 +314,6 @@ function deleteLocationQuantityKit() {
 }
 
 function editLocationQuantityAction(data, index) {
-    console.log(data)
     isEditing.value = true;
     currentLocationQuantityIndex.value = index
     locationQuantity.value = data.locationQuantity
@@ -497,7 +499,6 @@ const confirmLeave = () => {
 }
 
 onMounted(async () => {
-    isLoading.value = true;
     await transferInvoiceStore.fetchTransferInvoice(route.params.id);
 
     apiData.value = transferInvoiceStore.getTransferInvoice;
@@ -547,7 +548,7 @@ onMounted(async () => {
         <template #buttons>
             <div v-if="!isLoading && !isAcceptedTransferInvoice" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
                 <Button
-                    v-if="!editMode"
+                    v-if="!editMode && isAdminOrCreatedBy(transferInvoiceStore.getTransferInvoice.createdBy.id)"
                     :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
                     icon="pi pi-pencil"
                     @click="editMode = true"
@@ -696,7 +697,8 @@ onMounted(async () => {
                                             :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
-                                            :search-value="opt => opt.name"
+                                            :search-value="opt => opt.id"
+                                            search-key="name"
                                             :placeholder="t('placeholders.select.product')"
                                             :loading="locationQuantityStore.getIsLoadingLocationQuantity"
                                             :total-items="locationQuantityStore.getLocationQuantities.totalItems"
@@ -741,32 +743,20 @@ onMounted(async () => {
                                         <p class="text-sm">{{ t('labels.kit') }}<span class="text-red-500"> *</span></p>
                                         <SearchSelect
                                             v-model="locationQuantityKit"
-                                            :fetchFn="(query) => locationQuantityKitStore.fetchLocationQuantityKits({...query, location: fromLocation.id})"
+                                            :fetchFn="(query) => locationQuantityKitStore.fetchLocationQuantityKits({...query, location: fromLocation.id, isZero: true})"
                                             :options="locationQuantityKitStore.getLocationQuantityKits.models"
                                             :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :return-value="opt => opt"
-                                            :search-value="opt => opt.name"
+                                            :search-value="opt => opt.id"
+                                            search-key="name"
                                             :placeholder="t('placeholders.select.kit')"
                                             :loading="locationQuantityKitStore.getIsLoadingLocationQuantityKit"
                                             :total-items="locationQuantityKitStore.getLocationQuantityKits.totalItems"
                                             :invalid="!!locationQuantityKitErrors.locationQuantityKit"
                                         >
                                             <template v-if="locationQuantityKitStore.getLocationQuantityKits.models.length" #header>
-                                                <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900 grid grid-cols-4 gap-4">
-                                                    <div>{{t('labels.title')}}</div>
-                                                    <div>{{t('labels.code') }}</div>
-                                                    <div>{{t('labels.expiryDate')}}</div>
-                                                    <div>{{t('labels.qty')}}</div>
-                                                </div>
-                                            </template>
-                                            <template #option="{ option }">
-                                                <div class="grid grid-cols-4 w-full gap-4">
-                                                    <div>{{ option?.kit?.name }}</div>
-                                                    <div>{{ option?.kit?.code }}</div>
-                                                    <div>{{ getFormattedDate(option?.expiryDate) }}</div>
-                                                    <div>{{ formatCurrency(option?.qty) }} {{ t(`labels.pcs`) }}</div>
-                                                </div>
+                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
                                             </template>
                                         </SearchSelect>
                                     </div>
@@ -786,7 +776,7 @@ onMounted(async () => {
                                 </div>
 
                                 <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
-                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearLocationQuantityForm" />
+                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearLocationQuantityKitForm" />
                                     <Button v-if="!isEditing" @click="onSubmitLocationQuantityKit" :label="t('buttons.add')" class="px-5" :loading="locationQuantityIsSubmitting"/>
                                     <Button v-else @click="onEditLocationQuantityKit" :label="t('buttons.edit')" class="px-5"/>
                                 </div>

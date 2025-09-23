@@ -61,7 +61,7 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t("cards.incomeInvoices") }]);
-const isAdminAndWarehouseManager = computed(() => (
+const isAdminOrWarehouseManager = computed(() => (
     ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER'].includes(userStore.getAboutMeFromToken.role)
 ))
 
@@ -233,7 +233,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    v-if="isAdminAndWarehouseManager"
+                    v-if="isAdminOrWarehouseManager"
                     @click="router.push({ name: 'add-income-invoices' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >{{ t("buttons.newIncomeInvoice") }}</Button>
@@ -247,7 +247,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    v-if="isAdminAndWarehouseManager"
+                    v-if="isAdminOrWarehouseManager"
                     @click="router.push({ name: 'add-income-invoices' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >{{ t("buttons.newIncomeInvoice") }}</Button>
