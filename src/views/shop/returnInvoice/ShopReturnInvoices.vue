@@ -24,6 +24,7 @@ import Dialog from "@/volt/Dialog.vue";
 import {useReturnInvoiceStore} from "@/stores/returnInvoice.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useKitStore} from "@/stores/kit.js";
+import {useSellerStore} from "@/stores/seller.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -32,6 +33,7 @@ const toast = useToast()
 
 const returnInvoiceStore = useReturnInvoiceStore()
 const locationStore = useLocationStore()
+const sellerStore = useSellerStore()
 const productStore = useProductStore()
 const kitStore = useKitStore()
 const customerStore = useCustomerStore()
@@ -78,6 +80,12 @@ watch(
             queryFilter.location = filters.value.location;
         } else {
             delete queryFilter.location;
+        }
+
+        if (filters.value.seller !== null) {
+            queryFilter.seller = filters.value.seller;
+        } else {
+            delete queryFilter.seller;
         }
 
         if (filters.value.customer !== null) {
@@ -140,6 +148,7 @@ watch(tabVal, () => {
 
 const clearFilters = () => {
     filters.value.location = null;
+    filters.value.seller = null;
     filters.value.customer = null;
     filters.value.createdBy = null;
     filters.value.product = null;
@@ -270,6 +279,17 @@ onBeforeRouteLeave(() => {
                         :placeholder="t('placeholders.search.byLocation')"
                         :loading="locationStore.getIsLoadingLocation"
                         :total-items="locationStore.getLocations.totalItems"
+                    />
+                    <SearchSelect
+                        v-model="filters.seller"
+                        :fetchFn="(query) => sellerStore.fetchSellers({...query})"
+                        :options="sellerStore.getSellers.models"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
+                        :placeholder="t('placeholders.search.bySeller')"
+                        :loading="sellerStore.getIsLoadingSellers"
+                        :total-items="sellerStore.getSellers.totalItems"
                     />
                     <SearchSelect
                         v-model="filters.customer"
