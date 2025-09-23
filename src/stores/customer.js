@@ -30,11 +30,11 @@ export const useCustomerStore = defineStore('customer', () => {
         }
     }
 
-    const fetchCustomers = async (params = { page: 1 }, isB2B = true) => {
+    const fetchCustomers = async (params = { page: 1 }) => {
         try {
             state.isLoadingCustomers = true
 
-            const { data } = await authorizedClient.get('/customers', { params: { ...params, 'is-b2b': isB2B}})
+            const { data } = await authorizedClient.get('/customers', { params });
             state.customers.models = data.member
             state.customers.totalItems = data.totalItems
 

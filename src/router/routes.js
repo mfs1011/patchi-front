@@ -226,9 +226,21 @@ export const routes = [
                     },
                     {
                         path: 'return-invoices',
-                        name: 'shop-return-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/shop/ShopReturnInvoice.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'shop-return-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/returnInvoice/ShopReturnInvoices.vue')
+                            },
+                            {
+                                path: 'return-invoice/:id',
+                                name: 'shop-return-invoice',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/returnInvoice/ShopReturnInvoice.vue'),
+                            },
+                        ]
                     },
                     {
                         path: 'write-off-invoices',
