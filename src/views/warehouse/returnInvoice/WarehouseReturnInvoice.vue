@@ -56,6 +56,7 @@ const {
     productResetForm,
     productValidate,
     orderInvoiceProduct,
+    returnInvoiceProduct,
     qtyProduct,
     kitHandleSubmit,
     kitErrors,
@@ -63,6 +64,7 @@ const {
     kitResetForm,
     kitValidate,
     orderInvoiceKit,
+    returnInvoiceKit,
     qtyKit,
 } = useReturnInvoiceValidation();
 
@@ -144,6 +146,24 @@ const onEditKit = kitHandleSubmit(async (values) => {
 
     editKit(values)
 })
+
+const getReturnQtyProduct = (orderInvoiceProduct) => {
+    if (!orderInvoiceProduct?.orderInvoiceProductQuantities) return 0;
+
+    return orderInvoiceProduct.orderInvoiceProductQuantities.reduce(
+        (sum, q) => sum + (q.returnQty || 0),
+        0
+    );
+};
+
+const getReturnQtyKit = (orderInvoiceKit) => {
+    if (!orderInvoiceKit?.orderInvoiceKitQuantities) return 0;
+
+    return orderInvoiceKit.orderInvoiceKitQuantities.reduce(
+        (sum, q) => sum + (q.returnQty || 0),
+        0
+    );
+};
 
 const onSubmitReturnInvoice = returnInvoiceHandleSubmit(async values => {
     const payload = {};
@@ -458,6 +478,7 @@ function editProductAction(data, index) {
     isEditing.value = true;
     currentProductIndex.value = index
     orderInvoiceProduct.value = data.orderInvoiceProduct
+    returnInvoiceProduct.value = data
     qtyProduct.value = data.qty;
 }
 
@@ -465,6 +486,7 @@ function editKitAction(data, index) {
     isEditing.value = true;
     currentKitIndex.value = index
     orderInvoiceKit.value = data.orderInvoiceKit
+    returnInvoiceKit.value = data.returnInvoiceKit
     qtyKit.value = data.qty;
 }
 
@@ -722,10 +744,10 @@ onMounted(async () => {
                                         <p class="text-sm">{{ t('labels.product') }}<span class="text-red-500"> *</span></p>
                                         <SearchSelect
                                             v-model="orderInvoiceProduct"
-                                            :fetchFn="(query) => orderInvoiceProductStore.fetchOrderInvoiceProducts({...query, orderInvoice: returnInvoiceStore.getReturnInvoice.id})"
+                                            :fetchFn="(query) => orderInvoiceProductStore.fetchOrderInvoiceProducts({...query, orderInvoice: returnInvoiceStore.getReturnInvoice.orderInvoice.id})"
                                             :options="orderInvoiceProductStore.getOrderInvoiceProducts.models"
-                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
-                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty - getReturnQtyProduct(opt)} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty - getReturnQtyProduct(opt)} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
                                             search-key="name"
@@ -773,10 +795,10 @@ onMounted(async () => {
                                         <p class="text-sm">{{ t('labels.kit') }}<span class="text-red-500"> *</span></p>
                                         <SearchSelect
                                             v-model="orderInvoiceKit"
-                                            :fetchFn="(query) => orderInvoiceKitStore.fetchOrderInvoiceKits({...query, orderInvoice: returnInvoiceStore.getReturnInvoice.id})"
+                                            :fetchFn="(query) => orderInvoiceKitStore.fetchOrderInvoiceKits({...query, orderInvoice: returnInvoiceStore.getReturnInvoice.orderInvoice.id})"
                                             :options="orderInvoiceKitStore.getOrderInvoiceKits.models"
-                                            :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${opt?.qty} ${t(`labels.pcs`)}`"
-                                            :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${opt?.qty} ${t(`labels.pcs`)}`"
+                                            :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${opt?.qty - getReturnQtyKit(opt)} ${t(`labels.pcs`)}`"
+                                            :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${opt?.qty - getReturnQtyKit(opt)} ${t(`labels.pcs`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
                                             search-key="name"

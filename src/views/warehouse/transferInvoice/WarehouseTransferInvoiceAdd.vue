@@ -48,6 +48,7 @@ const {
     locationQuantity,
     qtyLocationQuantity,
     locationQuantityKitHandleSubmit,
+    locationQuantityKitIsSubmitting,
     locationQuantityKitErrors,
     locationQuantityKitResetForm,
     locationQuantityKitValidate,
@@ -156,7 +157,7 @@ const onSubmitLocationQuantityKit = locationQuantityKitHandleSubmit(async values
         })
     } else {
         transferInvoiceKits.value = [...transferInvoiceKits.value, values]
-        currentProduct.value = values
+        currentKit.value = values
         locationQuantityKitResetForm()
     }
 })
@@ -515,7 +516,7 @@ const confirmLeave = () => {
 
                                 <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
                                     <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearProductForm" />
-                                    <Button v-if="!isEditing" @click="onSubmitLocationQuantityKit" :label="t('buttons.add')" class="px-5" :loading="locationQuantityIsSubmitting"/>
+                                    <Button v-if="!isEditing" @click="onSubmitLocationQuantityKit" :label="t('buttons.add')" class="px-5" :loading="locationQuantityKitIsSubmitting"/>
                                     <Button v-else @click="saveEditingKit" :label="t('buttons.edit')" class="px-5"/>
                                 </div>
                             </TabPanel>

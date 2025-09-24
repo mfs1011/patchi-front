@@ -584,6 +584,10 @@
             "add": "Добавить",
             "edit": "Изменить"
         },
+        "returnInvoices": {
+          "add": "Добавить",
+          "edit": "Изменить"
+        },
         "transferInvoices": {
             "add": "Добавить",
             "edit": "Изменить"

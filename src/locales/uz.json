@@ -584,6 +584,10 @@
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"
         },
+        "returnInvoices": {
+          "add": "Qo‘shish",
+          "edit": "O‘zgartirish"
+        },
         "transferInvoices": {
             "add": "Qo‘shish",
             "edit": "O‘zgartirish"

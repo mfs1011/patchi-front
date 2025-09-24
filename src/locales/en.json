@@ -583,6 +583,10 @@
             "add": "Add",
             "edit": "Edit"
         },
+        "returnInvoices": {
+          "add": "Add",
+          "edit": "Edit"
+        },
         "transferInvoices": {
             "add": "Add",
             "edit": "Edit"

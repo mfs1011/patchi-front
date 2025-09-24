@@ -40,11 +40,11 @@ export function useReturnInvoiceValidation() {
                     "max-qty",
                     "Miqdor tanlangan lokatsiyadagi mavjud qty dan oshmasligi kerak",
                     function (value) {
-                        const { product } = this.parent;
-                        if (!product || typeof product.qty !== "number") {
+                        const { orderInvoiceProduct } = this.parent;
+                        if (!orderInvoiceProduct || typeof orderInvoiceProduct.qty !== "number") {
                             return true; // agar tanlanmagan bo‘lsa, boshqa xato chiqadi
                         }
-                        return value <= product.qty;
+                        return value <= orderInvoiceProduct.qty;
                     }
                 ),
         })
@@ -62,11 +62,11 @@ export function useReturnInvoiceValidation() {
                     "max-qty-kit",
                     "Miqdor tanlangan kit lokatsiyasidagi qty dan oshmasligi kerak",
                     function (value) {
-                        const { kit } = this.parent;
-                        if (!kit || typeof kit.qty !== "number") {
+                        const { orderInvoiceKit } = this.parent;
+                        if (!orderInvoiceKit || typeof orderInvoiceKit.qty !== "number") {
                             return true;
                         }
-                        return value <= kit.qty;
+                        return value <= orderInvoiceKit.qty;
                     }
                 ),
         })
@@ -137,6 +137,7 @@ export function useReturnInvoiceValidation() {
         seller,
         createdAt,
         returnInvoiceProducts,
+        returnInvoiceKits,
 
         // Product form
         productHandleSubmit,

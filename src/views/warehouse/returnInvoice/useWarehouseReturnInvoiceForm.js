@@ -11,9 +11,6 @@ export function useReturnInvoiceValidation() {
     const returnInvoiceInfoSchema = computed(() =>
         yup
             .object({
-                location: yup.object().required('Location is required'),
-                customer: yup.object().required('Supplier is required'),
-
                 returnInvoiceProducts: yup.array(),
                 returnInvoiceKits: yup.array(),
             })
@@ -40,11 +37,20 @@ export function useReturnInvoiceValidation() {
                     "max-qty",
                     "Miqdor tanlangan lokatsiyadagi mavjud qty dan oshmasligi kerak",
                     function (value) {
-                        const { product } = this.parent;
-                        if (!product || typeof product.qty !== "number") {
+                        const { orderInvoiceProduct } = this.parent;
+                        if (!orderInvoiceProduct || typeof orderInvoiceProduct.qty !== "number") {
                             return true; // agar tanlanmagan bo‘lsa, boshqa xato chiqadi
                         }
-                        return value <= product.qty;
+
+                        let returnQty = 0;
+
+                        for (const orderInvoiceProductQuantity of orderInvoiceProduct.orderInvoiceProductQuantities) {
+                            returnQty += orderInvoiceProductQuantity.returnQty;
+                        }
+
+                        let total = value - (returnInvoiceProduct.value ? returnInvoiceProduct.value.qty : 0);
+
+                        return total <= orderInvoiceProduct.qty - returnQty;
                     }
                 ),
         })
@@ -62,11 +68,20 @@ export function useReturnInvoiceValidation() {
                     "max-qty-kit",
                     "Miqdor tanlangan kit lokatsiyasidagi qty dan oshmasligi kerak",
                     function (value) {
-                        const { kit } = this.parent;
-                        if (!kit || typeof kit.qty !== "number") {
+                        const { orderInvoiceKit } = this.parent;
+                        if (!orderInvoiceKit || typeof orderInvoiceKit.qty !== "number") {
                             return true;
                         }
-                        return value <= kit.qty;
+
+                        let returnQty = 0;
+
+                        for (const orderInvoiceKitQuantity of orderInvoiceKit.orderInvoiceKitQuantities) {
+                            returnQty += orderInvoiceKitQuantity.returnQty;
+                        }
+
+                        let total = value - (returnInvoiceKit.value ? returnInvoiceKit.value.qty : 0);
+
+                        return total <= orderInvoiceKit.qty - returnQty;
                     }
                 ),
         })
@@ -118,9 +133,11 @@ export function useReturnInvoiceValidation() {
     const { value: customer } = useField('customer', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: returnInvoiceFormCtx })
     const { value: createdAt } = useField('createdAt', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: returnInvoiceFormCtx })
     const { value: orderInvoiceProduct } = useField('orderInvoiceProduct', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: productFormCtx })
+    const { value: returnInvoiceProduct } = useField('returnInvoiceProduct', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: productFormCtx })
     const { value: returnInvoiceProducts } = useField('returnInvoiceProducts', undefined, { validateOnMount: true, form: returnInvoiceFormCtx })
     const { value: returnInvoiceKits } = useField('returnInvoiceKits', undefined, { validateOnValueUpdate: false, validateOnMount: true, form: returnInvoiceFormCtx })
     const { value: orderInvoiceKit } = useField('orderInvoiceKit', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: kitFormCtx })
+    const { value: returnInvoiceKit } = useField('returnInvoiceKit', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: kitFormCtx })
     const { value: qtyProduct } = useField('qtyProduct', undefined, { validateOnMount: false, form: productFormCtx });
     const { value: qtyKit } = useField('qtyKit', undefined, { validateOnMount: false, form: kitFormCtx });
 
@@ -135,6 +152,7 @@ export function useReturnInvoiceValidation() {
         customer,
         createdAt,
         returnInvoiceProducts,
+        returnInvoiceKits,
 
         // Product form
         productHandleSubmit,
@@ -144,6 +162,7 @@ export function useReturnInvoiceValidation() {
         productFormCtx,
         productValidate,
         orderInvoiceProduct,
+        returnInvoiceProduct,
         qtyProduct,
 
         // Kit form
@@ -154,6 +173,7 @@ export function useReturnInvoiceValidation() {
         kitFormCtx,
         kitValidate,
         orderInvoiceKit,
+        returnInvoiceKit,
         qtyKit,
     }
 }

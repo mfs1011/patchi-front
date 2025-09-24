@@ -133,6 +133,12 @@ export const routes = [
                                 meta: { requiresAuth: true, roles: []},
                                 component: () => import('@/views/warehouse/returnInvoice/WarehouseReturnInvoice.vue'),
                             },
+                            {
+                                path: 'add',
+                                name: 'warehouse-add-return-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/returnInvoice/WarehouseReturnInvoiceAdd.vue')
+                            }
                         ]
                     },
                     {
@@ -240,6 +246,12 @@ export const routes = [
                                 meta: { requiresAuth: true, roles: []},
                                 component: () => import('@/views/shop/returnInvoice/ShopReturnInvoice.vue'),
                             },
+                            {
+                                path: 'add',
+                                name: 'shop-add-return-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/returnInvoice/ShopReturnInvoiceAdd.vue')
+                            }
                         ]
                     },
                     {

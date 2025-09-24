@@ -343,7 +343,7 @@ function editLocationQuantity(updatedLocationQuantity) {
     // Duplicate check
     const exists = editableData.value.transferInvoiceProducts.some((p, i) =>
         i !== currentLocationQuantityIndex.value &&
-        p.id === updatedLocationQuantity.locationQuantity.id
+        p.locationQuantity.id === updatedLocationQuantity.locationQuantity.id
     );
 
     if (exists) {
@@ -412,7 +412,7 @@ function editLocationQuantityKit(updatedLocationQuantityKit) {
     // Duplicate check
     const exists = editableData.value.transferInvoiceKits.some((p, i) =>
         i !== currentLocationQuantityKitIndex.value &&
-        p.id === updatedLocationQuantityKit.locationQuantityKit.id
+        p.locationQuantityKit.id === updatedLocationQuantityKit.locationQuantityKit.id
     );
 
     if (exists) {
