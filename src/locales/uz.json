@@ -183,6 +183,12 @@
       "accusative": "qaytarishni",
       "accusativeCapitalize": "Qaytarishni"
     },
+    "writeOffInvoice": {
+      "nominative": "chiqarish",
+      "nominativeCapitalize": "Chiqarish",
+      "accusative": "chiqarish",
+      "accusativeCapitalize": "Chiqarish"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Sotuvchi",
@@ -415,6 +421,7 @@
         "newInventory": "Yangi inventarizatisya",
         "newIncomeInvoice": "Yangi kirim",
         "newTransferInvoice": "Yangi ko‘chirish",
+        "newWriteOffInvoice": "Yangi chiqarish",
         "filters": "Filterlar",
         "saveAndExit": "Saqlash va chiqish",
         "add": "Qo'shish",
@@ -507,6 +514,7 @@
         "returnInvoices": "Qaytarilganlar",
         "returnInvoice": "Qaytarilgan",
         "writeOffInvoices": "Chiqarishlar",
+        "writeOffInvoice": "Chiqarish",
         "salesReports": "Sotuvlar hisobotlari",
         "kitsInWarehouse": "Ombordagi kompozitsiyalar",
         "kits": "Kompozitsiyalar",
@@ -585,6 +593,10 @@
             "edit": "O‘zgartirish"
         },
         "returnInvoices": {
+          "add": "Qo‘shish",
+          "edit": "O‘zgartirish"
+        },
+        "writeOffInvoices": {
           "add": "Qo‘shish",
           "edit": "O‘zgartirish"
         },

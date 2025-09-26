@@ -183,6 +183,12 @@
       "accusative": "return invoice",
       "accusativeCapitalize": "Return invoice"
     },
+    "writeOffInvoice": {
+      "nominative": "write off",
+      "nominativeCapitalize": "Write off",
+      "accusative": "write off",
+      "accusativeCapitalize": "Write off"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",
@@ -415,6 +421,7 @@
         "newInventory": "New inventory",
         "newIncomeInvoice": "New income",
         "newTransferInvoice": "New transfer",
+        "newWriteOffInvoice": "New write off",
         "filters": "Filters",
         "saveAndExit": "Save and exit",
         "add": "Add",
@@ -506,6 +513,7 @@
         "returnInvoices": "Returns",
         "returnInvoice": "Return",
         "writeOffInvoices": "Write-offs",
+        "writeOffInvoice": "Write-off",
         "salesReports": "Sales reports",
         "kitsInWarehouse": "Compositions in warehouse",
         "kitsInShop": "Compositions in shop",
@@ -584,6 +592,10 @@
             "edit": "Edit"
         },
         "returnInvoices": {
+          "add": "Add",
+          "edit": "Edit"
+        },
+        "writeOffInvoices": {
           "add": "Add",
           "edit": "Edit"
         },

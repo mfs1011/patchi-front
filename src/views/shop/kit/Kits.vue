@@ -52,6 +52,10 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t("cards.kits") }]);
+const isAdminAndSeller = computed(() => (
+    ['ROLE_ADMIN', 'ROLE_SELLER'].includes(userStore.getAboutMeFromToken?.role)
+))
+
 const baseUrl = computed(() => import.meta.env.VITE_APP_API_URL);
 const isVisibleSectionHeader = ref(false);
 const currentKit = ref();
@@ -219,6 +223,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
+                    v-if="isAdminAndSeller"
                     @click="router.push({ name: 'add-kit' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >
@@ -234,6 +239,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
+                    v-if="isAdminAndSeller"
                     @click="router.push({ name: 'add-product' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >

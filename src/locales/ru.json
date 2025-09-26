@@ -183,6 +183,12 @@
       "accusative": "возврат",
       "accusativeCapitalize": "Возврат"
     },
+    "writeOffInvoice": {
+      "nominative": "списани",
+      "nominativeCapitalize": "Списани",
+      "accusative": "списани",
+      "accusativeCapitalize": "Списани"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",
@@ -415,6 +421,7 @@
         "newInventory": "Новая инвентаризация",
         "newIncomeInvoice": "Новое поступление",
         "newTransferInvoice": "Новое перемещение",
+        "newWriteOffInvoice": "Новое списание",
         "filters": "Фильтры",
         "saveAndExit": "Сохранить и выйти",
         "add": "Добавить",
@@ -507,6 +514,7 @@
         "returnInvoices": "Возвраты",
         "returnInvoice": "Возврат",
         "writeOffInvoices": "Списания",
+        "writeOffInvoice": "Списание",
         "salesReports": "Отчеты о продажах",
         "kitsInWarehouse": "Композиции на складе",
         "kitsInShop": "Композиции в магазине",
@@ -585,6 +593,10 @@
             "edit": "Изменить"
         },
         "returnInvoices": {
+          "add": "Добавить",
+          "edit": "Изменить"
+        },
+        "writeOffInvoices": {
           "add": "Добавить",
           "edit": "Изменить"
         },

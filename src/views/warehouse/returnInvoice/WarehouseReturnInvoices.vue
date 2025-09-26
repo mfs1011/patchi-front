@@ -469,7 +469,7 @@ onBeforeRouteLeave(() => {
                 </template>
             </Card>
 
-            <!-- DELETE ICOME_INVOICE DIALOG -->
+            <!-- DELETE RETURN_INVOICE DIALOG -->
             <Dialog
                 v-model:visible="deleteVisible"
                 modal

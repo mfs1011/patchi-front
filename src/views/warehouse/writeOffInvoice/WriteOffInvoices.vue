@@ -21,26 +21,22 @@ import DatePicker from "@/volt/DatePicker.vue";
 import {useUserStore} from "@/stores/user.js";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import Dialog from "@/volt/Dialog.vue";
-import {useReturnInvoiceStore} from "@/stores/returnInvoice.js";
-import {useCustomerStore} from "@/stores/customer.js";
 import {useKitStore} from "@/stores/kit.js";
-import {useSellerStore} from "@/stores/seller.js";
+import {useWriteOffInvoiceStore} from "@/stores/writeOffInvoice.js";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const toast = useToast()
 
-const returnInvoiceStore = useReturnInvoiceStore()
+const writeOffInvoiceStore = useWriteOffInvoiceStore()
 const locationStore = useLocationStore()
-const sellerStore = useSellerStore()
 const productStore = useProductStore()
 const kitStore = useKitStore()
-const customerStore = useCustomerStore()
 const userStore = useUserStore()
 const deleteVisible = ref(false)
 const isDeleteLoading = ref(false)
-const currentReturnInvoiceId = ref(null)
+const currentWriteOffInvoiceId = ref(null)
 
 // refs
 const isVisibleSectionHeader = ref(false);
@@ -50,7 +46,6 @@ const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
     location: route.query.location || null,
-    customer: route.query.customer || null,
     createdBy: route.query.createdBy || null,
     product: route.query.product || null,
     kit: route.query.kit || null,
@@ -61,11 +56,14 @@ const filters = ref({
 // computed
 const home = computed(() => ({
     icon: "pi pi-slash",
-    label: t("shop"),
-    route: "/shop",
+    label: t("warehouse"),
+    route: "/warehouse",
 }));
 
-const items = computed(() => [{ label: t("cards.returnInvoices") }]);
+const items = computed(() => [{ label: t("cards.writeOffInvoices") }]);
+const isAdminAndWarehouseManager = computed(() => (
+    ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER'].includes(userStore.getAboutMeFromToken?.role)
+))
 
 // watchers
 watch(
@@ -73,25 +71,14 @@ watch(
     async () => {
         const queryFilter = {
             page: filters.value.page,
-            "items-per-page": filters.value.itemsPerPage
+            "items-per-page": filters.value.itemsPerPage,
+            "is-warehouse": true
         };
 
         if (filters.value.location !== null) {
             queryFilter.location = filters.value.location;
         } else {
             delete queryFilter.location;
-        }
-
-        if (filters.value.seller !== null) {
-            queryFilter.seller = filters.value.seller;
-        } else {
-            delete queryFilter.seller;
-        }
-
-        if (filters.value.customer !== null) {
-            queryFilter.customer = filters.value.customer;
-        } else {
-            delete queryFilter.customer;
         }
 
         if (filters.value.createdBy !== null) {
@@ -137,7 +124,7 @@ watch(
 
         await updateQuery(router, queryFilter);
 
-        await returnInvoiceStore.fetchReturnInvoices(route.query);
+        await writeOffInvoiceStore.fetchWriteOffInvoices(route.query);
     },
     { immediate: true, deep: true },
 );
@@ -148,8 +135,6 @@ watch(tabVal, () => {
 
 const clearFilters = () => {
     filters.value.location = null;
-    filters.value.seller = null;
-    filters.value.customer = null;
     filters.value.createdBy = null;
     filters.value.product = null;
     filters.value.kit = null;
@@ -162,16 +147,16 @@ const isAdminOrCreatedBy = createdById => (
 )
 
 const deleteAction = (id) => {
-    currentReturnInvoiceId.value = id;
+    currentWriteOffInvoiceId.value = id;
     deleteVisible.value = true;
 };
 
-const deleteReturnInvoice = async () => {
+const deleteWriteOffInvoice = async () => {
     try {
         isDeleteLoading.value = true;
 
-        await returnInvoiceStore.deleteReturnInvoice(currentReturnInvoiceId.value);
-        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('returnInvoice.nominativeCapitalize') }), life: 3000 })
+        await writeOffInvoiceStore.deleteWriteOffInvoice(currentWriteOffInvoiceId.value);
+        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('writeOffInvoice.nominativeCapitalize') }), life: 3000 })
     } catch (err) {
         toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
     } finally {
@@ -191,8 +176,8 @@ function connectMercure() {
     eventSource.value.addEventListener('message', async (event) => {
         const eventDataId = JSON.parse(event.data).eventId
 
-        if (eventDataId === 18) {
-            await returnInvoiceStore.fetchReturnInvoices(route.query);
+        if (eventDataId === 19) {
+            await writeOffInvoiceStore.fetchWriteOffInvoices(route.query);
         }
     })
 }
@@ -237,8 +222,8 @@ onBeforeRouteLeave(() => {
         </template>
     </Breadcrumb>
     <Section
-        :section-name="t('cards.returnInvoices')"
-        back-route-name="shop"
+        :section-name="t('cards.writeOffInvoices')"
+        back-route-name="warehouse"
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end">
@@ -248,6 +233,13 @@ onBeforeRouteLeave(() => {
                     :icon="isVisibleSectionHeader ? 'pi pi-filter' : 'pi pi-filter-slash'"
                     :label="t('buttons.filters')"
                 />
+                <Button
+                    v-if="isAdminAndWarehouseManager"
+                    @click="router.push({ name: 'warehouse-add-write_off-invoices' })"
+                    class="px-2 sm:px-5 whitespace-nowrap"
+                >
+                    {{ t("buttons.newWriteOffInvoice") }}
+                </Button>
             </div>
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
                 <Button
@@ -257,6 +249,13 @@ onBeforeRouteLeave(() => {
                     :icon="isVisibleSectionHeader ? 'pi pi-filter' : 'pi pi-filter-slash'"
                     :label="t('buttons.filters')"
                 />
+                <Button
+                    v-if="isAdminAndWarehouseManager"
+                    @click="router.push({ name: 'warehouse-add-write_off-invoices' })"
+                    class="w-full px-2 sm:px-5 whitespace-nowrap"
+                >
+                    {{ t("buttons.newWriteOffInvoice") }}
+                </Button>
             </div>
         </template>
 
@@ -271,7 +270,7 @@ onBeforeRouteLeave(() => {
                 <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
                     <SearchSelect
                         v-model="filters.location"
-                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, isWarehouse: false})"
+                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, isWarehouse: true})"
                         :options="locationStore.getLocations.models"
                         :option-label="opt => opt?.name"
                         :option-value="opt => opt?.id"
@@ -279,28 +278,6 @@ onBeforeRouteLeave(() => {
                         :placeholder="t('placeholders.search.byLocation')"
                         :loading="locationStore.getIsLoadingLocation"
                         :total-items="locationStore.getLocations.totalItems"
-                    />
-                    <SearchSelect
-                        v-model="filters.seller"
-                        :fetchFn="(query) => sellerStore.fetchSellers({...query})"
-                        :options="sellerStore.getSellers.models"
-                        :option-label="opt => opt?.name"
-                        :option-value="opt => opt?.id"
-                        :return-value="opt => opt?.id"
-                        :placeholder="t('placeholders.search.bySeller')"
-                        :loading="sellerStore.getIsLoadingSellers"
-                        :total-items="sellerStore.getSellers.totalItems"
-                    />
-                    <SearchSelect
-                        v-model="filters.customer"
-                        :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': false})"
-                        :options="customerStore.getCustomers.models"
-                        :option-label="opt => opt?.name"
-                        :option-value="opt => opt?.id"
-                        :return-value="opt => opt?.id"
-                        :placeholder="t('placeholders.search.byCustomer')"
-                        :loading="customerStore.getIsLoadingCustomers"
-                        :total-items="customerStore.getCustomers.totalItems"
                     />
                     <SearchSelect
                         v-model="filters.createdBy"
@@ -379,14 +356,14 @@ onBeforeRouteLeave(() => {
                 pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
                 <template #content>
-                    <NoData v-if="!returnInvoiceStore.getReturnInvoices.totalItems && !returnInvoiceStore.getIsLoadingReturnInvoices" class="text-surface-400 mx-auto my-auto">
+                    <NoData v-if="!writeOffInvoiceStore.getWriteOffInvoices.totalItems && !writeOffInvoiceStore.getIsLoadingWriteOffInvoices" class="text-surface-400 mx-auto my-auto">
                         <p class="text-xl font-normal">{{ t("noResults") }}</p>
                     </NoData>
 
                     <DataTable
-                        v-if="returnInvoiceStore.getIsLoadingReturnInvoices || returnInvoiceStore.getReturnInvoices.totalItems > 0"
-                        :value="returnInvoiceStore.getIsLoadingReturnInvoices ?  Array(10).fill({}) : returnInvoiceStore.getReturnInvoices.models"
-                        :total-records="returnInvoiceStore.getReturnInvoices.totalItems"
+                        v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices || writeOffInvoiceStore.getWriteOffInvoices.totalItems > 0"
+                        :value="writeOffInvoiceStore.getIsLoadingWriteOffInvoices ?  Array(10).fill({}) : writeOffInvoiceStore.getWriteOffInvoices.models"
+                        :total-records="writeOffInvoiceStore.getWriteOffInvoices.totalItems"
                         :rows="filters.itemsPerPage"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
@@ -394,67 +371,55 @@ onBeforeRouteLeave(() => {
                     >
                         <Column field="id" :header="t('labels.id')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
                                 <p v-else>{{ data.id }}</p>
                             </template>
                         </Column>
                         <Column field="location" :header="t('labels.location')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
-                                <p v-else>{{ data.orderInvoice.location.name }}</p>
-                            </template>
-                        </Column>
-                        <Column field="seller" :header="t('labels.seller')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
-                                <p v-else>{{ data.orderInvoice.seller ? data.orderInvoice.seller.name: '-' }}</p>
-                            </template>
-                        </Column>
-                        <Column field="customer" :header="t('labels.Customer')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
-                                <p v-else>{{ data.orderInvoice.customer ? data.orderInvoice.customer.name: '-' }}</p>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
+                                <p v-else>{{ data.location.name }}</p>
                             </template>
                         </Column>
                         <Column field="totalPrice" :header="t('labels.totalPrice')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
-                                <p v-else>{{ `${formatCurrency(data.totalPrice)}$` }}</p>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
+                                <p v-else>{{ `${formatCurrency(data.totalCostPrice)}$` }}</p>
                             </template>
                         </Column>
                         <Column field="createdAt" :header="t('labels.createdAt')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
                                 <p v-else>{{ getFormattedDate(data.createdAt) }}</p>
                             </template>
                         </Column>
                         <Column field="createdBy" :header="t('labels.createdBy')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
                                 <p v-else>{{ data.createdBy.name }}</p>
                             </template>
                         </Column>
                         <Column field="updatedAt" :header="t('labels.updatedAt')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
                                 <p v-else>{{ data.updatedAt ? getFormattedDate(data.updatedAt) : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="updatedBy" :header="t('labels.updatedBy')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
                                 <p v-else>{{ data.updatedBy?.name || '-' }}</p>
                             </template>
                         </Column>
                         <Column field="actions" :header="t('actions')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
 
                                 <div v-else class="flex justify-end w-full">
                                     <div class="flex items-center gap-2">
                                         <Button
                                             @click="router.push({
-                                                name: 'shop-return-invoice',
+                                                name: 'warehouse-write-off-invoice',
                                                 params: { id: data.id },
                                             })"
                                             icon="pi pi-eye"
@@ -474,19 +439,19 @@ onBeforeRouteLeave(() => {
                         </Column>
 
                         <template #footer>
-                            <div v-if="returnInvoiceStore.getIsLoadingReturnInvoices" class="flex justify-between">
+                            <div v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices" class="flex justify-between">
                                 <Skeleton height="2rem" width="10rem" />
                                 <Skeleton height="2rem" width="5rem"/>
                             </div>
                             <div v-else class="flex flex-wrap items-center justify-end gap-5">
                                 <p class="font-semibold">{{ t('labels.totals') }}:</p>
                                 <div>
-                                    <p class="font-semibold">{{ formatCurrency(returnInvoiceStore.getReturnInvoices.totalPrice) }}$</p>
+                                    <p class="font-semibold">{{ formatCurrency(writeOffInvoiceStore.getWriteOffInvoices.totalCostPrice) }}$</p>
                                 </div>
                                 <PaginatorComponent
                                     v-model="filters.page"
                                     v-model:items-per-page="filters.itemsPerPage"
-                                    :total-items="returnInvoiceStore.getReturnInvoices.totalItems"
+                                    :total-items="writeOffInvoiceStore.getWriteOffInvoices.totalItems"
                                 />
                             </div>
                         </template>
@@ -494,7 +459,7 @@ onBeforeRouteLeave(() => {
                 </template>
             </Card>
 
-            <!-- DELETE RETURN_INVOICE DIALOG -->
+            <!-- DELETE WRITE_OFF_INVOICE DIALOG -->
             <Dialog
                 v-model:visible="deleteVisible"
                 modal
@@ -503,7 +468,7 @@ onBeforeRouteLeave(() => {
                 pt:root="px-2"
             >
                 <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                    {{ t('dialog.deleteConfirmation', { name: t('returnInvoice.accusative'), id: currentReturnInvoiceId }) }}
+                    {{ t('dialog.deleteConfirmation', { name: t('writeOffInvoice.accusative'), id: currentWriteOffInvoiceId }) }}
                 </span>
 
                 <template #footer>
@@ -516,7 +481,7 @@ onBeforeRouteLeave(() => {
                         <Button
                             type="button"
                             :label="t('dialog.confirm')"
-                            @click="deleteReturnInvoice"
+                            @click="deleteWriteOffInvoice"
                             :loading="isDeleteLoading"
                             class="px-5"
                         />

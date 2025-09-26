@@ -143,9 +143,27 @@ export const routes = [
                     },
                     {
                         path: 'write-off-invoices',
-                        name: 'warehouse-write-off-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/warehouse/WarehouseWriteOffInvoice.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'warehouse-write-off-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/writeOffInvoice/WriteOffInvoices.vue')
+                            },
+                            {
+                                path: 'write-off-invoice/:id',
+                                name: 'warehouse-write-off-invoice',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/writeOffInvoice/WriteOffInvoice.vue'),
+                            },
+                            {
+                                path: 'add',
+                                name: 'warehouse-add-write_off-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/writeOffInvoice/WriteOffInvoiceAdd.vue')
+                            }
+                        ]
                     },
                 ]
             },

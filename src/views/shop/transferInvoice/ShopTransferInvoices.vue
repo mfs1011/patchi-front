@@ -573,7 +573,7 @@ onBeforeRouteLeave(() => {
                 </template>
             </Dialog>
 
-            <!-- ACCEPT INCOME_INVOICE DIALOG -->
+            <!-- ACCEPT TRANSFER_INVOICE DIALOG -->
             <Dialog
                 v-model:visible="acceptVisible"
                 modal
