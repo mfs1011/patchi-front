@@ -639,6 +639,7 @@
         "accessDenied": "Access denied",
         "cannot_edit_kpi_used_in_sales": "The KPI used in sales cannot be changed",
         "unconfirmedExists": "There is an unconfirmed inventory",
+        "confirmedExists": "There is an confirmed inventory",
         "noIncomingToLocation": "There have been no incoming entries to this location"
     },
     "choosePhoto": "Choose a photo",
@@ -651,6 +652,7 @@
     "incomingData": "Incoming data",
     "transferData": "Transfer data",
     "returnData": "Return data",
+    "writeOffData": "Write off data",
     "addProduct": "Add product",
     "addKit": "Add composition",
     "zero": "Out of stock",

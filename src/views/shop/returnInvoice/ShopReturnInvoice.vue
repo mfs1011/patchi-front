@@ -87,7 +87,6 @@ const updatedData = ref([]);
 const deletedKitData = ref([]);
 const createdKitData = ref([]);
 const updatedKitData = ref([]);
-const dateFrom = ref(null);
 const editMode = ref(false);
 const isLoading = ref(true);
 const showLeaveDialog = ref(false);
@@ -96,6 +95,7 @@ const pendingNavigation = ref(false);
 const isEdited = ref(false);
 const isConfirmLoading = ref(false);
 const tabVal = ref('products')
+const hasInventory = computed(() => inventoryStore.getHasInventory)
 
 // computed
 const home = computed(() => ({
@@ -493,25 +493,6 @@ function editKitAction(data, index) {
     qtyKit.value = data.qty;
 }
 
-watch(location, async () => {
-    if (location.value) {
-        await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
-
-        if (inventoryStore.getLastInventoryDateTo === null) {
-            dateFrom.value = null
-            createdAt.value = null
-        } else {
-            const date = new Date(inventoryStore.getLastInventoryDateTo);
-            date.setDate(date.getDate() + 1);
-            dateFrom.value = date;
-            // createdAt.value = date
-        }
-    } else {
-        dateFrom.value = null
-        createdAt.value = null
-    }
-})
-
 onBeforeRouteLeave((to, from, next) => {
     if (isChanged.value && !isEdited.value) {
         showLeaveDialog.value = true
@@ -530,6 +511,10 @@ const confirmLeave = () => {
 
 onMounted(async () => {
     await returnInvoiceStore.fetchReturnInvoice(route.params.id);
+    await inventoryStore.fetchHasInventory({
+        location: `/api/locations/${returnInvoiceStore.getReturnInvoice.orderInvoice.location.id}`,
+        createdAt: returnInvoiceStore.getReturnInvoice.createdAt
+    })
 
     apiData.value = returnInvoiceStore.getReturnInvoice;
     editableData.value = JSON.parse(JSON.stringify(returnInvoiceStore.getReturnInvoice));
@@ -578,7 +563,7 @@ onMounted(async () => {
         back-route-name="shop-return-invoices"
     >
         <template #buttons>
-            <div v-if="!isLoading" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
+            <div v-if="!isLoading && !hasInventory" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
                 <Button
                     v-if="!editMode && isAdminOrCreatedBy(returnInvoiceStore.getReturnInvoice.createdBy.id)"
                     :disabled="!!returnInvoiceErrors.returnInvoiceProducts"
@@ -735,7 +720,6 @@ onMounted(async () => {
                                 iconDisplay="input"
                                 :placeholder="t('placeholders.date')"
                                 show-button-bar
-                                :minDate="dateFrom"
                                 :invalid="!!returnInvoiceErrors.createdAt"
                                 showTime
                                 hourFormat="24"

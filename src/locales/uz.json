@@ -640,6 +640,7 @@
         "accessDenied": "Huquqingiz yetarli emas",
         "cannot_edit_kpi_used_in_sales": "Sotuvda ishlatilgan KPI ni o'zgartirib bo'lmaydi",
         "unconfirmedExists": "Tasdiqlanmagan inventarizatsiya mavjud",
+        "confirmedExists": "Tasdiqlangan inventarizatsiya mavjud",
         "noIncomingToLocation": "Bu joylashuvga umuman kirim bo‘lmagan"
     },
     "choosePhoto": "Rasm tanlang",
@@ -652,6 +653,7 @@
     "incomingData": "Kirim ma'lumotlari",
     "transferData": "Ko‘chiruv ma'lumotlari",
     "returnData": "Qaytarilgan ma'lumotlari",
+    "writeOffData": "Chiqarish ma'lumotlari",
     "addProduct": "Mahsulot qo'shish",
     "addKit": "Kompozitsiya qo'shish",
     "zero": "Tugagan",

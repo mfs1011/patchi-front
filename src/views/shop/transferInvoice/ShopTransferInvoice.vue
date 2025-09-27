@@ -814,21 +814,6 @@ onMounted(async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
-                                    <ColumnGroup type="header">
-                                        <Row>
-                                            <Column :header="t('labels.product')" :rowspan="1" :colspan="5"/>
-                                            <Column :header="t('labels.expiryDate')" :rowspan="2" :colspan="1" />
-                                            <Column :header="t('labels.qty')" :rowspan="2" :colspan="1" />
-                                            <Column v-if="editMode" :header="t('actions')" :rowspan="2" :colspan="1" />
-                                        </Row>
-                                        <Row>
-                                            <Column field="kit" :header="t('labels.title')" />
-                                            <Column field="code" :header="t('labels.code')" />
-                                            <Column field="color" :header="t('labels.color')" />
-                                            <Column field="qr" :header="t('labels.qr')" />
-                                            <Column field="retailPrice" :header="t('labels.retailPrice')" />
-                                        </Row>
-                                    </ColumnGroup>
                                     <Column field="product" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
@@ -911,20 +896,6 @@ onMounted(async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
-                                    <ColumnGroup type="header">
-                                        <Row>
-                                            <Column :header="t('labels.kit')" :rowspan="1" :colspan="4" class="text-center!"/>
-                                            <Column :header="t('labels.expiryDate')" :rowspan="2" :colspan="1" />
-                                            <Column :header="t('labels.transferQty')" :rowspan="2" :colspan="1" />
-                                            <Column v-if="editMode" :header="t('actions')" :rowspan="2" :colspan="1" />
-                                        </Row>
-                                        <Row>
-                                            <Column field="kit" :header="t('labels.title')" />
-                                            <Column field="code" :header="t('labels.code')" />
-                                            <Column field="qr" :header="t('labels.qr')" />
-                                            <Column field="retailPrice" :header="t('labels.retailPrice')" />
-                                        </Row>
-                                    </ColumnGroup>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantityKit?.kit?.name }}</p>
@@ -950,7 +921,7 @@ onMounted(async () => {
                                             <p>{{ data.locationQuantityKit?.expiryDate ? getFormattedDate(data.locationQuantityKit?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="qtyLocationQuantityKit" :header="t('labels.transferQty')">
+                                    <Column field="qty" :header="t('labels.qty')">
                                         <template #body="{ data }">
                                             <p>{{ data.qty }} {{t(`labels.pcs`)}}</p>
                                         </template>

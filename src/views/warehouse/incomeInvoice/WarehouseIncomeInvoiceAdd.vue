@@ -248,6 +248,7 @@ watch(location, async () => {
         } else {
             const date = new Date(inventoryStore.getLastInventoryDateTo);
             date.setDate(date.getDate());
+            date.setMinutes(date.getMinutes() + 1);
             dateFrom.value = date;
             createdAt.value = date
         }

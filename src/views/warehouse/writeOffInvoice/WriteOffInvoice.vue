@@ -1,6 +1,6 @@
 <script setup>
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref} from "vue";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
 import Section from "@/components/UI/Section.vue";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
@@ -10,83 +10,76 @@ import Column from "primevue/column";
 import InputNumber from "@/volt/InputNumber.vue";
 import Skeleton from "@/volt/Skeleton.vue";
 import Card from "@/volt/Card.vue";
-import DatePicker from "@/volt/DatePicker.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import Button from "@/volt/Button.vue";
 import NoData from "@/components/UI/NoData.vue";
 import {useI18n} from "vue-i18n";
 import {useLocationStore} from "@/stores/location.js";
-import {useInventoryStore} from "@/stores/inventory.js";
-import {formatCurrency, formatDateTimeLocal, getFormattedDate} from "@/helpers/numberFormat.js";
+import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
 import {useToast} from "primevue/usetoast";
-import {useCustomerStore} from "@/stores/customer.js";
-import TabList from "@/volt/TabList.vue";
-import TabPanel from "@/volt/TabPanel.vue";
-import Tab from "@/volt/Tab.vue";
-import TabPanels from "@/volt/TabPanels.vue";
 import Tabs from "@/volt/Tabs.vue";
-import {useReturnInvoiceStore} from "@/stores/returnInvoice.js";
-import {useReturnInvoiceValidation} from "@/views/warehouse/returnInvoice/useWarehouseReturnInvoiceForm.js";
-import {useOrderInvoiceProductStore} from "@/stores/orderInvoiceProduct.js";
+import TabPanels from "@/volt/TabPanels.vue";
+import Tab from "@/volt/Tab.vue";
+import TabPanel from "@/volt/TabPanel.vue";
+import TabList from "@/volt/TabList.vue";
+import {useLocationQuantityStore} from "@/stores/locationQuantity.js";
+import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
+import ColumnGroup from "primevue/columngroup";
+import Row from "primevue/row"
 import {useUserStore} from "@/stores/user.js";
-import {useOrderInvoiceKitStore} from "@/stores/orderInvoiceKit.js";
+import {useWriteOffInvoiceStore} from "@/stores/writeOffInvoice.js";
+import {useWriteOffInvoiceValidation} from "@/views/warehouse/writeOffInvoice/useWriteOffInvoiceForm.js";
+import DatePicker from "@/volt/DatePicker.vue";
 
 const route = useRoute();
 const router = useRouter();
 const toast = useToast()
-const returnInvoiceStore = useReturnInvoiceStore();
-const inventoryStore = useInventoryStore();
-const customerStore = useCustomerStore();
-const locationStore = useLocationStore();
-const orderInvoiceProductStore = useOrderInvoiceProductStore();
-const orderInvoiceKitStore = useOrderInvoiceKitStore();
+const writeOffInvoiceStore = useWriteOffInvoiceStore();
 const userStore = useUserStore();
+const locationQuantityStore = useLocationQuantityStore();
+const locationQuantityKitStore = useLocationQuantityKitStore();
+const locationStore = useLocationStore();
 const { t } = useI18n();
 const {
-    returnInvoiceHandleSubmit,
-    returnInvoiceErrors,
-    returnInvoiceIsSubmitting,
-    returnInvoiceResetForm,
+    writeOffInvoiceHandleSubmit,
+    writeOffInvoiceErrors,
+    writeOffInvoiceIsSubmitting,
+    writeOffInvoiceResetForm,
     location,
-    customer,
     createdAt,
-    productHandleSubmit,
-    productErrors,
-    productIsSubmitting,
-    productResetForm,
-    productValidate,
-    orderInvoiceProduct,
-    returnInvoiceProduct,
-    qtyProduct,
-    kitHandleSubmit,
-    kitErrors,
-    kitIsSubmitting,
-    kitResetForm,
-    kitValidate,
-    orderInvoiceKit,
-    returnInvoiceKit,
-    qtyKit,
-} = useReturnInvoiceValidation();
+    locationQuantityHandleSubmit,
+    locationQuantityErrors,
+    locationQuantityIsSubmitting,
+    locationQuantityResetForm,
+    locationQuantityValidate,
+    locationQuantity,
+    qtyLocationQuantity,
+    locationQuantityKitHandleSubmit,
+    locationQuantityKitErrors,
+    locationQuantityKitResetForm,
+    locationQuantityKitValidate,
+    locationQuantityKit,
+    qtyLocationQuantityKit,
+} = useWriteOffInvoiceValidation()
 
 const apiData = ref(null);
 const editableData = ref(null);
-const currentProductIndex = ref(null);
-const currentKitIndex = ref(null);
-const currentDeleteProduct = ref(null);
-const currentDeleteKit = ref(null);
-const deleteProductVisible = ref(false);
-const deleteKitVisible = ref(false);
-const isDeleteProductLoading = ref(false);
-const isDeleteKitLoading = ref(false);
+const currentLocationQuantityIndex = ref(null);
+const currentLocationQuantityKitIndex = ref(null);
+const currentDeleteLocationQuantity = ref(null);
+const currentDeleteLocationQuantityKit = ref(null);
 const deletedData = ref([]);
 const createdData = ref([]);
 const updatedData = ref([]);
 const deletedKitData = ref([]);
 const createdKitData = ref([]);
 const updatedKitData = ref([]);
-const dateFrom = ref(null);
 const editMode = ref(false);
 const isLoading = ref(true);
+const deleteLocationQuantityVisible = ref(false);
+const deleteLocationQuantityKitVisible = ref(false);
+const isDeleteLocationQuantityLoading = ref(false);
+const isDeleteLocationQuantityKitLoading = ref(false);
 const showLeaveDialog = ref(false);
 const isEditing = ref(false);
 const pendingNavigation = ref(false);
@@ -109,7 +102,6 @@ const tabList = computed(() => [
     { value: 'products', label: t('cards.products')},
     { value: 'kits', label: t('cards.kits')},
 ])
-
 const isChanged = computed(() => (
     createdData.value.length ||
     updatedData.value.length ||
@@ -118,69 +110,52 @@ const isChanged = computed(() => (
     updatedKitData.value.length ||
     deletedKitData.value.length
 ));
+
 // functions
-const onSubmitProduct = productHandleSubmit((values) => {
-    addProduct(values)
+const onSubmitLocationQuantity = locationQuantityHandleSubmit((values) => {
+    addLocationQuantity(values)
 })
 
-const onEditProduct = productHandleSubmit(async (values) => {
-    const isValid = await productValidate()
+const onEditLocationQuantity = locationQuantityHandleSubmit(async (values) => {
+    const isValid = await locationQuantityValidate()
 
     if (!isValid.valid) {
         return
     }
 
-    editProduct(values)
+    editLocationQuantity(values)
 })
 
-const onSubmitKit = kitHandleSubmit((values) => {
-    addKit(values)
+const onSubmitLocationQuantityKit = locationQuantityKitHandleSubmit((values) => {
+    addLocationQuantityKit(values)
 })
 
-const onEditKit = kitHandleSubmit(async (values) => {
-    const isValid = await kitValidate()
+const onEditLocationQuantityKit = locationQuantityKitHandleSubmit(async (values) => {
+    const isValid = await locationQuantityKitValidate()
 
     if (!isValid.valid) {
         return
     }
 
-    editKit(values)
+    editLocationQuantityKit(values)
 })
 
-const getReturnQtyProduct = (orderInvoiceProduct) => {
-    if (!orderInvoiceProduct?.orderInvoiceProductQuantities) return 0;
-
-    return orderInvoiceProduct.orderInvoiceProductQuantities.reduce(
-        (sum, q) => sum + (q.returnQty || 0),
-        0
-    );
-};
-
-const getReturnQtyKit = (orderInvoiceKit) => {
-    if (!orderInvoiceKit?.orderInvoiceKitQuantities) return 0;
-
-    return orderInvoiceKit.orderInvoiceKitQuantities.reduce(
-        (sum, q) => sum + (q.returnQty || 0),
-        0
-    );
-};
-
-const onSubmitReturnInvoice = returnInvoiceHandleSubmit(async values => {
+const onSubmitWriteOffInvoice = writeOffInvoiceHandleSubmit(async (values) => {
     const payload = {};
 
-    payload.returnInvoiceProducts = [...createdData.value, ...updatedData.value, ...deletedData.value]
-    payload.returnInvoiceKits = [...createdKitData.value, ...updatedKitData.value, ...deletedKitData.value]
+    payload.writeOffInvoiceProducts = [...createdData.value, ...updatedData.value, ...deletedData.value]
+    payload.writeOffInvoiceKits = [...createdKitData.value, ...updatedKitData.value, ...deletedKitData.value]
 
-    if (!payload.returnInvoiceProducts.length) {
-        delete payload.returnInvoiceProducts
+    if (!payload.writeOffInvoiceProducts.length) {
+        delete payload.writeOffInvoiceProducts
     }
 
-    if (!payload.returnInvoiceKits.length) {
-        delete payload.returnInvoiceKits
+    if (!payload.writeOffInvoiceKits.length) {
+        delete payload.writeOffInvoiceKits
     }
 
     try {
-        await returnInvoiceStore.putReturnInvoice(payload, route.params.id)
+        await writeOffInvoiceStore.putWriteOffInvoice(payload, route.params.id)
         isEditing.value = false
         editMode.value = false
         isEdited.value = true
@@ -209,21 +184,156 @@ const onSubmitReturnInvoice = returnInvoiceHandleSubmit(async values => {
     }
 })
 
-const clearProductForm = () => {
+const clearLocationQuantityForm = () => {
     isEditing.value = false
-    productResetForm()
+    locationQuantityResetForm()
 }
 
-const clearKitForm = () => {
+const clearLocationQuantityKitForm = () => {
     isEditing.value = false
-    kitResetForm()
+    locationQuantityKitResetForm()
 }
 
-function editProduct(updatedProduct) {
+function addLocationQuantity(newLocationQuantity) {
+    const exists = editableData.value.transferInvoiceProducts.some(p => p.locationQuantity.id === newLocationQuantity.locationQuantity.id);
+
+    if (exists) {
+        toast.add({
+            severity: 'error',
+            summary: t('toast.already_added', { name: t('product.nominativeCapitalize') }),
+            life: 3000
+        })
+
+        return;
+    }
+
+    const { qtyLocationQuantity, locationQuantity } = newLocationQuantity;
+
+    editableData.value.transferInvoiceProducts.push({ locationQuantity, qty: qtyLocationQuantity});
+    createdData.value.push({ locationQuantity: `/api/location_quantities/${locationQuantity.id}`, qty: qtyLocationQuantity})
+
+    toast.add({
+        severity: 'success',
+        summary: t('toast.added', { name: t('product.nominativeCapitalize') }),
+        life: 3000
+    })
+
+    locationQuantityResetForm();
+}
+
+function addLocationQuantityKit(newLocationQuantityKit) {
+    const exists = editableData.value.transferInvoiceKits.some(p => p.locationQuantityKit.id === newLocationQuantityKit.locationQuantityKit.id);
+
+    if (exists) {
+        toast.add({
+            severity: 'error',
+            summary: t('toast.already_added', { name: t('kit.nominativeCapitalize') }),
+            life: 3000
+        })
+
+        return;
+    }
+
+    const { qtyLocationQuantityKit, locationQuantityKit } = newLocationQuantityKit;
+
+    editableData.value.transferInvoiceKits.push({ locationQuantityKit, qty: qtyLocationQuantityKit });
+    createdKitData.value.push({ locationQuantityKit: `/api/location_quantity_kits/${locationQuantityKit.id}`, qty: qtyLocationQuantityKit})
+
+    toast.add({
+        severity: 'success',
+        summary: t('toast.added', { name: t('kit.nominativeCapitalize') }),
+        life: 3000
+    })
+
+    locationQuantityKitResetForm();
+}
+
+function deleteLocationQuantityAction(product) {
+    deleteLocationQuantityVisible.value = true
+    currentDeleteLocationQuantity.value = product
+}
+
+function deleteLocationQuantityKitAction(kit) {
+    deleteLocationQuantityKitVisible.value = true
+    currentDeleteLocationQuantityKit.value = kit
+}
+
+function deleteLocationQuantity() {
+    const index = editableData.value.transferInvoiceProducts.findIndex(p => p.id === currentDeleteLocationQuantity.value.id);
+
+    if (index === -1) return;
+
+    const current = editableData.value.transferInvoiceProducts[index];
+
+    if (current.id) {
+        // API’dan kelgan
+        editableData.value.transferInvoiceProducts.splice(index, 1);
+
+        deletedData.value.push({
+            transferInvoiceProduct: current["@id"],
+            isDelete: true
+        })
+    } else {
+        // Yangi qo‘shilgan
+        editableData.value.transferInvoiceProducts.splice(index, 1);
+    }
+    deleteLocationQuantityVisible.value = false
+}
+
+function deleteLocationQuantityKit() {
+    const index = editableData.value.transferInvoiceKits.findIndex(p => p.id === currentDeleteLocationQuantityKit.value.id);
+
+    if (index === -1) return;
+
+    const current = editableData.value.transferInvoiceKits[index];
+
+    if (current.id) {
+        // API’dan kelgan
+        editableData.value.transferInvoiceKits.splice(index, 1);
+
+        deletedKitData.value.push({
+            transferInvoiceKit: current["@id"],
+            isDelete: true
+        })
+    } else {
+        // Yangi qo‘shilgan
+        editableData.value.transferInvoiceKits.splice(index, 1);
+    }
+
+    deleteLocationQuantityKitVisible.value = false
+}
+
+function editLocationQuantityAction(data, index) {
+    isEditing.value = true;
+    currentLocationQuantityIndex.value = index
+    locationQuantity.value = data.locationQuantity
+    qtyLocationQuantity.value = data.qty;
+}
+
+function editLocationQuantityKitAction(data, index) {
+    isEditing.value = true;
+    currentLocationQuantityKitIndex.value = index
+    locationQuantityKit.value = data.locationQuantityKit
+    qtyLocationQuantityKit.value = data.qty;
+}
+
+async function fetchLocation(query) {
+    const params = {
+        ...query
+    }
+
+    if (userStore.getAboutMeFromToken.role === 'ROLE_WAREHOUSE_MANAGER') {
+        params.user = userStore.getAboutMeFromToken.id
+    }
+
+    await locationStore.fetchLocations(params)
+}
+
+function editLocationQuantity(updatedLocationQuantity) {
     // Duplicate check
-    const exists = editableData.value.returnInvoiceProducts.some((p, i) =>
-        i !== currentProductIndex.value &&
-        p.orderInvoiceProduct.id === updatedProduct.orderInvoiceProduct.id,
+    const exists = editableData.value.transferInvoiceProducts.some((p, i) =>
+        i !== currentLocationQuantityIndex.value &&
+        p.locationQuantity.id === updatedLocationQuantity.locationQuantity.id
     );
 
     if (exists) {
@@ -236,21 +346,21 @@ function editProduct(updatedProduct) {
         return;
     }
 
-     const current = editableData.value.returnInvoiceProducts[currentProductIndex.value];
+    const current = editableData.value.transferInvoiceProducts[currentLocationQuantityIndex.value];
 
     const payload = {};
 
-    if (updatedProduct.orderInvoiceProduct.id !== current.orderInvoiceProduct.id) {
-        payload.orderInvoiceProduct = updatedProduct.orderInvoiceProduct
+    if (updatedLocationQuantity.locationQuantity.id !== current.locationQuantity.id) {
+        payload.locationQuantity = updatedLocationQuantity.locationQuantity
     }
 
-    if (updatedProduct.qtyProduct !== current.qty) {
-        payload.qty = updatedProduct.qtyProduct
+    if (updatedLocationQuantity.qtyLocationQuantity !== current.qty) {
+        payload.qty = updatedLocationQuantity.qtyLocationQuantity
     }
 
     if (current.id) {
-        payload.returnInvoiceProduct = current['@id']
-        const indexFromUpdatedData = updatedData.value.findIndex(data => data.returnInvoiceProduct['@id'] === payload.returnInvoiceProduct['@id'])
+        payload.transferInvoiceProduct = current['@id']
+        const indexFromUpdatedData = updatedData.value.findIndex(data => data.transferInvoiceProduct['@id'] === payload.transferInvoiceProduct['@id'])
 
         if (indexFromUpdatedData !== -1) {
             updatedData.value[indexFromUpdatedData] = {
@@ -261,39 +371,38 @@ function editProduct(updatedProduct) {
         }
 
         // API’dan kelgan
-        editableData.value.returnInvoiceProducts[currentProductIndex.value] = {
-            returnInvoiceProduct: current['@id'],
+        editableData.value.transferInvoiceProducts[currentLocationQuantityIndex.value] = {
+            transferInvoiceProduct: current['@id'],
             ...current,
             ...payload,
         };
     } else {
         // Yangi qo‘shilgan
-        editableData.value.returnInvoiceProducts[currentProductIndex.value] = {
+        editableData.value.transferInvoiceProducts[currentLocationQuantityIndex.value] = {
             ...current,
             ...payload
         };
 
-        const index = createdData.value.findIndex(p => (
-            p.orderInvoiceProduct.id === current.orderInvoiceProduct.id
-        ))
+        const index = createdData.value.findIndex(p => p.locationQuantity.id === current.locationQuantity.id)
 
         if (index !== -1) {
             // Agar mavjud bo‘lsa yangilash
-            createdData.value[index] = { ...createdData.value[index], ...updatedProduct }
+            createdData.value[index] = { ...createdData.value[index], ...current, ...payload }
         } else {
             // Aks holda push qilish
-            createdData.value.push(updatedProduct)
+            const { qtyLocationQuantity, locationQuantity } = updatedLocationQuantity;
+            createdData.value.push({ locationQuantity, qty: qtyLocationQuantity})
         }
     }
 
-    clearProductForm()
+    clearLocationQuantityForm()
 }
 
-function editKit(updatedKit) {
+function editLocationQuantityKit(updatedLocationQuantityKit) {
     // Duplicate check
-    const exists = editableData.value.returnInvoiceKits.some((p, i) =>
-        i !== currentKitIndex.value &&
-        p.orderInvoiceKit.id === updatedKit.orderInvoiceKit.id,
+    const exists = editableData.value.transferInvoiceKits.some((p, i) =>
+        i !== currentLocationQuantityKitIndex.value &&
+        p.locationQuantityKit.id === updatedLocationQuantityKit.locationQuantityKit.id
     );
 
     if (exists) {
@@ -306,21 +415,21 @@ function editKit(updatedKit) {
         return;
     }
 
-    const current = editableData.value.returnInvoiceKits[currentKitIndex.value];
+    const current = editableData.value.transferInvoiceKits[currentLocationQuantityKitIndex.value];
 
     const payload = {};
 
-    if (updatedKit.orderInvoiceKit.id !== current.orderInvoiceKit.id) {
-        payload.orderInvoiceKit = updatedKit.orderInvoiceKit
+    if (updatedLocationQuantityKit.locationQuantityKit.id !== current.locationQuantityKit.id) {
+        payload.locationQuantityKit = updatedLocationQuantityKit.locationQuantityKit
     }
 
-    if (updatedKit.qtyKit !== current.qty) {
-        payload.qty = updatedKit.qtyKit
+    if (updatedLocationQuantityKit.qtyLocationQuantityKit !== current.qty) {
+        payload.qty = updatedLocationQuantityKit.qtyLocationQuantityKit
     }
 
     if (current.id) {
-        payload.returnInvoiceKit = current['@id']
-        const indexFromUpdatedData = updatedKitData.value.findIndex(data => data.returnInvoiceKit['@id'] === payload.returnInvoiceKit['@id'])
+        payload.transferInvoiceKit = current['@id']
+        const indexFromUpdatedData = updatedData.value.findIndex(data => data.transferInvoiceKit['@id'] === payload.transferInvoiceKit['@id'])
 
         if (indexFromUpdatedData !== -1) {
             updatedKitData.value[indexFromUpdatedData] = {
@@ -331,183 +440,37 @@ function editKit(updatedKit) {
         }
 
         // API’dan kelgan
-        editableData.value.returnInvoiceKits[currentKitIndex.value] = {
-            returnInvoiceKit: current['@id'],
+        editableData.value.transferInvoiceKits[currentLocationQuantityKitIndex.value] = {
+            transferInvoiceKit: current['@id'],
             ...current,
             ...payload,
         };
     } else {
         // Yangi qo‘shilgan
-        editableData.value.returnInvoiceKits[currentKitIndex.value] = {
+        editableData.value.transferInvoiceKits[currentLocationQuantityKitIndex.value] = {
             ...current,
             ...payload
         };
 
-        const index = createdData.value.findIndex(p => (
-            p.orderInvoiceKit.id === current.orderInvoiceKit.id
-        ))
+        const index = createdKitData.value.findIndex(p => p.locationQuantityKit.id === current.locationQuantityKit.id)
 
         if (index !== -1) {
             // Agar mavjud bo‘lsa yangilash
-            createdData.value[index] = { ...createdData.value[index], ...updatedKit }
+            createdKitData.value[index] = { ...createdData.value[index], ...current, ...payload }
         } else {
             // Aks holda push qilish
-            createdData.value.push(updatedKit)
+            const { qtyLocationQuantityKit, locationQuantityKit } = updatedLocationQuantityKit;
+            createdKitData.value.push({ locationQuantityKit, qty: qtyLocationQuantityKit})
         }
     }
 
-    clearKitForm()
+    clearLocationQuantityKitForm()
 }
 
 function cancelEditing() {
     editMode.value = false;
-    returnInvoiceResetForm()
+    writeOffInvoiceResetForm()
 }
-
-function addProduct(newProduct) {
-    const exists = editableData.value.returnInvoiceProducts.some(p => p.orderInvoiceProduct.id === newProduct.orderInvoiceProduct.id);
-
-    if (exists) {
-        toast.add({
-            severity: 'error',
-            summary: t('toast.already_added', { name: t('product.nominativeCapitalize') }),
-            life: 3000
-        })
-
-        return;
-    }
-
-    const { qtyProduct, orderInvoiceProduct } = newProduct;
-
-    editableData.value.returnInvoiceProducts.push({ orderInvoiceProduct, qty: qtyProduct});
-    createdData.value.push({ orderInvoiceProduct: `/api/order_invoice_products/${orderInvoiceProduct.id}`, qty: qtyProduct})
-
-    toast.add({
-        severity: 'success',
-        summary: t('toast.added', { name: t('product.nominativeCapitalize') }),
-        life: 3000
-    })
-
-    productResetForm();
-}
-
-function addKit(newKit) {
-    const exists = editableData.value.returnInvoiceKits.some(p => p.orderInvoiceKit.id === newKit.orderInvoiceKit.id);
-
-    if (exists) {
-        toast.add({
-            severity: 'error',
-            summary: t('toast.already_added', { name: t('kit.nominativeCapitalize') }),
-            life: 3000
-        })
-
-        return;
-    }
-
-    const { qtyKit, orderInvoiceKit } = newKit;
-
-    editableData.value.returnInvoiceKits.push({ orderInvoiceKit, qty: qtyKit });
-    createdKitData.value.push({ orderInvoiceKit: `/api/order_invoice_kits/${orderInvoiceKit.id}`, qty: qtyKit})
-
-    toast.add({
-        severity: 'success',
-        summary: t('toast.added', { name: t('kit.nominativeCapitalize') }),
-        life: 3000
-    })
-
-    kitResetForm();
-}
-
-function deleteProductAction(product) {
-    deleteProductVisible.value = true
-    currentDeleteProduct.value = product
-}
-
-function deleteKitAction(kit) {
-    deleteKitVisible.value = true
-    currentDeleteKit.value = kit
-}
-
-function deleteProduct() {
-    const index = editableData.value.returnInvoiceProducts.findIndex(p => p.id === currentDeleteProduct.value.id);
-
-    if (index === -1) return;
-
-    const current = editableData.value.returnInvoiceProducts[index];
-
-    if (current.id) {
-        // API’dan kelgan
-        editableData.value.returnInvoiceProducts.splice(index, 1);
-
-        deletedData.value.push({
-            returnInvoiceProduct: current["@id"],
-            isDelete: true
-        })
-    } else {
-        // Yangi qo‘shilgan
-        editableData.value.returnInvoiceProducts.splice(index, 1);
-    }
-
-    deleteProductVisible.value = false
-}
-
-function deleteKit() {
-    const index = editableData.value.returnInvoiceKits.findIndex(p => p.id === currentDeleteKit.value.id);
-
-    if (index === -1) return;
-
-    const current = editableData.value.returnInvoiceKits[index];
-
-    if (current.id) {
-        // API’dan kelgan
-        editableData.value.returnInvoiceKits.splice(index, 1);
-
-        deletedKitData.value.push({
-            returnInvoiceKit: current["@id"],
-            isDelete: true
-        })
-    } else {
-        // Yangi qo‘shilgan
-        editableData.value.returnInvoiceKits.splice(index, 1);
-    }
-
-    deleteKitVisible.value = false
-}
-
-function editProductAction(data, index) {
-    isEditing.value = true;
-    currentProductIndex.value = index
-    orderInvoiceProduct.value = data.orderInvoiceProduct
-    returnInvoiceProduct.value = data
-    qtyProduct.value = data.qty;
-}
-
-function editKitAction(data, index) {
-    isEditing.value = true;
-    currentKitIndex.value = index
-    orderInvoiceKit.value = data.orderInvoiceKit
-    returnInvoiceKit.value = data.returnInvoiceKit
-    qtyKit.value = data.qty;
-}
-
-watch(location, async () => {
-    if (location.value) {
-        await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
-
-        if (inventoryStore.getLastInventoryDateTo === null) {
-            dateFrom.value = null
-            createdAt.value = null
-        } else {
-            const date = new Date(inventoryStore.getLastInventoryDateTo);
-            date.setDate(date.getDate() + 1);
-            dateFrom.value = date;
-            // createdAt.value = date
-        }
-    } else {
-        dateFrom.value = null
-        createdAt.value = null
-    }
-})
 
 onBeforeRouteLeave((to, from, next) => {
     if (isChanged.value && !isEdited.value) {
@@ -526,19 +489,18 @@ const confirmLeave = () => {
 }
 
 onMounted(async () => {
-    await returnInvoiceStore.fetchReturnInvoice(route.params.id);
+    await writeOffInvoiceStore.fetchWriteOffInvoice(route.params.id);
 
-    apiData.value = returnInvoiceStore.getReturnInvoice;
-    editableData.value = JSON.parse(JSON.stringify(returnInvoiceStore.getReturnInvoice));
+    apiData.value = writeOffInvoiceStore.getWriteOffInvoice;
+    editableData.value = JSON.parse(JSON.stringify(writeOffInvoiceStore.getWriteOffInvoice));
 
     setTimeout(() => {
-        returnInvoiceResetForm({
+        writeOffInvoiceResetForm({
             values: {
-                location: returnInvoiceStore.getReturnInvoice.orderInvoice.location,
-                customer: returnInvoiceStore.getReturnInvoice.orderInvoice.customer,
-                createdAt: new Date(returnInvoiceStore.getReturnInvoice.createdAt),
-                returnInvoiceProducts: returnInvoiceStore.getReturnInvoice.returnInvoiceProducts,
-                returnInvoiceKits: returnInvoiceStore.getReturnInvoice.returnInvoiceKits
+                location: writeOffInvoiceStore.getWriteOffInvoice.location,
+                createdAt: new Date(writeOffInvoiceStore.getWriteOffInvoice.createdAt),
+                writeOffInvoiceProducts: writeOffInvoiceStore.getWriteOffInvoice.writeOffInvoiceProducts,
+                writeOffInvoiceKits: writeOffInvoiceStore.getWriteOffInvoice.writeOffInvoiceKits
             }
         })
     })
@@ -576,67 +538,69 @@ onMounted(async () => {
         <template #buttons>
             <div v-if="!isLoading" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
                 <Button
-                    v-if="!editMode && isAdminOrCreatedBy(returnInvoiceStore.getReturnInvoice.createdBy.id)"
-                    :disabled="!!returnInvoiceErrors.returnInvoiceProducts"
+                    v-if="!editMode && isAdminOrCreatedBy(writeOffInvoiceStore.getWriteOffInvoice.createdBy.id)"
+                    :disabled="!!writeOffInvoiceErrors.writeOffInvoiceProducts"
                     icon="pi pi-pencil"
                     @click="editMode = true"
                     class="px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.edit')"
-                    :loading="returnInvoiceIsSubmitting"
+                    :loading="writeOffInvoiceIsSubmitting"
                 />
                 <SecondaryButton
                     v-if="editMode"
-                    :disabled="!!returnInvoiceErrors.returnInvoiceProducts"
+                    :disabled="!!writeOffInvoiceErrors.writeOffInvoiceProducts"
                     @click="cancelEditing"
                     class="px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
+                    :loading="writeOffInvoiceIsSubmitting"
                 />
                 <Button
                     v-if="editMode"
                     :disabled="!isChanged"
                     icon="pi pi-save"
-                    @click="onSubmitReturnInvoice"
+                    @click="onSubmitWriteOffInvoice"
                     class="px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
-                    :loading="returnInvoiceIsSubmitting"
+                    :loading="writeOffInvoiceIsSubmitting"
                 />
             </div>
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
                 <Button
                     v-if="!editMode"
-                    :disabled="!!returnInvoiceErrors.returnInvoiceProducts"
+                    :disabled="!!writeOffInvoiceErrors.writeOffInvoiceProducts"
                     icon="pi pi-pencil"
                     @click="editMode = true"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.edit')"
-                    :loading="returnInvoiceIsSubmitting"
+                    :loading="writeOffInvoiceIsSubmitting"
                 />
                 <Button
                     v-if="editMode"
-                    :disabled="!!returnInvoiceErrors.returnInvoiceProducts"
+                    :disabled="!!writeOffInvoiceErrors.writeOffInvoiceProducts"
                     icon="pi pi-save"
-                    @click="onSubmitReturnInvoice"
+                    @click="onSubmitWriteOffInvoice"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
-                    :loading="returnInvoiceIsSubmitting"
+                    :loading="writeOffInvoiceIsSubmitting"
                 />
 
                 <SecondaryButton
                     v-if="editMode"
-                    :disabled="!!returnInvoiceErrors.returnInvoiceProducts"
+                    :disabled="!!writeOffInvoiceErrors.writeOffInvoiceProducts"
                     @click="cancelEditing"
                     class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
+                    :loading="writeOffInvoiceIsSubmitting"
                 />
 
                 <Button
                     v-if="editMode"
                     :disabled="!isChanged"
                     icon="pi pi-save"
-                    @click="onSubmitReturnInvoice"
+                    @click="onSubmitWriteOffInvoice"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
-                    :loading="returnInvoiceIsSubmitting"
+                    :loading="writeOffInvoiceIsSubmitting"
                 />
             </div>
         </template>
@@ -649,51 +613,28 @@ onMounted(async () => {
                 pt:title="font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
                 <template #content>
-                    <div class="font-medium mb-4">{{ t('returnData') }}</div>
+                    <div class="font-medium mb-4">{{ t('writeOffData') }}</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         <div>
-                            <p class="text-sm">{{ t('labels.location') }}</p>
+                            <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
 
                             <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
-
                             <SearchSelect
                                 v-if="!isLoading"
                                 v-model="location"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
+                                :fetchFn="fetchLocation"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
-                                :option-value="opt => opt?.name"
+                                :option-value="opt => opt?.id"
                                 :return-value="opt => opt"
-                                :placeholder="t('placeholders.select.location')"
+                                :placeholder="t('placeholders.search.byLocation')"
                                 :loading="locationStore.getIsLoadingLocation"
                                 :total-items="locationStore.getLocations.totalItems"
-                                :invalid="!!returnInvoiceErrors.location"
-                                disabled
-                                :show-clear="false"
-                            />
-                        </div>
-                        <div>
-                            <p class="text-sm">{{ t('labels.Customer') }}</p>
-
-                            <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
-                            <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
-
-                            <SearchSelect
-                                v-if="!isLoading"
-                                v-model="customer"
-                                :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': true})"
-                                :options="customerStore.getCustomers.models"
-                                :option-label="opt => opt?.name"
-                                :option-value="opt => opt?.name"
-                                :return-value="opt => opt"
-                                :placeholder="t('placeholders.select.customer')"
-                                :loading="customerStore.getIsLoadingCustomers"
-                                :total-items="customerStore.getCustomers.totalItems"
-                                :invalid="!!returnInvoiceErrors.customer"
                                 disabled
                             />
                         </div>
+
                         <div>
                             <p class="text-sm">{{ t('labels.createdAt') }}</p>
 
@@ -709,8 +650,7 @@ onMounted(async () => {
                                 iconDisplay="input"
                                 :placeholder="t('placeholders.date')"
                                 show-button-bar
-                                :minDate="dateFrom"
-                                :invalid="!!returnInvoiceErrors.createdAt"
+                                :invalid="!!writeOffInvoiceErrors.createdAt"
                                 showTime
                                 hourFormat="24"
                                 disabled
@@ -743,21 +683,21 @@ onMounted(async () => {
                                     <div>
                                         <p class="text-sm">{{ t('labels.product') }}<span class="text-red-500"> *</span></p>
                                         <SearchSelect
-                                            v-model="orderInvoiceProduct"
-                                            :fetchFn="(query) => orderInvoiceProductStore.fetchOrderInvoiceProducts({...query, orderInvoice: returnInvoiceStore.getReturnInvoice.orderInvoice.id})"
-                                            :options="orderInvoiceProductStore.getOrderInvoiceProducts.models"
-                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty - getReturnQtyProduct(opt)} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
-                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty - getReturnQtyProduct(opt)} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            v-model="locationQuantity"
+                                            :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: location.id, isZero: true})"
+                                            :options="locationQuantityStore.getLocationQuantities.models"
+                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
                                             search-key="name"
                                             :placeholder="t('placeholders.select.product')"
-                                            :loading="orderInvoiceProductStore.getIsLoadingOrderInvoiceProducts"
-                                            :total-items="orderInvoiceProductStore.getOrderInvoiceProducts.totalItems"
-                                            :invalid="!!productErrors.orderInvoiceProduct"
+                                            :loading="locationQuantityStore.getIsLoadingLocationQuantity"
+                                            :total-items="locationQuantityStore.getLocationQuantities.totalItems"
+                                            :invalid="!!locationQuantityErrors.locationQuantity"
                                         >
-                                            <template v-if="orderInvoiceProductStore.getOrderInvoiceProducts.models.length" #header>
-                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.qty') }}</p>
+                                            <template v-if="locationQuantityStore.getLocationQuantities.models.length" #header>
+                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
                                             </template>
                                         </SearchSelect>
                                     </div>
@@ -765,21 +705,21 @@ onMounted(async () => {
                                     <div>
                                         <p class="text-sm">{{ t('labels.qty') }}<span class="text-red-500"> *</span></p>
                                         <InputNumber
-                                            v-model="qtyProduct"
+                                            v-model="qtyLocationQuantity"
                                             fluid
                                             showButtons
                                             :placeholder="t('placeholders.qty')"
                                             :minFractionDigits="1"
                                             :maxFractionDigits="2"
-                                            :invalid="!!productErrors.qtyProduct"
+                                            :invalid="!!locationQuantityErrors.qtyLocationQuantity"
                                         />
                                     </div>
                                 </div>
 
                                 <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
-                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearProductForm" />
-                                    <Button v-if="!isEditing" @click="onSubmitProduct" :label="t('buttons.add')" class="px-5" :loading="productIsSubmitting"/>
-                                    <Button v-else @click="onEditProduct" :label="t('buttons.edit')" class="px-5"/>
+                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearLocationQuantityForm" />
+                                    <Button v-if="!isEditing" @click="onSubmitLocationQuantity" :label="t('buttons.add')" class="px-5" :loading="locationQuantityIsSubmitting"/>
+                                    <Button v-else @click="onEditLocationQuantity" :label="t('buttons.edit')" class="px-5"/>
                                 </div>
                             </TabPanel>
 
@@ -794,21 +734,21 @@ onMounted(async () => {
                                     <div>
                                         <p class="text-sm">{{ t('labels.kit') }}<span class="text-red-500"> *</span></p>
                                         <SearchSelect
-                                            v-model="orderInvoiceKit"
-                                            :fetchFn="(query) => orderInvoiceKitStore.fetchOrderInvoiceKits({...query, orderInvoice: returnInvoiceStore.getReturnInvoice.orderInvoice.id})"
-                                            :options="orderInvoiceKitStore.getOrderInvoiceKits.models"
-                                            :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${opt?.qty - getReturnQtyKit(opt)} ${t(`labels.pcs`)}`"
-                                            :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${opt?.qty - getReturnQtyKit(opt)} ${t(`labels.pcs`)}`"
+                                            v-model="locationQuantityKit"
+                                            :fetchFn="(query) => locationQuantityKitStore.fetchLocationQuantityKits({...query, location: location.id, isZero: true})"
+                                            :options="locationQuantityKitStore.getLocationQuantityKits.models"
+                                            :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
+                                            :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
                                             search-key="name"
                                             :placeholder="t('placeholders.select.kit')"
-                                            :loading="orderInvoiceKitStore.getIsLoadingOrderInvoiceKits"
-                                            :total-items="orderInvoiceKitStore.getOrderInvoiceKits.totalItems"
-                                            :invalid="!!kitErrors.orderInvoiceKit"
+                                            :loading="locationQuantityKitStore.getIsLoadingLocationQuantityKit"
+                                            :total-items="locationQuantityKitStore.getLocationQuantityKits.totalItems"
+                                            :invalid="!!locationQuantityKitErrors.locationQuantityKit"
                                         >
-                                            <template v-if="orderInvoiceKitStore.getOrderInvoiceKits.models.length" #header>
-                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.qty') }}</p>
+                                            <template v-if="locationQuantityKitStore.getLocationQuantityKits.models.length" #header>
+                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
                                             </template>
                                         </SearchSelect>
                                     </div>
@@ -816,21 +756,21 @@ onMounted(async () => {
                                     <div>
                                         <p class="text-sm">{{ t('labels.qty') }}<span class="text-red-500"> *</span></p>
                                         <InputNumber
-                                            v-model="qtyKit"
+                                            v-model="qtyLocationQuantityKit"
                                             fluid
                                             showButtons
                                             :placeholder="t('placeholders.qty')"
                                             :minFractionDigits="1"
                                             :maxFractionDigits="2"
-                                            :invalid="!!kitErrors.qtyKit"
+                                            :invalid="!!locationQuantityKitErrors.qtyLocationQuantityKit"
                                         />
                                     </div>
                                 </div>
 
                                 <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
-                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearKitForm" />
-                                    <Button v-if="!isEditing" @click="onSubmitKit" :label="t('buttons.add')" class="px-5" :loading="kitIsSubmitting"/>
-                                    <Button v-else @click="onEditKit" :label="t('buttons.edit')" class="px-5"/>
+                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearLocationQuantityKitForm" />
+                                    <Button v-if="!isEditing" @click="onSubmitLocationQuantityKit" :label="t('buttons.add')" class="px-5" :loading="locationQuantityIsSubmitting"/>
+                                    <Button v-else @click="onEditLocationQuantityKit" :label="t('buttons.edit')" class="px-5"/>
                                 </div>
                             </TabPanel>
                         </TabPanels>
@@ -854,13 +794,13 @@ onMounted(async () => {
                                 v-if="tabVal === 'products'"
                                 value="products"
                             >
-                                <NoData v-if="!editableData?.returnInvoiceProducts?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
+                                <NoData v-if="!editableData?.writeOffInvoiceProducts?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
                                     <p class="text-xl font-normal">{{ t("noResults") }}</p>
                                 </NoData>
 
                                 <DataTable
                                     v-else
-                                    :value="isLoading ? Array(10).fill({}) : editableData.returnInvoiceProducts"
+                                    :value="isLoading ? Array(10).fill({}) : editableData.writeOffInvoiceProducts"
                                     scrollable
                                     scroll-height="700px"
                                     pt:footer="border-none dark:bg-surface-800"
@@ -869,37 +809,43 @@ onMounted(async () => {
                                     <Column field="product" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.orderInvoiceProduct?.product?.name }}</p>
+                                            <p v-else>{{ data.locationQuantity?.product?.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.orderInvoiceProduct?.product?.code || '-' }}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="qr" :header="t('labels.qr')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.orderInvoiceProduct?.product?.qr || '-' }}</p>
+                                            <p v-else>{{ data.locationQuantity?.product?.code || '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="color" :header="t('labels.color')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.orderInvoiceProduct?.color?.name || '-' }}</p>
+                                            <p v-else>{{ data.locationQuantity?.color?.name || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="price" :header="t('labels.price')">
+                                    <Column field="qr" :header="t('labels.qr')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ (formatCurrency(data.orderInvoiceProduct?.price) + '$') || '-' }}</p>
+                                            <p v-else>{{ data.locationQuantity?.product?.qr || '-' }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="costPrice" :header="t('labels.costPrice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ (formatCurrency(data.locationQuantity?.product?.costPrice) + '$') || '-' }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="expiryDate" :header="t('labels.expiryDate')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.locationQuantity?.expiryDate ? getFormattedDate(data.locationQuantity?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qty" :header="t('labels.qty')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.qty }} {{t(`labels.${data.orderInvoiceProduct?.product?.category?.unit?.name}`)}}</p>
+                                            <p v-else>{{ data.qty }} {{t(`labels.${data.locationQuantity?.product?.category?.unit?.name}`)}}</p>
                                         </template>
                                     </Column>
                                     <Column v-if="editMode" field="actions" :header="t('actions')">
@@ -908,13 +854,13 @@ onMounted(async () => {
                                                 <Skeleton height="2rem" v-if="isLoading"/>
                                                 <div v-else class="flex items-center gap-2">
                                                     <Button
-                                                        @click="editProductAction(data, index)"
+                                                        @click="editLocationQuantityAction(data, index)"
                                                         icon="pi pi-pencil"
                                                         pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
                                                         size="small"
                                                     />
                                                     <Button
-                                                        @click="deleteProductAction(data)"
+                                                        @click="deleteLocationQuantityAction(data)"
                                                         icon="pi pi-trash"
                                                         pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
                                                         size="small"
@@ -931,35 +877,40 @@ onMounted(async () => {
                                 v-if="tabVal === 'kits'"
                                 value="kits"
                             >
-                                <NoData v-if="!editableData?.returnInvoiceKits?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
+                                <NoData v-if="!editableData?.writeOffInvoiceKits?.length && !isLoading" class="text-surface-400 mx-auto my-auto h-full">
                                     <p class="text-xl font-normal">{{ t("noResults") }}</p>
                                 </NoData>
 
                                 <DataTable
                                     v-else
-                                    :value="isLoading ? Array(10).fill({}) : editableData?.returnInvoiceKits"                                    scrollable
+                                    :value="isLoading ? Array(10).fill({}) : editableData?.writeOffInvoiceKits"                                    scrollable
                                     scroll-height="700px"
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
-                                            <p>{{ data.orderInvoiceKit?.kit?.name }}</p>
+                                            <p>{{ data.locationQuantityKit?.kit?.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
-                                            <p>{{ data.orderInvoiceKit?.kit?.code || '-' }}</p>
+                                            <p>{{ data.locationQuantityKit?.kit?.code || '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qr" :header="t('labels.qr')">
                                         <template #body="{ data }">
-                                            <p>{{ data.orderInvoiceKit?.kit?.qr || '-' }}</p>
+                                            <p>{{ data.locationQuantityKit?.kit?.qr || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="price" :header="t('labels.price')">
+                                    <Column field="costPrice" :header="t('labels.costPrice')">
                                         <template #body="{ data }">
-                                            <p>{{ (formatCurrency(data.orderInvoiceKit?.price) + '$') || '-' }}</p>
+                                            <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.costPrice) + '$') || '-' }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="expiryDate" :header="t('labels.expiryDate')">
+                                        <template #body="{ data }">
+                                            <p>{{ data.locationQuantityKit?.expiryDate ? getFormattedDate(data.locationQuantityKit?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qty" :header="t('labels.qty')">
@@ -972,13 +923,13 @@ onMounted(async () => {
                                             <div class="flex justify-end w-full">
                                                 <div class="flex items-center gap-2">
                                                     <Button
-                                                        @click="editKitAction(data, index)"
+                                                        @click="editLocationQuantityKitAction(data, index)"
                                                         icon="pi pi-pencil"
                                                         pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
                                                         size="small"
                                                     />
                                                     <Button
-                                                        @click="deleteKitAction(data)"
+                                                        @click="deleteLocationQuantityKitAction(data)"
                                                         icon="pi pi-trash"
                                                         pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
                                                         size="small"
@@ -993,9 +944,9 @@ onMounted(async () => {
                     </Tabs>
                 </template>
             </Card>
-            <!-- DELETE PRODUCT DIALOG -->
+            <!-- DELETE LOCATION_QUANTITY DIALOG -->
             <Dialog
-                v-model:visible="deleteProductVisible"
+                v-model:visible="deleteLocationQuantityVisible"
                 modal
                 :closable="false"
                 class="sm:min-w-100 sm:w-fit w-9/10"
@@ -1010,21 +961,21 @@ onMounted(async () => {
                         <SecondaryButton
                             type="button"
                             :label="t('dialog.cancel')"
-                            @click="deleteProductVisible = false"
+                            @click="deleteLocationQuantityVisible = false"
                         />
                         <Button
                             type="button"
                             :label="t('dialog.confirm')"
-                            @click="deleteProduct"
-                            :loading="isDeleteProductLoading"
+                            @click="deleteLocationQuantity"
+                            :loading="isDeleteLocationQuantityLoading"
                             class="px-5"
                         />
                     </div>
                 </template>
             </Dialog>
-            <!-- DELETE KIT DIALOG  -->
+            <!-- DELETE LOCATION_QUANTITY_KIT DIALOG  -->
             <Dialog
-                v-model:visible="deleteKitVisible"
+                v-model:visible="deleteLocationQuantityKitVisible"
                 modal
                 :closable="false"
                 class="sm:min-w-100 sm:w-fit w-9/10"
@@ -1039,13 +990,13 @@ onMounted(async () => {
                         <SecondaryButton
                             type="button"
                             :label="t('dialog.cancel')"
-                            @click="deleteKitVisible = false"
+                            @click="deleteLocationQuantityKitVisible = false"
                         />
                         <Button
                             type="button"
                             :label="t('dialog.confirm')"
-                            @click="deleteKit()"
-                            :loading="isDeleteKitLoading"
+                            @click="deleteLocationQuantityKit"
+                            :loading="isDeleteLocationQuantityKitLoading"
                             class="px-5"
                         />
                     </div>
