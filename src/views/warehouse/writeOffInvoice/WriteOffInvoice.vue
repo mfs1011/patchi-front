@@ -30,11 +30,13 @@ import {useUserStore} from "@/stores/user.js";
 import {useWriteOffInvoiceStore} from "@/stores/writeOffInvoice.js";
 import {useWriteOffInvoiceValidation} from "@/views/warehouse/writeOffInvoice/useWriteOffInvoiceForm.js";
 import DatePicker from "@/volt/DatePicker.vue";
+import {useInventoryStore} from "@/stores/inventory.js";
 
 const route = useRoute();
 const router = useRouter();
 const toast = useToast()
 const writeOffInvoiceStore = useWriteOffInvoiceStore();
+const inventoryStore = useInventoryStore();
 const userStore = useUserStore();
 const locationQuantityStore = useLocationQuantityStore();
 const locationQuantityKitStore = useLocationQuantityKitStore();
@@ -86,6 +88,7 @@ const pendingNavigation = ref(false);
 const isEdited = ref(false);
 const isConfirmLoading = ref(false);
 const tabVal = ref('products')
+const hasInventory = computed(() => inventoryStore.getHasInventory)
 
 // computed
 const home = computed(() => ({
@@ -195,7 +198,7 @@ const clearLocationQuantityKitForm = () => {
 }
 
 function addLocationQuantity(newLocationQuantity) {
-    const exists = editableData.value.transferInvoiceProducts.some(p => p.locationQuantity.id === newLocationQuantity.locationQuantity.id);
+    const exists = editableData.value.writeOffInvoiceProducts.some(p => p.locationQuantity.id === newLocationQuantity.locationQuantity.id);
 
     if (exists) {
         toast.add({
@@ -209,7 +212,7 @@ function addLocationQuantity(newLocationQuantity) {
 
     const { qtyLocationQuantity, locationQuantity } = newLocationQuantity;
 
-    editableData.value.transferInvoiceProducts.push({ locationQuantity, qty: qtyLocationQuantity});
+    editableData.value.writeOffInvoiceProducts.push({ locationQuantity, qty: qtyLocationQuantity});
     createdData.value.push({ locationQuantity: `/api/location_quantities/${locationQuantity.id}`, qty: qtyLocationQuantity})
 
     toast.add({
@@ -222,7 +225,7 @@ function addLocationQuantity(newLocationQuantity) {
 }
 
 function addLocationQuantityKit(newLocationQuantityKit) {
-    const exists = editableData.value.transferInvoiceKits.some(p => p.locationQuantityKit.id === newLocationQuantityKit.locationQuantityKit.id);
+    const exists = editableData.value.writeOffInvoiceKits.some(p => p.locationQuantityKit.id === newLocationQuantityKit.locationQuantityKit.id);
 
     if (exists) {
         toast.add({
@@ -236,7 +239,7 @@ function addLocationQuantityKit(newLocationQuantityKit) {
 
     const { qtyLocationQuantityKit, locationQuantityKit } = newLocationQuantityKit;
 
-    editableData.value.transferInvoiceKits.push({ locationQuantityKit, qty: qtyLocationQuantityKit });
+    editableData.value.writeOffInvoiceKits.push({ locationQuantityKit, qty: qtyLocationQuantityKit });
     createdKitData.value.push({ locationQuantityKit: `/api/location_quantity_kits/${locationQuantityKit.id}`, qty: qtyLocationQuantityKit})
 
     toast.add({
@@ -259,45 +262,45 @@ function deleteLocationQuantityKitAction(kit) {
 }
 
 function deleteLocationQuantity() {
-    const index = editableData.value.transferInvoiceProducts.findIndex(p => p.id === currentDeleteLocationQuantity.value.id);
+    const index = editableData.value.writeOffInvoiceProducts.findIndex(p => p.id === currentDeleteLocationQuantity.value.id);
 
     if (index === -1) return;
 
-    const current = editableData.value.transferInvoiceProducts[index];
+    const current = editableData.value.writeOffInvoiceProducts[index];
 
     if (current.id) {
         // API’dan kelgan
-        editableData.value.transferInvoiceProducts.splice(index, 1);
+        editableData.value.writeOffInvoiceProducts.splice(index, 1);
 
         deletedData.value.push({
-            transferInvoiceProduct: current["@id"],
+            writeOffInvoiceProduct: current["@id"],
             isDelete: true
         })
     } else {
         // Yangi qo‘shilgan
-        editableData.value.transferInvoiceProducts.splice(index, 1);
+        editableData.value.writeOffInvoiceProducts.splice(index, 1);
     }
     deleteLocationQuantityVisible.value = false
 }
 
 function deleteLocationQuantityKit() {
-    const index = editableData.value.transferInvoiceKits.findIndex(p => p.id === currentDeleteLocationQuantityKit.value.id);
+    const index = editableData.value.writeOffInvoiceKits.findIndex(p => p.id === currentDeleteLocationQuantityKit.value.id);
 
     if (index === -1) return;
 
-    const current = editableData.value.transferInvoiceKits[index];
+    const current = editableData.value.writeOffInvoiceKits[index];
 
     if (current.id) {
         // API’dan kelgan
-        editableData.value.transferInvoiceKits.splice(index, 1);
+        editableData.value.writeOffInvoiceKits.splice(index, 1);
 
         deletedKitData.value.push({
-            transferInvoiceKit: current["@id"],
+            writeOffInvoiceKit: current["@id"],
             isDelete: true
         })
     } else {
         // Yangi qo‘shilgan
-        editableData.value.transferInvoiceKits.splice(index, 1);
+        editableData.value.writeOffInvoiceKits.splice(index, 1);
     }
 
     deleteLocationQuantityKitVisible.value = false
@@ -331,7 +334,7 @@ async function fetchLocation(query) {
 
 function editLocationQuantity(updatedLocationQuantity) {
     // Duplicate check
-    const exists = editableData.value.transferInvoiceProducts.some((p, i) =>
+    const exists = editableData.value.writeOffInvoiceProducts.some((p, i) =>
         i !== currentLocationQuantityIndex.value &&
         p.locationQuantity.id === updatedLocationQuantity.locationQuantity.id
     );
@@ -346,7 +349,7 @@ function editLocationQuantity(updatedLocationQuantity) {
         return;
     }
 
-    const current = editableData.value.transferInvoiceProducts[currentLocationQuantityIndex.value];
+    const current = editableData.value.writeOffInvoiceProducts[currentLocationQuantityIndex.value];
 
     const payload = {};
 
@@ -359,8 +362,8 @@ function editLocationQuantity(updatedLocationQuantity) {
     }
 
     if (current.id) {
-        payload.transferInvoiceProduct = current['@id']
-        const indexFromUpdatedData = updatedData.value.findIndex(data => data.transferInvoiceProduct['@id'] === payload.transferInvoiceProduct['@id'])
+        payload.writeOffInvoiceProduct = current['@id']
+        const indexFromUpdatedData = updatedData.value.findIndex(data => data.writeOffInvoiceProduct['@id'] === payload.writeOffInvoiceProduct['@id'])
 
         if (indexFromUpdatedData !== -1) {
             updatedData.value[indexFromUpdatedData] = {
@@ -371,14 +374,14 @@ function editLocationQuantity(updatedLocationQuantity) {
         }
 
         // API’dan kelgan
-        editableData.value.transferInvoiceProducts[currentLocationQuantityIndex.value] = {
-            transferInvoiceProduct: current['@id'],
+        editableData.value.writeOffInvoiceProducts[currentLocationQuantityIndex.value] = {
+            writeOffInvoiceProduct: current['@id'],
             ...current,
             ...payload,
         };
     } else {
         // Yangi qo‘shilgan
-        editableData.value.transferInvoiceProducts[currentLocationQuantityIndex.value] = {
+        editableData.value.writeOffInvoiceProducts[currentLocationQuantityIndex.value] = {
             ...current,
             ...payload
         };
@@ -400,7 +403,7 @@ function editLocationQuantity(updatedLocationQuantity) {
 
 function editLocationQuantityKit(updatedLocationQuantityKit) {
     // Duplicate check
-    const exists = editableData.value.transferInvoiceKits.some((p, i) =>
+    const exists = editableData.value.writeOffInvoiceKits.some((p, i) =>
         i !== currentLocationQuantityKitIndex.value &&
         p.locationQuantityKit.id === updatedLocationQuantityKit.locationQuantityKit.id
     );
@@ -415,7 +418,7 @@ function editLocationQuantityKit(updatedLocationQuantityKit) {
         return;
     }
 
-    const current = editableData.value.transferInvoiceKits[currentLocationQuantityKitIndex.value];
+    const current = editableData.value.writeOffInvoiceKits[currentLocationQuantityKitIndex.value];
 
     const payload = {};
 
@@ -428,8 +431,8 @@ function editLocationQuantityKit(updatedLocationQuantityKit) {
     }
 
     if (current.id) {
-        payload.transferInvoiceKit = current['@id']
-        const indexFromUpdatedData = updatedData.value.findIndex(data => data.transferInvoiceKit['@id'] === payload.transferInvoiceKit['@id'])
+        payload.writeOffInvoiceKit = current['@id']
+        const indexFromUpdatedData = updatedData.value.findIndex(data => data.writeOffInvoiceKit['@id'] === payload.writeOffInvoiceKit['@id'])
 
         if (indexFromUpdatedData !== -1) {
             updatedKitData.value[indexFromUpdatedData] = {
@@ -440,14 +443,14 @@ function editLocationQuantityKit(updatedLocationQuantityKit) {
         }
 
         // API’dan kelgan
-        editableData.value.transferInvoiceKits[currentLocationQuantityKitIndex.value] = {
-            transferInvoiceKit: current['@id'],
+        editableData.value.writeOffInvoiceKits[currentLocationQuantityKitIndex.value] = {
+            writeOffInvoiceKit: current['@id'],
             ...current,
             ...payload,
         };
     } else {
         // Yangi qo‘shilgan
-        editableData.value.transferInvoiceKits[currentLocationQuantityKitIndex.value] = {
+        editableData.value.writeOffInvoiceKits[currentLocationQuantityKitIndex.value] = {
             ...current,
             ...payload
         };
@@ -490,6 +493,10 @@ const confirmLeave = () => {
 
 onMounted(async () => {
     await writeOffInvoiceStore.fetchWriteOffInvoice(route.params.id);
+    await inventoryStore.fetchHasInventory({
+        location: `/api/locations/${writeOffInvoiceStore.getWriteOffInvoice.location.id}`,
+        createdAt: writeOffInvoiceStore.getWriteOffInvoice.createdAt
+    })
 
     apiData.value = writeOffInvoiceStore.getWriteOffInvoice;
     editableData.value = JSON.parse(JSON.stringify(writeOffInvoiceStore.getWriteOffInvoice));
@@ -536,7 +543,7 @@ onMounted(async () => {
         back-route-name="warehouse-write-off-invoices"
     >
         <template #buttons>
-            <div v-if="!isLoading" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
+            <div v-if="!isLoading && !hasInventory" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
                 <Button
                     v-if="!editMode && isAdminOrCreatedBy(writeOffInvoiceStore.getWriteOffInvoice.createdBy.id)"
                     :disabled="!!writeOffInvoiceErrors.writeOffInvoiceProducts"

@@ -17,7 +17,7 @@ import NoData from "@/components/UI/NoData.vue";
 import {useI18n} from "vue-i18n";
 import {useLocationStore} from "@/stores/location.js";
 import {useInventoryStore} from "@/stores/inventory.js";
-import {formatCurrency, formatDateTimeLocal, getFormattedDate} from "@/helpers/numberFormat.js";
+import {formatCurrency} from "@/helpers/numberFormat.js";
 import {useToast} from "primevue/usetoast";
 import {useCustomerStore} from "@/stores/customer.js";
 import TabList from "@/volt/TabList.vue";

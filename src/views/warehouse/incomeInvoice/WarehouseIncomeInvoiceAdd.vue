@@ -118,11 +118,13 @@ const sumPriceOfIncomeInvoiceProducts = computed(() => {
 })
 
 const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
+    const date = new Date(values.createdAt);
+    date.setHours(date.getHours() + 5);
     const payload = {
         supplier: values.supplier['@id'],
         location: values.location['@id'],
         comment: values.comment,
-        createdAt: values.createdAt,
+        createdAt: date,
         incomeInvoiceProducts: values.incomeInvoiceProducts.map(incomeInvoiceProduct => {
             const newVal = {
                 product: incomeInvoiceProduct.product['@id'],

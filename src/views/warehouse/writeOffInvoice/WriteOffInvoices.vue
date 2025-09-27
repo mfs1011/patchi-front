@@ -23,6 +23,7 @@ import SecondaryButton from "@/volt/SecondaryButton.vue";
 import Dialog from "@/volt/Dialog.vue";
 import {useKitStore} from "@/stores/kit.js";
 import {useWriteOffInvoiceStore} from "@/stores/writeOffInvoice.js";
+import {useInventoryStore} from "@/stores/inventory.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -30,6 +31,7 @@ const { t } = useI18n();
 const toast = useToast()
 
 const writeOffInvoiceStore = useWriteOffInvoiceStore()
+const inventoryStore = useInventoryStore();
 const locationStore = useLocationStore()
 const productStore = useProductStore()
 const kitStore = useKitStore()
@@ -146,9 +148,18 @@ const isAdminOrCreatedBy = createdById => (
     userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
 )
 
-const deleteAction = (id) => {
-    currentWriteOffInvoiceId.value = id;
-    deleteVisible.value = true;
+const deleteAction = async (data) => {
+    await inventoryStore.fetchHasInventory({
+        location: `/api/locations/${data.location.id}`,
+        createdAt: data.createdAt
+    })
+
+    if (inventoryStore.getHasInventory) {
+        toast.add({ severity: 'error', summary: t('toast.confirmedExists'), life: 3000 })
+    } else {
+        currentWriteOffInvoiceId.value = data.id;
+        deleteVisible.value = true;
+    }
 };
 
 const deleteWriteOffInvoice = async () => {
@@ -428,7 +439,7 @@ onBeforeRouteLeave(() => {
                                         />
                                         <Button
                                             v-if="isAdminOrCreatedBy(data.createdBy.id)"
-                                            @click="deleteAction(data.id)"
+                                            @click="deleteAction(data)"
                                             icon="pi pi-trash"
                                             pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
                                             size="small"

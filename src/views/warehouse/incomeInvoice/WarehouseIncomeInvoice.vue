@@ -78,6 +78,7 @@ const isEditing = ref(false);
 const pendingNavigation = ref(false);
 const isEdited = ref(false);
 const isConfirmLoading = ref(false);
+const hasInventory = computed(() => inventoryStore.getHasInventory)
 
 // computed
 const home = computed(() => ({
@@ -389,15 +390,16 @@ watch(isProductTypeNonFood, (newVal) => {
 watch(location, async () => {
     if (location.value) {
         await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
+        console.log(location.value.id)
 
         if (inventoryStore.getLastInventoryDateTo === null) {
             dateFrom.value = null
             createdAt.value = null
         } else {
             const date = new Date(inventoryStore.getLastInventoryDateTo);
-            date.setDate(date.getDate() + 1);
+            date.setDate(date.getDate());
+            date.setMinutes(date.getMinutes() + 1);
             dateFrom.value = date;
-            // createdAt.value = date
         }
     } else {
         dateFrom.value = null
@@ -423,6 +425,10 @@ const confirmLeave = () => {
 
 onMounted(async () => {
     await incomeInvoiceStore.fetchIncomeInvoice(route.params.id);
+    await inventoryStore.fetchHasInventory({
+        location: `/api/locations/${incomeInvoiceStore.getIncomeInvoice.location.id}`,
+        createdAt: incomeInvoiceStore.getIncomeInvoice.createdAt
+    })
 
     apiData.value = incomeInvoiceStore.getIncomeInvoice;
     editableData.value = JSON.parse(JSON.stringify(incomeInvoiceStore.getIncomeInvoice));
@@ -470,7 +476,7 @@ onMounted(async () => {
         back-route-name="warehouse-income-invoices"
     >
         <template #buttons>
-            <div v-if="!isLoading" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
+            <div v-if="!isLoading && !hasInventory" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
                 <Button
                     v-if="!editMode && isAdminOrCreatedBy(incomeInvoiceStore.getIncomeInvoice.createdBy.id)"
                     :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
