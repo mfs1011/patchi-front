@@ -1,7 +1,7 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
 import Card from "@/volt/Card.vue";
@@ -15,7 +15,6 @@ import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
 import Column from "primevue/column";
 import DataTable from "@/volt/DataTable.vue";
 import Dialog from "@/volt/Dialog.vue";
-import {useTransferInvoiceStore} from "@/stores/transferInvoice.js";
 import {useLocationQuantityStore} from "@/stores/locationQuantity.js";
 import {useUserStore} from "@/stores/user.js";
 import TabPanels from "@/volt/TabPanels.vue";
@@ -27,19 +26,20 @@ import Tab from "@/volt/Tab.vue";
 import ColumnGroup from "primevue/columngroup";
 import Row from "primevue/row";
 import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
-import {useTransferInvoiceValidation} from "@/views/warehouse/transferInvoice/useWarehouseTransferInvoiceForm.js";
+import {useWriteOffInvoiceStore} from "@/stores/writeOffInvoice.js";
+import {useWriteOffInvoiceValidation} from "@/views/warehouse/writeOffInvoice/useWriteOffInvoiceForm.js";
 
 const { t } = useI18n()
 const toast = useToast()
 const {
-    transferInvoiceHandleSubmit,
-    transferInvoiceErrors,
-    transferInvoiceIsSubmitting,
-    transferInvoiceResetForm,
-    fromLocation,
-    toLocation,
-    transferInvoiceProducts,
-    transferInvoiceKits,
+    writeOffInvoiceHandleSubmit,
+    writeOffInvoiceErrors,
+    writeOffInvoiceIsSubmitting,
+    writeOffInvoiceResetForm,
+    location,
+    createdAt,
+    writeOffInvoiceProducts,
+    writeOffInvoiceKits,
     locationQuantityHandleSubmit,
     locationQuantityErrors,
     locationQuantityIsSubmitting,
@@ -48,19 +48,19 @@ const {
     locationQuantity,
     qtyLocationQuantity,
     locationQuantityKitHandleSubmit,
-    locationQuantityKitIsSubmitting,
     locationQuantityKitErrors,
+    locationQuantityKitIsSubmitting,
     locationQuantityKitResetForm,
     locationQuantityKitValidate,
     locationQuantityKit,
     qtyLocationQuantityKit,
-} = useTransferInvoiceValidation()
+} = useWriteOffInvoiceValidation()
 
 const locationStore = useLocationStore();
 const userStore = useUserStore();
 const locationQuantityStore = useLocationQuantityStore();
 const locationQuantityKitStore = useLocationQuantityKitStore();
-const transferInvoiceStore = useTransferInvoiceStore();
+const writeOffInvoiceStore = useWriteOffInvoiceStore();
 const router = useRouter();
 const currentProduct = ref({})
 const currentKit = ref({})
@@ -74,6 +74,7 @@ const pendingNavigation = ref(false)
 const editingProductIndex = ref(null)
 const editingKitIndex = ref(null)
 const tabVal = ref('products')
+const isLocation = ref(false)
 
 const home = computed(() => ({
     icon: 'pi pi-home',
@@ -82,45 +83,41 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t('cards.writeOffInvoices'), route: { name: 'warehouse-write-off-invoices'} }, { label: t('sections.writeOffInvoices.add') }]);
-const hasTransferInvoiceData = computed(() => !!toLocation.value && !!fromLocation.value)
 const tabList = computed(() => [
     { value: 'products', label: t('cards.products')},
     { value: 'kits', label: t('cards.kits')},
 ])
 
 const isChanged = computed(() => (
-    !!fromLocation.value ||
-    !!toLocation.value ||
-    !!transferInvoiceProducts.value.length ||
-    !!transferInvoiceKits.value.length
+    !!location.value ||
+    !!writeOffInvoiceProducts.value.length ||
+    !!writeOffInvoiceKits.value.length
 ))
 
 const isSetAllData = computed(() => (
-    !!fromLocation.value &&
-    !!toLocation.value &&
-    (!!transferInvoiceProducts.value.length ||
-    !!transferInvoiceKits.value.length)
+    !!location.value &&
+    (!!writeOffInvoiceProducts.value.length ||
+    !!writeOffInvoiceKits.value.length)
 ))
 
-const onSubmitTransferInvoice = transferInvoiceHandleSubmit(async values => {
+const onSubmitWriteOffInvoice = writeOffInvoiceHandleSubmit(async values => {
     const payload = {
-        fromLocation: values.fromLocation['@id'],
-        toLocation: values.toLocation['@id'],
-        transferInvoiceProducts: values.transferInvoiceProducts.map(transferInvoiceProduct => ({
-            locationQuantity: `api/location_quantities/${transferInvoiceProduct.locationQuantity.id}`,
-            qty: transferInvoiceProduct.qtyLocationQuantity,
+        location: values.location['@id'],
+        writeOffInvoiceProducts: values.writeOffInvoiceProducts.map(writeOffInvoiceProduct => ({
+            locationQuantity: `api/location_quantities/${writeOffInvoiceProduct.locationQuantity.id}`,
+            qty: writeOffInvoiceProduct.qtyLocationQuantity,
         })),
-        transferInvoiceKits: values.transferInvoiceKits.map(transferInvoiceKit => ({
-            locationQuantityKit: `api/location_quantity_kits/${transferInvoiceKit.locationQuantityKit.id}`,
-            qty: transferInvoiceKit.qtyLocationQuantityKit,
+        writeOffInvoiceKits: values.writeOffInvoiceKits.map(writeOffInvoiceKit => ({
+            locationQuantityKit: `api/location_quantity_kits/${writeOffInvoiceKit.locationQuantityKit.id}`,
+            qty: writeOffInvoiceKit.qtyLocationQuantityKit,
         }))
     };
 
     try {
-        await transferInvoiceStore.pushTransferInvoice(payload)
+        await writeOffInvoiceStore.pushWriteOffInvoice(payload)
 
-        toast.add({ severity: 'success', summary: t('toast.created', { name: t('transferInvoice.nominativeCapitalize') }), life: 3000 })
-        transferInvoiceResetForm()
+        toast.add({ severity: 'success', summary: t('toast.created', { name: t('writeOffInvoice.nominativeCapitalize') }), life: 3000 })
+        writeOffInvoiceResetForm()
         locationQuantityResetForm()
         locationQuantityKitResetForm()
         router.back()
@@ -131,7 +128,7 @@ const onSubmitTransferInvoice = transferInvoiceHandleSubmit(async values => {
 })
 
 const onSubmitLocationQuantity = locationQuantityHandleSubmit(async values => {
-    const isInclude = transferInvoiceProducts.value.some(transferInvoiceProduct => transferInvoiceProduct.locationQuantity?.id === values.locationQuantity?.id)
+    const isInclude = writeOffInvoiceProducts.value.some(writeOffInvoiceProduct => writeOffInvoiceProduct.locationQuantity?.id === values.locationQuantity?.id)
 
     if (isInclude) {
         toast.add({
@@ -140,14 +137,14 @@ const onSubmitLocationQuantity = locationQuantityHandleSubmit(async values => {
             life: 3000
         })
     } else {
-        transferInvoiceProducts.value = [...transferInvoiceProducts.value, values]
+        writeOffInvoiceProducts.value = [...writeOffInvoiceProducts.value, values]
         currentProduct.value = values
         locationQuantityResetForm()
     }
 })
 
 const onSubmitLocationQuantityKit = locationQuantityKitHandleSubmit(async values => {
-    const isInclude = transferInvoiceKits.value.some(transferInvoiceKit => transferInvoiceKit.locationQuantityKit?.id === values.locationQuantityKit?.id)
+    const isInclude = writeOffInvoiceKits.value.some(writeOffInvoiceKit => writeOffInvoiceKit.locationQuantityKit?.id === values.locationQuantityKit?.id)
 
     if (isInclude) {
         toast.add({
@@ -156,7 +153,7 @@ const onSubmitLocationQuantityKit = locationQuantityKitHandleSubmit(async values
             life: 3000
         })
     } else {
-        transferInvoiceKits.value = [...transferInvoiceKits.value, values]
+        writeOffInvoiceKits.value = [...writeOffInvoiceKits.value, values]
         currentKit.value = values
         locationQuantityKitResetForm()
     }
@@ -175,7 +172,7 @@ const deleteKitAction = data => {
 const deleteProduct = () => {
     isDeleteLoading.value = true;
 
-    transferInvoiceProducts.value = transferInvoiceProducts.value.filter(p => p.locationQuantity.product.id !== currentProduct.value.locationQuantity.product.id);
+    writeOffInvoiceProducts.value = writeOffInvoiceProducts.value.filter(p => p.locationQuantity.product.id !== currentProduct.value.locationQuantity.product.id);
     currentProduct.value = {}
     isDeleteLoading.value = false;
     deleteProductVisible.value = false;
@@ -184,7 +181,7 @@ const deleteProduct = () => {
 const deleteKit = () => {
     isDeleteLoading.value = true;
 
-    transferInvoiceKits.value = transferInvoiceKits.value.filter(k => k.locationQuantityKit.kit.id !== currentKit.value.locationQuantityKit.kit.id);
+    writeOffInvoiceKits.value = writeOffInvoiceKits.value.filter(k => k.locationQuantityKit.kit.id !== currentKit.value.locationQuantityKit.kit.id);
     currentKit.value = {}
     isDeleteLoading.value = false;
     deleteKitVisible.value = false;
@@ -222,8 +219,8 @@ const saveEditingProduct = async () => {
         qtyLocationQuantity: qtyLocationQuantity.value,
     }
 
-    transferInvoiceProducts.value = transferInvoiceProducts.value.map((transferInvoiceProduct, index) => (
-        index === editingProductIndex.value ? editedData : transferInvoiceProduct
+    writeOffInvoiceProducts.value = writeOffInvoiceProducts.value.map((writeOffInvoiceProduct, index) => (
+        index === editingProductIndex.value ? editedData : writeOffInvoiceProduct
     ))
 
     toast.add({
@@ -249,8 +246,8 @@ const saveEditingKit = async () => {
         qtyLocationQuantityKit: qtyLocationQuantityKit.value,
     }
 
-    transferInvoiceKits.value = transferInvoiceKits.value.map((transferInvoiceKit, index) => (
-        index === editingKitIndex.value ? editedData : transferInvoiceKit
+    writeOffInvoiceKits.value = writeOffInvoiceKits.value.map((writeOffInvoiceKit, index) => (
+        index === editingKitIndex.value ? editedData : writeOffInvoiceKit
     ))
 
     toast.add({
@@ -262,21 +259,6 @@ const saveEditingKit = async () => {
     locationQuantityKitResetForm()
     editingKitIndex.value = null
     isEditing.value = false
-}
-
-async function fetchLocation(query) {
-    const params = {
-        ...query,
-        isWarehouse: true
-    }
-
-    if (userStore.getAboutMeFromToken.role === 'ROLE_WAREHOUSE_MANAGER') {
-        params.user = userStore.getAboutMeFromToken.id
-    }
-
-    console.log(params)
-
-    await locationStore.fetchLocations(params)
 }
 
 onBeforeRouteLeave((to, from, next) => {
@@ -294,6 +276,16 @@ const confirmLeave = () => {
         pendingNavigation.value()
     }
 }
+
+watch(location, async (newVal) => {
+    isLocation.value = false
+
+    if (newVal) {
+        await locationQuantityStore.fetchLocationQuantities({location: newVal.id})
+        await locationQuantityKitStore.fetchLocationQuantityKits({location: newVal.id})
+        isLocation.value = true
+    }
+})
 </script>
 
 <template>
@@ -327,20 +319,20 @@ const confirmLeave = () => {
                 <Button
                     :disabled="!isSetAllData"
                     icon="pi pi-save"
-                    @click="onSubmitTransferInvoice"
+                    @click="onSubmitWriteOffInvoice"
                     class="px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
-                    :loading="transferInvoiceIsSubmitting"
+                    :loading="writeOffInvoiceIsSubmitting"
                 />
             </div>
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
                 <Button
                     :disabled="!isSetAllData"
                     icon="pi pi-save"
-                    @click="onSubmitTransferInvoice"
+                    @click="onSubmitWriteOffInvoice"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
-                    :loading="transferInvoiceIsSubmitting"
+                    :loading="writeOffInvoiceIsSubmitting"
                 />
             </div>
         </template>
@@ -353,13 +345,13 @@ const confirmLeave = () => {
                 pt:title="font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
                 <template #content>
-                    <div class="font-medium mb-4">{{ t('transferData') }}</div>
+                    <div class="font-medium mb-4">{{ t('writeOffData') }}</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         <div>
-                            <p class="text-sm">{{ t('labels.fromLocation') }}<span class="text-red-500"> *</span></p>
+                            <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
                             <SearchSelect
-                                v-model="fromLocation"
-                                :fetchFn="fetchLocation"
+                                v-model="location"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.name"
@@ -367,32 +359,14 @@ const confirmLeave = () => {
                                 :placeholder="t('placeholders.search.byLocation')"
                                 :loading="locationStore.getIsLoadingLocation"
                                 :total-items="locationStore.getLocations.totalItems"
-                                :invalid="!!transferInvoiceErrors.fromLocation"
-                                @update:model-value="() => toLocation = null"
-                            />
-                        </div>
-
-                        <div>
-                            <p class="text-sm">{{ t('labels.toLocation') }}<span class="text-red-500"> *</span></p>
-
-                            <SearchSelect
-                                v-model="toLocation"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query, toLocation: true })"
-                                :options="locationStore.getLocations.models.filter(l => l.id !== fromLocation)"
-                                :option-label="opt => opt?.name"
-                                :option-value="opt => opt?.name"
-                                :return-value="opt => opt"
-                                :placeholder="t('placeholders.search.byLocation')"
-                                :loading="locationStore.getIsLoadingLocation"
-                                :total-items="locationStore.getLocations.totalItems - 1"
-                                :invalid="!!transferInvoiceErrors.toLocation"
+                                :invalid="!!writeOffInvoiceErrors.location"
                             />
                         </div>
                     </div>
                 </template>
             </Card>
             <Card
-                v-if="hasTransferInvoiceData"
+                v-if="isLocation"
                 pt:root="overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"
@@ -416,7 +390,7 @@ const confirmLeave = () => {
                                         <p class="text-sm">{{ t('labels.product') }}<span class="text-red-500"> *</span></p>
                                         <SearchSelect
                                             v-model="locationQuantity"
-                                            :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: fromLocation.id})"
+                                            :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: location.id})"
                                             :options="locationQuantityStore.getLocationQuantities.models"
                                             :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
@@ -468,7 +442,7 @@ const confirmLeave = () => {
                                         <p class="text-sm">{{ t('labels.kit') }}<span class="text-red-500"> *</span></p>
                                         <SearchSelect
                                             v-model="locationQuantityKit"
-                                            :fetchFn="(query) => locationQuantityKitStore.fetchLocationQuantityKits({...query, location: fromLocation.id})"
+                                            :fetchFn="(query) => locationQuantityKitStore.fetchLocationQuantityKits({...query, location: location.id})"
                                             :options="locationQuantityKitStore.getLocationQuantityKits.models"
                                             :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
@@ -525,7 +499,7 @@ const confirmLeave = () => {
                 </template>
             </Card>
             <Card
-                v-if="transferInvoiceProducts.length > 0 || transferInvoiceKits.length > 0"
+                v-if="writeOffInvoiceProducts.length > 0 || writeOffInvoiceKits.length > 0"
                 pt:root="h-fit grow overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0 grow"
                 pt:content="grow flex flex-col p-2 sm:p-4"
@@ -540,36 +514,18 @@ const confirmLeave = () => {
                                 v-if="tabVal === 'products'"
                                 value="products"
                             >
-                                <NoData v-if="!transferInvoiceProducts?.length" class="text-surface-400 mx-auto my-auto h-full">
+                                <NoData v-if="!writeOffInvoiceProducts?.length" class="text-surface-400 mx-auto my-auto h-full">
                                     <p class="text-xl font-normal">{{ t("noResults") }}</p>
                                 </NoData>
 
                                 <DataTable
                                     v-else
-                                    :value="transferInvoiceProducts"
+                                    :value="writeOffInvoiceProducts"
                                     scrollable
                                     scroll-height="700px"
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
-                                    <ColumnGroup type="header">
-                                        <Row>
-                                            <Column :header="t('labels.product')" :rowspan="1" :colspan="7"/>
-                                            <Column :header="t('labels.expiryDate')" :rowspan="2" :colspan="1" />
-                                            <Column :header="t('labels.qty')" :rowspan="2" :colspan="1" />
-                                            <Column :header="t('labels.transferQty')" :rowspan="2" :colspan="1" />
-                                            <Column :header="t('actions')" :rowspan="2" :colspan="1" />
-                                        </Row>
-                                        <Row>
-                                            <Column field="kit" :header="t('labels.title')" />
-                                            <Column field="code" :header="t('labels.code')" />
-                                            <Column field="qr" :header="t('labels.color')" />
-                                            <Column field="qr" :header="t('labels.qr')" />
-                                            <Column field="qr" :header="t('labels.costPrice')" />
-                                            <Column field="qr" :header="t('labels.wholesalePrice')" />
-                                            <Column field="qr" :header="t('labels.retailPrice')" />
-                                        </Row>
-                                    </ColumnGroup>
                                     <Column field="product" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantity?.product?.name }}</p>
@@ -595,27 +551,12 @@ const confirmLeave = () => {
                                             <p>{{ (formatCurrency(data.locationQuantity?.product?.costPrice) + '$') || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
-                                        <template #body="{ data }">
-                                            <p>{{ (formatCurrency(data.locationQuantity?.product?.wholesalePrice) + '$') || '-' }}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
-                                        <template #body="{ data }">
-                                            <p>{{ (formatCurrency(data.locationQuantity?.product?.retailPrice) + '$') || '-' }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantity?.expiryDate ? getFormattedDate(data.locationQuantity?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qty" :header="t('labels.qty')">
-                                        <template #body="{ data }">
-                                            <p>{{ data.locationQuantity.qty }} {{t(`labels.${data.locationQuantity?.product?.category?.unit?.name}`)}}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="qty" :header="t('labels.transferQty')">
                                         <template #body="{ data }">
                                             <p>{{ data.qtyLocationQuantity }} {{t(`labels.${data.locationQuantity?.product?.category?.unit?.name}`)}}</p>
                                         </template>
@@ -648,35 +589,18 @@ const confirmLeave = () => {
                                 v-if="tabVal === 'kits'"
                                 value="kits"
                             >
-                                <NoData v-if="!transferInvoiceKits?.length" class="text-surface-400 mx-auto my-auto h-full">
+                                <NoData v-if="!writeOffInvoiceKits?.length" class="text-surface-400 mx-auto my-auto h-full">
                                     <p class="text-xl font-normal">{{ t("noResults") }}</p>
                                 </NoData>
 
                                 <DataTable
                                     v-else
-                                    :value="transferInvoiceKits"
+                                    :value="writeOffInvoiceKits"
                                     scrollable
                                     scroll-height="700px"
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
-                                    <ColumnGroup type="header">
-                                        <Row>
-                                            <Column :header="t('labels.kit')" :rowspan="1" :colspan="6" class="text-center!"/>
-                                            <Column :header="t('labels.expiryDate')" :rowspan="2" :colspan="1" />
-                                            <Column :header="t('labels.qty')" :rowspan="2" :colspan="1" />
-                                            <Column :header="t('labels.transferQty')" :rowspan="2" :colspan="1" />
-                                            <Column :header="t('actions')" :rowspan="2" :colspan="1" />
-                                        </Row>
-                                        <Row>
-                                            <Column field="kit" :header="t('labels.title')" />
-                                            <Column field="code" :header="t('labels.code')" />
-                                            <Column field="qr" :header="t('labels.qr')" />
-                                            <Column field="qr" :header="t('labels.costPrice')" />
-                                            <Column field="qr" :header="t('labels.wholesalePrice')" />
-                                            <Column field="qr" :header="t('labels.retailPrice')" />
-                                        </Row>
-                                    </ColumnGroup>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantityKit?.kit?.name }}</p>
@@ -697,27 +621,12 @@ const confirmLeave = () => {
                                             <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.costPrice) + '$') || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
-                                        <template #body="{ data }">
-                                            <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.wholesalePrice) + '$') || '-' }}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
-                                        <template #body="{ data }">
-                                            <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.retailPrice) + '$') || '-' }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantityKit?.expiryDate ? getFormattedDate(data.locationQuantityKit?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qty" :header="t('labels.qty')">
-                                        <template #body="{ data }">
-                                            <p>{{ data.locationQuantityKit.qty }} {{t(`labels.pcs`)}}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="qtyLocationQuantityKit" :header="t('labels.transferQty')">
                                         <template #body="{ data }">
                                             <p>{{ data.qtyLocationQuantityKit }} {{t(`labels.pcs`)}}</p>
                                         </template>

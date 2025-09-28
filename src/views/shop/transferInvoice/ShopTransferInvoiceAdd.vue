@@ -264,21 +264,6 @@ const saveEditingKit = async () => {
     isEditing.value = false
 }
 
-async function fetchLocation(query) {
-    const params = {
-        ...query,
-        isWarehouse: false
-    }
-
-    if (userStore.getAboutMeFromToken.role === 'ROLE_WAREHOUSE_MANAGER') {
-        params.user = userStore.getAboutMeFromToken.id
-    }
-
-    console.log(params)
-
-    await locationStore.fetchLocations(params)
-}
-
 onBeforeRouteLeave((to, from, next) => {
     if (isChanged.value) {
         showLeaveDialog.value = true
@@ -359,7 +344,7 @@ const confirmLeave = () => {
                             <p class="text-sm">{{ t('labels.fromLocation') }}<span class="text-red-500"> *</span></p>
                             <SearchSelect
                                 v-model="fromLocation"
-                                :fetchFn="fetchLocation"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: false})"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.name"
