@@ -177,6 +177,12 @@
         "accusative": "ko‘chirishni",
         "accusativeCapitalize": "Ko‘chirishni"
     },
+    "orderInvoice": {
+      "nominative": "buyurtma",
+      "nominativeCapitalize": "Buyurtma",
+      "accusative": "buyurtma",
+      "accusativeCapitalize": "Buyurtma"
+    },
     "returnInvoice": {
       "nominative": "qaytarish",
       "nominativeCapitalize": "Qaytarish",

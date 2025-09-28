@@ -13,7 +13,9 @@ export function useOrderInvoice() {
         );
 
         if (existing) {
-            existing.api.qty += 1; // ✅ qty api ichida
+            if (existing.ui.totalQty > existing.api.qty) {
+                existing.api.qty += 1; // ✅ qty api ichida
+            }
         } else {
             orderInvoiceProducts.value.push({
                 ui: { ...product }, // UI uchun to‘liq ma'lumot
@@ -32,7 +34,6 @@ export function useOrderInvoice() {
             (p) => p.ui.id === product.ui.id && p.ui.color === product.ui.color
         );
 
-        console.log(index)
         if (index !== -1) {
             orderInvoiceProducts.value.splice(index, 1);
         }
@@ -43,7 +44,6 @@ export function useOrderInvoice() {
             (p) => p.ui.id === product.ui.id && p.ui.color === product.ui.color
         );
 
-        console.log(index)
         if (index !== -1) {
             if (orderInvoiceProducts.value[index].api.qty > 1) {
                 orderInvoiceProducts.value[index].api.qty -= 1; // ✅ api.qty ni kamaytirish
@@ -59,7 +59,9 @@ export function useOrderInvoice() {
         const existing = orderInvoiceKits.value.find((k) => k.api.kit === kitPath);
 
         if (existing) {
-            existing.api.qty += 1; // ✅ api.qty ichida
+            if (existing.ui.totalQty > existing.api.qty) {
+                existing.api.qty += 1; // ✅ qty api ichida
+            }
         } else {
             orderInvoiceKits.value.push({
                 ui: { ...kit }, // UI uchun to‘liq ma'lumot
@@ -101,9 +103,7 @@ export function useOrderInvoice() {
         orderInvoiceKits,
         addProduct,
         removeProduct,
-        removeOneProduct,
         addKit,
         removeKit,
-        removeOneKit,
     };
 }

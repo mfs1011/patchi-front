@@ -122,7 +122,7 @@ export const routes = [
                                 component: () => import('@/views/warehouse/orderInvoice/WarehouseOrderInvoices.vue')
                             },
                             {
-                                path: 'transfer-invoice/:id',
+                                path: 'order-invoice/:id',
                                 name: 'warehouse-order-invoice',
                                 meta: { requiresAuth: true, roles: []},
                                 component: () => import('@/views/warehouse/orderInvoice/WarehouseOrderInvoice.vue'),
@@ -261,10 +261,16 @@ export const routes = [
                         ]
                     },
                     {
-                        path: 'orders',
-                        name: 'shop-orders',
+                        path: 'order-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/shop/ShopOrders.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'shop-order-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/orderInvoice/ShopOrderInvoices.vue')
+                            },
+                        ]
                     },
                     {
                         path: 'return-invoices',
@@ -289,12 +295,6 @@ export const routes = [
                                 component: () => import('@/views/shop/returnInvoice/ShopReturnInvoiceAdd.vue')
                             }
                         ]
-                    },
-                    {
-                        path: 'write-off-invoices',
-                        name: 'shop-write-off-invoices',
-                        meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/shop/ShopWriteOffInvoice.vue')
                     },
                 ]
             },

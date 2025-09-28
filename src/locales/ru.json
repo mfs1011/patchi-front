@@ -177,6 +177,12 @@
         "accusative": "перемещению",
         "accusativeCapitalize": "Перемещению"
     },
+    "orderInvoice": {
+      "nominative": "заказ",
+      "nominativeCapitalize": "Заказ",
+      "accusative": "заказ",
+      "accusativeCapitalize": "Заказ"
+    },
     "returnInvoice": {
       "nominative": "возврат",
       "nominativeCapitalize": "Возврат",

@@ -21,11 +21,17 @@ import Card from "@/volt/Card.vue";
 import NoData from "@/components/UI/NoData.vue";
 import Column from "primevue/column";
 import DataTable from "@/volt/DataTable.vue";
+import {useInventoryStore} from "@/stores/inventory.js";
+import SecondaryButton from "@/volt/SecondaryButton.vue";
+import Dialog from "@/volt/Dialog.vue";
+import {useToast} from "primevue/usetoast";
 
 const { t } = useI18n();
+const toast = useToast()
 const router = useRouter();
 const route = useRoute();
 const orderInvoiceStore = useOrderInvoiceStore();
+const inventoryStore = useInventoryStore();
 const locationStore = useLocationStore();
 const customerStore = useCustomerStore();
 const userStore = useUserStore();
@@ -33,6 +39,9 @@ const productStore = useProductStore();
 const kitStore = useKitStore();
 const isVisibleSectionHeader = ref(false);
 const tabVal = ref('product');
+const deleteVisible = ref(false)
+const isDeleteLoading = ref(false)
+const currentOrderInvoiceId = ref(null)
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
@@ -65,6 +74,37 @@ const clearFilters = () => {
     filters.value['date-to'] = null;
 }
 
+const isAdminOrCreatedBy = createdById => (
+    userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
+)
+
+const deleteAction = async (data) => {
+    await inventoryStore.fetchHasInventory({
+        location: `/api/locations/${data.location.id}`,
+        createdAt: data.createdAt
+    })
+
+    if (inventoryStore.getHasInventory) {
+        toast.add({ severity: 'error', summary: t('toast.confirmedExists'), life: 3000 })
+    } else {
+        currentOrderInvoiceId.value = data.id;
+        deleteVisible.value = true;
+    }
+};
+
+const deleteOrderInvoice = async () => {
+    try {
+        isDeleteLoading.value = true;
+
+        await orderInvoiceStore.deleteOrderInvoice(currentOrderInvoiceId.value);
+        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('orderInvoice.nominativeCapitalize') }), life: 3000 })
+    } catch (err) {
+        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+    } finally {
+        isDeleteLoading.value = false;
+        deleteVisible.value = false;
+    }
+};
 
 // watchers
 watch(
@@ -362,16 +402,21 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ data.customer?.name || '-' }}</p>
                             </template>
                         </Column>
+                        <Column field="status" :header="t('labels.status')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="orderInvoiceStore.getIsLoadingOrderInvoices"/>
+                                <p
+                                    v-else
+                                    :class="{'text-yellow-500': data.status === 1, 'text-green-500': data.status === 2}"
+                                >
+                                    {{ t(data.status) }}
+                                </p>
+                            </template>
+                        </Column>
                         <Column field="totalPrice" :header="t('labels.totalPrice')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="orderInvoiceStore.getIsLoadingOrderInvoices"/>
                                 <p v-else>{{ `${formatCurrency(data.totalPrice)}$` || '-' }}</p>
-                            </template>
-                        </Column>
-                        <Column field="comment" :header="t('labels.comment')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="orderInvoiceStore.getIsLoadingOrderInvoices"/>
-                                <p v-else class="max-h-20 border border-surface-300 dark:border-surface-700 rounded px-2 py-1 max-w-100 overflow-auto whitespace-break-spaces">{{ data.comment || '-' }}</p>
                             </template>
                         </Column>
                         <Column field="createdAt" :header="t('labels.createdAt')">
@@ -406,15 +451,16 @@ onBeforeRouteLeave(() => {
                                     <div class="flex items-center gap-2">
                                         <Button
                                             @click="router.push({
-                                                name: 'income-invoice',
-                                                params: { id: data.id },
+                                                name: 'warehouse-order-invoice',
+                                                params: { id: data.id }
                                             })"
                                             icon="pi pi-eye"
                                             pt:root="rounded-full size-8! bg-blue-400 dark:bg-blue-400 enabled:hover:bg-blue-300 dark:enabled:hover:bg-blue-300 border-blue-400 dark:border-blue-400 enabled:hover:border-blue-300 dark:enabled:hover:border-blue-300 focus-visible:outline-blue-400 dark:focus-visible:outline-blue-400"
                                             size="small"
                                         />
                                         <Button
-                                            @click="deleteAction(data.id)"
+                                            v-if="isAdminOrCreatedBy(data.createdBy.id) && data.status !== 2"
+                                            @click="deleteAction(data)"
                                             icon="pi pi-trash"
                                             pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
                                             size="small"
@@ -445,35 +491,35 @@ onBeforeRouteLeave(() => {
                 </template>
             </Card>
 
-            <!-- DELETE ICOME_INVOICE DIALOG -->
-<!--            <Dialog-->
-<!--                v-model:visible="deleteVisible"-->
-<!--                modal-->
-<!--                :closable="false"-->
-<!--                class="sm:min-w-100 sm:w-fit w-9/10"-->
-<!--                pt:root="px-2"-->
-<!--            >-->
-<!--                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">-->
-<!--                    {{ t('dialog.deleteConfirmation', { name: t('incomeInvoice.accusative'), id: currentIncomeInvoiceId }) }}-->
-<!--                </span>-->
+            <!-- DELETE ORDER_INVOICE DIALOG -->
+            <Dialog
+                v-model:visible="deleteVisible"
+                modal
+                :closable="false"
+                class="sm:min-w-100 sm:w-fit w-9/10"
+                pt:root="px-2"
+            >
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.deleteConfirmation', { name: t('orderInvoice.accusative'), id: currentOrderInvoiceId }) }}
+                </span>
 
-<!--                <template #footer>-->
-<!--                    <div class="flex justify-end gap-2">-->
-<!--                        <SecondaryButton-->
-<!--                            type="button"-->
-<!--                            :label="t('dialog.cancel')"-->
-<!--                            @click="deleteVisible = false"-->
-<!--                        />-->
-<!--                        <Button-->
-<!--                            type="button"-->
-<!--                            :label="t('dialog.confirm')"-->
-<!--                            @click="deleteIncomeInvoice"-->
-<!--                            :loading="isDeleteLoading"-->
-<!--                            class="px-5"-->
-<!--                        />-->
-<!--                    </div>-->
-<!--                </template>-->
-<!--            </Dialog>-->
+                <template #footer>
+                    <div class="flex justify-end gap-2">
+                        <SecondaryButton
+                            type="button"
+                            :label="t('dialog.cancel')"
+                            @click="deleteVisible = false"
+                        />
+                        <Button
+                            type="button"
+                            :label="t('dialog.confirm')"
+                            @click="deleteOrderInvoice"
+                            :loading="isDeleteLoading"
+                            class="px-5"
+                        />
+                    </div>
+                </template>
+            </Dialog>
         </template>
     </Section>
 </template>

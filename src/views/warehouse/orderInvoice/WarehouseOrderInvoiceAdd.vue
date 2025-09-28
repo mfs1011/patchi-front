@@ -1,37 +1,23 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
 import Card from "@/volt/Card.vue";
-import SecondaryButton from "@/volt/SecondaryButton.vue";
-import {onBeforeRouteLeave, useRouter} from "vue-router";
 import {useLocationStore} from "@/stores/location.js";
 import {useToast} from "primevue/usetoast";
 import InputNumber from "@/volt/InputNumber.vue";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
-import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
-import Column from "primevue/column";
-import DataTable from "@/volt/DataTable.vue";
-import Dialog from "@/volt/Dialog.vue";
-import {useTransferInvoiceStore} from "@/stores/transferInvoice.js";
-import {useLocationQuantityStore} from "@/stores/locationQuantity.js";
-import {useUserStore} from "@/stores/user.js";
+import {formatCurrency} from "@/helpers/numberFormat.js";
 import TabPanels from "@/volt/TabPanels.vue";
 import TabPanel from "@/volt/TabPanel.vue";
 import TabList from "@/volt/TabList.vue";
 import NoData from "@/components/UI/NoData.vue";
 import Tabs from "@/volt/Tabs.vue";
 import Tab from "@/volt/Tab.vue";
-import ColumnGroup from "primevue/columngroup";
-import Row from "primevue/row";
-import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
-import {useTransferInvoiceValidation} from "@/views/warehouse/transferInvoice/useWarehouseTransferInvoiceForm.js";
 import {useOrderInvoiceValidation} from "@/views/warehouse/orderInvoice/useWarehouseOrderInvoiceForm.js";
 import {useCustomerStore} from "@/stores/customer.js";
-import Skeleton from "@/volt/Skeleton.vue";
-import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import DatePicker from "@/volt/DatePicker.vue";
 import Loader from "@/components/Loader.vue";
 import {useProductStore} from "@/stores/product.js";
@@ -39,13 +25,18 @@ import {useKitStore} from "@/stores/kit.js";
 import { vIntersectionObserver } from "@vueuse/components";
 import InputText from "@/volt/InputText.vue";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
-import updateQuery from "@/helpers/updateQuery.js";
 import {useAssemblyStore} from "@/stores/assembly.js";
 import {useCategoryStore} from "@/stores/category.js";
 import {useOrderInvoice} from "@/views/warehouse/orderInvoice/useOrderInvoice.js";
+import {useOrderInvoiceStore} from "@/stores/orderInvoice.js";
+import {useInventoryStore} from "@/stores/inventory.js";
+import {useRouter} from "vue-router";
+import Select from "@/volt/Select.vue";
+import {usePaymentStore} from "@/stores/payment.js";
 
 const { t } = useI18n()
 const toast = useToast()
+const router = useRouter();
 
 const {
     orderInvoiceHandleSubmit,
@@ -77,13 +68,15 @@ const {
     kitPrice,
 } = useOrderInvoiceValidation();
 
+const orderInvoiceStore = useOrderInvoiceStore();
+const inventoryStore = useInventoryStore();
 const locationStore = useLocationStore();
 const customerStore = useCustomerStore();
 const productStore = useProductStore();
 const kitStore = useKitStore();
 const assemblyStore = useAssemblyStore();
 const categoryStore = useCategoryStore();
-const userStore = useUserStore();
+const paymentStore = usePaymentStore();
 const tabVal = ref('products')
 const currentProductPage = ref(1)
 const currentKitPage = ref(1)
@@ -92,6 +85,7 @@ const isVisibleIntersectingProduct = ref(false)
 const isVisibleIntersectingKit = ref(false)
 const availableProducts = ref([])
 const availableKits = ref([])
+const dateFrom = ref();
 
 const filters = ref({
     productCategory: null,
@@ -114,29 +108,86 @@ const tabList = computed(() => [
     { value: 'kits', label: t('cards.kits')},
 ])
 
-const tabPanels = computed(() => [
-    { value: 'products', key: 'orderInvoiceProducts' },
-    { value: 'kit', key: 'orderInvoiceKits' },
-])
-
 const baseUrl = computed(() => import.meta.env.VITE_APP_API_URL + '/media/')
 
+const totalPrice = computed(() => {
+    const productsTotal = orderInvoiceProducts.value.reduce((sum, item) => {
+        return sum + (item.api.qty * item.api.price)
+    }, 0)
+
+    const kitsTotal = orderInvoiceKits.value.reduce((sum, item) => {
+        return sum + (item.api.qty * item.api.price)
+    }, 0)
+
+    return productsTotal + kitsTotal
+})
+
+const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async values => {
+    if (orderInvoiceProducts.value.length > 0 || orderInvoiceKits.value.length > 0) {
+        const date = new Date(values.createdAt);
+        date.setHours(date.getHours() + 5);
+        const payload = {
+            location: values.location['@id'],
+            customer: values.customer['@id'],
+            createdAt: date,
+            orderInvoiceProducts: orderInvoiceProducts.value.map(p => p.api),
+            orderInvoiceKits: orderInvoiceKits.value.map(k => k.api),
+        };
+
+        try {
+            await orderInvoiceStore.pushOrderInvoiceB2B(payload)
+
+            toast.add({ severity: 'success', summary: t('toast.created', { name: t('orderInvoice.nominativeCapitalize') }), life: 3000 })
+            orderInvoiceResetForm()
+            productResetForm()
+            kitResetForm()
+            router.back()
+
+        } catch (error) {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
+    }
+})
+
+onMounted( () => {
+    paymentStore.fetchPayments()
+})
+
 watch([() => location.value, () => tabVal.value], async () => {
-    if (!location.value) {
+    if (location.value) {
+        await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
+
+        if (inventoryStore.getLastInventoryDateTo === null) {
+            dateFrom.value = null
+            createdAt.value = null
+        } else {
+            const date = new Date(inventoryStore.getLastInventoryDateTo);
+            date.setDate(date.getDate());
+            date.setMinutes(date.getMinutes() + 1);
+            dateFrom.value = date;
+            createdAt.value = date
+        }
+    } else {
         availableProducts.value = [];
         availableKits.value = [];
+        dateFrom.value = null
+        createdAt.value = null
+
         return;
     }
 
     isLoading.value = true;
+
     try {
         if (tabVal.value === 'products') {
+            availableProducts.value = []
             currentProductPage.value = 1;
-            await productStore.fetchAvailableProducts({ page: 1, location: location.value });
+            await productStore.fetchAvailableProducts({ page: 1, location: location?.value?.id });
             availableProducts.value = productStore.getAvailableProducts.models;
         } else {
+            availableKits.value = []
             currentKitPage.value = 1;
-            await kitStore.fetchAvailableKits({ page: 1, location: location.value });
+            await kitStore.fetchAvailableKits({ page: 1, location: location?.value?.id });
             availableKits.value = kitStore.getAvailableKits.models;
         }
     } catch (err) {
@@ -162,7 +213,7 @@ watch(isVisibleIntersectingProduct, async (newVal) => {
 
         const query = {
             page: nextPage,
-            location: location?.value ?? null,
+            location: location?.value?.id ?? null,
         };
 
         if (typeof productNameDebounced.value === 'string' && productNameDebounced.value.trim() !== '') {
@@ -202,7 +253,7 @@ watch(isVisibleIntersectingKit, async (newVal) => {
     try {
         const nextPage = currentKitPage.value + 1;
 
-        const query = { page: nextPage, location: location?.value ?? null };
+        const query = { page: nextPage, location: location?.value?.id ?? null };
 
         if (typeof kitNameDebounced.value === 'string' && kitNameDebounced.value.trim() !== '') {
             query.name = kitNameDebounced.value;
@@ -229,7 +280,7 @@ watch(
     async () => {
         const queryFilter = {
             page: 1,
-            location: location.value,
+            location: location?.value?.id,
         };
 
         if (typeof productNameDebounced.value === 'string' && productNameDebounced.value.trim() !== '') {
@@ -262,7 +313,7 @@ watch(
 watch(
     [() => kitNameDebounced.value, () => filters.value.kitAssembly],
     async () => {
-        const queryFilter = { page: 1, location: location.value };
+        const queryFilter = { page: 1, location: location?.value?.id };
 
         if (typeof kitNameDebounced.value === 'string' && kitNameDebounced.value.trim() !== '') {
             queryFilter.name = kitNameDebounced.value;
@@ -300,27 +351,13 @@ function clearFilters() {
     filters.value.kitAssembly = null
 }
 
-async function fetchLocations(query) {
-    const newQuery = {
-        ...query
-    }
-
-    if(userStore.getAboutMeFromToken.role === 'ROLE_ADMIN') {
-        newQuery.isWarehouse = true
-    }
-    console.log(userStore.getAboutMeFromToken.role)
-
-    if (userStore.getAboutMeFromToken.role === 'ROLE_WAREHOUSE_MANAGER') {
-        newQuery.user = userStore.getAboutMeFromToken.id
-    }
-
-    await locationStore.fetchLocations(newQuery)
-}
-
 const {
-    orderInvoiceProducts, orderInvoiceKits,
-    addProduct, removeProduct,
-    addKit, removeKit
+    orderInvoiceProducts,
+    orderInvoiceKits,
+    addProduct,
+    removeProduct,
+    addKit,
+    removeKit
 } = useOrderInvoice();
 
 </script>
@@ -365,13 +402,14 @@ const {
                                 <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-2 border-b border-surface-200 dark:border-surface-600/50 p-2 sm:p-4">
                                 <div>
                                     <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
+
                                     <SearchSelect
                                         v-model="location"
-                                        :fetchFn="fetchLocations"
+                                        :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
                                         :options="locationStore.getLocations.models"
                                         :option-label="opt => opt?.name"
-                                        :option-value="opt => opt?.name"
-                                        :return-value="opt => opt.id"
+                                        :option-value="opt => opt?.id"
+                                        :return-value="opt => opt"
                                         :placeholder="t('placeholders.select.location')"
                                         :loading="locationStore.getIsLoadingLocation"
                                         :total-items="locationStore.getLocations.totalItems"
@@ -388,8 +426,8 @@ const {
                                         :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': true })"
                                         :options="customerStore.getCustomers.models"
                                         :option-label="opt => opt?.name"
-                                        :option-value="opt => opt?.name"
-                                        :return-value="opt => opt.id"
+                                        :option-value="opt => opt?.id"
+                                        :return-value="opt => opt"
                                         :placeholder="t('placeholders.select.customer')"
                                         :loading="customerStore.getIsLoadingCustomers"
                                         :total-items="customerStore.getCustomers.totalItems"
@@ -410,7 +448,7 @@ const {
                                         :placeholder="t('placeholders.date')"
                                         show-button-bar
                                         :invalid="!!orderInvoiceErrors.createdAt"
-                                        :minDate="new Date()"
+                                        :minDate="dateFrom"
                                         size="small"
                                     />
 
@@ -423,9 +461,9 @@ const {
                                     <thead>
                                         <tr class="sticky top-0 bg-surface-0 dark:bg-surface-800 z-20 border-b border-surface-200 dark:border-surface-600/50">
                                             <th class="font-medium text-sm text-start pl-4 py-3">{{ t('labels.title') }} / {{ t('labels.color') }}</th>
-                                            <th class="font-medium text-sm text-start">Miqdori</th>
-                                            <th class="font-medium text-sm text-start">Narxi</th>
-                                            <th class="font-medium text-sm text-start">Jami</th>
+                                            <th class="font-medium text-sm text-start">{{t('labels.amount')}}</th>
+                                            <th class="font-medium text-sm text-start">{{t('labels.price')}}</th>
+                                            <th class="font-medium text-sm text-start">{{t('labels.total')}}</th>
                                             <th class="font-medium text-sm text-start pr-4"></th>
                                         </tr>
                                     </thead>
@@ -439,6 +477,7 @@ const {
                                                     v-model.number="item.api.qty"
                                                     class="max-w-20!"
                                                     :min="1"
+                                                    :max="item.ui.totalQty"
                                                     size="small"
                                                     :minFractionDigits="1"
                                                     :maxFractionDigits="2"
@@ -481,6 +520,7 @@ const {
                                                     v-model.number="item.api.qty"
                                                     class="max-w-20!"
                                                     :min="1"
+                                                    :max="item.ui.totalQty"
                                                     size="small"
                                                     :minFractionDigits="1"
                                                     :maxFractionDigits="2"
@@ -521,15 +561,24 @@ const {
                             <div class="p-2 sm:p-4 border-t border-surface-200 dark:border-surface-600/50">
                                 <Button
                                     size="small"
-                                    @click="clearFilters"
+                                    @click="onSubmitOrderInvoice"
                                     :label="t('buttons.save')"
                                     icon="pi pi-save"
                                     class="w-full px-3!"
                                 />
 
                                 <div class="py-4">
-                                    <p>footer</p>
-                                    <p>footer</p>
+                                    <p>{{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }}$</p>
+                                    <Select
+                                        v-model="filters.payment"
+                                        :options="paymentStore.getPayments.models"
+                                        option-label="name"
+                                        option-value="id"
+                                        :placeholder="t('placeholders.search.byStatus')"
+                                        showClear
+                                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full bg-surface-0! dark:bg-surface-700!"
+                                        size="small"
+                                    />
                                     <p>footer</p>
                                 </div>
                                 <div class="flex justify-end">
@@ -637,8 +686,7 @@ const {
                                 </TabList>
                                 <TabPanels>
                                     <TabPanel value="products">
-
-                                        <div v-if="!isLoading && !location && (!kitStore.getAvailableKits.totalItems && !kitStore.getIsLoadingKits) || (!productStore.getAvailableProducts.totalItems && !productStore.getIsLoadingProducts)" class="my-auto">
+                                        <div v-if="!isLoading && !productStore.getAvailableProducts.totalItems && !productStore.getIsLoadingProducts" class="my-auto">
                                             <NoData class="text-surface-400 mx-auto my-auto h-full">
                                                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
                                             </NoData>
@@ -704,7 +752,7 @@ const {
                                     </TabPanel>
                                     <TabPanel value="kits">
 
-                                        <div v-if="!location && (!kitStore.getAvailableKits.totalItems && !kitStore.getIsLoadingKits)" class="my-auto">
+                                        <div v-if="!isLoading && !kitStore.getAvailableKits.totalItems && !kitStore.getIsLoadingKits" class="my-auto">
                                             <NoData class="text-surface-400 mx-auto my-auto h-full">
                                                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
                                             </NoData>

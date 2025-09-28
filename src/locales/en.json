@@ -177,6 +177,12 @@
         "accusative": "transfer invoice",
         "accusativeCapitalize": "Transfer invoice"
     },
+    "orderInvoice": {
+      "nominative": "order invoice",
+      "nominativeCapitalize": "Order invoice",
+      "accusative": "order invoice",
+      "accusativeCapitalize": "Order invoice"
+    },
     "returnInvoice": {
       "nominative": "return invoice",
       "nominativeCapitalize": "Return invoice",

@@ -11,18 +11,7 @@ export function useOrderInvoiceValidation() {
         location: yup.object().required('Location is required'),
         customer: yup.object().required('Location is required'),
         createdAt: yup.date().required(t('errorMessages.dateRequired')),
-        orderInvoiceProducts: yup.array().required().min(1, 'At least one product required'),
-        orderInvoiceKits: yup.array().required().min(1, 'At least one product required')
-    })
-    .test(
-        "products-or-kits",
-        "Mahsulot yoki kompozitsiya kiritilishi kerak",
-        (value) => {
-            const hasProducts = value?.transferInvoiceProducts?.length > 0;
-            const hasKits = value?.transferInvoiceKits?.length > 0;
-            return hasProducts || hasKits; // ikkalasidan biri bo‘lsa yetarli
-        }
-    ));
+    }));
 
     // Product
     const productSchema = computed(() => yup.object({
@@ -84,8 +73,6 @@ export function useOrderInvoiceValidation() {
     const { value: location } = useField('location', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
     const { value: customer } = useField('customer', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
     const { value: createdAt } = useField('createdAt', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
-    const { value: orderInvoiceProducts } = useField('orderInvoiceProducts', undefined, { validateOnMount: true, form: orderInvoiceFormCtx })
-    const { value: orderInvoiceKits } = useField('orderInvoiceKits', undefined, { validateOnMount: true, form: orderInvoiceFormCtx })
     const { value: product } = useField('product', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: productFormCtx })
     const { value: productColor } = useField('color', undefined, { validateOnMount: false, form: productFormCtx });
     const { value: productQty } = useField('qty', undefined, { validateOnMount: false, form: productFormCtx });
@@ -104,8 +91,6 @@ export function useOrderInvoiceValidation() {
         location,
         customer,
         createdAt,
-        orderInvoiceProducts,
-        orderInvoiceKits,
 
         // Product form
         productHandleSubmit,
