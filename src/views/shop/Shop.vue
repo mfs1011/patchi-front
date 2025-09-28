@@ -9,7 +9,7 @@ const cards = computed(() => [
     { id: 1, name: t('cards.shopContent'), image: 'WarehouseQuantity.png', routeName: 'shop-content' },
     { id: 1, name: t('cards.kits'), image: 'Kits.png', routeName: 'kits' },
     { id: 3, name: t('cards.transferInvoices'), image: 'TransferInvoice.png', routeName: 'shop-transfer-invoices' },
-    { id: 4, name: t('cards.orders'), image: 'Order.png', routeName: 'shop-orders' },
+    { id: 4, name: t('cards.orderInvoices'), image: 'Order.png', routeName: 'shop-orders' },
     { id: 5, name: t('cards.returnInvoices'), image: 'Return.png', routeName: 'shop-return-invoices' },
 ])
 

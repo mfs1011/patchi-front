@@ -8,6 +8,10 @@ export const useKitStore = defineStore('kit', () => {
             models: [],
             totalItems: 0,
         },
+        availableKits: {
+            models: [],
+            totalItems: 0,
+        },
         residualKits: {
             models: [],
             totalItems: 0,
@@ -47,6 +51,22 @@ export const useKitStore = defineStore('kit', () => {
             const { data } = await authorizedClient.get('/kits', { params })
             state.kits.models = data.member
             state.kits.totalItems = data.totalItems
+
+            return data
+        } catch (error) {
+            throw error
+        } finally {
+            state.isLoadingKits = false
+        }
+    }
+
+    const fetchAvailableKits = async (params = { page: 1 }) => {
+        try {
+            state.isLoadingKits = true
+
+            const { data } = await authorizedClient.get('/kits/available_qty', { params })
+            state.availableKits.models = data.member
+            state.availableKits.totalItems = data.totalItems
 
             return data
         } catch (error) {
@@ -115,11 +135,13 @@ export const useKitStore = defineStore('kit', () => {
         pushKit,
         putKit,
         fetchKits,
+        fetchAvailableKits,
         fetchResidualKits,
         fetchFranchiseFeeKits,
         fetchKit,
         rollbackKit,
         getKits: computed(() => state.kits),
+        getAvailableKits: computed(() => state.availableKits),
         getResidualKits: computed(() => state.residualKits),
         getFranchiseFeeKits: computed(() => state.franchiseFeeKits),
         getKit: computed(() => state.kit),

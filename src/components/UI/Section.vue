@@ -29,7 +29,7 @@ defineEmits(["on-click-add"]);
 </script>
 
 <template>
-    <div class="flex flex-col gap-2 sm:gap-4 grow">
+    <div class="flex flex-col min-h-0 overflow-auto gap-2 sm:gap-4 grow">
         <SectionHeader
             :addButtonName
             :sectionName

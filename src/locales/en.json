@@ -365,8 +365,7 @@
             "byExpiry": "Search by expiry date",
             "byQty": "Search by quantity",
             "orderByExpiry": "Order by expiry date",
-            "bySeller": "Search by seller",
-            "byCustomer": "Search by customer"
+            "bySeller": "Search by seller"
         },
         "select": {
             "role": "Select role",
@@ -380,7 +379,6 @@
             "location": "Select location",
             "supplier": "Select supplier",
             "seller": "Select seller",
-            "customer": "Select customer",
             "product": "Select product",
             "kit": "Select composition",
             "color": "Select color"
@@ -426,7 +424,8 @@
         "saveAndExit": "Save and exit",
         "add": "Add",
         "save": "Save",
-        "edit": "Edit"
+        "edit": "Edit",
+        "pay": "Pay"
     },
     "errorMessages": {
         "usernameRequired": "Username is required",
@@ -508,7 +507,10 @@
         "shopContent": "Shop content",
         "incomeInvoices": "Income invoices",
         "incomeInvoice": "Income invoice",
-        "transferInvoices": "Transfer",
+        "transferInvoices": "Transfers",
+        "transferInvoice": "Transfer",
+        "orderInvoices": "Orders",
+        "orderInvoice": "Order",
         "orders": "Orders",
         "returnInvoices": "Returns",
         "returnInvoice": "Return",
@@ -614,6 +616,10 @@
         "shopTransferInvoices": {
             "add": "Add",
             "edit": "Edit"
+        },
+        "warehouseOrderInvoices": {
+            "add": "Add",
+            "edit": "Edit"
         }
     },
     "pagination": {
@@ -644,6 +650,7 @@
     },
     "choosePhoto": "Choose a photo",
     "changePhoto": "Change photo",
+    "noPhoto": "No photo",
     "today": "Today",
     "clear": "Clear",
     "notifyPrefix": "Will notify in ",

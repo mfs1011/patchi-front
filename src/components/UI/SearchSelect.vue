@@ -1,5 +1,5 @@
 <script setup>
-import {ref, useTemplateRef, watch} from "vue";
+import {ref, watch} from "vue";
 import { vIntersectionObserver } from "@vueuse/components";
 import Skeleton from "@/volt/Skeleton.vue";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";

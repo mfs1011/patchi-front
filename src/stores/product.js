@@ -72,6 +72,7 @@ export const useProductStore = defineStore('product', () => {
             const { data } = await authorizedClient.get('/products/available_qty', { params })
             state.availableProducts.models = data.member
             state.availableProducts.totalItems = data.totalItems
+            console.log(state.availableProducts.totalItems)
 
             return data
         } catch (error) {

@@ -363,8 +363,7 @@
             "byExpiry": "Yaroqlilik muddati bo'yicha tartiblash",
             "byQty": "Miqdori bo'yicha",
             "orderByExpiry": "Yaroqlilik muddati bo'yicha",
-            "bySeller": "Sotuvchi bo'yicha qidiruv",
-            "byCustomer": "Mijoz bo'yicha qidiruv"
+            "bySeller": "Sotuvchi bo'yicha qidiruv"
         },
         "select": {
             "role": "Rol tanlang",
@@ -381,7 +380,8 @@
             "customer": "Mijozni tanlang",
             "product": "Mahsulotni tanlang",
             "kit": "Kompozitsiyani tanlang",
-            "color": "Rangni tanlang"
+            "color": "Rangni tanlang",
+            "customer": "Mijozni tanlang"
         },
         "shopName": "Do‘kon nomini kiriting...",
         "warehouseName": "Ombor nomini kiriting...",
@@ -422,11 +422,13 @@
         "newIncomeInvoice": "Yangi kirim",
         "newTransferInvoice": "Yangi ko‘chirish",
         "newWriteOffInvoice": "Yangi chiqarish",
+        "newOrderInvoice": "Yangi buyurtma",
         "filters": "Filterlar",
         "saveAndExit": "Saqlash va chiqish",
         "add": "Qo'shish",
         "save": "Saqlash",
-        "edit": "O'zgartirish"
+        "edit": "O'zgartirish",
+        "pay": "To'lash"
     },
     "errorMessages": {
         "usernameRequired": "Username kiritish majburiy",
@@ -510,7 +512,8 @@
         "incomeInvoice": "Kirim",
         "transferInvoices": "Ko‘chirish",
         "transferInvoice": "Ko‘chiruv",
-        "orders": "Buyurtmalar",
+        "orderInvoices": "Buyurtmalar",
+        "orderInvoice": "Buyurtma",
         "returnInvoices": "Qaytarilganlar",
         "returnInvoice": "Qaytarilgan",
         "writeOffInvoices": "Chiqarishlar",
@@ -615,6 +618,10 @@
         "shopTransferInvoices": {
           "add": "Qo‘shish",
           "edit": "O‘zgartirish"
+        },
+        "warehouseOrderInvoices": {
+          "add": "Qo‘shish",
+          "edit": "O‘zgartirish"
         }
     },
     "pagination": {
@@ -645,6 +652,7 @@
     },
     "choosePhoto": "Rasm tanlang",
     "changePhoto": "Rasmni o'zgartirish",
+    "noPhoto": "Rasm yo'q",
     "today": "Bugun",
     "clear": "Tozalash",
     "notifyPrefix": "Xabar beradi: ",

@@ -89,7 +89,7 @@ const theme = ref<DataTablePassThroughOptions>({
         `,
         columnHeaderContent: `flex items-center gap-2`,
         columnTitle: `font-semibold`,
-        bodyCell: `text-start py-3 px-4 border-b border-surface-300 dark:border-surface-600/50
+        bodyCell: `text-start py-5 px-4 border-b border-surface-300 dark:border-surface-600/50
             p-frozen:sticky p-frozen:bg-surface-0 dark:p-frozen:bg-surface-900`,
         bodyCellContent: ``,
         footerCell: `text-start py-3 px-4 border-b border-surface-200 dark:border-surface-800
