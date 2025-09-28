@@ -111,18 +111,24 @@ const restoreAction = (id) => {
 
 const deleteLocation = async () => {
     isDeleteLoading.value = true;
+
     await locationStore.deleteLocation(currentCustomerId.value);
+
     toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('warehouses.nominativeCapitalize') }), life: 3000 })
+
     isDeleteLoading.value = false;
     visible.value.deleteVisible = false;
 };
 
 const restoreLocation = async () => {
     isDeleteLoading.value = true;
+
     await locationStore.restoreLocation(currentCustomerId.value);
+
+    toast.add({ severity: 'success', summary: t('toast.restored', { name: t('warehouses.nominativeCapitalize') }), life: 3000 })
+
     isDeleteLoading.value = false;
     visible.value.restoreVisible = false;
-    toast.add({ severity: 'success', summary: t('toast.restored', { name: t('warehouses.nominativeCapitalize') }), life: 3000 })
 };
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)

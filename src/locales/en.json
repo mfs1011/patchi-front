@@ -353,7 +353,8 @@
             "byExpiry": "Search by expiry date",
             "byQty": "Search by quantity",
             "orderByExpiry": "Order by expiry date",
-            "bySeller": "Search by seller"
+            "bySeller": "Search by seller",
+            "byCustomer": "Search by client"
         },
         "select": {
             "role": "Select role",
@@ -369,7 +370,8 @@
             "seller": "Select seller",
             "product": "Select product",
             "kit": "Select composition",
-            "color": "Select color"
+            "color": "Select color",
+            "customer": "Select client"
         },
         "supplierName": "Enter supplier name...",
         "colorName": "Enter color name...",
@@ -407,11 +409,13 @@
         "newInventory": "New inventory",
         "newIncomeInvoice": "New income",
         "newTransferInvoice": "New transfer",
+        "newOrderInvoice": "New order",
         "filters": "Filters",
         "saveAndExit": "Save and exit",
         "add": "Add",
         "save": "Save",
-        "edit": "Edit"
+        "edit": "Edit",
+        "pay": "Pay"
     },
     "errorMessages": {
         "usernameRequired": "Username is required",
@@ -493,7 +497,10 @@
         "shopContent": "Shop content",
         "incomeInvoices": "Income invoices",
         "incomeInvoice": "Income invoice",
-        "transferInvoices": "Transfer",
+        "transferInvoices": "Transfers",
+        "transferInvoice": "Transfer",
+        "orderInvoices": "Orders",
+        "orderInvoice": "Order",
         "orders": "Orders",
         "returnInvoices": "Returns",
         "writeOffInvoices": "Write-offs",
@@ -589,6 +596,10 @@
         "shopTransferInvoices": {
             "add": "Add",
             "edit": "Edit"
+        },
+        "warehouseOrderInvoices": {
+            "add": "Add",
+            "edit": "Edit"
         }
     },
     "pagination": {
@@ -617,6 +628,7 @@
     },
     "choosePhoto": "Choose a photo",
     "changePhoto": "Change photo",
+    "noPhoto": "No photo",
     "today": "Today",
     "clear": "Clear",
     "notifyPrefix": "Will notify in ",

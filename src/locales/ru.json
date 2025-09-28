@@ -353,7 +353,8 @@
             "bySeller": "Поиск по продавцу",
             "byExpiry": "Поиск сроку годности",
             "byQty": "Поиск по количеству",
-            "orderByExpiry": "Сортировка по сроку годности"
+            "orderByExpiry": "Сортировка по сроку годности",
+            "byCustomer": "Поиск по клиенту"
         },
         "select": {
             "role": "Выберите роль",
@@ -369,7 +370,8 @@
             "seller": "Выберите продавца",
             "product": "Выберите продукт",
             "kit": "Выберите композицию",
-            "color": "Выберите цвет"
+            "color": "Выберите цвет",
+            "customer": "Выберите клиент"
         },
         "supplierName": "Введите имя поставщика...",
         "colorName": "Введите название цвета...",
@@ -407,11 +409,13 @@
         "newInventory": "Новая инвентаризация",
         "newIncomeInvoice": "Новое поступление",
         "newTransferInvoice": "Новое перемещение",
+        "newOrderInvoice": "Новый заказ",
         "filters": "Фильтры",
         "saveAndExit": "Сохранить и выйти",
         "add": "Добавить",
         "save": "Сохранить",
-        "edit": "Изменить"
+        "edit": "Изменить",
+        "pay": "Оплатить"
     },
     "errorMessages": {
         "usernameRequired": "Имя пользователя обязательно",
@@ -495,7 +499,8 @@
         "incomeInvoice": "Поступление",
         "transferInvoices": "Перемещения",
         "transferInvoice": "Перемещение",
-        "orders": "Заказы",
+        "orderInvoices": "Заказы",
+        "orderInvoice": "Заказ",
         "returnInvoices": "Возвраты",
         "writeOffInvoices": "Списания",
         "salesReports": "Отчеты о продажах",
@@ -590,6 +595,10 @@
         "shopTransferInvoices": {
           "add": "Добавить",
           "edit": "Изменить"
+        },
+        "warehouseOrderInvoices": {
+            "add": "Добавить",
+            "edit": "Изменить"
         }
     },
     "pagination": {
@@ -618,6 +627,7 @@
     },
     "choosePhoto": "Выберите фото",
     "changePhoto": "Изменить фото",
+    "noPhoto": "Нет фото",
     "today": "Сегодня",
     "clear": "Очистить",
     "notifyPrefix": "Уведомит за ",
