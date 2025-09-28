@@ -95,6 +95,11 @@ const home = computed(() => ({
     route: "/warehouse",
 }));
 
+const dt = ref();
+const exportCSV = () => {
+    dt.value.exportCSV();
+};
+
 const items = computed(() => [{ label: t("cards.writeOffInvoices"), route: { name: 'warehouse-write-off-invoices'} }, { label: t("cards.writeOffInvoice") }]);
 const isAdminOrCreatedBy = createdById => (
     userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
@@ -579,15 +584,6 @@ onMounted(async () => {
                     :label="t('buttons.edit')"
                     :loading="writeOffInvoiceIsSubmitting"
                 />
-                <Button
-                    v-if="editMode"
-                    :disabled="!!writeOffInvoiceErrors.writeOffInvoiceProducts"
-                    icon="pi pi-save"
-                    @click="onSubmitWriteOffInvoice"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap"
-                    :label="t('buttons.save')"
-                    :loading="writeOffInvoiceIsSubmitting"
-                />
 
                 <SecondaryButton
                     v-if="editMode"
@@ -617,8 +613,18 @@ onMounted(async () => {
                 pt:content="p-2 sm:p-4"
                 pt:title="font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
+                <template #header>
+                    <div class="pt-5 px-5">
+                        <Button
+                            @click="exportCSV"
+                            icon="pi pi-file-excel"
+                            pt:root="bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                            size="small"
+                            label="Export"
+                        />
+                    </div>
+                </template>
                 <template #content>
-                    <div class="font-medium mb-4">{{ t('writeOffData') }}</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         <div>
                             <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>

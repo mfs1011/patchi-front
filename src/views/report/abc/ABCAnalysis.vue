@@ -43,6 +43,11 @@ const home = computed(() => ({
     route: "/reports",
 }));
 
+const dt = ref();
+const exportCSV = () => {
+    dt.value.exportCSV();
+};
+
 const items = computed(() => [{ label: t("cards.abc") }]);
 
 const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
@@ -206,6 +211,17 @@ onBeforeRouteLeave(() => {
                 pt:content="p-2 sm:p-4"
                 pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
+                <template #header>
+                    <div class="pt-5 px-5">
+                        <Button
+                            @click="exportCSV"
+                            icon="pi pi-file-excel"
+                            pt:root="bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                            size="small"
+                            label="Export"
+                        />
+                    </div>
+                </template>
                 <template #content>
                     <DataTable
                         :value="productStore.getIsLoadingProducts ?  Array(10).fill({}) : productStore.getABCProducts.models"

@@ -363,7 +363,8 @@
             "byExpiry": "Yaroqlilik muddati bo'yicha tartiblash",
             "byQty": "Miqdori bo'yicha",
             "orderByExpiry": "Yaroqlilik muddati bo'yicha",
-            "bySeller": "Sotuvchi bo'yicha qidiruv"
+            "bySeller": "Sotuvchi bo'yicha qidiruv",
+            "byCustomer": "Mijoz bo'yicha qidiruv"
         },
         "select": {
             "role": "Rol tanlang",
@@ -380,8 +381,7 @@
             "customer": "Mijozni tanlang",
             "product": "Mahsulotni tanlang",
             "kit": "Kompozitsiyani tanlang",
-            "color": "Rangni tanlang",
-            "customer": "Mijozni tanlang"
+            "color": "Rangni tanlang"
         },
         "shopName": "Do‘kon nomini kiriting...",
         "warehouseName": "Ombor nomini kiriting...",

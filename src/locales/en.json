@@ -365,7 +365,8 @@
             "byExpiry": "Search by expiry date",
             "byQty": "Search by quantity",
             "orderByExpiry": "Order by expiry date",
-            "bySeller": "Search by seller"
+            "bySeller": "Search by seller",
+            "byCustomer": "Search by customer"
         },
         "select": {
             "role": "Select role",
@@ -379,6 +380,7 @@
             "location": "Select location",
             "supplier": "Select supplier",
             "seller": "Select seller",
+            "customer": "Select customer",
             "product": "Select product",
             "kit": "Select composition",
             "color": "Select color"

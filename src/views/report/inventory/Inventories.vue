@@ -21,6 +21,7 @@ import {useToast} from "primevue/usetoast";
 import Select from "@/volt/Select.vue";
 import {useLocationStore} from "@/stores/location.js";
 import DatePicker from "@/volt/DatePicker.vue";
+import SearchSelect from "@/components/UI/SearchSelect.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -162,10 +163,6 @@ function connectMercure() {
 
 onMounted(() => {
     connectMercure()
-
-    if(!locationStore.getLocations.models.length) {
-        locationStore.fetchLocations({ page: 1, 'items-per-page': 100 })
-    }
 })
 
 onBeforeRouteLeave(() => {
@@ -269,14 +266,16 @@ onBeforeRouteLeave(() => {
                         show-button-bar
                     />
 
-                    <Select
+                    <SearchSelect
                         v-model="filters.location"
+                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, toLocation: true})"
                         :options="locationStore.getLocations.models"
-                        option-label="name"
-                        option-value="id"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.byLocation')"
-                        showClear
-                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                        :loading="locationStore.getIsLoadingLocation"
+                        :total-items="locationStore.getLocations.totalItems"
                     />
 
                     <Select

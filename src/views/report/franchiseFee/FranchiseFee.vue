@@ -1,7 +1,7 @@
 <script setup>
 import Section from "@/components/UI/Section.vue";
 import {useI18n} from "vue-i18n";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Skeleton from "@/volt/Skeleton.vue";
@@ -30,6 +30,7 @@ import ColumnGroup from "primevue/columngroup";
 import Row from "primevue/row";
 import {useUserStore} from "@/stores/user.js";
 import {useSellerStore} from "@/stores/seller.js";
+import SearchSelect from "@/components/UI/SearchSelect.vue";
 
 const { t } = useI18n();
 const route = useRoute()
@@ -157,24 +158,6 @@ watch(
 watch(() => tabVal.value, () => {
     filters.value.page = 1;
 });
-
-onMounted(() => {
-    if(!categoryStore.getCategories.models.length) {
-        categoryStore.fetchCategories()
-    }
-
-    if(!locationStore.getLocations.models.length) {
-        locationStore.fetchLocations()
-    }
-
-    if(!sellerStore.getSellers.models.length) {
-        sellerStore.fetchSellers()
-    }
-
-    if(!userStore.getUsers.models.length) {
-        userStore.fetchUsers()
-    }
-})
 </script>
 
 <template>
@@ -244,42 +227,50 @@ onMounted(() => {
                         </label>
                     </div>
 
-                    <Select
+                    <SearchSelect
                         v-if="tabVal === 'products'"
                         v-model="filters.category"
+                        :fetchFn="(query) => categoryStore.fetchCategories({ ...query })"
                         :options="categoryStore.getCategories.models"
-                        option-label="name"
-                        option-value="id"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.byCategory')"
-                        showClear
-                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                        :loading="categoryStore.getIsLoadingCategory"
+                        :total-items="categoryStore.getCategories.totalItems"
                     />
-                    <Select
+                    <SearchSelect
                         v-model="filters.location"
+                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, toLocation: true})"
                         :options="locationStore.getLocations.models"
-                        option-label="name"
-                        option-value="id"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.byLocation')"
-                        showClear
-                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                        :loading="locationStore.getIsLoadingLocation"
+                        :total-items="locationStore.getLocations.totalItems"
                     />
-                    <Select
+                    <SearchSelect
                         v-model="filters.seller"
+                        :fetchFn="(query) => sellerStore.fetchSellers({ ...query })"
                         :options="sellerStore.getSellers.models"
-                        option-label="name"
-                        option-value="id"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.bySeller')"
-                        showClear
-                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                        :loading="sellerStore.getIsLoadingSellers"
+                        :total-items="sellerStore.getSellers.totalItems"
                     />
-                    <Select
+                    <SearchSelect
                         v-model="filters.createdBy"
+                        :fetchFn="(query) => userStore.fetchUsers({ ...query })"
                         :options="userStore.getUsers.models"
-                        option-label="name"
-                        option-value="id"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.byUser')"
-                        showClear
-                        class="min-w-50 max-w-full w-full"
+                        :loading="userStore.getIsLoadingUsers"
+                        :total-items="userStore.getUsers.totalItems"
                     />
                     <DatePicker
                         v-model.trim="filters['date-from']"
@@ -310,17 +301,17 @@ onMounted(() => {
                 pt:content="h-full grow flex flex-col p-2 sm:p-4"
                 pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
-                <!--                <template #header>-->
-                <!--                    <div class="pt-5 px-5">-->
-                <!--                        <Button-->
-                <!--                            @click="exportCSV"-->
-                <!--                            icon="pi pi-file-excel"-->
-                <!--                            pt:root="bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"-->
-                <!--                            size="small"-->
-                <!--                            label="Export"-->
-                <!--                        />-->
-                <!--                    </div>-->
-                <!--                </template>-->
+                <template #header>
+                    <div class="pt-5 px-5">
+                        <Button
+                            @click="exportCSV"
+                            icon="pi pi-file-excel"
+                            pt:root="bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                            size="small"
+                            label="Export"
+                        />
+                    </div>
+                </template>
                 <template #content>
                     <Tabs v-model:value="tabVal" scrollable :showNavigators="false">
                         <TabList>

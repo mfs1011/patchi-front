@@ -1,7 +1,7 @@
 <script setup>
 import Section from "@/components/UI/Section.vue";
 import {useI18n} from "vue-i18n";
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Skeleton from "@/volt/Skeleton.vue";
@@ -18,7 +18,6 @@ import Tabs from "@/volt/Tabs.vue";
 import {useProductStore} from "@/stores/product.js";
 import updateQuery from "@/helpers/updateQuery.js";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
-import Select from "@/volt/Select.vue";
 import DatePicker from "@/volt/DatePicker.vue";
 import Button from "@/volt/Button.vue";
 import InputText from "@/volt/InputText.vue";
@@ -26,6 +25,7 @@ import {useCategoryStore} from "@/stores/category.js";
 import {useLocationStore} from "@/stores/location.js";
 import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import {useKitStore} from "@/stores/kit.js";
+import SearchSelect from "@/components/UI/SearchSelect.vue";
 
 const { t } = useI18n();
 const route = useRoute()
@@ -118,16 +118,6 @@ watch(
 watch(() => tabVal.value, () => {
     filters.value.page = 1;
 });
-
-onMounted(() => {
-    if(!categoryStore.getCategories.models.length) {
-        categoryStore.fetchCategories()
-    }
-
-    if(!locationStore.getLocations.models.length) {
-        locationStore.fetchLocations()
-    }
-})
 </script>
 
 <template>
@@ -196,25 +186,28 @@ onMounted(() => {
                             />
                         </label>
                     </div>
-
-                    <Select
+                    <SearchSelect
                         v-if="tabVal === 'products'"
                         v-model="filters.category"
+                        :fetchFn="(query) => categoryStore.fetchCategories({ ...query })"
                         :options="categoryStore.getCategories.models"
-                        option-label="name"
-                        option-value="id"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.byCategory')"
-                        showClear
-                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                        :loading="categoryStore.getIsLoadingCategory"
+                        :total-items="categoryStore.getCategories.totalItems"
                     />
-                    <Select
+                    <SearchSelect
                         v-model="filters.location"
+                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, toLocation: true})"
                         :options="locationStore.getLocations.models"
-                        option-label="name"
-                        option-value="id"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.byLocation')"
-                        showClear
-                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                        :loading="locationStore.getIsLoadingLocation"
+                        :total-items="locationStore.getLocations.totalItems"
                     />
                     <DatePicker
                         v-model.trim="filters['date-to']"
@@ -236,17 +229,17 @@ onMounted(() => {
                 pt:content="h-full grow flex flex-col p-2 sm:p-4"
                 pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
-                <!--                <template #header>-->
-                <!--                    <div class="pt-5 px-5">-->
-                <!--                        <Button-->
-                <!--                            @click="exportCSV"-->
-                <!--                            icon="pi pi-file-excel"-->
-                <!--                            pt:root="bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"-->
-                <!--                            size="small"-->
-                <!--                            label="Export"-->
-                <!--                        />-->
-                <!--                    </div>-->
-                <!--                </template>-->
+                <template #header>
+                    <div class="pt-5 px-5">
+                        <Button
+                            @click="exportCSV"
+                            icon="pi pi-file-excel"
+                            pt:root="bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                            size="small"
+                            label="Export"
+                        />
+                    </div>
+                </template>
                 <template #content>
                     <Tabs v-model:value="tabVal" scrollable :showNavigators="false">
                         <TabList>

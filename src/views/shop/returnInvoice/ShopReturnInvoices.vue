@@ -418,13 +418,13 @@ onBeforeRouteLeave(() => {
                         <Column field="seller" :header="t('labels.seller')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
-                                <p v-else>{{ data.orderInvoice.seller ? data.orderInvoice.seller.name: '-' }}</p>
+                                <p v-else>{{ data.orderInvoice.seller?.name || '-' }}</p>
                             </template>
                         </Column>
                         <Column field="customer" :header="t('labels.Customer')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
-                                <p v-else>{{ data.orderInvoice.customer ? data.orderInvoice.customer.name: '-' }}</p>
+                                <p v-else>{{ data.orderInvoice.customer?.name || '-' }}</p>
                             </template>
                         </Column>
                         <Column field="totalPrice" :header="t('labels.totalPrice')">

@@ -9,6 +9,7 @@ import DatePicker from "@/volt/DatePicker.vue";
 import {useLocationStore} from "@/stores/location.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
+import {useSellerStore} from "@/stores/seller.js";
 import {useUserStore} from "@/stores/user.js";
 import {useProductStore} from "@/stores/product.js";
 import {useKitStore} from "@/stores/kit.js";
@@ -20,6 +21,8 @@ import PaginatorComponent from "@/components/PaginatorComponent.vue";
 import Card from "@/volt/Card.vue";
 import NoData from "@/components/UI/NoData.vue";
 import Column from "primevue/column";
+import SecondaryButton from "@/volt/SecondaryButton.vue";
+import Dialog from "@/volt/Dialog.vue";
 import DataTable from "@/volt/DataTable.vue";
 
 const { t } = useI18n();
@@ -29,6 +32,7 @@ const orderInvoiceStore = useOrderInvoiceStore();
 const locationStore = useLocationStore();
 const customerStore = useCustomerStore();
 const userStore = useUserStore();
+const sellerStore = useSellerStore();
 const productStore = useProductStore();
 const kitStore = useKitStore();
 const isVisibleSectionHeader = ref(false);
@@ -38,6 +42,7 @@ const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
     location: route.query.location || null,
+    seller: route.query.seller || null,
     customer: route.query.customer || null,
     createdBy: route.query.createdBy || null,
     product: route.query.product || null,
@@ -57,6 +62,7 @@ const items = computed(() => [{ label: t("cards.orderInvoices") }]);
 
 const clearFilters = () => {
     filters.value.location = null;
+    filters.value.seller = null;
     filters.value.customer = null;
     filters.value.createdBy = null;
     filters.value.product = null;
@@ -79,6 +85,12 @@ watch(
             queryFilter.location = filters.value.location;
         } else {
             delete queryFilter.location;
+        }
+
+        if (filters.value.seller !== null) {
+            queryFilter.seller = filters.value.seller;
+        } else {
+            delete queryFilter.seller;
         }
 
         if (filters.value.customer !== null) {
@@ -247,8 +259,19 @@ onBeforeRouteLeave(() => {
                         :total-items="locationStore.getLocations.totalItems"
                     />
                     <SearchSelect
+                        v-model="filters.seller"
+                        :fetchFn="sellerStore.fetchSellers"
+                        :options="sellerStore.getSellers.models"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
+                        :placeholder="t('placeholders.search.bySeller')"
+                        :loading="sellerStore.getIsLoadingSellers"
+                        :total-items="sellerStore.getSellers.totalItems"
+                    />
+                    <SearchSelect
                         v-model="filters.customer"
-                        :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': true})"
+                        :fetchFn="customerStore.fetchCustomers"
                         :options="customerStore.getCustomers.models"
                         :option-label="opt => opt?.name"
                         :option-value="opt => opt?.id"

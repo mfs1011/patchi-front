@@ -24,6 +24,10 @@ import Dialog from "@/volt/Dialog.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {STATUSES} from "@/helpers/constants.js";
 import {useToast} from "primevue/usetoast";
+import DatePicker from "@/volt/DatePicker.vue";
+import SearchSelect from "@/components/UI/SearchSelect.vue";
+import {useLocationStore} from "@/stores/location.js";
+import {useField} from "vee-validate";
 
 const { t } = useI18n();
 const toast = useToast();
@@ -40,6 +44,7 @@ const pendingNavigation = ref(false)
 const isSaved = ref(false)
 
 const inventoryStore = useInventoryStore()
+const locationStore = useLocationStore();
 
 const home = ref({
     icon: 'pi pi-home',
@@ -140,10 +145,21 @@ const rowClassKits = (row) => {
         : 'bg-surface-100/50 dark:bg-surface-900/50!';
 };
 
+const { value: location } = useField('location',)
+const { value: dateFrom } = useField('dateFrom')
+const { value: dateTo } = useField('dateTo')
+
 onMounted(async () => {
     await inventoryStore.fetchInventory(route.params.id)
     inventoryProducts.value = JSON.parse(JSON.stringify(inventoryStore.getInventory.inventoryProducts))
     inventoryKits.value = JSON.parse(JSON.stringify(inventoryStore.getInventory.inventoryKits))
+
+    setTimeout(() => {
+        location.value = inventoryStore.getInventory.location
+        dateFrom.value = inventoryStore.getInventory.dateFrom
+        dateTo.value = inventoryStore.getInventory.dateTo
+    })
+
     isLoading.value = false
 })
 
@@ -223,31 +239,78 @@ const pushChanges = async () => {
                 pt:content="h-full grow flex flex-col p-2 sm:p-4"
                 pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
-<!--                <template #header>-->
-<!--                    <div class="pt-5 px-5">-->
-<!--                        <Button-->
-<!--                            @click="exportCSV"-->
-<!--                            icon="pi pi-file-excel"-->
-<!--                            pt:root="bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"-->
-<!--                            size="small"-->
-<!--                            label="Export"-->
-<!--                        />-->
-<!--                    </div>-->
-<!--                </template>-->
+                <template #header>
+                    <div class="pt-5 px-5">
+                        <Button
+                            @click="exportCSV"
+                            icon="pi pi-file-excel"
+                            pt:root="bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                            size="small"
+                            label="Export"
+                        />
+                    </div>
+                </template>
                 <template #content>
-                    <Skeleton height="2rem" v-if="isLoading"/>
-                    <div class="row g-2" v-else>
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <span>{{ t('labels.id') }}: {{ inventoryStore.getInventory.id }}</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <div>
+                            <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
+
+                            <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
+
+                            <SearchSelect
+                                v-if="!isLoading"
+                                v-model="location"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query})"
+                                :options="locationStore.getLocations.models"
+                                :option-label="opt => opt?.name"
+                                :option-value="opt => opt?.name"
+                                :return-value="opt => opt"
+                                :placeholder="t('placeholders.select.location')"
+                                :loading="locationStore.getIsLoadingLocation"
+                                :total-items="locationStore.getLocations.totalItems"
+                                disabled
+                            />
                         </div>
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <span>{{ t('labels.locations') }}: {{ inventoryStore.getInventory.location.name }}</span>
+                        <div>
+                            <p class="text-sm">{{ t('labels.dateFrom') }}<span class="text-red-500"> *</span></p>
+
+                            <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
+
+                            <DatePicker
+                                v-if="!isLoading"
+                                v-model.trim="dateFrom"
+                                dateFormat="dd.mm.yy"
+                                showIcon
+                                fluid
+                                iconDisplay="input"
+                                :placeholder="t('placeholders.date')"
+                                show-button-bar
+                                showTime
+                                hourFormat="24"
+                                disabled
+                            />
                         </div>
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <span>{{ t('labels.dateFrom') }}: {{ getFormattedDateWithTime(inventoryStore.getInventory.dateFrom) }}</span>
-                        </div>
-                        <div class="col-12 col-md-6 col-lg-3">
-                            <span>{{ t('labels.dateTo') }}: {{ getFormattedDateWithTime(inventoryStore.getInventory.dateTo) }}</span>
+                        <div>
+                            <p class="text-sm">{{ t('labels.dateTo') }}<span class="text-red-500"> *</span></p>
+
+                            <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
+
+                            <DatePicker
+                                v-if="!isLoading"
+                                v-model.trim="dateTo"
+                                dateFormat="dd.mm.yy"
+                                showIcon
+                                fluid
+                                iconDisplay="input"
+                                :placeholder="t('placeholders.date')"
+                                show-button-bar
+                                showTime
+                                hourFormat="24"
+                                disabled
+                            />
                         </div>
                     </div>
 
