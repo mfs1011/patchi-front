@@ -495,10 +495,10 @@ onMounted(async () => {
                                 <p v-else>{{ data.product.wholesalePrice ? `${formatCurrency(data.product.wholesalePrice)}$` : '-' }}</p>
                             </template>
                         </Column>
-                        <Column field="exclude" :header="t('labels.exclude')">
+                        <Column field="exclude" header="...">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.exclude }}</p>
+                                <p v-else>{{ data.exclude ? 'exclude': 'include' }}</p>
                             </template>
                         </Column>
                         <template #footer>

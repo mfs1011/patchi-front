@@ -48,6 +48,7 @@ const {
     locationQuantity,
     qtyLocationQuantity,
     locationQuantityKitHandleSubmit,
+    locationQuantityKitIsSubmitting,
     locationQuantityKitErrors,
     locationQuantityKitResetForm,
     locationQuantityKitValidate,
@@ -156,7 +157,7 @@ const onSubmitLocationQuantityKit = locationQuantityKitHandleSubmit(async values
         })
     } else {
         transferInvoiceKits.value = [...transferInvoiceKits.value, values]
-        currentProduct.value = values
+        currentKit.value = values
         locationQuantityKitResetForm()
     }
 })
@@ -376,14 +377,14 @@ const confirmLeave = () => {
 
                             <SearchSelect
                                 v-model="toLocation"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query })"
-                                :options="locationStore.getLocations.models"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query, toLocation: true })"
+                                :options="locationStore.getLocations.models.filter(l => l.id !== fromLocation)"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.name"
                                 :return-value="opt => opt"
                                 :placeholder="t('placeholders.search.byLocation')"
                                 :loading="locationStore.getIsLoadingLocation"
-                                :total-items="locationStore.getLocations.totalItems"
+                                :total-items="locationStore.getLocations.totalItems - 1"
                                 :invalid="!!transferInvoiceErrors.toLocation"
                             />
                         </div>
@@ -515,7 +516,7 @@ const confirmLeave = () => {
 
                                 <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
                                     <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearProductForm" />
-                                    <Button v-if="!isEditing" @click="onSubmitLocationQuantityKit" :label="t('buttons.add')" class="px-5" :loading="locationQuantityIsSubmitting"/>
+                                    <Button v-if="!isEditing" @click="onSubmitLocationQuantityKit" :label="t('buttons.add')" class="px-5" :loading="locationQuantityKitIsSubmitting"/>
                                     <Button v-else @click="saveEditingKit" :label="t('buttons.edit')" class="px-5"/>
                                 </div>
                             </TabPanel>

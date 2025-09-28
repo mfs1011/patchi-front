@@ -177,6 +177,18 @@
         "accusative": "перемещению",
         "accusativeCapitalize": "Перемещению"
     },
+    "returnInvoice": {
+      "nominative": "возврат",
+      "nominativeCapitalize": "Возврат",
+      "accusative": "возврат",
+      "accusativeCapitalize": "Возврат"
+    },
+    "writeOffInvoice": {
+      "nominative": "списани",
+      "nominativeCapitalize": "Списани",
+      "accusative": "списани",
+      "accusativeCapitalize": "Списани"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",
@@ -350,9 +362,11 @@
             "byElementId": "Поиск по элементу ID",
             "byElement": "Поиск по элементу",
             "byAction": "Поиск по действию",
-            "bySeller": "Поиск по продавцу",
             "byExpiry": "Поиск сроку годности",
             "byQty": "Поиск по количеству",
+            "orderByExpiry": "Сортировка по сроку годности",
+            "bySeller": "Поиск по продавцу",
+            "byCustomer": "Поиск по клиенту"
             "orderByExpiry": "Сортировка по сроку годности",
             "byCustomer": "Поиск по клиенту"
         },
@@ -368,6 +382,7 @@
             "location": "Выберите локацию",
             "supplier": "Выберите поставщика",
             "seller": "Выберите продавца",
+            "customer": "Выберите клиента",
             "product": "Выберите продукт",
             "kit": "Выберите композицию",
             "color": "Выберите цвет",
@@ -409,6 +424,7 @@
         "newInventory": "Новая инвентаризация",
         "newIncomeInvoice": "Новое поступление",
         "newTransferInvoice": "Новое перемещение",
+        "newWriteOffInvoice": "Новое списание",
         "newOrderInvoice": "Новый заказ",
         "filters": "Фильтры",
         "saveAndExit": "Сохранить и выйти",
@@ -502,7 +518,9 @@
         "orderInvoices": "Заказы",
         "orderInvoice": "Заказ",
         "returnInvoices": "Возвраты",
+        "returnInvoice": "Возврат",
         "writeOffInvoices": "Списания",
+        "writeOffInvoice": "Списание",
         "salesReports": "Отчеты о продажах",
         "kitsInWarehouse": "Композиции на складе",
         "kitsInShop": "Композиции в магазине",
@@ -580,6 +598,14 @@
             "add": "Добавить",
             "edit": "Изменить"
         },
+        "returnInvoices": {
+          "add": "Добавить",
+          "edit": "Изменить"
+        },
+        "writeOffInvoices": {
+          "add": "Добавить",
+          "edit": "Изменить"
+        },
         "transferInvoices": {
             "add": "Добавить",
             "edit": "Изменить"
@@ -621,8 +647,10 @@
         "already_added": "\"{name}\" уже добавлено",
         "cannot_delete_product_in_stock": "Невозможно удалить продукт, который есть на складе",
         "notEnough": "Недостаточно на складе",
+        "accessDenied": "Доступ запрещен",
         "cannot_edit_kpi_used_in_sales": "KPI, используемые в продажах, не могут быть изменены",
         "unconfirmedExists": "Имеется неподтверждённая инвентаризация",
+        "confirmedExists": "Имеется подтверждённая инвентаризация",
         "noIncomingToLocation": "На эту локацию не было ни одного поступления"
     },
     "choosePhoto": "Выберите фото",
@@ -635,6 +663,8 @@
     "day": "день",
     "incomingData": "Данные поступления",
     "transferData": "Данные перемещения",
+    "returnData": "Данные возврат",
+    "writeOffData": "Данные списание",
     "addProduct": "Добавление продукта",
     "addKit": "Добавление композиции",
     "zero": "Нет в наличии",

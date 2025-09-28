@@ -28,6 +28,8 @@ import {useKitStore} from "@/stores/kit.js";
 import {useSellerStore} from "@/stores/seller.js";
 import {useLocationStore} from "@/stores/location.js";
 import DatePicker from "@/volt/DatePicker.vue";
+import SearchSelect from "@/components/UI/SearchSelect.vue";
+import {useUserStore} from "@/stores/user.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -37,6 +39,7 @@ const kitStore = useKitStore()
 const assemblyStore = useAssemblyStore()
 const sellerStore = useSellerStore()
 const locationStore = useLocationStore()
+const userStore = useUserStore()
 
 const visible = ref({
     imageVisible: false,
@@ -49,6 +52,10 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t("cards.kits") }]);
+const isAdminAndSeller = computed(() => (
+    ['ROLE_ADMIN', 'ROLE_SELLER'].includes(userStore.getAboutMeFromToken?.role)
+))
+
 const baseUrl = computed(() => import.meta.env.VITE_APP_API_URL);
 const isVisibleSectionHeader = ref(false);
 const currentKit = ref();
@@ -163,18 +170,6 @@ function connectMercure() {
 }
 
 onMounted(async () => {
-    if(!assemblyStore.getAssemblies.models.length) {
-        await assemblyStore.fetchAssemblies()
-    }
-
-    if(!sellerStore.getSellers.models.length) {
-        sellerStore.fetchSellers()
-    }
-
-    if(!locationStore.getLocations.models.length) {
-        locationStore.fetchLocations()
-    }
-
     connectMercure()
 })
 
@@ -228,6 +223,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
+                    v-if="isAdminAndSeller"
                     @click="router.push({ name: 'add-kit' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >
@@ -243,6 +239,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
+                    v-if="isAdminAndSeller"
                     @click="router.push({ name: 'add-product' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >
@@ -272,32 +269,38 @@ onBeforeRouteLeave(() => {
                         </label>
                     </div>
 
-                    <Select
+                    <SearchSelect
                         v-model="filters.assembly"
+                        :fetchFn="assemblyStore.fetchAssemblies"
                         :options="assemblyStore.getAssemblies.models"
-                        option-label="name"
-                        option-value="id"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.byAssembly')"
-                        showClear
-                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                        :loading="assemblyStore.getIsLoadingAssembly"
+                        :total-items="assemblyStore.getAssemblies.totalItems"
                     />
-                    <Select
+                    <SearchSelect
                         v-model="filters.seller"
+                        :fetchFn="sellerStore.fetchSellers"
                         :options="sellerStore.getSellers.models"
-                        option-label="name"
-                        option-value="id"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.bySeller')"
-                        showClear
-                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                        :loading="sellerStore.getIsLoadingSellers"
+                        :total-items="sellerStore.getSellers.totalItems"
                     />
-                    <Select
+                    <SearchSelect
                         v-model="filters.location"
+                        :fetchFn="locationStore.fetchLocations"
                         :options="locationStore.getLocations.models"
-                        option-label="name"
-                        option-value="id"
+                        :option-label="opt => opt?.name"
+                        :option-value="opt => opt?.id"
+                        :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.byLocation')"
-                        showClear
-                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full"
+                        :loading="locationStore.getIsLoadingLocation"
+                        :total-items="locationStore.getLocations.totalItems"
                     />
                     <DatePicker
                         v-model.trim="filters['date-from']"

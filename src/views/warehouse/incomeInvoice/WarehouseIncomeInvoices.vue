@@ -23,6 +23,7 @@ import {useSupplierStore} from "@/stores/supplier.js";
 import {useUserStore} from "@/stores/user.js";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import Dialog from "@/volt/Dialog.vue";
+import {useInventoryStore} from "@/stores/inventory.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -30,6 +31,7 @@ const { t } = useI18n();
 const toast = useToast()
 
 const incomeInvoiceStore = useIncomeInvoiceStore()
+const inventoryStore = useInventoryStore();
 const locationStore = useLocationStore()
 const productStore = useProductStore()
 const supplierStore = useSupplierStore()
@@ -61,10 +63,9 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t("cards.incomeInvoices") }]);
-const isAdminAndWarehouseManager = computed(() => (
+const isAdminOrWarehouseManager = computed(() => (
     ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER'].includes(userStore.getAboutMeFromToken.role)
 ))
-const isAdmin = computed(() => userStore.getAboutMeFromToken.role === 'ROLE_ADMIN')
 
 // watchers
 watch(
@@ -142,13 +143,22 @@ const clearFilters = () => {
     filters.value['date-to'] = null;
 }
 
-const isAdminAndCreatedBy = createdById => (
+const isAdminOrCreatedBy = createdById => (
     userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
 )
 
-const deleteAction = (id) => {
-    currentIncomeInvoiceId.value = id;
-    deleteVisible.value = true;
+const deleteAction = async (data) => {
+    await inventoryStore.fetchHasInventory({
+        location: `/api/locations/${data.location.id}`,
+        createdAt: data.createdAt
+    })
+
+    if (inventoryStore.getHasInventory) {
+        toast.add({ severity: 'error', summary: t('toast.confirmedExists'), life: 3000 })
+    } else {
+        currentIncomeInvoiceId.value = data.id;
+        deleteVisible.value = true;
+    }
 };
 
 const deleteIncomeInvoice = async () => {
@@ -156,9 +166,9 @@ const deleteIncomeInvoice = async () => {
         isDeleteLoading.value = true;
 
         await incomeInvoiceStore.deleteIncomeInvoice(currentIncomeInvoiceId.value);
-        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('product.nominativeCapitalize') }), life: 3000 })
+        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('incomeInvoice.nominativeCapitalize') }), life: 3000 })
     } catch (err) {
-        toast.add({ severity: 'error', summary: t('toast.cannot_delete_product_in_stock'), life: 3000 })
+        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
     } finally {
         isDeleteLoading.value = false;
         deleteVisible.value = false;
@@ -234,7 +244,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    v-if="isAdminAndWarehouseManager"
+                    v-if="isAdminOrWarehouseManager"
                     @click="router.push({ name: 'add-income-invoices' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >{{ t("buttons.newIncomeInvoice") }}</Button>
@@ -248,7 +258,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    v-if="isAdminAndWarehouseManager"
+                    v-if="isAdminOrWarehouseManager"
                     @click="router.push({ name: 'add-income-invoices' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >{{ t("buttons.newIncomeInvoice") }}</Button>
@@ -287,7 +297,6 @@ onBeforeRouteLeave(() => {
                         :total-items="supplierStore.getSuppliers.totalItems"
                     />
                     <SearchSelect
-                        v-if="isAdmin"
                         v-model="filters.createdBy"
                         :fetchFn="userStore.fetchUsers"
                         :options="userStore.getUsers.models"
@@ -443,7 +452,8 @@ onBeforeRouteLeave(() => {
                                             size="small"
                                         />
                                         <Button
-                                            @click="deleteAction(data.id)"
+                                            v-if="isAdminOrCreatedBy(data.createdBy.id)"
+                                            @click="deleteAction(data)"
                                             icon="pi pi-trash"
                                             pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
                                             size="small"

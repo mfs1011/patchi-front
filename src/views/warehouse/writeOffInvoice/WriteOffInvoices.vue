@@ -1,6 +1,6 @@
 <script setup>
 import Section from "@/components/UI/Section.vue";
-import { useI18n } from "vue-i18n";
+import {useI18n} from "vue-i18n";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import {computed, onMounted, ref, watch} from "vue";
 import Button from "@/volt/Button.vue";
@@ -16,33 +16,29 @@ import Card from "@/volt/Card.vue";
 import NoData from "@/components/UI/NoData.vue";
 import {useProductStore} from "@/stores/product.js";
 import PaginatorComponent from "@/components/PaginatorComponent.vue";
-import {useIncomeInvoiceStore} from "@/stores/incomeInvoice.js";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
 import DatePicker from "@/volt/DatePicker.vue";
-import {useSupplierStore} from "@/stores/supplier.js";
 import {useUserStore} from "@/stores/user.js";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import Dialog from "@/volt/Dialog.vue";
-import {useTransferInvoiceStore} from "@/stores/transferInvoice.js";
-import Select from "@/volt/Select.vue";
 import {useKitStore} from "@/stores/kit.js";
+import {useWriteOffInvoiceStore} from "@/stores/writeOffInvoice.js";
+import {useInventoryStore} from "@/stores/inventory.js";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const toast = useToast()
 
-const transferInvoiceStore = useTransferInvoiceStore()
+const writeOffInvoiceStore = useWriteOffInvoiceStore()
+const inventoryStore = useInventoryStore();
 const locationStore = useLocationStore()
 const productStore = useProductStore()
 const kitStore = useKitStore()
 const userStore = useUserStore()
 const deleteVisible = ref(false)
-const acceptVisible = ref(false)
 const isDeleteLoading = ref(false)
-const isAcceptLoading = ref(false)
-const currentTransferInvoiceIdForAccept = ref(null)
-const currentTransferInvoiceId = ref(null)
+const currentWriteOffInvoiceId = ref(null)
 
 // refs
 const isVisibleSectionHeader = ref(false);
@@ -52,11 +48,9 @@ const filters = ref({
     page: parseInt(route.query.page) || 1,
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
     location: route.query.location || null,
-    kit: route.query.kit || null,
     createdBy: route.query.createdBy || null,
-    acceptedBy: route.query.acceptedBy || null,
-    status: route.query.status || null,
     product: route.query.product || null,
+    kit: route.query.kit || null,
     'date-from': route.query['date-from'] || null,
     'date-to': route.query['date-to'] || null,
 });
@@ -64,19 +58,14 @@ const filters = ref({
 // computed
 const home = computed(() => ({
     icon: "pi pi-slash",
-    label: t("shop"),
-    route: "/shop",
+    label: t("warehouse"),
+    route: "/warehouse",
 }));
 
-const items = computed(() => [{ label: t("cards.transferInvoices") }]);
-const isAdminAndSeller = computed(() => (
-    ['ROLE_ADMIN', 'ROLE_SELLER'].includes(userStore.getAboutMeFromToken?.role)
+const items = computed(() => [{ label: t("cards.writeOffInvoices") }]);
+const isAdminAndWarehouseManager = computed(() => (
+    ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER'].includes(userStore.getAboutMeFromToken?.role)
 ))
-
-const statuses = computed(() => [
-    { id: 1, name: t('1') },
-    { id: 2, name: t('2') }
-])
 
 // watchers
 watch(
@@ -84,7 +73,8 @@ watch(
     async () => {
         const queryFilter = {
             page: filters.value.page,
-            "items-per-page": filters.value.itemsPerPage
+            "items-per-page": filters.value.itemsPerPage,
+            "is-warehouse": true
         };
 
         if (filters.value.location !== null) {
@@ -93,34 +83,22 @@ watch(
             delete queryFilter.location;
         }
 
-        if (filters.value.supplier !== null) {
-            queryFilter.supplier = filters.value.supplier;
-        } else {
-            delete queryFilter.supplier;
-        }
-
         if (filters.value.createdBy !== null) {
             queryFilter.createdBy = filters.value.createdBy;
         } else {
             delete queryFilter.createdBy;
         }
 
-        if (filters.value.acceptedBy !== null) {
-            queryFilter.acceptedBy = filters.value.acceptedBy;
-        } else {
-            delete queryFilter.acceptedBy;
-        }
-
-        if (filters.value.status !== null) {
-            queryFilter.status = filters.value.status;
-        } else {
-            delete queryFilter.status;
-        }
-
         if (filters.value.product !== null) {
             queryFilter.product = filters.value.product;
         } else {
             delete queryFilter.product;
+        }
+
+        if (filters.value.kit !== null) {
+            queryFilter.kit = filters.value.kit;
+        } else {
+            delete queryFilter.kit;
         }
 
         if (filters.value['date-from']) {
@@ -148,7 +126,7 @@ watch(
 
         await updateQuery(router, queryFilter);
 
-        await transferInvoiceStore.fetchTransferInvoices({ ...route.query, 'is-warehouse': false });
+        await writeOffInvoiceStore.fetchWriteOffInvoices(route.query);
     },
     { immediate: true, deep: true },
 );
@@ -159,10 +137,9 @@ watch(tabVal, () => {
 
 const clearFilters = () => {
     filters.value.location = null;
-    filters.value.supplier = null;
     filters.value.createdBy = null;
-    filters.value.acceptedBy = null;
     filters.value.product = null;
+    filters.value.kit = null;
     filters.value['date-from'] = null;
     filters.value['date-to'] = null;
 }
@@ -171,17 +148,26 @@ const isAdminOrCreatedBy = createdById => (
     userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
 )
 
-const deleteAction = (id) => {
-    currentTransferInvoiceId.value = id;
-    deleteVisible.value = true;
+const deleteAction = async (data) => {
+    await inventoryStore.fetchHasInventory({
+        location: `/api/locations/${data.location.id}`,
+        createdAt: data.createdAt
+    })
+
+    if (inventoryStore.getHasInventory) {
+        toast.add({ severity: 'error', summary: t('toast.confirmedExists'), life: 3000 })
+    } else {
+        currentWriteOffInvoiceId.value = data.id;
+        deleteVisible.value = true;
+    }
 };
 
-const deleteTransferInvoice = async () => {
+const deleteWriteOffInvoice = async () => {
     try {
         isDeleteLoading.value = true;
 
-        await transferInvoiceStore.deleteTransferInvoice(currentTransferInvoiceId.value);
-        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('transferInvoice.nominativeCapitalize') }), life: 3000 })
+        await writeOffInvoiceStore.deleteWriteOffInvoice(currentWriteOffInvoiceId.value);
+        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('writeOffInvoice.nominativeCapitalize') }), life: 3000 })
     } catch (err) {
         toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
     } finally {
@@ -189,30 +175,6 @@ const deleteTransferInvoice = async () => {
         deleteVisible.value = false;
     }
 };
-
-const acceptAction = id => {
-    currentTransferInvoiceIdForAccept.value = id
-    acceptVisible.value = true
-}
-const acceptTransferInvoice = async () => {
-    isAcceptLoading.value = true;
-
-    try {
-        await transferInvoiceStore.acceptTransferInvoice(currentTransferInvoiceIdForAccept.value)
-        toast.add({ severity: 'success', summary: t('toast.accepted', { name: t('transferInvoice.nominativeCapitalize') }), life: 3000 })
-    } catch (error) {
-        if (error.status === 403) {
-            toast.add({ severity: 'error', summary: t('toast.accessDenied', { field: t('code.nominativeCapitalize') }), life: 3000 })
-        } else if (error.status === 412) {
-            toast.add({ severity: 'error', summary: t('toast.notEnough', { field: t('code.nominativeCapitalize') }), life: 3000 })
-        } else {
-            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
-        }
-    } finally {
-        isAcceptLoading.value = false;
-        acceptVisible.value = false;
-    }
-}
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
 const eventSource = ref(null)
@@ -225,8 +187,8 @@ function connectMercure() {
     eventSource.value.addEventListener('message', async (event) => {
         const eventDataId = JSON.parse(event.data).eventId
 
-        if (eventDataId === 17) {
-            await transferInvoiceStore.fetchTransferInvoices({ ...route.query, 'is-warehouse': false });
+        if (eventDataId === 19) {
+            await writeOffInvoiceStore.fetchWriteOffInvoices(route.query);
         }
     })
 }
@@ -271,8 +233,8 @@ onBeforeRouteLeave(() => {
         </template>
     </Breadcrumb>
     <Section
-        :section-name="t('cards.transferInvoices')"
-        back-route-name="shop"
+        :section-name="t('cards.writeOffInvoices')"
+        back-route-name="warehouse"
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end">
@@ -283,10 +245,12 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    v-if="isAdminAndSeller"
-                    @click="router.push({ name: 'shop-add-transfer-invoices' })"
+                    v-if="isAdminAndWarehouseManager"
+                    @click="router.push({ name: 'warehouse-add-write_off-invoices' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
-                >{{ t("buttons.newTransferInvoice") }}</Button>
+                >
+                    {{ t("buttons.newWriteOffInvoice") }}
+                </Button>
             </div>
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
                 <Button
@@ -297,10 +261,12 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    v-if="isAdminAndSeller"
-                    @click="router.push({ name: 'shop-add-transfer-invoices' })"
+                    v-if="isAdminAndWarehouseManager"
+                    @click="router.push({ name: 'warehouse-add-write_off-invoices' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
-                >{{ t("buttons.newTransferInvoice") }}</Button>
+                >
+                    {{ t("buttons.newWriteOffInvoice") }}
+                </Button>
             </div>
         </template>
 
@@ -315,7 +281,7 @@ onBeforeRouteLeave(() => {
                 <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
                     <SearchSelect
                         v-model="filters.location"
-                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, isWarehouse: false })"
+                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, isWarehouse: true})"
                         :options="locationStore.getLocations.models"
                         :option-label="opt => opt?.name"
                         :option-value="opt => opt?.id"
@@ -336,26 +302,6 @@ onBeforeRouteLeave(() => {
                         :total-items="userStore.getUsers.totalItems"
                     />
                     <SearchSelect
-                        v-model="filters.acceptedBy"
-                        :fetchFn="userStore.fetchUsers"
-                        :options="userStore.getUsers.models"
-                        :option-label="opt => opt?.name"
-                        :option-value="opt => opt?.id"
-                        :return-value="opt => opt?.id"
-                        :placeholder="t('placeholders.search.byAcceptedBy')"
-                        :loading="userStore.getIsLoadingUsers"
-                        :total-items="userStore.getUsers.totalItems"
-                    />
-                    <Select
-                        v-model="filters.status"
-                        :options="statuses"
-                        option-label="name"
-                        option-value="id"
-                        :placeholder="t('placeholders.search.byStatus')"
-                        showClear
-                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full bg-surface-0! dark:bg-surface-700!"
-                    />
-                    <SearchSelect
                         v-model="filters.product"
                         :fetchFn="productStore.fetchProducts"
                         :options="productStore.getProducts.models"
@@ -370,6 +316,7 @@ onBeforeRouteLeave(() => {
                             <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }}</div>
                         </template>
                     </SearchSelect>
+
                     <SearchSelect
                         v-model="filters.kit"
                         :fetchFn="kitStore.fetchKits"
@@ -420,14 +367,14 @@ onBeforeRouteLeave(() => {
                 pt:title="hidden sm:block font-normal text-xl lg:text-2xl dark:text-surface-0"
             >
                 <template #content>
-                    <NoData v-if="!transferInvoiceStore.getTransferInvoices.totalItems && !transferInvoiceStore.getIsLoadingTransferInvoices" class="text-surface-400 mx-auto my-auto">
+                    <NoData v-if="!writeOffInvoiceStore.getWriteOffInvoices.totalItems && !writeOffInvoiceStore.getIsLoadingWriteOffInvoices" class="text-surface-400 mx-auto my-auto">
                         <p class="text-xl font-normal">{{ t("noResults") }}</p>
                     </NoData>
 
                     <DataTable
-                        v-if="transferInvoiceStore.getIsLoadingTransferInvoices || transferInvoiceStore.getTransferInvoices.totalItems > 0"
-                        :value="transferInvoiceStore.getIsLoadingTransferInvoices ?  Array(10).fill({}) : transferInvoiceStore.getTransferInvoices.models"
-                        :total-records="transferInvoiceStore.getTransferInvoices.totalItems"
+                        v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices || writeOffInvoiceStore.getWriteOffInvoices.totalItems > 0"
+                        :value="writeOffInvoiceStore.getIsLoadingWriteOffInvoices ?  Array(10).fill({}) : writeOffInvoiceStore.getWriteOffInvoices.models"
+                        :total-records="writeOffInvoiceStore.getWriteOffInvoices.totalItems"
                         :rows="filters.itemsPerPage"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
@@ -435,79 +382,55 @@ onBeforeRouteLeave(() => {
                     >
                         <Column field="id" :header="t('labels.id')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
                                 <p v-else>{{ data.id }}</p>
                             </template>
                         </Column>
-                        <Column field="fromLocation" :header="t('labels.fromLocation')">
+                        <Column field="location" :header="t('labels.location')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>
-                                <p v-else>{{ data.fromLocation?.name }}</p>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
+                                <p v-else>{{ data.location.name }}</p>
                             </template>
                         </Column>
-                        <Column field="toLocation" :header="t('labels.toLocation')">
+                        <Column field="totalPrice" :header="t('labels.totalPrice')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>
-                                <p v-else>{{ data.toLocation?.name }}</p>
-                            </template>
-                        </Column>
-                        <Column field="status" :header="t('labels.status')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>
-                                <p
-                                    v-else
-                                    :class="{'text-yellow-500': data.status === 1, 'text-green-500': data.status === 2}"
-                                >
-                                    {{ t(data.status) }}
-                                </p>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
+                                <p v-else>{{ `${formatCurrency(data.totalCostPrice)}$` }}</p>
                             </template>
                         </Column>
                         <Column field="createdAt" :header="t('labels.createdAt')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
                                 <p v-else>{{ getFormattedDate(data.createdAt) }}</p>
                             </template>
                         </Column>
                         <Column field="createdBy" :header="t('labels.createdBy')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
                                 <p v-else>{{ data.createdBy.name }}</p>
-                            </template>
-                        </Column>
-                        <Column field="acceptedBy" :header="t('labels.acceptedBy')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>
-                                <p v-else>{{ data.acceptedBy?.name ?? '-' }}</p>
                             </template>
                         </Column>
                         <Column field="updatedAt" :header="t('labels.updatedAt')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
                                 <p v-else>{{ data.updatedAt ? getFormattedDate(data.updatedAt) : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="updatedBy" :header="t('labels.updatedBy')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
                                 <p v-else>{{ data.updatedBy?.name || '-' }}</p>
                             </template>
                         </Column>
                         <Column field="actions" :header="t('actions')">
                             <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>
+                                <Skeleton height="2rem" v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices"/>
 
                                 <div v-else class="flex justify-end w-full">
                                     <div class="flex items-center gap-2">
                                         <Button
-                                            v-if="data.status !== 2"
-                                            @click="acceptAction(data.id)"
-                                            icon="pi pi-check"
-                                            pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
-                                            size="small"
-                                        />
-                                        <Button
                                             @click="router.push({
-                                                name: 'shop-transfer-invoice',
+                                                name: 'warehouse-write-off-invoice',
                                                 params: { id: data.id },
                                             })"
                                             icon="pi pi-eye"
@@ -515,8 +438,8 @@ onBeforeRouteLeave(() => {
                                             size="small"
                                         />
                                         <Button
-                                            v-if="isAdminOrCreatedBy(data.createdBy.id) && data.status !== 2"
-                                            @click="deleteAction(data.id)"
+                                            v-if="isAdminOrCreatedBy(data.createdBy.id)"
+                                            @click="deleteAction(data)"
                                             icon="pi pi-trash"
                                             pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
                                             size="small"
@@ -527,15 +450,19 @@ onBeforeRouteLeave(() => {
                         </Column>
 
                         <template #footer>
-                            <div v-if="transferInvoiceStore.getIsLoadingTransferInvoices" class="flex justify-between">
+                            <div v-if="writeOffInvoiceStore.getIsLoadingWriteOffInvoices" class="flex justify-between">
                                 <Skeleton height="2rem" width="10rem" />
                                 <Skeleton height="2rem" width="5rem"/>
                             </div>
                             <div v-else class="flex flex-wrap items-center justify-end gap-5">
+                                <p class="font-semibold">{{ t('labels.totals') }}:</p>
+                                <div>
+                                    <p class="font-semibold">{{ formatCurrency(writeOffInvoiceStore.getWriteOffInvoices.totalCostPrice) }}$</p>
+                                </div>
                                 <PaginatorComponent
                                     v-model="filters.page"
                                     v-model:items-per-page="filters.itemsPerPage"
-                                    :total-items="transferInvoiceStore.getTransferInvoices.totalItems"
+                                    :total-items="writeOffInvoiceStore.getWriteOffInvoices.totalItems"
                                 />
                             </div>
                         </template>
@@ -543,7 +470,7 @@ onBeforeRouteLeave(() => {
                 </template>
             </Card>
 
-            <!-- DELETE INCOME_INVOICE DIALOG -->
+            <!-- DELETE WRITE_OFF_INVOICE DIALOG -->
             <Dialog
                 v-model:visible="deleteVisible"
                 modal
@@ -552,7 +479,7 @@ onBeforeRouteLeave(() => {
                 pt:root="px-2"
             >
                 <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                    {{ t('dialog.deleteConfirmation', { name: t('transferInvoice.accusative'), id: currentTransferInvoiceId }) }}
+                    {{ t('dialog.deleteConfirmation', { name: t('writeOffInvoice.accusative'), id: currentWriteOffInvoiceId }) }}
                 </span>
 
                 <template #footer>
@@ -565,38 +492,8 @@ onBeforeRouteLeave(() => {
                         <Button
                             type="button"
                             :label="t('dialog.confirm')"
-                            @click="deleteTransferInvoice"
+                            @click="deleteWriteOffInvoice"
                             :loading="isDeleteLoading"
-                            class="px-5"
-                        />
-                    </div>
-                </template>
-            </Dialog>
-
-            <!-- ACCEPT TRANSFER_INVOICE DIALOG -->
-            <Dialog
-                v-model:visible="acceptVisible"
-                modal
-                :closable="false"
-                class="sm:min-w-100 sm:w-fit w-9/10"
-                pt:root="px-2"
-            >
-                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                    {{ t('dialog.acceptConfirmation', { name: t('transferInvoice.accusative'), id: currentTransferInvoiceIdForAccept }) }}
-                </span>
-
-                <template #footer>
-                    <div class="flex justify-end gap-2">
-                        <SecondaryButton
-                            type="button"
-                            :label="t('dialog.cancel')"
-                            @click="acceptVisible = false"
-                        />
-                        <Button
-                            type="button"
-                            :label="t('dialog.confirm')"
-                            @click="acceptTransferInvoice"
-                            :loading="isAcceptLoading"
                             class="px-5"
                         />
                     </div>

@@ -16,7 +16,11 @@ import SearchSelect from "@/components/UI/SearchSelect.vue";
 import {useProductStore} from "@/stores/product.js";
 import {useColorStore} from "@/stores/color.js";
 import DatePicker from "@/volt/DatePicker.vue";
-import {formatCurrency, formatDateTimeLocal, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
+import {
+    formatCurrency,
+    formatDateTimeLocal,
+    getFormattedDate
+} from "@/helpers/numberFormat.js";
 import Column from "primevue/column";
 import DataTable from "@/volt/DataTable.vue";
 import Dialog from "@/volt/Dialog.vue";
@@ -114,11 +118,13 @@ const sumPriceOfIncomeInvoiceProducts = computed(() => {
 })
 
 const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
+    const date = new Date(values.createdAt);
+    date.setHours(date.getHours() + 5);
     const payload = {
         supplier: values.supplier['@id'],
         location: values.location['@id'],
         comment: values.comment,
-        createdAt: values.createdAt,
+        createdAt: date,
         incomeInvoiceProducts: values.incomeInvoiceProducts.map(incomeInvoiceProduct => {
             const newVal = {
                 product: incomeInvoiceProduct.product['@id'],
@@ -244,6 +250,7 @@ watch(location, async () => {
         } else {
             const date = new Date(inventoryStore.getLastInventoryDateTo);
             date.setDate(date.getDate());
+            date.setMinutes(date.getMinutes() + 1);
             dateFrom.value = date;
             createdAt.value = date
         }
@@ -556,7 +563,7 @@ const confirmLeave = () => {
                         </Column>
                         <Column field="expiryDate" :header="t('labels.expiryDate')">
                             <template #body="{ data }">
-                                <p>{{ data.expiryDate ? getFormattedDateWithTime(data.expiryDate) : '-' }}</p>
+                                <p>{{ data.expiryDate ? getFormattedDate(data.expiryDate) : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="qty" :header="t('labels.qty')">

@@ -137,15 +137,51 @@ export const routes = [
                     },
                     {
                         path: 'return-invoices',
-                        name: 'warehouse-return-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/warehouse/WarehouseReturnInvoice.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'warehouse-return-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/returnInvoice/WarehouseReturnInvoices.vue')
+                            },
+                            {
+                                path: 'return-invoice/:id',
+                                name: 'warehouse-return-invoice',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/returnInvoice/WarehouseReturnInvoice.vue'),
+                            },
+                            {
+                                path: 'add',
+                                name: 'warehouse-add-return-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/returnInvoice/WarehouseReturnInvoiceAdd.vue')
+                            }
+                        ]
                     },
                     {
                         path: 'write-off-invoices',
-                        name: 'warehouse-write-off-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/warehouse/WarehouseWriteOffInvoice.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'warehouse-write-off-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/writeOffInvoice/WriteOffInvoices.vue')
+                            },
+                            {
+                                path: 'write-off-invoice/:id',
+                                name: 'warehouse-write-off-invoice',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/writeOffInvoice/WriteOffInvoice.vue'),
+                            },
+                            {
+                                path: 'add',
+                                name: 'warehouse-add-write_off-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/writeOffInvoice/WriteOffInvoiceAdd.vue')
+                            }
+                        ]
                     },
                 ]
             },
@@ -232,9 +268,27 @@ export const routes = [
                     },
                     {
                         path: 'return-invoices',
-                        name: 'shop-return-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        component: () => import('@/views/shop/ShopReturnInvoice.vue')
+                        children: [
+                            {
+                                path: '',
+                                name: 'shop-return-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/returnInvoice/ShopReturnInvoices.vue')
+                            },
+                            {
+                                path: 'return-invoice/:id',
+                                name: 'shop-return-invoice',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/returnInvoice/ShopReturnInvoice.vue'),
+                            },
+                            {
+                                path: 'add',
+                                name: 'shop-add-return-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/returnInvoice/ShopReturnInvoiceAdd.vue')
+                            }
+                        ]
                     },
                     {
                         path: 'write-off-invoices',

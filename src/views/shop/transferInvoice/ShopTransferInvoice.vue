@@ -74,7 +74,7 @@ const deletedKitData = ref([]);
 const createdKitData = ref([]);
 const updatedKitData = ref([]);
 const editMode = ref(false);
-const isLoading = ref(false);
+const isLoading = ref(true);
 const deleteLocationQuantityVisible = ref(false);
 const deleteLocationQuantityKitVisible = ref(false);
 const isDeleteLocationQuantityLoading = ref(false);
@@ -94,6 +94,9 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t("cards.transferInvoices"), route: { name: 'shop-transfer-invoices'} }, { label: t("cards.transferInvoice") }]);
+const isAdminOrCreatedBy = createdById => (
+    userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
+)
 const tabList = computed(() => [
     { value: 'products', label: t('cards.products')},
     { value: 'kits', label: t('cards.kits')},
@@ -174,15 +177,13 @@ const onSubmitTransferInvoice = transferInvoiceHandleSubmit(async (values) => {
 
         router.back()
     } catch (error) {
-        // todo bu yeridagi status kodlardan kelib chiqib beradigan errorMessage'ga nima deb yozishni bilmadim
-        // if (error.status === 439) {
-        //     toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
-        // } else if (error.status === 412) {
-        //     toast.add({ severity: 'error', summary: t('toast.notEnoughKit', { field: t('code.nominativeCapitalize') }), life: 3000 })
-        // } else {
-        //     toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
-        // }
-        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        if (error.status === 439) {
+            toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else if (error.status === 412) {
+            toast.add({ severity: 'error', summary: t('toast.notEnough', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
     } finally {
         createdData.value = []
         deletedData.value = []
@@ -290,15 +291,15 @@ function deleteLocationQuantity() {
 }
 
 function deleteLocationQuantityKit() {
-    const index = editableData.value.transferInvoiceProducts.findIndex(p => p.id === currentDeleteLocationQuantityKit.value.id);
+    const index = editableData.value.transferInvoiceKits.findIndex(p => p.id === currentDeleteLocationQuantityKit.value.id);
 
     if (index === -1) return;
 
-    const current = editableData.value.transferInvoiceProducts[index];
+    const current = editableData.value.transferInvoiceKits[index];
 
     if (current.id) {
         // API’dan kelgan
-        editableData.value.transferInvoiceProducts.splice(index, 1);
+        editableData.value.transferInvoiceKits.splice(index, 1);
 
         deletedKitData.value.push({
             transferInvoiceKit: current["@id"],
@@ -306,14 +307,13 @@ function deleteLocationQuantityKit() {
         })
     } else {
         // Yangi qo‘shilgan
-        editableData.value.transferInvoiceProducts.splice(index, 1);
+        editableData.value.transferInvoiceKits.splice(index, 1);
     }
 
     deleteLocationQuantityKitVisible.value = false
 }
 
 function editLocationQuantityAction(data, index) {
-    console.log(data)
     isEditing.value = true;
     currentLocationQuantityIndex.value = index
     locationQuantity.value = data.locationQuantity
@@ -343,7 +343,7 @@ function editLocationQuantity(updatedLocationQuantity) {
     // Duplicate check
     const exists = editableData.value.transferInvoiceProducts.some((p, i) =>
         i !== currentLocationQuantityIndex.value &&
-        p.id === updatedLocationQuantity.locationQuantity.id
+        p.locationQuantity.id === updatedLocationQuantity.locationQuantity.id
     );
 
     if (exists) {
@@ -412,7 +412,7 @@ function editLocationQuantityKit(updatedLocationQuantityKit) {
     // Duplicate check
     const exists = editableData.value.transferInvoiceKits.some((p, i) =>
         i !== currentLocationQuantityKitIndex.value &&
-        p.id === updatedLocationQuantityKit.locationQuantityKit.id
+        p.locationQuantityKit.id === updatedLocationQuantityKit.locationQuantityKit.id
     );
 
     if (exists) {
@@ -499,7 +499,6 @@ const confirmLeave = () => {
 }
 
 onMounted(async () => {
-    isLoading.value = true;
     await transferInvoiceStore.fetchTransferInvoice(route.params.id);
 
     apiData.value = transferInvoiceStore.getTransferInvoice;
@@ -549,7 +548,7 @@ onMounted(async () => {
         <template #buttons>
             <div v-if="!isLoading && !isAcceptedTransferInvoice" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
                 <Button
-                    v-if="!editMode"
+                    v-if="!editMode && isAdminOrCreatedBy(transferInvoiceStore.getTransferInvoice.createdBy.id)"
                     :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
                     icon="pi pi-pencil"
                     @click="editMode = true"
@@ -578,7 +577,7 @@ onMounted(async () => {
             <div class="sm:hidden flex grow gap-2 sm:gap-4">
                 <Button
                     v-if="!editMode"
-                    :disabled="!!transferInvoiceErrors.incomeInvoiceProducts"
+                    :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
                     icon="pi pi-pencil"
                     @click="editMode = true"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
@@ -587,7 +586,7 @@ onMounted(async () => {
                 />
                 <Button
                     v-if="editMode"
-                    :disabled="!!transferInvoiceErrors.incomeInvoiceProducts"
+                    :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
                     icon="pi pi-save"
                     @click="onSubmitTransferInvoice"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
@@ -597,7 +596,7 @@ onMounted(async () => {
 
                 <SecondaryButton
                     v-if="editMode"
-                    :disabled="!!transferInvoiceErrors.incomeInvoiceProducts"
+                    :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
                     @click="cancelEditing"
                     class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
@@ -654,7 +653,7 @@ onMounted(async () => {
                             <SearchSelect
                                 v-if="!isLoading"
                                 v-model="toLocation"
-                                :fetchFn="(query) => locationStore.fetchLocations({ ...query })"
+                                :fetchFn="(query) => locationStore.fetchLocations({ ...query, toLocation: true })"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
@@ -699,7 +698,7 @@ onMounted(async () => {
                                             :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
-                                            search-key="id"
+                                            search-key="name"
                                             :placeholder="t('placeholders.select.product')"
                                             :loading="locationQuantityStore.getIsLoadingLocationQuantity"
                                             :total-items="locationQuantityStore.getLocationQuantities.totalItems"
@@ -744,31 +743,20 @@ onMounted(async () => {
                                         <p class="text-sm">{{ t('labels.kit') }}<span class="text-red-500"> *</span></p>
                                         <SearchSelect
                                             v-model="locationQuantityKit"
-                                            :fetchFn="(query) => locationQuantityKitStore.fetchLocationQuantityKits({...query, location: fromLocation.id})"
+                                            :fetchFn="(query) => locationQuantityKitStore.fetchLocationQuantityKits({...query, location: fromLocation.id, isZero: true})"
                                             :options="locationQuantityKitStore.getLocationQuantityKits.models"
                                             :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :return-value="opt => opt"
+                                            :search-value="opt => opt.id"
+                                            search-key="name"
                                             :placeholder="t('placeholders.select.kit')"
                                             :loading="locationQuantityKitStore.getIsLoadingLocationQuantityKit"
                                             :total-items="locationQuantityKitStore.getLocationQuantityKits.totalItems"
                                             :invalid="!!locationQuantityKitErrors.locationQuantityKit"
                                         >
                                             <template v-if="locationQuantityKitStore.getLocationQuantityKits.models.length" #header>
-                                                <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900 grid grid-cols-4 gap-4">
-                                                    <div>{{t('labels.title')}}</div>
-                                                    <div>{{t('labels.code') }}</div>
-                                                    <div>{{t('labels.expiryDate')}}</div>
-                                                    <div>{{t('labels.qty')}}</div>
-                                                </div>
-                                            </template>
-                                            <template #option="{ option }">
-                                                <div class="grid grid-cols-4 w-full gap-4">
-                                                    <div>{{ option?.kit?.name }}</div>
-                                                    <div>{{ option?.kit?.code }}</div>
-                                                    <div>{{ getFormattedDate(option?.expiryDate) }}</div>
-                                                    <div>{{ formatCurrency(option?.qty) }} {{ t(`labels.pcs`) }}</div>
-                                                </div>
+                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
                                             </template>
                                         </SearchSelect>
                                     </div>
@@ -788,7 +776,7 @@ onMounted(async () => {
                                 </div>
 
                                 <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
-                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearLocationQuantityForm" />
+                                    <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearLocationQuantityKitForm" />
                                     <Button v-if="!isEditing" @click="onSubmitLocationQuantityKit" :label="t('buttons.add')" class="px-5" :loading="locationQuantityIsSubmitting"/>
                                     <Button v-else @click="onEditLocationQuantityKit" :label="t('buttons.edit')" class="px-5"/>
                                 </div>
@@ -826,21 +814,6 @@ onMounted(async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
-                                    <ColumnGroup type="header">
-                                        <Row>
-                                            <Column :header="t('labels.product')" :rowspan="1" :colspan="5"/>
-                                            <Column :header="t('labels.expiryDate')" :rowspan="2" :colspan="1" />
-                                            <Column :header="t('labels.qty')" :rowspan="2" :colspan="1" />
-                                            <Column v-if="editMode" :header="t('actions')" :rowspan="2" :colspan="1" />
-                                        </Row>
-                                        <Row>
-                                            <Column field="kit" :header="t('labels.title')" />
-                                            <Column field="code" :header="t('labels.code')" />
-                                            <Column field="color" :header="t('labels.color')" />
-                                            <Column field="qr" :header="t('labels.qr')" />
-                                            <Column field="retailPrice" :header="t('labels.retailPrice')" />
-                                        </Row>
-                                    </ColumnGroup>
                                     <Column field="product" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
@@ -923,20 +896,6 @@ onMounted(async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
-                                    <ColumnGroup type="header">
-                                        <Row>
-                                            <Column :header="t('labels.kit')" :rowspan="1" :colspan="4" class="text-center!"/>
-                                            <Column :header="t('labels.expiryDate')" :rowspan="2" :colspan="1" />
-                                            <Column :header="t('labels.transferQty')" :rowspan="2" :colspan="1" />
-                                            <Column v-if="editMode" :header="t('actions')" :rowspan="2" :colspan="1" />
-                                        </Row>
-                                        <Row>
-                                            <Column field="kit" :header="t('labels.title')" />
-                                            <Column field="code" :header="t('labels.code')" />
-                                            <Column field="qr" :header="t('labels.qr')" />
-                                            <Column field="retailPrice" :header="t('labels.retailPrice')" />
-                                        </Row>
-                                    </ColumnGroup>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantityKit?.kit?.name }}</p>
@@ -962,7 +921,7 @@ onMounted(async () => {
                                             <p>{{ data.locationQuantityKit?.expiryDate ? getFormattedDate(data.locationQuantityKit?.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="qtyLocationQuantityKit" :header="t('labels.transferQty')">
+                                    <Column field="qty" :header="t('labels.qty')">
                                         <template #body="{ data }">
                                             <p>{{ data.qty }} {{t(`labels.pcs`)}}</p>
                                         </template>
@@ -1031,7 +990,7 @@ onMounted(async () => {
                 pt:root="px-2"
             >
                 <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                    {{ t('dialog.deleteConfirm', { name: t('product.accusative') }) }}
+                    {{ t('dialog.deleteConfirm', { name: t('kit.accusative') }) }}
                 </span>
 
                 <template #footer>

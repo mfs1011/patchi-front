@@ -27,7 +27,7 @@ import Tab from "@/volt/Tab.vue";
 import ColumnGroup from "primevue/columngroup";
 import Row from "primevue/row";
 import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
-import {useTransferInvoiceValidation} from "@/views/shop/transferInvoice/useShopTransferInvoiceForm.js";
+import {useTransferInvoiceValidation} from "@/views/warehouse/transferInvoice/useWarehouseTransferInvoiceForm.js";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -48,8 +48,8 @@ const {
     locationQuantity,
     qtyLocationQuantity,
     locationQuantityKitHandleSubmit,
-    locationQuantityKitErrors,
     locationQuantityKitIsSubmitting,
+    locationQuantityKitErrors,
     locationQuantityKitResetForm,
     locationQuantityKitValidate,
     locationQuantityKit,
@@ -77,11 +77,11 @@ const tabVal = ref('products')
 
 const home = computed(() => ({
     icon: 'pi pi-home',
-    label: t('shop'),
-    route: '/shop'
+    label: t('warehouse'),
+    route: '/warehouse'
 }));
 
-const items = computed(() => [{ label: t('cards.transferInvoices'), route: { name: 'shop-transfer-invoices'} }, { label: t('sections.transferInvoices.add') }]);
+const items = computed(() => [{ label: t('cards.writeOffInvoices'), route: { name: 'warehouse-write-off-invoices'} }, { label: t('sections.writeOffInvoices.add') }]);
 const hasTransferInvoiceData = computed(() => !!toLocation.value && !!fromLocation.value)
 const tabList = computed(() => [
     { value: 'products', label: t('cards.products')},
@@ -267,7 +267,7 @@ const saveEditingKit = async () => {
 async function fetchLocation(query) {
     const params = {
         ...query,
-        isWarehouse: false
+        isWarehouse: true
     }
 
     if (userStore.getAboutMeFromToken.role === 'ROLE_WAREHOUSE_MANAGER') {
@@ -319,8 +319,8 @@ const confirmLeave = () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.shopTransferInvoices.add')"
-        back-route-name="shop-transfer-invoices"
+        :section-name="t('sections.writeOffInvoices.add')"
+        back-route-name="warehouse-write-off-invoices"
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
@@ -377,7 +377,7 @@ const confirmLeave = () => {
 
                             <SearchSelect
                                 v-model="toLocation"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query })"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query, toLocation: true })"
                                 :options="locationStore.getLocations.models.filter(l => l.id !== fromLocation)"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.name"
@@ -418,8 +418,8 @@ const confirmLeave = () => {
                                             v-model="locationQuantity"
                                             :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: fromLocation.id})"
                                             :options="locationQuantityStore.getLocationQuantities.models"
-                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
-                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
                                             search-key="id"
@@ -470,8 +470,8 @@ const confirmLeave = () => {
                                             v-model="locationQuantityKit"
                                             :fetchFn="(query) => locationQuantityKitStore.fetchLocationQuantityKits({...query, location: fromLocation.id})"
                                             :options="locationQuantityKitStore.getLocationQuantityKits.models"
-                                            :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.pcs`)}`"
-                                            :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.pcs`)}`"
+                                            :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
+                                            :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
                                             search-key="id"
@@ -481,7 +481,20 @@ const confirmLeave = () => {
                                             :invalid="!!locationQuantityKitErrors.locationQuantityKit"
                                         >
                                             <template v-if="locationQuantityKitStore.getLocationQuantityKits.models.length" #header>
-                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
+                                                <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900 grid grid-cols-4 gap-4">
+                                                    <div>{{t('labels.title')}}</div>
+                                                    <div>{{t('labels.code') }}</div>
+                                                    <div>{{t('labels.expiryDate')}}</div>
+                                                    <div>{{t('labels.qty')}}</div>
+                                                </div>
+                                            </template>
+                                            <template #option="{ option }">
+                                                <div class="grid grid-cols-4 w-full gap-4">
+                                                    <div>{{ option?.kit?.name }}</div>
+                                                    <div>{{ option?.kit?.code }}</div>
+                                                    <div>{{ getFormattedDate(option?.expiryDate) }}</div>
+                                                    <div>{{ formatCurrency(option?.qty) }} {{ t(`labels.pcs`) }}</div>
+                                                </div>
                                             </template>
                                         </SearchSelect>
                                     </div>

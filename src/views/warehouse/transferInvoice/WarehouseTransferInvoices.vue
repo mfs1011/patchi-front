@@ -167,7 +167,7 @@ const clearFilters = () => {
     filters.value['date-to'] = null;
 }
 
-const isAdminAndCreatedBy = createdById => (
+const isAdminOrCreatedBy = createdById => (
     userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
 )
 
@@ -181,9 +181,9 @@ const deleteTransferInvoice = async () => {
         isDeleteLoading.value = true;
 
         await transferInvoiceStore.deleteTransferInvoice(currentTransferInvoiceId.value);
-        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('product.nominativeCapitalize') }), life: 3000 })
+        toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('transferInvoice.nominativeCapitalize') }), life: 3000 })
     } catch (err) {
-        toast.add({ severity: 'error', summary: t('toast.cannot_delete_product_in_stock'), life: 3000 })
+        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
     } finally {
         isDeleteLoading.value = false;
         deleteVisible.value = false;
@@ -200,8 +200,14 @@ const acceptTransferInvoice = async () => {
     try {
         await transferInvoiceStore.acceptTransferInvoice(currentTransferInvoiceIdForAccept.value)
         toast.add({ severity: 'success', summary: t('toast.accepted', { name: t('transferInvoice.nominativeCapitalize') }), life: 3000 })
-    } catch (err) {
-        toast.add({ severity: 'error', summary: t('toast.cannot_delete_product_in_stock'), life: 3000 })
+    } catch (error) {
+        if (error.status === 403) {
+            toast.add({ severity: 'error', summary: t('toast.accessDenied', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else if (error.status === 412) {
+            toast.add({ severity: 'error', summary: t('toast.notEnough', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
     } finally {
         isAcceptLoading.value = false;
         acceptVisible.value = false;
@@ -493,7 +499,7 @@ onBeforeRouteLeave(() => {
                                 <div v-else class="flex justify-end w-full">
                                     <div class="flex items-center gap-2">
                                         <Button
-                                            v-if="isAdminAndCreatedBy && data.status !== 2"
+                                            v-if="data.status !== 2"
                                             @click="acceptAction(data.id)"
                                             icon="pi pi-check"
                                             pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
@@ -509,7 +515,7 @@ onBeforeRouteLeave(() => {
                                             size="small"
                                         />
                                         <Button
-                                            v-if="data.status !== 2"
+                                            v-if="isAdminOrCreatedBy(data.createdBy.id) && data.status !== 2"
                                             @click="deleteAction(data.id)"
                                             icon="pi pi-trash"
                                             pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
@@ -567,7 +573,7 @@ onBeforeRouteLeave(() => {
                 </template>
             </Dialog>
 
-            <!-- ACCEPT INCOME_INVOICE DIALOG -->
+            <!-- ACCEPT TRANSFER_INVOICE DIALOG -->
             <Dialog
                 v-model:visible="acceptVisible"
                 modal

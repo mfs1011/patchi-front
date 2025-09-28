@@ -79,8 +79,8 @@ const FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp'];
 
 const excludeOptions = [
-    { value: true },
-    { value: false }
+    { label: 'exclude', value: true },
+    { label: 'include', value: false }
 ]
 
 const kitInfoSchema = computed(() => yup.object({
@@ -550,11 +550,11 @@ const confirmLeave = () => {
                                 </div>
 
                                 <div>
-                                    <p class="text-sm">{{ t('labels.exclude') }}</p>
+                                    <p class="text-sm">...</p>
                                     <Select
                                         v-model="exclude"
                                         :options="excludeOptions"
-                                        option-label="value"
+                                        option-label="label"
                                         option-value="value"
                                         pt:root="w-full dark:bg-surface-700"
                                     />
@@ -611,9 +611,9 @@ const confirmLeave = () => {
                                 <p>{{ data.qty }} {{t(`labels.${data.product.unit}`)}}</p>
                             </template>
                         </Column>
-                        <Column field="exclude" :header="t('labels.exclude')">
+                        <Column field="exclude" header="...">
                             <template #body="{ data }">
-                                <p>{{ data.exclude }}</p>
+                                <p>{{ data.exclude ? 'exclude' : 'include' }}</p>
                             </template>
                         </Column>
                         <Column

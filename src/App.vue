@@ -10,6 +10,7 @@ const userStore = useUserStore()
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
 const eventSource = ref(null)
+const isLoading = ref(true);
 
 function connectMercure() {
     const url = new URL(mercureUrl)
@@ -33,6 +34,7 @@ function connectMercure() {
 onMounted(() => {
     connectMercure()
     userStore.fetchAboutMe()
+        .then(() => isLoading.value = false)
 })
 
 onBeforeUnmount(() => {
@@ -46,6 +48,6 @@ onBeforeUnmount(() => {
     <div class="transition-colors duration-200">
         <Toast />
         <ProgressBar v-if="sidebar.isRouteLoading" mode="indeterminate"  style="height: 4px"/>
-        <router-view />
+        <router-view v-if="!isLoading" />
     </div>
 </template>

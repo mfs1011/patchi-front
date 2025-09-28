@@ -26,6 +26,7 @@ import {formatCurrency, formatDateTimeLocal, getFormattedDate} from "@/helpers/n
 import {useColorStore} from "@/stores/color.js";
 import {useToast} from "primevue/usetoast";
 import Message from "@/volt/Message.vue";
+import {useUserStore} from "@/stores/user.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -36,6 +37,7 @@ const supplierStore = useSupplierStore();
 const locationStore = useLocationStore();
 const productStore = useProductStore();
 const colorStore = useColorStore();
+const userStore = useUserStore()
 const { t } = useI18n();
 const {
     productHandleSubmit,
@@ -68,7 +70,7 @@ const createdData = ref([]);
 const updatedData = ref([]);
 const dateFrom = ref(null);
 const editMode = ref(false);
-const isLoading = ref(false);
+const isLoading = ref(true);
 const deleteVisible = ref(false);
 const isDeleteLoading = ref(false);
 const showLeaveDialog = ref(false);
@@ -76,6 +78,7 @@ const isEditing = ref(false);
 const pendingNavigation = ref(false);
 const isEdited = ref(false);
 const isConfirmLoading = ref(false);
+const hasInventory = computed(() => inventoryStore.getHasInventory)
 
 // computed
 const home = computed(() => ({
@@ -85,6 +88,10 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t("cards.incomeInvoices"), route: { name: 'warehouse-income-invoices'} }, { label: t("cards.incomeInvoice") }]);
+const isAdminOrCreatedBy = createdById => (
+    userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
+)
+
 const sumPriceOfIncomeInvoiceProducts = computed(() => {
     return editableData.value.incomeInvoiceProducts.length === 0
         ? 0
@@ -150,12 +157,20 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
             summary: t('toast.successEditingSave'),
             life: 3000
         })
-        createdData.value = [];
-        updatedData.value = [];
-        deletedData.value = [];
+
         router.back()
     } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        if (error.status === 439) {
+            toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else if (error.status === 412) {
+            toast.add({ severity: 'error', summary: t('toast.notEnoughKit', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
+    } finally {
+        createdData.value = []
+        deletedData.value = []
+        updatedData.value = []
     }
 })
 
@@ -375,15 +390,16 @@ watch(isProductTypeNonFood, (newVal) => {
 watch(location, async () => {
     if (location.value) {
         await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
+        console.log(location.value.id)
 
         if (inventoryStore.getLastInventoryDateTo === null) {
             dateFrom.value = null
             createdAt.value = null
         } else {
             const date = new Date(inventoryStore.getLastInventoryDateTo);
-            date.setDate(date.getDate() + 1);
+            date.setDate(date.getDate());
+            date.setMinutes(date.getMinutes() + 1);
             dateFrom.value = date;
-            // createdAt.value = date
         }
     } else {
         dateFrom.value = null
@@ -408,8 +424,11 @@ const confirmLeave = () => {
 }
 
 onMounted(async () => {
-    isLoading.value = true;
     await incomeInvoiceStore.fetchIncomeInvoice(route.params.id);
+    await inventoryStore.fetchHasInventory({
+        location: `/api/locations/${incomeInvoiceStore.getIncomeInvoice.location.id}`,
+        createdAt: incomeInvoiceStore.getIncomeInvoice.createdAt
+    })
 
     apiData.value = incomeInvoiceStore.getIncomeInvoice;
     editableData.value = JSON.parse(JSON.stringify(incomeInvoiceStore.getIncomeInvoice));
@@ -453,13 +472,13 @@ onMounted(async () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.sellers.add')"
+        :section-name="t('cards.incomeInvoice')"
         back-route-name="warehouse-income-invoices"
     >
         <template #buttons>
-            <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
+            <div v-if="!isLoading && !hasInventory" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
                 <Button
-                    v-if="!editMode"
+                    v-if="!editMode && isAdminOrCreatedBy(incomeInvoiceStore.getIncomeInvoice.createdBy.id)"
                     :disabled="!!incomeInvoiceErrors.incomeInvoiceProducts"
                     icon="pi pi-pencil"
                     @click="editMode = true"

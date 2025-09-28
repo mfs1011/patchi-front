@@ -3,44 +3,24 @@ import { computed } from 'vue'
 import { useField, useForm } from 'vee-validate'
 import {useI18n} from "vue-i18n";
 
-export function useTransferInvoiceValidation() {
+export function useWriteOffInvoiceValidation() {
     const { t } = useI18n()
     // Main invoice schema
 
 // VeeValidate
-    const transferInvoiceInfoSchema = computed(() =>
+    const writeOffInvoiceInfoSchema = computed(() =>
         yup
             .object({
-                fromLocation: yup.object().required("From location majburiy"),
-
-                toLocation: yup.lazy((value) => {
-                    if (!value) {
-                        return yup.object().required("To location majburiy");
-                    }
-
-                    return yup
-                        .object()
-                        .required("To location majburiy")
-                        .test(
-                            "not-same-as-from",
-                            "From location va To location bir xil bo‘lishi mumkin emas",
-                            function (val) {
-                                const { fromLocation } = this.parent;
-                                if (!val?.id || !fromLocation?.id) return true;
-                                return fromLocation.id !== val.id;
-                            }
-                        );
-                }),
-
-                transferInvoiceProducts: yup.array(),
-                transferInvoiceKits: yup.array(),
+                location: yup.object().required("From location majburiy"),
+                writeOffInvoiceProducts: yup.array(),
+                writeOffInvoiceKits: yup.array(),
             })
             .test(
                 "products-or-kits",
                 "Mahsulot yoki kompozitsiya kiritilishi kerak",
                 (value) => {
-                    const hasProducts = value?.transferInvoiceProducts?.length > 0;
-                    const hasKits = value?.transferInvoiceKits?.length > 0;
+                    const hasProducts = value?.writeOffInvoiceProducts?.length > 0;
+                    const hasKits = value?.writeOffInvoiceKits?.length > 0;
                     return hasProducts || hasKits; // ikkalasidan biri bo‘lsa yetarli
                 }
             )
@@ -91,16 +71,16 @@ export function useTransferInvoiceValidation() {
     );
 
     const {
-        handleSubmit: transferInvoiceHandleSubmit,
-        errors: transferInvoiceErrors,
-        isSubmitting: transferInvoiceIsSubmitting,
-        resetForm: transferInvoiceResetForm,
-        ...transferInvoiceFormCtx
+        handleSubmit: writeOffInvoiceHandleSubmit,
+        errors: writeOffInvoiceErrors,
+        isSubmitting: writeOffInvoiceIsSubmitting,
+        resetForm: writeOffInvoiceResetForm,
+        ...writeOffInvoiceFormCtx
     } = useForm({
-        validationSchema: transferInvoiceInfoSchema,
+        validationSchema: writeOffInvoiceInfoSchema,
         initialValues: {
-            transferInvoiceProducts: [],
-            transferInvoiceKits: []
+            writeOffInvoiceProducts: [],
+            writeOffInvoiceKits: []
         }
     })
 
@@ -132,26 +112,26 @@ export function useTransferInvoiceValidation() {
         }
     })
 
-    const { value: fromLocation } = useField('fromLocation', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: transferInvoiceFormCtx })
-    const { value: toLocation } = useField('toLocation', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: transferInvoiceFormCtx })
+    const { value: location } = useField('location', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: writeOffInvoiceFormCtx })
+    const { value: createdAt } = useField('createdAt', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: writeOffInvoiceFormCtx })
+    const { value: writeOffInvoiceProducts } = useField('writeOffInvoiceProducts', undefined, { validateOnMount: true, form: writeOffInvoiceFormCtx })
+    const { value: writeOffInvoiceKits } = useField('writeOffInvoiceKits', undefined, { validateOnValueUpdate: false, validateOnMount: true, form: writeOffInvoiceFormCtx })
     const { value: locationQuantity } = useField('locationQuantity', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: locationQuantityFormCtx })
-    const { value: transferInvoiceProducts } = useField('transferInvoiceProducts', undefined, { validateOnMount: true, form: transferInvoiceFormCtx })
-    const { value: transferInvoiceKits } = useField('transferInvoiceKits', undefined, { validateOnValueUpdate: false, validateOnMount: true, form: transferInvoiceFormCtx })
     const { value: locationQuantityKit } = useField('locationQuantityKit', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: locationQuantityKitFormCtx })
     const { value: qtyLocationQuantity } = useField('qtyLocationQuantity', undefined, { validateOnMount: false, form: locationQuantityFormCtx });
     const { value: qtyLocationQuantityKit } = useField('qtyLocationQuantityKit', undefined, { validateOnMount: false, form: locationQuantityKitFormCtx });
 
     return {
-        // Invoice form
-        transferInvoiceHandleSubmit,
-        transferInvoiceErrors,
-        transferInvoiceIsSubmitting,
-        transferInvoiceResetForm,
-        transferInvoiceFormCtx,
-        fromLocation,
-        toLocation,
-        transferInvoiceProducts,
-        transferInvoiceKits,
+        // WriteOff form
+        writeOffInvoiceHandleSubmit,
+        writeOffInvoiceErrors,
+        writeOffInvoiceIsSubmitting,
+        writeOffInvoiceResetForm,
+        writeOffInvoiceFormCtx,
+        location,
+        createdAt,
+        writeOffInvoiceProducts,
+        writeOffInvoiceKits,
 
         // Product form
         locationQuantityHandleSubmit,
