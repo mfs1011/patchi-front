@@ -18,6 +18,7 @@ import Select from "@/volt/Select.vue";
 import Button from "@/volt/Button.vue";
 import {useLocationStore} from "@/stores/location.js";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
+import {exportSellersKpi} from "@/helpers/xlsx.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -48,7 +49,7 @@ const home = computed(() => ({
 
 const dt = ref();
 const exportCSV = () => {
-    dt.value.exportCSV();
+    exportSellersKpi(formattedRows.value)
 };
 
 const items = computed(() => [{ label: t("cards.sellerKpi") }]);

@@ -352,6 +352,98 @@ export const exportInventory = async (products, kits, location, dateFrom, dateTo
     link.click()
 }
 
+export const exportSellersKpi = async (sellersKpi) => {
+    // Создаем новую книгу и лист
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet(i18n.global.t('cards.sellerKpi'))
+
+    setupPage(worksheet, 'portrait')
+
+    // Добавляем заголовки
+    worksheet.columns = [
+        { width: 6 }, // 1 id
+        { width: 30 }, // 2 seller
+        { width: 18 }, // 3 location
+        { width: 14 }, // 4 month
+        { width: 14 }, // 5 inComposition
+        { width: 12 }, // 6 forOrder
+        { width: 12 }, // 7 forCategory
+        { width: 14 }, // 8 total
+    ]
+
+    const header = [
+        i18n.global.t('labels.id'),
+        i18n.global.t('roles.seller'),
+        i18n.global.t('labels.locations'),
+        i18n.global.t('labels.month'),
+        i18n.global.t('labels.forTheKit'),
+        i18n.global.t('labels.forTheOrder'),
+        i18n.global.t('labels.forTheCategory'),
+        i18n.global.t('labels.total'),
+    ]
+
+    const headerRow = worksheet.addRow(header)
+    headerRow.height = 30
+
+    // Форматирование заголовка таблицы
+    headerRow.eachCell((cell) => {
+        addBorder(cell)
+        fillFormat(cell, 'eaecef')
+        textFormat(cell, 'Tahoma', true, 10, '000000')
+        textAlignment(cell, 'center', 'middle', true)
+    })
+
+    // Пример данных для таблицы
+    const tableData = sellersKpi.map((item, index) => [
+        item.id,
+        item.seller,
+        item.location,
+        i18n.global.t(item.month),
+        item.kitsKpi,
+        item.orderInvoicesKpi,
+        item.categoriesKpi,
+        '',
+    ])
+
+    // Добавление данных в таблицу
+    tableData.forEach((rowData) => {
+        const row = worksheet.addRow(rowData)
+        const rowIndex = row.number // Номер текущей строки
+
+        row.getCell(8).value = {
+            formula: `E${rowIndex}+F${rowIndex}+G${rowIndex}`
+        }
+
+        row.eachCell((cell, colNumber) => {
+            addBorder(cell)
+            textFormat(cell, 'Tahoma', false, 11, '000000')
+
+            if ([1].includes(colNumber)) {
+                textAlignment(cell, 'center', 'middle', false)
+            } else if ([2, 3, 4].includes(colNumber)) {
+                textAlignment(cell, 'left', 'middle', false)
+            } else if ([5, 6, 7, 8].includes(colNumber)) {
+                textAlignment(cell, 'right', 'middle', false)
+                formatNumber(cell)
+            }
+        })
+    })
+
+    // ******************************************************************************** //
+
+    // Генерация файла
+    const buffer = await workbook.xlsx.writeBuffer()
+
+    // Создание и скачивание файла
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+
+    const timestamp = formatDateForFilename()
+    link.download = `${i18n.global.t('cards.sellerKpi')}_${timestamp}.xlsx`
+    link.click()
+}
+
 function addBorder(cell) {
     cell.border = {
         top: { style: 'thin' },
