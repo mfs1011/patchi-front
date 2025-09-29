@@ -39,9 +39,21 @@ export const useUSDRateStore = defineStore('usdRate', () => {
         }
     }
 
+    const fetchLastUSDRate = async () => {
+        try {
+            const { data } = await authorizedClient.get(`/usd_rates/last`)
+            state.usdRate = data
+
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
     return {
         fetchUSDRates,
         fetchUSDRate,
+        fetchLastUSDRate,
         getUSDRates: computed(() => state.usdRates),
         getUSDRate: computed(() => state.usdRate),
         getIsLoadingUSDRate: computed(() => state.isLoadingUSDRates),

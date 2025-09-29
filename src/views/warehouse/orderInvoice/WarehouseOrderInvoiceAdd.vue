@@ -33,6 +33,8 @@ import {useInventoryStore} from "@/stores/inventory.js";
 import {useRouter} from "vue-router";
 import Select from "@/volt/Select.vue";
 import {usePaymentStore} from "@/stores/payment.js";
+import SecondaryButton from "@/volt/SecondaryButton.vue";
+import {useUSDRateStore} from "@/stores/usdRate.js";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -66,6 +68,15 @@ const {
     kit,
     kitQty,
     kitPrice,
+    paymentHandleSubmit,
+    paymentErrors,
+    paymentIsSubmitting,
+    paymentResetForm,
+    paymentFormCtx,
+    paymentValidate,
+    orderInvoicePrices,
+    payment,
+    amount
 } = useOrderInvoiceValidation();
 
 const orderInvoiceStore = useOrderInvoiceStore();
@@ -77,6 +88,7 @@ const kitStore = useKitStore();
 const assemblyStore = useAssemblyStore();
 const categoryStore = useCategoryStore();
 const paymentStore = usePaymentStore();
+const usdRateStore = useUSDRateStore();
 const tabVal = ref('products')
 const currentProductPage = ref(1)
 const currentKitPage = ref(1)
@@ -86,6 +98,8 @@ const isVisibleIntersectingKit = ref(false)
 const availableProducts = ref([])
 const availableKits = ref([])
 const dateFrom = ref();
+const isEditing = ref(false)
+const currentPayment = ref({})
 
 const filters = ref({
     productCategory: null,
@@ -122,6 +136,34 @@ const totalPrice = computed(() => {
     return productsTotal + kitsTotal
 })
 
+const totalPayments = computed(() => {
+    return orderInvoicePrices.value.reduce((sum, item) => {
+        const amount = item.payment.id === 1 ? item.amount : item.amount / usdRateStore.getUSDRate.rate
+        return sum + amount
+    }, 0)
+})
+
+const clearPaymentForm = () => {
+    isEditing.value = false
+    paymentResetForm()
+}
+
+const onSubmitPayment = paymentHandleSubmit(async values => {
+    const isInclude = orderInvoicePrices.value.some(orderInvoicePrice => orderInvoicePrice.payment?.id === values.payment?.id)
+
+    if (isInclude) {
+        toast.add({
+            severity: 'error',
+            summary: t('toast.already_added', { name: t('payment.nominativeCapitalize') }),
+            life: 3000
+        })
+    } else {
+        orderInvoicePrices.value = [...orderInvoicePrices.value, values]
+        currentPayment.value = values
+        paymentResetForm()
+    }
+})
+
 const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async values => {
     if (orderInvoiceProducts.value.length > 0 || orderInvoiceKits.value.length > 0) {
         const date = new Date(values.createdAt);
@@ -151,10 +193,14 @@ const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async values => {
 
 onMounted( () => {
     paymentStore.fetchPayments()
+    usdRateStore.fetchLastUSDRate()
 })
 
 watch([() => location.value, () => tabVal.value], async () => {
     if (location.value) {
+        orderInvoiceProducts.value = []
+        orderInvoiceKits.value = []
+
         await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
 
         if (inventoryStore.getLastInventoryDateTo === null) {
@@ -543,7 +589,7 @@ const {
                                                     pt:decrementButton="w-6 ml-auto"
                                                 />
                                             </td>
-                                            <td class="text-sm">{{ item.api.qty * item.api.price }}</td>
+                                            <td class="text-sm">{{ formatCurrency(item.api.qty * item.api.price) }}</td>
                                             <td class="pr-4">
                                                 <Button
                                                     @click="removeKit(item)"
@@ -559,6 +605,7 @@ const {
                             </div>
 
                             <div class="p-2 sm:p-4 border-t border-surface-200 dark:border-surface-600/50">
+                                <p class="pb-4">{{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }}$</p>
                                 <Button
                                     size="small"
                                     @click="onSubmitOrderInvoice"
@@ -567,20 +614,78 @@ const {
                                     class="w-full px-3!"
                                 />
 
-                                <div class="py-4">
-                                    <p>{{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }}$</p>
-                                    <Select
-                                        v-model="filters.payment"
-                                        :options="paymentStore.getPayments.models"
-                                        option-label="name"
-                                        option-value="id"
-                                        :placeholder="t('placeholders.search.byStatus')"
-                                        showClear
-                                        class="col-span-2 sm:col-span-1 md:min-w-50 max-w-full w-full bg-surface-0! dark:bg-surface-700!"
-                                        size="small"
-                                    />
-                                    <p>footer</p>
+                                <div class="flex-1 overflow-auto">
+                                    <table class="w-full">
+                                        <thead>
+                                        <tr class="sticky top-0 bg-surface-0 dark:bg-surface-800 z-20 border-b border-surface-200 dark:border-surface-600/50">
+                                            <th class="font-medium text-sm text-start pl-4 py-3">{{ t('labels.title') }} / {{ t('labels.paymentType') }}</th>
+                                            <th class="font-medium text-sm text-start">{{t('labels.price')}}</th>
+                                            <th class="font-medium text-sm text-start pr-4"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr class="text-start" v-for="item of orderInvoicePrices" :key="item.payment.id">
+                                            <td class="text-start text-sm pl-4 py-3">{{ item.payment.name }} / {{ item.payment.paymentType.name }}</td>
+                                            <td class="text-sm">{{ formatCurrency(item.amount) }}</td>
+                                            <td class="pr-4">
+                                                <Button
+                                                    @click="removeProduct(item)"
+                                                    icon="pi pi-trash"
+                                                    pt:root="rounded-full size-7! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
+                                                    pt:icon="text-sm"
+                                                    size="small"
+                                                />
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <p class="text-sm">{{ t('labels.Payment') }}<span class="text-red-500"> *</span></p>
+                                            <SearchSelect
+                                                v-model="payment"
+                                                :fetchFn="(query) => paymentStore.fetchPayments({...query})"
+                                                :options="paymentStore.getPayments.models"
+                                                :option-label="opt => `${opt?.name} | ${opt?.paymentType?.name}`"
+                                                :option-value="opt => `${opt?.name} | ${opt?.paymentType?.name}`"
+                                                :return-value="opt => opt"
+                                                :search-value="opt => opt.id"
+                                                search-key="name"
+                                                :placeholder="t('placeholders.select.product')"
+                                                :loading="paymentStore.getIsLoadingPayments"
+                                                :total-items="paymentStore.getPayments.totalItems"
+                                                :invalid="!!paymentErrors.payment"
+                                            >
+                                                <template v-if="paymentStore.getPayments.models.length" #header>
+                                                    <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.paymentType') }}</p>
+                                                </template>
+                                            </SearchSelect>
+                                        </div>
+
+                                        <div>
+                                            <p class="text-sm">{{ t('labels.price') }}<span class="text-red-500"> *</span></p>
+                                            <InputNumber
+                                                v-model="amount"
+                                                fluid
+                                                showButtons
+                                                :placeholder="t('placeholders.price')"
+                                                :minFractionDigits="1"
+                                                :maxFractionDigits="2"
+                                                :invalid="!!paymentErrors.amount"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
+                                        <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearPaymentForm" />
+                                        <Button v-if="!isEditing" @click="onSubmitPayment" :label="t('buttons.add')" class="px-5" :loading="paymentIsSubmitting"/>
+                                    </div>
                                 </div>
+
+                                <p class="pt-4">{{ t('labels.usdRate') }}: {{ formatCurrency(usdRateStore.getUSDRate.rate) }}</p>
+                                <p class="pb-4">{{ t('labels.total') }}: {{ formatCurrency(totalPayments) }}$</p>
+
                                 <div class="flex justify-end">
                                     <Button
                                         size="small"

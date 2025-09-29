@@ -28,6 +28,12 @@ export function useOrderInvoiceValidation() {
         price: yup.number().required('Price is required'),
     }));
 
+    // Payment
+    const paymentSchema = computed(() => yup.object({
+        payment: yup.object().required('Payment is required'),
+        amount: yup.number().required('Amount is required').moreThan(0, "Miqdor 0 dan katta bo‘lishi kerak"),
+    }));
+
     const {
         handleSubmit: orderInvoiceHandleSubmit,
         errors: orderInvoiceErrors,
@@ -38,7 +44,8 @@ export function useOrderInvoiceValidation() {
         validationSchema: orderInvoiceInfoSchema,
         initialValues: {
             orderInvoiceProducts: [],
-            orderInvoiceKits: []
+            orderInvoiceKits: [],
+            orderInvoicePrices: []
         }
     })
 
@@ -70,6 +77,20 @@ export function useOrderInvoiceValidation() {
         }
     })
 
+    const {
+        handleSubmit: paymentHandleSubmit,
+        errors: paymentErrors,
+        isSubmitting: paymentIsSubmitting,
+        validate: paymentValidate,
+        resetForm: paymentResetForm,
+        ...paymentFormCtx
+    } = useForm({
+        validationSchema: paymentSchema,
+        initialValues: {
+            amount: 0
+        }
+    })
+
     const { value: location } = useField('location', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
     const { value: customer } = useField('customer', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
     const { value: createdAt } = useField('createdAt', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
@@ -80,6 +101,9 @@ export function useOrderInvoiceValidation() {
     const { value: kit } = useField('kit', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: kitFormCtx })
     const { value: kitQty } = useField('qty', undefined, { validateOnMount: false, form: kitFormCtx });
     const { value: kitPrice } = useField('price', undefined, { validateOnMount: false, form: kitFormCtx });
+    const { value: orderInvoicePrices } = useField('orderInvoicePrices', undefined, { validateOnMount: true, form: orderInvoiceFormCtx })
+    const { value: payment } = useField('payment', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: paymentFormCtx })
+    const { value: amount } = useField('amount', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: paymentFormCtx })
 
     return {
         // Invoice form
@@ -114,5 +138,16 @@ export function useOrderInvoiceValidation() {
         kit,
         kitQty,
         kitPrice,
+
+        // Payment form
+        paymentHandleSubmit,
+        paymentErrors,
+        paymentIsSubmitting,
+        paymentResetForm,
+        paymentFormCtx,
+        paymentValidate,
+        orderInvoicePrices,
+        payment,
+        amount
     }
 }
