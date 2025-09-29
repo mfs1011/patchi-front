@@ -16,9 +16,7 @@ import TabList from "@/volt/TabList.vue";
 import NoData from "@/components/UI/NoData.vue";
 import Tabs from "@/volt/Tabs.vue";
 import Tab from "@/volt/Tab.vue";
-import {useOrderInvoiceValidation} from "@/views/warehouse/orderInvoice/useWarehouseOrderInvoiceForm.js";
 import {useCustomerStore} from "@/stores/customer.js";
-import DatePicker from "@/volt/DatePicker.vue";
 import Loader from "@/components/Loader.vue";
 import {useProductStore} from "@/stores/product.js";
 import {useKitStore} from "@/stores/kit.js";
@@ -29,12 +27,12 @@ import {useAssemblyStore} from "@/stores/assembly.js";
 import {useCategoryStore} from "@/stores/category.js";
 import {useOrderInvoice} from "@/views/warehouse/orderInvoice/useOrderInvoice.js";
 import {useOrderInvoiceStore} from "@/stores/orderInvoice.js";
-import {useInventoryStore} from "@/stores/inventory.js";
 import {useRouter} from "vue-router";
-import Select from "@/volt/Select.vue";
 import {usePaymentStore} from "@/stores/payment.js";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {useUSDRateStore} from "@/stores/usdRate.js";
+import {useSellerStore} from "@/stores/seller.js";
+import {useShopOrderInvoiceValidation} from "@/views/shop/orderInvoice/useShopOrderInvoiceForm.js";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -47,8 +45,8 @@ const {
     orderInvoiceResetForm,
     orderInvoiceFormCtx,
     location,
+    seller,
     customer,
-    createdAt,
     productHandleSubmit,
     productErrors,
     productIsSubmitting,
@@ -77,11 +75,11 @@ const {
     orderInvoicePrices,
     payment,
     amount
-} = useOrderInvoiceValidation();
+} = useShopOrderInvoiceValidation();
 
 const orderInvoiceStore = useOrderInvoiceStore();
-const inventoryStore = useInventoryStore();
 const locationStore = useLocationStore();
+const sellerStore = useSellerStore();
 const customerStore = useCustomerStore();
 const productStore = useProductStore();
 const kitStore = useKitStore();
@@ -97,7 +95,6 @@ const isVisibleIntersectingProduct = ref(false)
 const isVisibleIntersectingKit = ref(false)
 const availableProducts = ref([])
 const availableKits = ref([])
-const dateFrom = ref();
 const isEditing = ref(false)
 const currentPayment = ref({})
 
@@ -112,11 +109,11 @@ const kitNameDebounced = useDebouncedRef('', 300)
 
 const home = computed(() => ({
     icon: 'pi pi-home',
-    label: t('warehouse'),
-    route: '/warehouse'
+    label: t('shop'),
+    route: '/shop'
 }));
 
-const items = computed(() => [{ label: t('cards.orderInvoices'), route: { name: 'warehouse-order-invoices'} }, { label: t('sections.warehouseOrderInvoices.add') }]);
+const items = computed(() => [{ label: t('cards.orderInvoices'), route: { name: 'shop-order-invoices'} }, { label: t('sections.warehouseOrderInvoices.add') }]);
 const tabList = computed(() => [
     { value: 'products', label: t('cards.products')},
     { value: 'kits', label: t('cards.kits')},
@@ -142,7 +139,7 @@ const totalPayments = computed(() => {
         return sum + amount
     }, 0)
 
-    return Math.floor(total)
+    return Math.round(total)
 })
 
 const clearPaymentForm = () => {
@@ -174,19 +171,22 @@ const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async values => {
 })
 
 const addOrderInvoice = async (values) => {
-    const date = new Date(values.createdAt);
-    date.setHours(date.getHours() + 5);
-
     const payload = {
         location: values.location['@id'],
-        customer: values.customer['@id'],
-        createdAt: date,
         orderInvoiceProducts: orderInvoiceProducts.value.map(p => p.api),
         orderInvoiceKits: orderInvoiceKits.value.map(k => k.api),
     };
 
+    if (values.seller) {
+        payload.seller = values.seller['@id']
+    }
+
+    if (values.customer) {
+        payload.customer = values.customer['@id']
+    }
+
     try {
-        await orderInvoiceStore.pushOrderInvoiceB2B(payload)
+        await orderInvoiceStore.pushOrderInvoice(payload)
 
         toast.add({ severity: 'success', summary: t('toast.created', { name: t('orderInvoice.nominativeCapitalize') }), life: 3000 })
         orderInvoiceResetForm()
@@ -226,27 +226,14 @@ onMounted( () => {
 })
 
 watch([() => location.value], async () => {
+    seller.value = null
+
     if (location.value) {
         orderInvoiceProducts.value = []
         orderInvoiceKits.value = []
-
-        await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
-
-        if (inventoryStore.getLastInventoryDateTo === null) {
-            dateFrom.value = null
-            createdAt.value = null
-        } else {
-            const date = new Date(inventoryStore.getLastInventoryDateTo);
-            date.setDate(date.getDate());
-            date.setMinutes(date.getMinutes() + 1);
-            dateFrom.value = date;
-            createdAt.value = date
-        }
     } else {
         availableProducts.value = [];
         availableKits.value = [];
-        dateFrom.value = null
-        createdAt.value = null
 
         return;
     }
@@ -485,7 +472,7 @@ const {
 
     <Section
         :section-name="t('sections.warehouseOrderInvoices.add')"
-        back-route-name="warehouse-order-invoices"
+        back-route-name="shop-order-invoices"
         without-buttons
     >
         <template #sectionBody>
@@ -504,7 +491,7 @@ const {
 
                                     <SearchSelect
                                         v-model="location"
-                                        :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
+                                        :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: false })"
                                         :options="locationStore.getLocations.models"
                                         :option-label="opt => opt?.name"
                                         :option-value="opt => opt?.id"
@@ -517,12 +504,30 @@ const {
                                     />
                                 </div>
 
+                                <div v-if="location">
+                                    <p class="text-sm">{{ t('labels.seller') }}</p>
+
+                                    <SearchSelect
+                                        v-model="seller"
+                                        :fetchFn="(query) => sellerStore.fetchSellers({...query, location: location?.id })"
+                                        :options="sellerStore.getSellers.models"
+                                        :option-label="opt => opt?.name"
+                                        :option-value="opt => opt?.id"
+                                        :return-value="opt => opt"
+                                        :placeholder="t('placeholders.select.seller')"
+                                        :loading="sellerStore.getIsLoadingSellers"
+                                        :total-items="sellerStore.getSellers.totalItems"
+                                        :invalid="!!orderInvoiceErrors.seller"
+                                        size="small"
+                                    />
+                                </div>
+
                                 <div>
-                                    <p class="text-sm">{{ t('labels.client') }}<span class="text-red-500"> *</span></p>
+                                    <p class="text-sm">{{ t('labels.client') }}</p>
 
                                     <SearchSelect
                                         v-model="customer"
-                                        :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': true })"
+                                        :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': false })"
                                         :options="customerStore.getCustomers.models"
                                         :option-label="opt => opt?.name"
                                         :option-value="opt => opt?.id"
@@ -533,24 +538,6 @@ const {
                                         :invalid="!!orderInvoiceErrors.customer"
                                         size="small"
                                     />
-                                </div>
-
-                                <div>
-                                    <p class="text-sm">{{ t('labels.createdAt') }}<span class="text-red-500"> *</span></p>
-
-                                    <DatePicker
-                                        v-model="createdAt"
-                                        dateFormat="dd.mm.yy"
-                                        showIcon
-                                        fluid
-                                        iconDisplay="input"
-                                        :placeholder="t('placeholders.date')"
-                                        show-button-bar
-                                        :invalid="!!orderInvoiceErrors.createdAt"
-                                        :minDate="dateFrom"
-                                        size="small"
-                                    />
-
                                 </div>
                             </div>
                             </div>

@@ -270,6 +270,12 @@ export const routes = [
                                 meta: { requiresAuth: true, roles: []},
                                 component: () => import('@/views/shop/orderInvoice/ShopOrderInvoices.vue')
                             },
+                            {
+                                path: 'add',
+                                name: 'shop-add-order-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/orderInvoice/ShopOrderInvoiceAdd.vue')
+                            }
                         ]
                     },
                     {

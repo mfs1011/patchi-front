@@ -330,7 +330,9 @@
         "ReturnInvoice": "Return",
         "WriteOffInvoice": "Write-off",
         "customsFee": "Customs fee",
-        "transportationFee": "Transportation fee"
+        "transportationFee": "Transportation fee",
+        "paid": "Paid",
+        "unpaid": "Unpaid"
     },
     "placeholders": {
         "enterPhoneNumber": "Enter phone number...",

@@ -191,7 +191,7 @@ function connectMercure() {
         const eventDataId = JSON.parse(event.data).eventId
 
         if (eventDataId === 13) {
-            await orderInvoiceStore.fetchOrderInvoices(route.query);
+            await orderInvoiceStore.fetchOrderInvoices({ ...route.query, 'is-warehouse': true });
         }
     })
 }
@@ -409,7 +409,7 @@ onBeforeRouteLeave(() => {
                                     v-else
                                     :class="{'text-yellow-500': data.status === 1, 'text-green-500': data.status === 2}"
                                 >
-                                    {{ t(data.status) }}
+                                    {{ data.status === 1 ? t('labels.unpaid') : t('labels.paid') }}
                                 </p>
                             </template>
                         </Column>

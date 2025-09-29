@@ -330,7 +330,9 @@
         "ReturnInvoice": "Возврат",
         "WriteOffInvoice": "Списани",
         "customsFee": "Таможенные расходы",
-        "transportationFee": "Транспортные расходы"
+        "transportationFee": "Транспортные расходы",
+        "paid": "Оплаченный",
+        "unpaid": "Неоплачиваемый"
     },
     "placeholders": {
         "enterPhoneNumber": "Введите номер телефона...",

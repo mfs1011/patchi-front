@@ -330,7 +330,9 @@
         "ReturnInvoice": "Qaytarilgan",
         "WriteOffInvoice": "Chiqarish",
         "customsFee": "Bojxona xarajatlari",
-        "transportationFee": "Transport xarajatlari"
+        "transportationFee": "Transport xarajatlari",
+        "paid": "To'langan",
+        "unpaid": "To'lanmagan"
     },
     "placeholders": {
         "enterPhoneNumber": "Telefon raqamingizni kiriting...",

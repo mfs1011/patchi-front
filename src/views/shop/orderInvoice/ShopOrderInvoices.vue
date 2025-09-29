@@ -258,7 +258,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    @click="router.push({ name: 'warehouse-add-order-invoices' })"
+                    @click="router.push({ name: 'shop-add-order-invoices' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >{{ t("buttons.newOrderInvoice") }}</Button>
             </div>
@@ -271,7 +271,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
-                    @click="router.push({ name: 'warehouse-add-order-invoices' })"
+                    @click="router.push({ name: 'shop-add-order-invoices' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >{{ t("buttons.newOrderInvoice") }}</Button>
             </div>
@@ -420,7 +420,7 @@ onBeforeRouteLeave(() => {
                         <Column field="seller" :header="t('labels.seller')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="orderInvoiceStore.getIsLoadingOrderInvoices"/>
-                                <p v-else>{{ data.seller.name }}</p>
+                                <p v-else>{{ data.seller?.name || '-' }}</p>
                             </template>
                         </Column>
                         <Column field="Customer" :header="t('labels.Customer')">
@@ -436,7 +436,7 @@ onBeforeRouteLeave(() => {
                                     v-else
                                     :class="{'text-yellow-500': data.status === 1, 'text-green-500': data.status === 2}"
                                 >
-                                    {{ t(data.status) }}
+                                    {{ data.status === 1 ? t('labels.unpaid') : t('labels.paid') }}
                                 </p>
                             </template>
                         </Column>
