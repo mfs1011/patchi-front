@@ -137,10 +137,12 @@ const totalPrice = computed(() => {
 })
 
 const totalPayments = computed(() => {
-    return orderInvoicePrices.value.reduce((sum, item) => {
+    const total = orderInvoicePrices.value.reduce((sum, item) => {
         const amount = item.payment.id === 1 ? item.amount : item.amount / usdRateStore.getUSDRate.rate
         return sum + amount
     }, 0)
+
+    return Math.floor(total)
 })
 
 const clearPaymentForm = () => {
@@ -166,23 +168,50 @@ const onSubmitPayment = paymentHandleSubmit(async values => {
 
 const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async values => {
     if (orderInvoiceProducts.value.length > 0 || orderInvoiceKits.value.length > 0) {
-        const date = new Date(values.createdAt);
-        date.setHours(date.getHours() + 5);
+        await addOrderInvoice(values)
+        router.back()
+    }
+})
+
+const addOrderInvoice = async (values) => {
+    const date = new Date(values.createdAt);
+    date.setHours(date.getHours() + 5);
+
+    const payload = {
+        location: values.location['@id'],
+        customer: values.customer['@id'],
+        createdAt: date,
+        orderInvoiceProducts: orderInvoiceProducts.value.map(p => p.api),
+        orderInvoiceKits: orderInvoiceKits.value.map(k => k.api),
+    };
+
+    try {
+        await orderInvoiceStore.pushOrderInvoiceB2B(payload)
+
+        toast.add({ severity: 'success', summary: t('toast.created', { name: t('orderInvoice.nominativeCapitalize') }), life: 3000 })
+        orderInvoiceResetForm()
+        productResetForm()
+        kitResetForm()
+
+    } catch (error) {
+        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+    }
+}
+
+const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
+    if (orderInvoiceProducts.value.length && totalPrice.value === totalPayments.value) {
+        await addOrderInvoice(values)
+
         const payload = {
-            location: values.location['@id'],
-            customer: values.customer['@id'],
-            createdAt: date,
-            orderInvoiceProducts: orderInvoiceProducts.value.map(p => p.api),
-            orderInvoiceKits: orderInvoiceKits.value.map(k => k.api),
-        };
+            orderInvoicePrices: values.orderInvoicePrices.map(orderInvoicePrice => ({
+                payment: orderInvoicePrice.payment['@id'],
+                amount: orderInvoicePrice.amount,
+            }))
+        }
 
         try {
-            await orderInvoiceStore.pushOrderInvoiceB2B(payload)
-
-            toast.add({ severity: 'success', summary: t('toast.created', { name: t('orderInvoice.nominativeCapitalize') }), life: 3000 })
-            orderInvoiceResetForm()
-            productResetForm()
-            kitResetForm()
+            await orderInvoiceStore.acceptOrderInvoice({id: orderInvoiceStore.getOrderInvoice.id, payment: payload})
+            paymentResetForm()
             router.back()
 
         } catch (error) {
@@ -196,7 +225,7 @@ onMounted( () => {
     usdRateStore.fetchLastUSDRate()
 })
 
-watch([() => location.value, () => tabVal.value], async () => {
+watch([() => location.value], async () => {
     if (location.value) {
         orderInvoiceProducts.value = []
         orderInvoiceKits.value = []
@@ -224,6 +253,26 @@ watch([() => location.value, () => tabVal.value], async () => {
 
     isLoading.value = true;
 
+    try {
+        if (tabVal.value === 'products') {
+            availableProducts.value = []
+            currentProductPage.value = 1;
+            await productStore.fetchAvailableProducts({ page: 1, location: location?.value?.id });
+            availableProducts.value = productStore.getAvailableProducts.models;
+        } else {
+            availableKits.value = []
+            currentKitPage.value = 1;
+            await kitStore.fetchAvailableKits({ page: 1, location: location?.value?.id });
+            availableKits.value = kitStore.getAvailableKits.models;
+        }
+    } catch (err) {
+        console.error('Tab/Location load error', err);
+    } finally {
+        isLoading.value = false;
+    }
+});
+
+watch([() => tabVal.value], async () => {
     try {
         if (tabVal.value === 'products') {
             availableProducts.value = []
@@ -605,7 +654,7 @@ const {
                             </div>
 
                             <div class="p-2 sm:p-4 border-t border-surface-200 dark:border-surface-600/50">
-                                <p class="pb-4">{{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }}$</p>
+                                <p class="text-sm pb-4">{{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }}$</p>
                                 <Button
                                     size="small"
                                     @click="onSubmitOrderInvoice"
@@ -683,13 +732,13 @@ const {
                                     </div>
                                 </div>
 
-                                <p class="pt-4">{{ t('labels.usdRate') }}: {{ formatCurrency(usdRateStore.getUSDRate.rate) }}</p>
-                                <p class="pb-4">{{ t('labels.total') }}: {{ formatCurrency(totalPayments) }}$</p>
+                                <p class="text-sm pt-4">{{ t('labels.usdRate') }}: {{ formatCurrency(usdRateStore.getUSDRate.rate) }}</p>
+                                <p class="text-sm pb-4">{{ t('labels.total') }}: {{ formatCurrency(totalPayments) }}$</p>
 
                                 <div class="flex justify-end">
                                     <Button
                                         size="small"
-                                        @click="clearFilters"
+                                        @click="onSubmitOrderInvoicePrice"
                                         :label="t('buttons.pay')"
                                         icon="pi pi-credit-card"
                                         class="w-fit px-3! h-fit"

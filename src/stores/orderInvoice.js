@@ -16,6 +16,8 @@ export const useOrderInvoiceStore = defineStore('orderInvoice', () => {
     const pushOrderInvoice = async orderInvoiceData => {
         try {
             const { data } = await authorizedClient.post('/order_invoices', orderInvoiceData)
+            state.orderInvoice = data
+
             return data
         } catch (error) {
             throw error
@@ -25,6 +27,8 @@ export const useOrderInvoiceStore = defineStore('orderInvoice', () => {
     const pushOrderInvoiceB2B = async orderInvoiceData => {
         try {
             const { data } = await authorizedClient.post('/order_invoices/is_b2b', orderInvoiceData)
+            state.orderInvoice = data
+
             return data
         } catch (error) {
             throw error
@@ -76,9 +80,9 @@ export const useOrderInvoiceStore = defineStore('orderInvoice', () => {
         }
     }
 
-    const restoreOrderInvoice = async id => {
+    const acceptOrderInvoice = async data => {
         try {
-            await authorizedClient.put(`/order_invoices/restore/${id}`, {})
+            await authorizedClient.put(`/order_invoices/accepted/${data.id}`, data.payment)
         } catch (error) {
             throw error
         }
@@ -91,7 +95,7 @@ export const useOrderInvoiceStore = defineStore('orderInvoice', () => {
         fetchOrderInvoices,
         fetchOrderInvoice,
         deleteOrderInvoice,
-        restoreOrderInvoice,
+        acceptOrderInvoice,
         getOrderInvoices: computed(() => state.orderInvoices),
         getOrderInvoice: computed(() => state.orderInvoice),
         getIsLoadingOrderInvoices: computed(() => state.isLoadingOrderInvoices),
