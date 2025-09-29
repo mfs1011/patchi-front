@@ -1,5 +1,7 @@
 import ExcelJS from 'exceljs'
 import i18n from '@/locales/i18n'
+import {useProductStore} from "@/stores/product.js";
+import {formatCurrency} from "@/helpers/numberFormat.js";
 
 export const exportInventory = async (products, kits, location, dateFrom, dateTo) => {
     // Создаем новую книгу и лист
@@ -441,6 +443,101 @@ export const exportSellersKpi = async (sellersKpi) => {
 
     const timestamp = formatDateForFilename()
     link.download = `${i18n.global.t('cards.sellerKpi')}_${timestamp}.xlsx`
+    link.click()
+}
+
+export const exportAbcAnalysis = async () => {
+    // Создаем новую книгу и лист
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet(i18n.global.t('cards.abc'))
+    const productStore = useProductStore()
+
+    setupPage(worksheet, 'portrait')
+
+    // Добавляем заголовки
+    worksheet.columns = [
+        { width: 6 }, // 1 id
+        { width: 30 }, // 2 product
+        { width: 18 }, // 3 sales unit
+        { width: 14 }, // 4 income $
+        { width: 14 }, // 5 profit $
+        { width: 12 }, // 6 sales %
+        { width: 12 }, // 7 income %
+        { width: 14 }, // 8 profit %
+    ]
+
+    const header = [
+        '№',
+        i18n.global.t('labels.product'),
+        i18n.global.t('labels.sales'),
+        i18n.global.t('labels.revenue'),
+        i18n.global.t('labels.benefit'),
+        `${i18n.global.t('labels.sales')} %`,
+        `${i18n.global.t('labels.revenue')} %`,
+        `${i18n.global.t('labels.benefit')} %`,
+    ]
+
+    const headerRow = worksheet.addRow(header)
+
+    // Форматирование заголовка таблицы
+    headerRow.eachCell((cell) => {
+        addBorder(cell)
+        fillFormat(cell, 'eaecef')
+        textFormat(cell, 'Tahoma', true, 10, '000000')
+        textAlignment(cell, 'center', 'middle', false)
+    })
+
+    // Пример данных для таблицы
+    const tableData = productStore.getABCProducts.models.map((item, index) => [
+        index + 1,
+        item.name,
+        `${formatCurrency(item.ordersQty)} ${i18n.global.t(`labels.${item.unit}`)}`,
+        `${formatCurrency(item.ordersPrice)} $`,
+        `${formatCurrency(item.benefit)} $`,
+        `${item.qtyCategory} ${item.ordersQtyPercent.toFixed(2)}`,
+        `${item.priceCategory} ${item.ordersPricePercent.toFixed(2)}`,
+        `${item.benefitCategory} ${item.benefitPercent.toFixed(2)}`,
+
+    ])
+
+    // Добавление данных в таблицу
+    tableData.forEach((rowData) => {
+        const row = worksheet.addRow(rowData)
+
+        row.eachCell((cell, colNumber) => {
+            addBorder(cell)
+            textFormat(cell, 'Tahoma', false, 11, '000000')
+
+            if ([1, 6, 7, 8].includes(colNumber)) {
+                textAlignment(cell, 'center', 'middle', false)
+
+                if ([6, 7, 8].includes(colNumber)) {
+                    if (cell.value.startsWith('A')) {
+                        textFormat(cell, 'Tahoma', false, 11, '16a34a')
+                    } else if (cell.value.startsWith('B')) {
+                        textFormat(cell, 'Tahoma', false, 11, 'facc15')
+                    } else if (cell.value.startsWith('C')) {
+                        textFormat(cell, 'Tahoma', false, 11, 'dc2626')
+                    }
+                }
+            } else if ([2, 3, 4, 5].includes(colNumber)) {
+                textAlignment(cell, 'left', 'middle', false)
+            }
+        })
+    })
+
+    // ******************************************************************************** //
+
+    // Генерация файла
+    const buffer = await workbook.xlsx.writeBuffer()
+
+    // Создание и скачивание файла
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+
+    const timestamp = formatDateForFilename()
+    link.download = `${i18n.global.t('cards.abc')}_${timestamp}.xlsx`
     link.click()
 }
 

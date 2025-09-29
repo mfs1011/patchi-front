@@ -15,6 +15,7 @@ import updateQuery from "@/helpers/updateQuery.js";
 import {useProductStore} from "@/stores/product.js";
 import DatePicker from "@/volt/DatePicker.vue";
 import Button from "@/volt/Button.vue";
+import {exportAbcAnalysis} from "@/helpers/xlsx.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -45,7 +46,7 @@ const home = computed(() => ({
 
 const dt = ref();
 const exportCSV = () => {
-    dt.value.exportCSV();
+    exportAbcAnalysis()
 };
 
 const items = computed(() => [{ label: t("cards.abc") }]);
