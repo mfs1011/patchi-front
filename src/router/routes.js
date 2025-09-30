@@ -132,7 +132,13 @@ export const routes = [
                                 name: 'warehouse-add-order-invoices',
                                 meta: { requiresAuth: true, roles: []},
                                 component: () => import('@/views/warehouse/orderInvoice/WarehouseOrderInvoiceAdd.vue')
-                            }
+                            },
+                            {
+                                path: 'order-invoice/:id/return',
+                                name: 'warehouse-add-return-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/warehouse/returnInvoice/WarehouseReturnInvoiceAdd.vue'),
+                            },
                         ]
                     },
                     {
@@ -151,12 +157,6 @@ export const routes = [
                                 meta: { requiresAuth: true, roles: []},
                                 component: () => import('@/views/warehouse/returnInvoice/WarehouseReturnInvoice.vue'),
                             },
-                            {
-                                path: 'add',
-                                name: 'warehouse-add-return-invoices',
-                                meta: { requiresAuth: true, roles: []},
-                                component: () => import('@/views/warehouse/returnInvoice/WarehouseReturnInvoiceAdd.vue')
-                            }
                         ]
                     },
                     {
@@ -271,11 +271,23 @@ export const routes = [
                                 component: () => import('@/views/shop/orderInvoice/ShopOrderInvoices.vue')
                             },
                             {
+                                path: 'order-invoice/:id',
+                                name: 'shop-order-invoice',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/orderInvoice/ShopOrderInvoice.vue'),
+                            },
+                            {
                                 path: 'add',
                                 name: 'shop-add-order-invoices',
                                 meta: { requiresAuth: true, roles: []},
                                 component: () => import('@/views/shop/orderInvoice/ShopOrderInvoiceAdd.vue')
-                            }
+                            },
+                            {
+                                path: 'order-invoice/:id/return',
+                                name: 'shop-add-return-invoices',
+                                meta: { requiresAuth: true, roles: []},
+                                component: () => import('@/views/shop/returnInvoice/ShopReturnInvoiceAdd.vue'),
+                            },
                         ]
                     },
                     {
@@ -294,12 +306,6 @@ export const routes = [
                                 meta: { requiresAuth: true, roles: []},
                                 component: () => import('@/views/shop/returnInvoice/ShopReturnInvoice.vue'),
                             },
-                            {
-                                path: 'add',
-                                name: 'shop-add-return-invoices',
-                                meta: { requiresAuth: true, roles: []},
-                                component: () => import('@/views/shop/returnInvoice/ShopReturnInvoiceAdd.vue')
-                            }
                         ]
                     },
                 ]

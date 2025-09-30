@@ -26,8 +26,6 @@ import TabPanel from "@/volt/TabPanel.vue";
 import TabList from "@/volt/TabList.vue";
 import {useLocationQuantityStore} from "@/stores/locationQuantity.js";
 import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
-import ColumnGroup from "primevue/columngroup";
-import Row from "primevue/row"
 import {useUserStore} from "@/stores/user.js";
 import {exportTransferInvoice} from "@/helpers/xlsx.js";
 
@@ -56,6 +54,7 @@ const {
     qtyLocationQuantity,
     locationQuantityKitHandleSubmit,
     locationQuantityKitErrors,
+    locationQuantityKitIsSubmitting,
     locationQuantityKitResetForm,
     locationQuantityKitValidate,
     locationQuantityKit,
@@ -166,7 +165,7 @@ const onSubmitTransferInvoice = transferInvoiceHandleSubmit(async (values) => {
     }
 
     if (values.toLocation.id !== apiData.value.toLocation.id) {
-        payload.toLocation = values.toLocation
+        payload.toLocation = values.toLocation['@id']
     }
 
     try {
@@ -330,18 +329,6 @@ function editLocationQuantityKitAction(data, index) {
     currentLocationQuantityKitIndex.value = index
     locationQuantityKit.value = data.locationQuantityKit
     qtyLocationQuantityKit.value = data.qty;
-}
-
-async function fetchLocation(query) {
-    const params = {
-        ...query
-    }
-
-    if (userStore.getAboutMeFromToken.role === 'ROLE_WAREHOUSE_MANAGER') {
-        params.user = userStore.getAboutMeFromToken.id
-    }
-
-    await locationStore.fetchLocations(params)
 }
 
 function editLocationQuantity(updatedLocationQuantity) {
@@ -640,7 +627,7 @@ onMounted(async () => {
                             <SearchSelect
                                 v-if="!isLoading"
                                 v-model="fromLocation"
-                                :fetchFn="fetchLocation"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
@@ -784,7 +771,7 @@ onMounted(async () => {
 
                                 <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
                                     <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearLocationQuantityKitForm" />
-                                    <Button v-if="!isEditing" @click="onSubmitLocationQuantityKit" :label="t('buttons.add')" class="px-5" :loading="locationQuantityIsSubmitting"/>
+                                    <Button v-if="!isEditing" @click="onSubmitLocationQuantityKit" :label="t('buttons.add')" class="px-5" :loading="locationQuantityKitIsSubmitting"/>
                                     <Button v-else @click="onEditLocationQuantityKit" :label="t('buttons.edit')" class="px-5"/>
                                 </div>
                             </TabPanel>

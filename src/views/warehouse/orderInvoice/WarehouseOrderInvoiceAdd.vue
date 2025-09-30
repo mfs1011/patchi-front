@@ -31,7 +31,6 @@ import {useOrderInvoice} from "@/views/warehouse/orderInvoice/useOrderInvoice.js
 import {useOrderInvoiceStore} from "@/stores/orderInvoice.js";
 import {useInventoryStore} from "@/stores/inventory.js";
 import {useRouter} from "vue-router";
-import Select from "@/volt/Select.vue";
 import {usePaymentStore} from "@/stores/payment.js";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {useUSDRateStore} from "@/stores/usdRate.js";
@@ -735,7 +734,7 @@ const {
                                         </div>
                                     </div>
 
-                                    <p class="text-sm pt-4">{{ t('labels.usdRate') }}: {{ formatCurrency(usdRateStore.getUSDRate.rate) }}</p>
+                                    <p class="text-sm pt-4">{{ t('labels.usdRate') }}: {{ formatCurrency(Math.floor(usdRateStore.getUSDRate.rate)) }}</p>
                                     <p class="text-sm pb-4">{{ t('labels.total') }}: {{ formatCurrency(totalPayments) }}$</p>
 
                                     <div class="flex justify-end">
@@ -872,7 +871,7 @@ const {
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.code') }}:</p>
-                                                                <p class="font-semibold">{{ product.code || '-' }}</p>
+                                                                <p class="font-semibold">{{ product.code }}</p>
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.color') }}:</p>
@@ -880,7 +879,7 @@ const {
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.category') }}:</p>
-                                                                <p class="font-semibold">{{ product.category || '-' }}</p>
+                                                                <p class="font-semibold">{{ product.category }}</p>
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.collection') }}:</p>
@@ -888,11 +887,11 @@ const {
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.qty') }}:</p>
-                                                                <p class="font-semibold">{{ product.totalQty + `${t(`labels.${product.unit}`)}` || '-' }}</p>
+                                                                <p class="font-semibold">{{ formatCurrency(product.totalQty) + `${t(`labels.${product.unit}`)}` || '-' }}</p>
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.price') }}:</p>
-                                                                <p class="font-semibold">{{ product.wholesalePrice }}$</p>
+                                                                <p class="font-semibold">{{ formatCurrency(product.wholesalePrice) }}$</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -929,15 +928,6 @@ const {
                                                         {{ t('noPhoto') }}
                                                     </div>
                                                 </div>
-                                                <div class="flex items-center grow px-2 text-sm">
-                                                    <div class="flex justify-between w-full text-surface-900 dark:text-surface-0">
-                                                        <div>
-                                                            <p>{{ kit.name }}</p>
-                                                            <p>{{ kit.color || 'color' }}</p>
-                                                        </div>
-                                                        <p>{{ kit.wholesalePrice }}$</p>
-                                                    </div>
-                                                </div>
                                                 <div class="flex items-center grow p-2 text-sm">
                                                     <div class="flex justify-between w-full dark:text-surface-0">
                                                         <div class="w-full">
@@ -947,7 +937,7 @@ const {
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.code') }}:</p>
-                                                                <p class="font-semibold">{{ kit.code || '-' }}</p>
+                                                                <p class="font-semibold">{{ kit.code }}</p>
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.Assembly') }}:</p>
@@ -955,11 +945,11 @@ const {
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.qty') }}:</p>
-                                                                <p class="font-semibold">{{ kit.totalQty + `${t('labels.pcs')}` || '-' }}</p>
+                                                                <p class="font-semibold">{{ formatCurrency(kit.totalQty) + `${t('labels.pcs')}` || '-' }}</p>
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.price') }}:</p>
-                                                                <p class="font-semibold">{{ kit.wholesalePrice }}$</p>
+                                                                <p class="font-semibold">{{ formatCurrency(kit.wholesalePrice) }}$</p>
                                                             </div>
                                                         </div>
                                                     </div>

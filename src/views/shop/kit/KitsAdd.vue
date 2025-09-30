@@ -1,7 +1,7 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
 import Card from "@/volt/Card.vue";
@@ -45,6 +45,7 @@ const isConfirmLoading = ref(false)
 const pendingNavigation = ref(false)
 const editingProductIndex = ref(null)
 const photoName = ref('');
+const isLocation = ref(false)
 
 const home = computed(() => ({
     icon: 'pi pi-home',
@@ -53,9 +54,6 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t('cards.kits'), route: { name: 'kits'} }, { label: t('sections.kits.add') }]);
-const hasKitData = computed(() => (
-    !!seller.value
-))
 
 const isChanged = computed(() => (
     !!seller.value ||
@@ -291,6 +289,17 @@ const setPhoto = event => {
     photoName.value = event.target.files[0].name
 }
 
+watch(seller, async (newVal) => {
+    isLocation.value = false
+
+    if (newVal) {
+        await productStore.fetchAvailableProducts({location: newVal.location.id })
+        kitProducts.value = []
+
+        isLocation.value = true
+    }
+})
+
 onBeforeRouteLeave((to, from, next) => {
     if (isChanged.value) {
         showLeaveDialog.value = true
@@ -501,7 +510,7 @@ const confirmLeave = () => {
                 </template>
             </Card>
             <Card
-                v-if="hasKitData"
+                v-if="isLocation"
                 pt:root="overflow-x-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                 pt:body="p-0"
                 pt:content="p-2 sm:p-4"

@@ -478,7 +478,7 @@ onBeforeRouteLeave(() => {
                                     <div class="flex items-center gap-2">
                                         <Button
                                             @click="router.push({
-                                                name: 'warehouse-order-invoice',
+                                                name: 'shop-order-invoice',
                                                 params: { id: data.id }
                                             })"
                                             icon="pi pi-eye"

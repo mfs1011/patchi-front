@@ -23,7 +23,6 @@ import Tab from "@/volt/Tab.vue";
 import TabPanel from "@/volt/TabPanel.vue";
 import TabList from "@/volt/TabList.vue";
 import {useUserStore} from "@/stores/user.js";
-import {useOrderInvoiceValidation} from "@/views/warehouse/orderInvoice/useWarehouseOrderInvoiceForm.js";
 import {useOrderInvoiceStore} from "@/stores/orderInvoice.js";
 import {useCustomerStore} from "@/stores/customer.js";
 import {useProductStore} from "@/stores/product.js";
@@ -31,6 +30,8 @@ import {useKitStore} from "@/stores/kit.js";
 import DatePicker from "@/volt/DatePicker.vue";
 import {usePaymentStore} from "@/stores/payment.js";
 import {useUSDRateStore} from "@/stores/usdRate.js";
+import {useSellerStore} from "@/stores/seller.js";
+import {useShopOrderInvoiceValidation} from "@/views/shop/orderInvoice/useShopOrderInvoiceForm.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -42,6 +43,7 @@ const userStore = useUserStore();
 const productStore = useProductStore();
 const kitStore = useKitStore();
 const locationStore = useLocationStore();
+const sellerStore = useSellerStore();
 const customerStore = useCustomerStore();
 const { t } = useI18n();
 const {
@@ -51,6 +53,7 @@ const {
     orderInvoiceResetForm,
     orderInvoiceFormCtx,
     location,
+    seller,
     customer,
     createdAt,
     productHandleSubmit,
@@ -81,7 +84,7 @@ const {
     orderInvoicePrices,
     payment,
     amount
-} = useOrderInvoiceValidation();
+} = useShopOrderInvoiceValidation();
 
 const apiData = ref(null);
 const editableData = ref(null);
@@ -112,15 +115,15 @@ const tabVal = ref('products')
 // computed
 const home = computed(() => ({
     icon: "pi pi-slash",
-    label: t("warehouse"),
-    route: "/warehouse",
+    label: t("shop"),
+    route: "/shop",
 }));
 
 const exportCSV = () => {
     console.log('export')
 };
 
-const items = computed(() => [{ label: t("cards.orderInvoices"), route: { name: 'warehouse-order-invoices'} }, { label: t("cards.orderInvoice") }]);
+const items = computed(() => [{ label: t("cards.orderInvoices"), route: { name: 'shop-order-invoices'} }, { label: t("cards.orderInvoice") }]);
 const isAdminOrCreatedBy = createdById => (
     userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
 )
@@ -459,6 +462,7 @@ onMounted(async () => {
         orderInvoiceResetForm({
             values: {
                 location: orderInvoiceStore.getOrderInvoice.location,
+                seller: orderInvoiceStore.getOrderInvoice.seller,
                 customer: orderInvoiceStore.getOrderInvoice.customer,
                 createdAt: new Date(orderInvoiceStore.getOrderInvoice.createdAt),
                 orderInvoiceProducts: orderInvoiceStore.getOrderInvoice.orderInvoiceProducts,
@@ -508,7 +512,7 @@ watch([() => kit.value], async () => {
 
     <Section
         :section-name="t('cards.orderInvoice')"
-        back-route-name="warehouse-order-invoices"
+        back-route-name="shop-order-invoices"
     >
         <template #buttons>
             <div v-if="!isLoading && !isAcceptedOrderInvoice" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
@@ -542,7 +546,7 @@ watch([() => kit.value], async () => {
             <div v-if="!isLoading && isAcceptedOrderInvoice" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
                 <Button
                     @click="router.push({
-                        name: 'warehouse-add-return-invoices',
+                        name: 'shop-add-return-invoices',
                         params: { id: orderInvoiceStore.getOrderInvoice.id }
                     })"
                     class="px-2 sm:px-5 whitespace-nowrap"
@@ -610,7 +614,7 @@ watch([() => kit.value], async () => {
                             <SearchSelect
                                 v-if="!isLoading"
                                 v-model="location"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: false })"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
@@ -618,6 +622,26 @@ watch([() => kit.value], async () => {
                                 :placeholder="t('placeholders.search.byLocation')"
                                 :loading="locationStore.getIsLoadingLocation"
                                 :total-items="locationStore.getLocations.totalItems"
+                                disabled
+                            />
+                        </div>
+                        <div>
+                            <p class="text-sm">{{ t('labels.seller') }}<span class="text-red-500"> *</span></p>
+
+                            <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
+
+                            <SearchSelect
+                                v-if="!isLoading"
+                                v-model="seller"
+                                :fetchFn="(query) => sellerStore.fetchSellers({...query, location: location?.id })"
+                                :options="sellerStore.getSellers.models"
+                                :option-label="opt => opt?.name"
+                                :option-value="opt => opt?.id"
+                                :return-value="opt => opt"
+                                :placeholder="t('placeholders.search.bySeller')"
+                                :loading="sellerStore.getIsLoadingSellers"
+                                :total-items="sellerStore.getSellers.totalItems"
                                 disabled
                             />
                         </div>
@@ -630,7 +654,7 @@ watch([() => kit.value], async () => {
                             <SearchSelect
                                 v-if="!isLoading"
                                 v-model="customer"
-                                :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': true })"
+                                :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': false })"
                                 :options="customerStore.getCustomers.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"

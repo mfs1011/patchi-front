@@ -1,7 +1,7 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
 import Card from "@/volt/Card.vue";
@@ -263,6 +263,13 @@ const saveEditingKit = async () => {
     editingKitIndex.value = null
     isEditing.value = false
 }
+
+watch([() => fromLocation.value], async () => {
+    if (fromLocation.value) {
+        transferInvoiceProducts.value = []
+        transferInvoiceKits.value = []
+    }
+});
 
 onBeforeRouteLeave((to, from, next) => {
     if (isChanged.value) {

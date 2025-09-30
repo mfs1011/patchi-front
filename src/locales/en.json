@@ -430,6 +430,8 @@
         "newIncomeInvoice": "New income",
         "newTransferInvoice": "New transfer",
         "newWriteOffInvoice": "New write off",
+        "newOrderInvoice": "New order",
+        "newReturnInvoice": "New return",
         "filters": "Filters",
         "saveAndExit": "Save and exit",
         "add": "Add",

@@ -283,6 +283,8 @@ watch(location, async (newVal) => {
     if (newVal) {
         await locationQuantityStore.fetchLocationQuantities({location: newVal.id})
         await locationQuantityKitStore.fetchLocationQuantityKits({location: newVal.id})
+        writeOffInvoiceProducts.value = []
+        writeOffInvoiceKits.value = []
         isLocation.value = true
     }
 })

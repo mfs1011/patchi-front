@@ -6,7 +6,7 @@ import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
 import Card from "@/volt/Card.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
-import {onBeforeRouteLeave, useRouter} from "vue-router";
+import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
 import {useToast} from "primevue/usetoast";
 import InputNumber from "@/volt/InputNumber.vue";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
@@ -25,6 +25,7 @@ import {useOrderInvoiceProductStore} from "@/stores/orderInvoiceProduct.js";
 import {useReturnInvoiceValidation} from "@/views/warehouse/returnInvoice/useWarehouseReturnInvoiceForm.js";
 import {useOrderInvoiceKitStore} from "@/stores/orderInvoiceKit.js";
 
+const route = useRoute();
 const { t } = useI18n()
 const toast = useToast()
 const {
@@ -72,7 +73,7 @@ const home = computed(() => ({
     route: '/shop'
 }));
 
-const items = computed(() => [{ label: t('cards.returnInvoices'), route: { name: 'shop-return-invoices'} }, { label: t('sections.returnInvoices.add') }]);
+const items = computed(() => [{ label: t('cards.orderInvoices'), route: { name: 'shop-order-invoices'} }, { label: t('cards.orderInvoice'), route: { name: 'shop-order-invoice'} }, { label: t('buttons.newReturnInvoice') }]);
 
 const tabList = computed(() => [
     { value: 'products', label: t('cards.products')},
@@ -109,7 +110,7 @@ const getReturnQtyKit = (orderInvoiceKit) => {
 
 const onSubmitReturnInvoice = returnInvoiceHandleSubmit(async values => {
     const payload = {
-        orderInvoice: 'api/order_invoices/2',
+        orderInvoice: 'api/order_invoices/' + route.params.id,
         returnInvoiceProducts: values.returnInvoiceProducts.map(returnInvoiceProduct => ({
             orderInvoiceProduct: `api/order_invoice_products/${returnInvoiceProduct.orderInvoiceProduct.id}`,
             qty: returnInvoiceProduct.qtyProduct,
@@ -308,8 +309,8 @@ const confirmLeave = () => {
     </Breadcrumb>
 
     <Section
-        :section-name="t('sections.returnInvoices.add')"
-        back-route-name="shop-return-invoices"
+        :section-name="t('buttons.newReturnInvoice')"
+        back-route-name="shop-order-invoice"
     >
         <template #buttons>
             <div class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
@@ -359,7 +360,7 @@ const confirmLeave = () => {
                                         <p class="text-sm">{{ t('labels.product') }}<span class="text-red-500"> *</span></p>
                                         <SearchSelect
                                             v-model="orderInvoiceProduct"
-                                            :fetchFn="(query) => orderInvoiceProductStore.fetchOrderInvoiceProducts({...query, orderInvoice: 2})"
+                                            :fetchFn="(query) => orderInvoiceProductStore.fetchOrderInvoiceProducts({...query, orderInvoice: route.params.id})"
                                             :options="orderInvoiceProductStore.getOrderInvoiceProducts.models"
                                             :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty - getReturnQtyProduct(opt)} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty - getReturnQtyProduct(opt)} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
@@ -410,7 +411,7 @@ const confirmLeave = () => {
                                         <p class="text-sm">{{ t('labels.kit') }}<span class="text-red-500"> *</span></p>
                                         <SearchSelect
                                             v-model="orderInvoiceKit"
-                                            :fetchFn="(query) => orderInvoiceKitStore.fetchOrderInvoiceKits({...query, orderInvoice: 2})"
+                                            :fetchFn="(query) => orderInvoiceKitStore.fetchOrderInvoiceKits({...query, orderInvoice: route.params.id})"
                                             :options="orderInvoiceKitStore.getOrderInvoiceKits.models"
                                             :option-label="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${opt?.qty - getReturnQtyKit(opt)} ${t(`labels.pcs`)}`"
                                             :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${opt?.qty - getReturnQtyKit(opt)} ${t(`labels.pcs`)}`"
