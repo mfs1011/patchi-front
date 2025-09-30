@@ -751,6 +751,119 @@ export const exportTransferInvoice = async (products, kits, fromLocation, toLoca
     link.click()
 }
 
+export const exportReturnInvoice = async (products, kits, customer, location, date) => {
+    // Создаем новую книгу и лист
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet(i18n.global.t('labels.ReturnInvoice'))
+
+    setupPage(worksheet, 'portrait')
+
+    // Добавляем заголовки
+    worksheet.columns = [
+        { width: 6 }, // 1 index
+        { width: 16 }, // 2 type
+        { width: 32 }, // 3 name
+        { width: 16 }, // 4 code
+        { width: 14 }, // 5 color
+        { width: 14 }, // 6 qr
+        { width: 12 }, // 7 price
+        { width: 12 }, // 9 qty
+    ]
+
+    const title = [
+        [i18n.global.t('labels.client'), customer.name],
+        [i18n.global.t('labels.location'), location.name],
+        [i18n.global.t('labels.createdAt'), formatDate(date)],
+        [],
+    ]
+
+    title.forEach((row, index) => {
+        const rowIndex = index + 1 // Excel нумерация начинается с 1
+
+        const aCell = worksheet.getCell(`A${rowIndex}`)
+        const cCell = worksheet.getCell(`C${rowIndex}`)
+
+        worksheet.mergeCells(`A${rowIndex}:B${rowIndex}`)
+        worksheet.mergeCells(`C${rowIndex}:E${rowIndex}`)
+        aCell.value = row[0]
+        cCell.value = row[1]
+
+        textFormat(aCell, 'Tahoma', true, 11, '000000')
+        textFormat(cCell, 'Tahoma', false, 11, '000000')
+    })
+
+    const header = [
+        '№',
+        i18n.global.t('labels.type'),
+        i18n.global.t('labels.title'),
+        i18n.global.t('labels.code'),
+        i18n.global.t('labels.color'),
+        i18n.global.t('labels.qr'),
+        i18n.global.t('labels.price'),
+        i18n.global.t('labels.qty'),
+    ]
+
+    formatHeader(worksheet, header)
+
+    // Пример данных для таблицы
+    const productTableData = products.map((item, index) => [
+        index + 1,
+        i18n.global.t('labels.Product'),
+        item.orderInvoiceProduct?.product?.name,
+        item.orderInvoiceProduct?.product?.code || '-',
+        item.orderInvoiceProduct?.color?.name || '-',
+        item.orderInvoiceProduct?.product?.qr || '-',
+        item.orderInvoiceProduct?.price,
+        item.qty,
+    ])
+
+    const kitTableData = kits.map((item, index) => [
+        productTableData.length + index + 1,
+        i18n.global.t('labels.Kit'),
+        item.orderInvoiceKit?.kit?.name,
+        item.orderInvoiceKit?.kit?.code || '-',
+        '-',
+        item.orderInvoiceKit?.kit?.qr || '-',
+        item.orderInvoiceKit?.price,
+        item.qty,
+    ])
+
+    const tableData = [...productTableData, ...kitTableData]
+
+    // Добавление данных в таблицу
+    tableData.forEach((rowData) => {
+        const row = worksheet.addRow(rowData)
+
+        row.eachCell((cell, colNumber) => {
+            addBorder(cell)
+            textFormat(cell, 'Tahoma', false, 11, '000000')
+
+            if ([1].includes(colNumber)) {
+                textAlignment(cell, 'center', 'middle', false)
+            } else if ([2, 3, 4, 5, 6].includes(colNumber)) {
+                textAlignment(cell, 'left', 'middle', false)
+            } else if ([7, 8].includes(colNumber)) {
+                textAlignment(cell, 'right', 'middle', false)
+                formatNumber(cell)
+            }
+        })
+    })
+
+    // ******************************************************************************** //
+
+    // Генерация файла
+    const buffer = await workbook.xlsx.writeBuffer()
+
+    // Создание и скачивание файла
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+
+    const timestamp = formatDateForFilename()
+    link.download = `${i18n.global.t('labels.ReturnInvoice')}_${timestamp}.xlsx`
+    link.click()
+}
+
 function addBorder(cell) {
     cell.border = {
         top: { style: 'thin' },

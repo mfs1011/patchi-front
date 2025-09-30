@@ -31,6 +31,7 @@ import {useOrderInvoiceProductStore} from "@/stores/orderInvoiceProduct.js";
 import {useUserStore} from "@/stores/user.js";
 import {useOrderInvoiceKitStore} from "@/stores/orderInvoiceKit.js";
 import {useSellerStore} from "@/stores/seller.js";
+import {exportReturnInvoice} from "@/helpers/xlsx.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -104,9 +105,8 @@ const home = computed(() => ({
     route: "/shop",
 }));
 
-const dt = ref();
 const exportCSV = () => {
-    dt.value.exportCSV();
+  exportReturnInvoice(editableData.value.returnInvoiceProducts, editableData.value.returnInvoiceKits, customer.value, location.value, createdAt.value)
 };
 
 const items = computed(() => [{ label: t("cards.returnInvoices"), route: { name: 'shop-return-invoices'} }, { label: t("cards.returnInvoice") }]);
