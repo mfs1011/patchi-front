@@ -79,7 +79,7 @@ export const exportInventory = async (products, kits, location, dateFrom, dateTo
             i18n.global.t('labels.totalFact'),
         ]
 
-        formatHeader(worksheet, header)
+        formatHeader(worksheet, header, 30)
 
         // Пример данных для таблицы
         const productTableData = products.map((item, index) => [
@@ -222,7 +222,7 @@ export const exportInventory = async (products, kits, location, dateFrom, dateTo
             i18n.global.t('labels.difference'),
         ]
 
-        formatHeader(worksheet, header)
+        formatHeader(worksheet, header, 30)
 
         // Пример данных для таблицы
         const kitTableData = kits.map((item, index) => [
@@ -861,6 +861,122 @@ export const exportReturnInvoice = async (products, kits, customer, location, da
 
     const timestamp = formatDateForFilename()
     link.download = `${i18n.global.t('labels.ReturnInvoice')}_${timestamp}.xlsx`
+    link.click()
+}
+
+export const exportWriteOffInvoice = async (products, kits, location, date) => {
+    // Создаем новую книгу и лист
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet(i18n.global.t('labels.WriteOffInvoice'))
+
+    setupPage(worksheet, 'portrait')
+
+    // Добавляем заголовки
+    worksheet.columns = [
+        { width: 6 }, // 1 index
+        { width: 16 }, // 2 type
+        { width: 32 }, // 3 name
+        { width: 16 }, // 4 code
+        { width: 14 }, // 5 color
+        { width: 14 }, // 6 qr
+        { width: 12 }, // 7 costPrice
+        { width: 12 }, // 9 qty
+        { width: 14 }, // 8 expiryDate
+    ]
+
+    const title = [
+        [i18n.global.t('labels.location'), location.name],
+        [i18n.global.t('labels.createdAt'), formatDate(date)],
+        [],
+    ]
+
+    title.forEach((row, index) => {
+        const rowIndex = index + 1 // Excel нумерация начинается с 1
+
+        const aCell = worksheet.getCell(`A${rowIndex}`)
+        const cCell = worksheet.getCell(`C${rowIndex}`)
+
+        worksheet.mergeCells(`A${rowIndex}:B${rowIndex}`)
+        worksheet.mergeCells(`C${rowIndex}:E${rowIndex}`)
+        aCell.value = row[0]
+        cCell.value = row[1]
+
+        textFormat(aCell, 'Tahoma', true, 11, '000000')
+        textFormat(cCell, 'Tahoma', false, 11, '000000')
+    })
+
+    const header = [
+        '№',
+        i18n.global.t('labels.type'),
+        i18n.global.t('labels.title'),
+        i18n.global.t('labels.code'),
+        i18n.global.t('labels.color'),
+        i18n.global.t('labels.qr'),
+        i18n.global.t('labels.costPrice'),
+        i18n.global.t('labels.qty'),
+        i18n.global.t('labels.expiryDate'),
+    ]
+
+    formatHeader(worksheet, header, 30)
+
+    // Пример данных для таблицы
+    const productTableData = products.map((item, index) => [
+        index + 1,
+        i18n.global.t('labels.Product'),
+        item.locationQuantity?.product?.name,
+        item.locationQuantity?.product?.code || '-',
+        item.locationQuantity?.color?.name || '-',
+        item.locationQuantity?.product?.qr || '-',
+        item.locationQuantity?.product?.costPrice,
+        item.qty,
+        item.locationQuantity?.expiryDate ? formatDate(item.locationQuantity?.expiryDate) : '-',
+    ])
+
+    const kitTableData = kits.map((item, index) => [
+        productTableData.length + index + 1,
+        i18n.global.t('labels.Kit'),
+        item.locationQuantityKit?.kit?.name,
+        item.locationQuantityKit?.kit?.code || '-',
+        '-',
+        item.locationQuantityKit?.kit?.qr || '-',
+        item.locationQuantityKit?.kit?.costPrice,
+        item.qty,
+        item.locationQuantityKit?.expiryDate ? formatDate(item.locationQuantityKit?.expiryDate) : '-',
+    ])
+
+    const tableData = [...productTableData, ...kitTableData]
+
+    // Добавление данных в таблицу
+    tableData.forEach((rowData) => {
+        const row = worksheet.addRow(rowData)
+
+        row.eachCell((cell, colNumber) => {
+            addBorder(cell)
+            textFormat(cell, 'Tahoma', false, 11, '000000')
+
+            if ([1, 9].includes(colNumber)) {
+                textAlignment(cell, 'center', 'middle', false)
+            } else if ([2, 3, 4, 5, 6].includes(colNumber)) {
+                textAlignment(cell, 'left', 'middle', false)
+            } else if ([7, 8].includes(colNumber)) {
+                textAlignment(cell, 'right', 'middle', false)
+                formatNumber(cell)
+            }
+        })
+    })
+
+    // ******************************************************************************** //
+
+    // Генерация файла
+    const buffer = await workbook.xlsx.writeBuffer()
+
+    // Создание и скачивание файла
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+
+    const timestamp = formatDateForFilename()
+    link.download = `${i18n.global.t('labels.WriteOffInvoice')}_${timestamp}.xlsx`
     link.click()
 }
 
