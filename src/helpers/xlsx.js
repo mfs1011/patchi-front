@@ -980,6 +980,146 @@ export const exportWriteOffInvoice = async (products, kits, location, date) => {
     link.click()
 }
 
+export const exportKit = async (products, data = {}) => {
+    // Создаем новую книгу и лист
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet(i18n.global.t('labels.kit'))
+
+    setupPage(worksheet, 'portrait')
+
+    // Добавляем заголовки
+    worksheet.columns = [
+        { width: 6 }, // 1 index
+        { width: 24 }, // 2 product
+        { width: 16 }, // 3 code
+        { width: 14 }, // 4 color
+        { width: 16 }, // 5 category
+        { width: 14 }, // 6 type
+        { width: 12 }, // 7 qty
+        { width: 12 }, // 8 retailPrice
+        { width: 12 }, // 9 wholesalePrice
+        { width: 12 }, // 10 include/exclude
+    ]
+
+    const title = [
+        [i18n.global.t('labels.Seller'), data.seller.name],
+        [i18n.global.t('labels.qr'), data.qr],
+        [i18n.global.t('labels.code'), data.code],
+        [i18n.global.t('labels.title'), data.name],
+        [i18n.global.t('labels.collection'), data.assembly.name],
+        [i18n.global.t('labels.wholesalePrice'), data.wholesalePrice],
+        [i18n.global.t('labels.retailPrice'), data.retailPrice],
+        [i18n.global.t('labels.qty'), data.qty],
+        [],
+    ]
+
+    title.forEach((row, index) => {
+        const rowIndex = index + 1 // Excel нумерация начинается с 1
+
+        const aCell = worksheet.getCell(`A${rowIndex}`)
+        const cCell = worksheet.getCell(`C${rowIndex}`)
+
+        worksheet.mergeCells(`A${rowIndex}:B${rowIndex}`)
+        worksheet.mergeCells(`C${rowIndex}:E${rowIndex}`)
+        aCell.value = row[0]
+        cCell.value = row[1]
+
+        textFormat(aCell, 'Tahoma', true, 11, '000000')
+        textFormat(cCell, 'Tahoma', false, 11, '000000')
+
+        if ([5, 6, 7].includes(index)) {
+            textAlignment(cCell, 'left', 'middle', false)
+        }
+    })
+
+    const header = [
+        '№',
+        i18n.global.t('labels.product'),
+        i18n.global.t('labels.code'),
+        i18n.global.t('labels.color'),
+        i18n.global.t('labels.category'),
+        i18n.global.t('labels.type'),
+        i18n.global.t('labels.amount'),
+        i18n.global.t('labels.retailPrice'),
+        i18n.global.t('labels.wholesalePrice'),
+        '...',
+    ]
+
+    formatHeader(worksheet, header, 30)
+
+    // Пример данных для таблицы
+    const tableData = products.map((item, index) => [
+        index + 1,
+        item.product?.name,
+        item.product?.code,
+        item.color?.name || '-',
+        item.product.category.name,
+        item.product.category.categoryType.name,
+        item.qty,
+        item.product.retailPrice,
+        item.product.wholesalePrice,
+        item.exclude ? 'exclude': 'include',
+    ])
+
+    // Добавление данных в таблицу
+    tableData.forEach((rowData) => {
+        const row = worksheet.addRow(rowData)
+
+        row.eachCell((cell, colNumber) => {
+            addBorder(cell)
+            textFormat(cell, 'Tahoma', false, 11, '000000')
+
+            if ([1, 10].includes(colNumber)) {
+                textAlignment(cell, 'center', 'middle', false)
+            } else if ([2, 3, 4, 5, 6].includes(colNumber)) {
+                textAlignment(cell, 'left', 'middle', false)
+            } else if ([7, 8, 9].includes(colNumber)) {
+                textAlignment(cell, 'right', 'middle', false)
+            }
+        })
+    })
+
+    // Реализовываем футер
+    const rowNumber = products.length + 11
+    const footerRow = worksheet.getRow(rowNumber)
+
+    // footerTitle
+    const titleCell = footerRow.getCell(9)
+    titleCell.value = i18n.global.t('labels.totals')
+
+    // totalsValueCell
+    const totalsValueCell = footerRow.getCell(10)
+    totalsValueCell.value = { formula: `SUMPRODUCT(G11:G${products.length + 10}, H11:H${products.length + 10})` }
+    formatNumber(totalsValueCell)
+
+    for (let colNumber = 1; colNumber <= 10; colNumber++) {
+        const cell = footerRow.getCell(colNumber)
+        fillFormat(cell, 'e6e9ec')
+        addBorder(cell)
+        textAlignment(cell, 'right', 'middle', false)
+
+        if (colNumber === 9) {
+            textFormat(cell, 'Tahoma', true, 10, '000000')
+        } else if (colNumber > 9) {
+            textFormat(cell, 'Tahoma', false, 11, '000000')
+        }
+    }
+
+    // ******************************************************************************** //
+
+    // Генерация файла
+    const buffer = await workbook.xlsx.writeBuffer()
+
+    // Создание и скачивание файла
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+
+    const timestamp = formatDateForFilename()
+    link.download = `${i18n.global.t('labels.kit')}_${timestamp}.xlsx`
+    link.click()
+}
+
 function addBorder(cell) {
     cell.border = {
         top: { style: 'thin' },

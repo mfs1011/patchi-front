@@ -22,6 +22,7 @@ import {useKitValidation} from "@/views/shop/kit/useKitForm.js";
 import Dialog from "@/volt/Dialog.vue";
 import {useToast} from "primevue/usetoast";
 import {useUserStore} from "@/stores/user.js";
+import {exportKit} from "@/helpers/xlsx.js";
 
 const { t } = useI18n();
 const route = useRoute()
@@ -63,7 +64,19 @@ const home = ref({
 
 const dt = ref();
 const exportCSV = () => {
-    dt.value.exportCSV();
+    exportKit(
+        kitStore.getKit.filteredKitProducts,
+        {
+          seller: seller.value,
+          qr: qr.value,
+          code: code.value,
+          name: name.value,
+          assembly: assembly.value,
+          wholesalePrice: wholesalePrice.value,
+          retailPrice: retailPrice.value,
+          qty: qty.value,
+        }
+    )
 };
 
 const items = computed(() => [{ label: t('cards.kits'), route: { name: 'kits'} }, { label: t('labels.kit') }]);
@@ -148,7 +161,6 @@ const onSubmitIncomeInvoice = kitHandleSubmit(async values => {
 })
 
 onBeforeRouteLeave((to, from, next) => {
-    console.log(isChanged.value)
     if (isChanged.value && !isEdited.value) {
         showLeaveDialog.value = true
         pendingNavigation.value = next
@@ -349,7 +361,7 @@ onMounted(async () => {
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.name') }}<span class="text-red-500"> *</span></p>
+                            <p class="text-sm">{{ t('labels.title') }}<span class="text-red-500"> *</span></p>
 
                             <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
