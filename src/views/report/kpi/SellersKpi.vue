@@ -47,7 +47,6 @@ const home = computed(() => ({
     route: "/reports",
 }));
 
-const dt = ref();
 const exportCSV = () => {
     exportSellersKpi(formattedRows.value)
 };

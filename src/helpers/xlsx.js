@@ -1,7 +1,7 @@
 import ExcelJS from 'exceljs'
 import i18n from '@/locales/i18n'
 import {useProductStore} from "@/stores/product.js";
-import {formatCurrency} from "@/helpers/numberFormat.js";
+import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
 
 export const exportInventory = async (products, kits, location, dateFrom, dateTo) => {
     // Создаем новую книгу и лист
@@ -79,15 +79,7 @@ export const exportInventory = async (products, kits, location, dateFrom, dateTo
             i18n.global.t('labels.totalFact'),
         ]
 
-        const headerRow = worksheet.addRow(header)
-
-        // Форматирование заголовка таблицы
-        headerRow.eachCell((cell) => {
-            addBorder(cell)
-            fillFormat(cell, 'eaecef')
-            textFormat(cell, 'Tahoma', true, 10, '000000')
-            textAlignment(cell, 'center', 'middle', false)
-        })
+        formatHeader(worksheet, header)
 
         // Пример данных для таблицы
         const productTableData = products.map((item, index) => [
@@ -230,15 +222,7 @@ export const exportInventory = async (products, kits, location, dateFrom, dateTo
             i18n.global.t('labels.difference'),
         ]
 
-        const headerRow = worksheet.addRow(header)
-
-        // Форматирование заголовка таблицы
-        headerRow.eachCell((cell) => {
-            addBorder(cell)
-            fillFormat(cell, 'eaecef')
-            textFormat(cell, 'Tahoma', true, 10, '000000')
-            textAlignment(cell, 'center', 'middle', false)
-        })
+        formatHeader(worksheet, header)
 
         // Пример данных для таблицы
         const kitTableData = kits.map((item, index) => [
@@ -384,16 +368,7 @@ export const exportSellersKpi = async (sellersKpi) => {
         i18n.global.t('labels.total'),
     ]
 
-    const headerRow = worksheet.addRow(header)
-    headerRow.height = 30
-
-    // Форматирование заголовка таблицы
-    headerRow.eachCell((cell) => {
-        addBorder(cell)
-        fillFormat(cell, 'eaecef')
-        textFormat(cell, 'Tahoma', true, 10, '000000')
-        textAlignment(cell, 'center', 'middle', true)
-    })
+    formatHeader(worksheet, header, 30)
 
     // Пример данных для таблицы
     const tableData = sellersKpi.map((item, index) => [
@@ -477,15 +452,7 @@ export const exportAbcAnalysis = async () => {
         `${i18n.global.t('labels.benefit')} %`,
     ]
 
-    const headerRow = worksheet.addRow(header)
-
-    // Форматирование заголовка таблицы
-    headerRow.eachCell((cell) => {
-        addBorder(cell)
-        fillFormat(cell, 'eaecef')
-        textFormat(cell, 'Tahoma', true, 10, '000000')
-        textAlignment(cell, 'center', 'middle', false)
-    })
+    formatHeader(worksheet, header)
 
     // Пример данных для таблицы
     const tableData = productStore.getABCProducts.models.map((item, index) => [
@@ -538,6 +505,133 @@ export const exportAbcAnalysis = async () => {
 
     const timestamp = formatDateForFilename()
     link.download = `${i18n.global.t('cards.abc')}_${timestamp}.xlsx`
+    link.click()
+}
+
+export const exportIncomeInvoice = async (data, supplier, location, date, comment) => {
+    // Создаем новую книгу и лист
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet(i18n.global.t('cards.incomeInvoice'))
+
+    setupPage(worksheet, 'portrait')
+
+    // Добавляем заголовки
+    worksheet.columns = [
+        { width: 6 }, // 1 index
+        { width: 24 }, // 2 product
+        { width: 12 }, // 3 color
+        { width: 14 }, // 4 expiryDate
+        { width: 12 }, // 5 qty
+        { width: 12 }, // 6 price
+        { width: 16 }, // 7 logistics
+        { width: 16 }, // 8 customsFee
+    ]
+
+    const title = [
+        [i18n.global.t('supplier.nominativeCapitalize'), supplier.name],
+        [i18n.global.t('labels.Location'), location.name],
+        [i18n.global.t('labels.createdAt'), formatDate(date)],
+        [i18n.global.t('labels.comment'), comment],
+        [],
+    ]
+
+    title.forEach((row, index) => {
+        const rowIndex = index + 1 // Excel нумерация начинается с 1
+
+        const aCell = worksheet.getCell(`A${rowIndex}`)
+        const cCell = worksheet.getCell(`C${rowIndex}`)
+
+        worksheet.mergeCells(`A${rowIndex}:B${rowIndex}`)
+        worksheet.mergeCells(`C${rowIndex}:E${rowIndex}`)
+        aCell.value = row[0]
+        cCell.value = row[1]
+
+        textFormat(aCell, 'Tahoma', true, 11, '000000')
+        textFormat(cCell, 'Tahoma', false, 11, '000000')
+    })
+
+    const header = [
+        '№',
+        i18n.global.t('labels.product'),
+        i18n.global.t('labels.color'),
+        i18n.global.t('labels.expiryDate'),
+        i18n.global.t('labels.qty'),
+        i18n.global.t('labels.price'),
+        i18n.global.t('labels.transportationFee'),
+        i18n.global.t('labels.customsFee'),
+    ]
+
+    formatHeader(worksheet, header, 30)
+
+    // Пример данных для таблицы
+    const tableData = data.map((item, index) => [
+        index + 1,
+        item.product?.name,
+        item.color?.name || '-',
+        item.expiryDate ? formatDate(item.expiryDate) : '-',
+        item.qty,
+        item.price,
+        item.transportationFee,
+        item.customsFee,
+    ])
+
+    // Добавление данных в таблицу
+    tableData.forEach((rowData) => {
+        const row = worksheet.addRow(rowData)
+
+        row.eachCell((cell, colNumber) => {
+            addBorder(cell)
+            textFormat(cell, 'Tahoma', false, 11, '000000')
+
+            if ([1, 4].includes(colNumber)) {
+                textAlignment(cell, 'center', 'middle', false)
+            } else if ([2, 3].includes(colNumber)) {
+                textAlignment(cell, 'left', 'middle', false)
+            } else if ([5, 6, 7, 8].includes(colNumber)) {
+                textAlignment(cell, 'right', 'middle', false)
+            }
+        })
+    })
+
+    // Реализовываем футер
+    const rowNumber = data.length + 7
+    const footerRow = worksheet.getRow(rowNumber)
+
+    // footerTitle
+    const titleCell = footerRow.getCell(7)
+    titleCell.value = i18n.global.t('labels.totals')
+
+    // totalsValueCell
+    const totalsValueCell = footerRow.getCell(8)
+    totalsValueCell.value = { formula: `SUM(F7:H${data.length + 6})` }
+    formatNumber(totalsValueCell)
+
+    for (let colNumber = 1; colNumber <= 8; colNumber++) {
+        const cell = footerRow.getCell(colNumber)
+        fillFormat(cell, 'e6e9ec')
+        addBorder(cell)
+        textAlignment(cell, 'right', 'middle', false)
+
+        if (colNumber === 7) {
+            textFormat(cell, 'Tahoma', true, 10, '000000')
+        } else if (colNumber > 7) {
+            textFormat(cell, 'Tahoma', false, 11, '000000')
+            formatNumber(cell)
+        }
+    }
+
+    // ******************************************************************************** //
+
+    // Генерация файла
+    const buffer = await workbook.xlsx.writeBuffer()
+
+    // Создание и скачивание файла
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+
+    const timestamp = formatDateForFilename()
+    link.download = `${i18n.global.t('cards.incomeInvoice')}_${timestamp}.xlsx`
     link.click()
 }
 
@@ -606,6 +700,22 @@ function setupPage(worksheet, orientation) {
             left: 0.3, right: 0.3, top: 0.3, bottom: 0.3, header: 0.3, footer: 0.3
         },
     }
+}
+
+function formatHeader(worksheet, header, height = 0) {
+    const headerRow = worksheet.addRow(header)
+
+    if (height > 0) {
+        headerRow.height = height
+    }
+
+    // Форматирование заголовка таблицы
+    headerRow.eachCell((cell) => {
+        addBorder(cell)
+        fillFormat(cell, 'eaecef')
+        textFormat(cell, 'Tahoma', true, 10, '000000')
+        textAlignment(cell, 'center', 'middle', height > 0)
+    })
 }
 
 const formatDateForFilename = () => {
