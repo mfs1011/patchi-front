@@ -29,6 +29,7 @@ import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
 import ColumnGroup from "primevue/columngroup";
 import Row from "primevue/row"
 import {useUserStore} from "@/stores/user.js";
+import {exportTransferInvoice} from "@/helpers/xlsx.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -95,7 +96,7 @@ const home = computed(() => ({
 
 const dt = ref();
 const exportCSV = () => {
-    dt.value.exportCSV();
+  exportTransferInvoice(editableData.value.transferInvoiceProducts, editableData.value.transferInvoiceKits, fromLocation.value, toLocation.value)
 };
 
 const items = computed(() => [{ label: t("cards.transferInvoices"), route: { name: 'shop-transfer-invoices'} }, { label: t("cards.transferInvoice") }]);
