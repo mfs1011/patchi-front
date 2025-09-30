@@ -407,7 +407,7 @@ const confirmLeave = () => {
                                             :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
-                                            search-key="id"
+                                            search-key="name"
                                             :placeholder="t('placeholders.select.product')"
                                             :loading="locationQuantityStore.getIsLoadingLocationQuantity"
                                             :total-items="locationQuantityStore.getLocationQuantities.totalItems"
