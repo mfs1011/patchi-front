@@ -70,10 +70,10 @@
         "accusativeCapitalize": "Цвета"
     },
     "shop_name": {
-        "nominative": "имя магазин",
-        "nominativeCapitalize": "Имя магазин",
-        "accusative": "имя магазина",
-        "accusativeCapitalize": "Имя магазина"
+        "nominative": "название магазин",
+        "nominativeCapitalize": "Название магазин",
+        "accusative": "название магазина",
+        "accusativeCapitalize": "Название магазина"
     },
     "warehouses": {
         "nominative": "склад",
@@ -82,10 +82,10 @@
         "accusativeCapitalize": "Склад"
     },
     "warehouse_name": {
-        "nominative": "имя склада",
-        "nominativeCapitalize": "Имя склада",
-        "accusative": "имя склада",
-        "accusativeCapitalize": "Имя склада"
+        "nominative": "название склада",
+        "nominativeCapitalize": "Название склада",
+        "accusative": "название склада",
+        "accusativeCapitalize": "Название склада"
     },
     "category_name": {
         "nominative": "название категории",
@@ -212,8 +212,8 @@
         "shop": "Магазин",
         "fullName": "Полное имя",
         "comment": "Комментарий",
-        "shopName": "Имя магазина",
-        "warehouseName": "Имя склада",
+        "shopName": "Название магазина",
+        "warehouseName": "Название склада",
         "locations": "Локация",
         "location": "Локация",
         "seller": "Продавец",
@@ -224,7 +224,7 @@
         "categoryName": "Название категории",
         "status": "Статус",
         "dateFrom": "Дата с",
-        "dateTo": "До даты",
+        "dateTo": "Дата по",
         "responsible": "Ответственный",
         "unit": "Единица",
         "photo": "Фото",
@@ -245,7 +245,7 @@
         "color": "Цвет",
         "expiryDate": "Срок годности",
         "initial": "Начальный",
-        "income": "Доход",
+        "income": "Приход",
         "expense": "Расход",
         "currentQty": "Текущее",
         "factQty": "Факт",

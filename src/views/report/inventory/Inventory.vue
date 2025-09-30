@@ -28,6 +28,7 @@ import DatePicker from "@/volt/DatePicker.vue";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
 import {useLocationStore} from "@/stores/location.js";
 import {useField} from "vee-validate";
+import {exportInventory} from "@/helpers/xlsx.js";
 
 const { t } = useI18n();
 const toast = useToast();
@@ -54,7 +55,7 @@ const home = ref({
 
 const dt = ref();
 const exportCSV = () => {
-    dt.value.exportCSV();
+    exportInventory(inventoryProducts.value, inventoryKits.value, location.value, dateFrom.value, dateTo.value)
 };
 
 const items = computed(() => [{ label: t('cards.inventories'), route: { name: 'inventories'} }, { label: t('cards.inventory') }]);

@@ -27,6 +27,7 @@ import {useColorStore} from "@/stores/color.js";
 import {useToast} from "primevue/usetoast";
 import Message from "@/volt/Message.vue";
 import {useUserStore} from "@/stores/user.js";
+import {exportIncomeInvoice} from "@/helpers/xlsx.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -87,9 +88,8 @@ const home = computed(() => ({
     route: "/warehouse",
 }));
 
-const dt = ref();
 const exportCSV = () => {
-    dt.value.exportCSV();
+    exportIncomeInvoice(editableData.value.incomeInvoiceProducts, supplier.value, location.value, createdAt.value, comment.value)
 };
 
 const items = computed(() => [{ label: t("cards.incomeInvoices"), route: { name: 'warehouse-income-invoices'} }, { label: t("cards.incomeInvoice") }]);
@@ -130,7 +130,6 @@ const onSubmitProduct = productHandleSubmit((values) => {
 })
 
 const onEditProduct = productHandleSubmit((values) => {
-    console.log('onedit',values)
     editProduct(values)
 })
 
@@ -387,7 +386,6 @@ function cancelEditing() {
 
 watch(isProductTypeNonFood, (newVal) => {
     if (newVal) {
-        console.log('onnonfood')
         expiryDate.value = null; // agar non_food bo‘lsa, qiymatni tozalaymiz
     }
 });
@@ -395,7 +393,6 @@ watch(isProductTypeNonFood, (newVal) => {
 watch(location, async () => {
     if (location.value) {
         await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
-        console.log(location.value.id)
 
         if (inventoryStore.getLastInventoryDateTo === null) {
             dateFrom.value = null

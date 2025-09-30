@@ -29,6 +29,7 @@ import {useWriteOffInvoiceStore} from "@/stores/writeOffInvoice.js";
 import {useWriteOffInvoiceValidation} from "@/views/warehouse/writeOffInvoice/useWriteOffInvoiceForm.js";
 import DatePicker from "@/volt/DatePicker.vue";
 import {useInventoryStore} from "@/stores/inventory.js";
+import {exportWriteOffInvoice} from "@/helpers/xlsx.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -97,7 +98,7 @@ const home = computed(() => ({
 
 const dt = ref();
 const exportCSV = () => {
-    dt.value.exportCSV();
+    exportWriteOffInvoice(editableData.value.writeOffInvoiceProducts, editableData.value.writeOffInvoiceKits, location.value, createdAt.value)
 };
 
 const items = computed(() => [{ label: t("cards.writeOffInvoices"), route: { name: 'warehouse-write-off-invoices'} }, { label: t("cards.writeOffInvoice") }]);

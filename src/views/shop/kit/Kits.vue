@@ -366,7 +366,7 @@ onBeforeRouteLeave(() => {
                                 <div v-else> - </div>
                             </template>
                         </Column>
-                        <Column field="name" :header="t('labels.name')">
+                        <Column field="name" :header="t('labels.title')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                 <p v-else>{{ data.name }}</p>
