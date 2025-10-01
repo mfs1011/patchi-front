@@ -18,22 +18,19 @@ const ifNotAuthorized = (to, from, next) => {
     }
 }
 
-const accessPageByRoles = (roles) => (to, from, next) => {
+const accessPageByRoles = (roles) => async (to, from, next) => {
     const userStore = useUserStore()
-    if (userStore.getAboutMe.roles?.length === 0) {
-        userStore.fetchAboutMe()
-            .then(() => {
-                if (roles.includes(userStore.getAboutMe.roles[0])) {
-                    next()
-                } else {
-                    next({ name: 'home' })
-                }
-            })
-            .catch(() => {
-                next({ name: 'home' })
-            });
-    } else {
-        next()
+
+    try {
+        const userRole = userStore.getAboutMe.role?.name
+
+        if (roles.includes(userRole)) {
+            next()
+        } else {
+            next({ name: 'home' })
+        }
+    } catch (e) {
+        next({ name: 'home' })
     }
 }
 
