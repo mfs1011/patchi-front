@@ -563,15 +563,16 @@ onMounted(async () => {
     <Section
         :section-name="t('cards.returnInvoice')"
         back-route-name="warehouse-return-invoices"
+        :withoutButtons="(isLoading || hasInventory)"
     >
         <template #buttons>
-            <div v-if="!isLoading && !hasInventory" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
+            <div class="flex sm:justify-end grow gap-2 sm:gap-4 sm:mt-4">
                 <Button
                     v-if="!editMode && isAdminOrCreatedBy(returnInvoiceStore.getReturnInvoice.createdBy.id)"
                     :disabled="!!returnInvoiceErrors.returnInvoiceProducts"
                     icon="pi pi-pencil"
                     @click="editMode = true"
-                    class="px-2 sm:px-5 whitespace-nowrap"
+                    class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.edit')"
                     :loading="returnInvoiceIsSubmitting"
                 />
@@ -579,7 +580,7 @@ onMounted(async () => {
                     v-if="editMode"
                     :disabled="!!returnInvoiceErrors.returnInvoiceProducts"
                     @click="cancelEditing"
-                    class="px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
+                    class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
                 />
                 <Button
@@ -587,36 +588,7 @@ onMounted(async () => {
                     :disabled="!isChanged"
                     icon="pi pi-save"
                     @click="onSubmitReturnInvoice"
-                    class="px-2 sm:px-5 whitespace-nowrap"
-                    :label="t('buttons.save')"
-                    :loading="returnInvoiceIsSubmitting"
-                />
-            </div>
-            <div class="sm:hidden flex grow gap-2 sm:gap-4">
-                <Button
-                    v-if="!editMode"
-                    :disabled="!!returnInvoiceErrors.returnInvoiceProducts"
-                    icon="pi pi-pencil"
-                    @click="editMode = true"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap"
-                    :label="t('buttons.edit')"
-                    :loading="returnInvoiceIsSubmitting"
-                />
-
-                <SecondaryButton
-                    v-if="editMode"
-                    :disabled="!!returnInvoiceErrors.returnInvoiceProducts"
-                    @click="cancelEditing"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
-                    :label="t('dialog.cancel')"
-                />
-
-                <Button
-                    v-if="editMode"
-                    :disabled="!isChanged"
-                    icon="pi pi-save"
-                    @click="onSubmitReturnInvoice"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap"
+                    class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
                     :loading="returnInvoiceIsSubmitting"
                 />
