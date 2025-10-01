@@ -1,5 +1,6 @@
 import MainLayout from "@/layouts/MainLayout.vue";
 import BlankLayout from "@/layouts/BlankLayout.vue";
+import {useUserStore} from "@/stores/user.js";
 
 const ifAuthorized = (to, from, next) => {
     if (localStorage.getItem('patchi_accessToken') !== null) {
@@ -14,6 +15,25 @@ const ifNotAuthorized = (to, from, next) => {
         next()
     } else {
         next({ name: 'home' })
+    }
+}
+
+const accessPageByRoles = (roles) => (to, from, next) => {
+    const userStore = useUserStore()
+    if (userStore.getAboutMe.roles?.length === 0) {
+        userStore.fetchAboutMe()
+            .then(() => {
+                if (roles.includes(userStore.getAboutMe.roles[0])) {
+                    next()
+                } else {
+                    next({ name: 'home' })
+                }
+            })
+            .catch(() => {
+                next({ name: 'home' })
+            });
+    } else {
+        next()
     }
 }
 
@@ -33,6 +53,7 @@ export const routes = [
                 path: '/warehouse',
                 meta: { requiresAuth: true, roles: []},
                 component: BlankLayout,
+                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_WAREHOUSE_MANAGER", "ROLE_DIRECTOR", "ROLE_PARTNER"]),
                 children: [
                     {
                         path: '',
@@ -189,6 +210,7 @@ export const routes = [
                 path: '/shop',
                 meta: { requiresAuth: true, roles: []},
                 component: BlankLayout,
+                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_SELLER", "ROLE_DIRECTOR", "ROLE_PARTNER"]),
                 children: [
                     {
                         path: '',
@@ -314,6 +336,7 @@ export const routes = [
                 path: '/administration',
                 meta: { requiresAuth: true, roles: []},
                 component: BlankLayout,
+                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_PARTNER"]),
                 children: [
                     {
                         path: '',
@@ -659,6 +682,7 @@ export const routes = [
                 path: '/reports',
                 meta: { requiresAuth: true, roles: []},
                 component: BlankLayout,
+                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_PARTNER"]),
                 children: [
                     {
                         path: '',
@@ -714,7 +738,8 @@ export const routes = [
                 path: '/logs',
                 name: 'logs',
                 meta: { requiresAuth: true, roles: []},
-                component: () => import('@/views/Logs.vue')
+                component: () => import('@/views/Logs.vue'),
+                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_PARTNER"]),
             },
         ]
     },

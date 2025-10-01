@@ -54,12 +54,63 @@ const logout = () => {
             </div>
 
             <div class="flex flex-col gap-3 p-4">
-                <RouterButton @click="closeSidebar" exact-active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'home' }" icon="pi pi-home">{{ t('dashboard') }}</RouterButton>
-                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'warehouse' }" icon="pi pi-warehouse">{{ t('warehouse') }}</RouterButton>
-                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'shop' }" icon="pi pi-shop">{{ t('shop') }}</RouterButton>
-                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'administration' }" icon="pi pi-cog">{{ t('administration') }}</RouterButton>
-                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'reports' }" icon="pi pi-book">{{ t('reports') }}</RouterButton>
-                <RouterButton @click="closeSidebar" active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast" class="!w-full" :to="{ name: 'logs' }" icon="pi pi-list">{{ t('logs') }}</RouterButton>
+                <RouterButton
+                    @click="closeSidebar"
+                    exact-active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast"
+                    class="!w-full"
+                    :to="{ name: 'home' }" icon="pi pi-home"
+                >
+                    {{ t('dashboard') }}
+                </RouterButton>
+
+                <RouterButton
+                    v-if="userStore.getAboutMe.role?.name !== 'ROLE_SELLER'"
+                    @click="closeSidebar"
+                    active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast"
+                    class="!w-full"
+                    :to="{ name: 'warehouse' }" icon="pi pi-warehouse"
+                >
+                    {{ t('warehouse') }}
+                </RouterButton>
+
+                <RouterButton
+                    v-if="userStore.getAboutMe.role?.name !== 'ROLE_WAREHOUSE_MANAGER'"
+                    @click="closeSidebar"
+                    active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast"
+                    class="!w-full"
+                    :to="{ name: 'shop' }" icon="pi pi-shop"
+                >
+                    {{ t('shop') }}
+                </RouterButton>
+
+                <RouterButton
+                    v-if="userStore.getAboutMe.role?.name === 'ROLE_ADMIN' || userStore.getAboutMe.role?.name === 'ROLE_DIRECTOR' || userStore.getAboutMe.role?.name === 'ROLE_PARTNER'"
+                    @click="closeSidebar"
+                    active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast"
+                    class="!w-full"
+                    :to="{ name: 'administration' }" icon="pi pi-cog"
+                >
+                    {{ t('administration') }}
+                </RouterButton>
+
+                <RouterButton
+                    v-if="userStore.getAboutMe.role?.name === 'ROLE_ADMIN' || userStore.getAboutMe.role?.name === 'ROLE_DIRECTOR' || userStore.getAboutMe.role?.name === 'ROLE_PARTNER'"
+                    @click="closeSidebar"
+                    active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast"
+                    class="!w-full"
+                    :to="{ name: 'reports' }" icon="pi pi-book"
+                >
+                    {{ t('reports') }}
+                </RouterButton>
+
+                <RouterButton
+                    v-if="userStore.getAboutMe.role?.name === 'ROLE_ADMIN' || userStore.getAboutMe.role?.name === 'ROLE_DIRECTOR' || userStore.getAboutMe.role?.name === 'ROLE_PARTNER'"
+                    @click="closeSidebar"
+                    active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast"
+                    class="!w-full" :to="{ name: 'logs' }" icon="pi pi-list"
+                >
+                    {{ t('logs') }}
+                </RouterButton>
             </div>
             <div class="flex flex-col gap-2 p-4 border-t border-t-surface-300 dark:border-t-surface-600/50 grow">
                 <SidebarButton @click="visible = true" icon="pi pi-sign-out" aria-label="Exit" :label="t('logout')" class="justify-start px-3"/>

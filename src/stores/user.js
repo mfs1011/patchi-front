@@ -141,7 +141,8 @@ export const useUserStore = defineStore('user', () => {
             locations: []
         },
         me: {
-            locations: []
+            locations: [],
+            roles: []
         },
         isLoadingUsers: false,
     })
