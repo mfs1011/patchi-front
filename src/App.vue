@@ -33,8 +33,16 @@ function connectMercure() {
 
 onMounted(() => {
     connectMercure()
-    userStore.fetchAboutMe()
-        .then(() => isLoading.value = false)
+
+    if (userStore.isAuthorized()) {
+        userStore.fetchAboutMe()
+            .catch(() => {
+                userStore.refreshTokens()
+                    .catch(() => userStore.logout())
+            })
+    }
+
+    isLoading.value = false
 })
 
 onBeforeUnmount(() => {

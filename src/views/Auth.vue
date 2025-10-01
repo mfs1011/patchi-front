@@ -9,7 +9,6 @@ import {useForm, useField} from "vee-validate";
 import * as yup from "yup";
 import {useI18n} from "vue-i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher.vue";
-import {getDeviceId} from "@/helpers/deviceId.js";
 import {useUserStore} from "@/stores/user.js";
 import {useRouter} from "vue-router";
 import DarkModeSwitcher from "@/components/DarkModeSwitcher.vue";
@@ -44,9 +43,15 @@ const { handleSubmit, errors, isSubmitting } = useForm({
 const { value: phoneNumber } = useField('phoneNumber', undefined, { validateOnValueUpdate: false });
 const { value: password } = useField('password')
 
+function getDeviceInfo() {
+    const userAgent = navigator.userAgent;
+    const match = userAgent.match(/\((.*?)\)/);
+    return match ? match[1] : "Unknown device";
+}
+
 const onSubmit = handleSubmit(async values => {
     try {
-        await userStore.fetchToken({ username: values.phoneNumber.replace(/\D/g, ''), password: values.password, device: getDeviceId() })
+        await userStore.fetchToken({ username: values.phoneNumber.replace(/\D/g, ''), password: values.password, device: getDeviceInfo() })
         await userStore.fetchAboutMe()
 
         await router.push({ name: 'home' })

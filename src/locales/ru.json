@@ -195,6 +195,12 @@
       "accusative": "списани",
       "accusativeCapitalize": "Списани"
     },
+    "notification": {
+      "nominative": "уведомление",
+      "nominativeCapitalize": "Уведомление",
+      "accusative": "уведомление",
+      "accusativeCapitalize": "Уведомление"
+    },
     "roles": {
         "admin": "Администратор",
         "seller": "Продавец",

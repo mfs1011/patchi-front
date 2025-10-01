@@ -5,6 +5,7 @@ import LogoButton from "@/volt/LogoButton.vue";
 import {useSidebarStore} from "@/stores/sidebar.js";
 import DarkModeSwitcher from "@/components/DarkModeSwitcher.vue";
 import {useI18n} from "vue-i18n";
+import BellComponent from "@/components/BellComponent.vue";
 
 defineProps({
     isTop: {
@@ -67,6 +68,10 @@ const userName = computed(() => aboutMe.value?.name)
 
         <Button @click="sidebar.toggle" icon="pi pi-align-justify" size="small" class="text-white ml-2 sm:ml-0 order-4"/>
         <DarkModeSwitcher class="sm:order-5"/>
+
+        <div class="sm:order-5 dark:text-surface-0 px-5 sm:flex items-center gap-5">
+            <BellComponent />
+        </div>
 
         <div class="hidden order-5 dark:text-surface-0 px-5 border-l border-surface-300 dark:border-surface-600 ml-5 sm:flex items-center gap-5">
             <div class="text-right">

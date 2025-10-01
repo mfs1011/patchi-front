@@ -195,6 +195,12 @@
       "accusative": "write off",
       "accusativeCapitalize": "Write off"
     },
+    "notification": {
+      "nominative": "notification",
+      "nominativeCapitalize": "Notification",
+      "accusative": "notification",
+      "accusativeCapitalize": "Notification"
+    },
     "roles": {
         "admin": "Administrator",
         "seller": "Seller",

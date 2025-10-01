@@ -180,8 +180,8 @@
     "orderInvoice": {
       "nominative": "buyurtma",
       "nominativeCapitalize": "Buyurtma",
-      "accusative": "buyurtma",
-      "accusativeCapitalize": "Buyurtma"
+      "accusative": "buyurtmani",
+      "accusativeCapitalize": "Buyurtmani"
     },
     "returnInvoice": {
       "nominative": "qaytarish",
@@ -192,8 +192,14 @@
     "writeOffInvoice": {
       "nominative": "chiqarish",
       "nominativeCapitalize": "Chiqarish",
-      "accusative": "chiqarish",
-      "accusativeCapitalize": "Chiqarish"
+      "accusative": "chiqarishni",
+      "accusativeCapitalize": "Chiqarishni"
+    },
+    "notification": {
+      "nominative": "eslatma",
+      "nominativeCapitalize": "Eslatma",
+      "accusative": "eslatmani",
+      "accusativeCapitalize": "Eslatmani"
     },
     "roles": {
         "admin": "Administrator",

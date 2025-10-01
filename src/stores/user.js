@@ -250,6 +250,25 @@ export const useUserStore = defineStore('user', () => {
         router.push("/login");
     };
 
+    const isAuthorized = () => {
+        const token = localStorage.getItem("patchi_accessToken");
+        if (!token) return false;
+
+        try {
+            // JWT ni decode qilamiz
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            const currentTime = Math.floor(Date.now() / 1000);
+
+            // Agar muddati tugagan bo‘lsa => false
+            return !(payload.exp && payload.exp < currentTime);
+
+
+        } catch (e) {
+            return false;
+        }
+    };
+
+
     return {
         pushUser,
         editUser,
@@ -261,6 +280,7 @@ export const useUserStore = defineStore('user', () => {
         refreshTokens,
         logout,
         fetchAboutMe,
+        isAuthorized,
         getAboutMe: computed(() => state.me),
         getAboutMeFromToken: computed(() => JSON.parse(atob(localStorage.getItem('patchi_accessToken').split('.')[1]))),
         getAccessToken: computed(() => localStorage.getItem('patchi_accessToken')),
