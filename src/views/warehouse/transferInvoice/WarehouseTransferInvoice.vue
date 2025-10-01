@@ -536,15 +536,16 @@ onMounted(async () => {
     <Section
         :section-name="t('cards.transferInvoice')"
         back-route-name="warehouse-transfer-invoices"
+        :withoutButtons="(isLoading || isAcceptedTransferInvoice)"
     >
         <template #buttons>
-            <div v-if="!isLoading && !isAcceptedTransferInvoice" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
+            <div class="flex sm:justify-end grow gap-2 sm:gap-4 sm:mt-4">
                 <Button
                     v-if="!editMode && isAdminOrCreatedBy(transferInvoiceStore.getTransferInvoice.createdBy.id)"
                     :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
                     icon="pi pi-pencil"
                     @click="editMode = true"
-                    class="px-2 sm:px-5 whitespace-nowrap"
+                    class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.edit')"
                     :loading="transferInvoiceIsSubmitting"
                 />
@@ -552,7 +553,7 @@ onMounted(async () => {
                     v-if="editMode"
                     :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
                     @click="cancelEditing"
-                    class="px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
+                    class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
                     :loading="transferInvoiceIsSubmitting"
                 />
@@ -561,41 +562,11 @@ onMounted(async () => {
                     :disabled="!isChanged"
                     icon="pi pi-save"
                     @click="onSubmitTransferInvoice"
-                    class="px-2 sm:px-5 whitespace-nowrap"
+                    class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
                     :loading="transferInvoiceIsSubmitting"
                 />
 
-            </div>
-            <div class="sm:hidden flex grow gap-2 sm:gap-4">
-                <Button
-                    v-if="!editMode"
-                    :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
-                    icon="pi pi-pencil"
-                    @click="editMode = true"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap"
-                    :label="t('buttons.edit')"
-                    :loading="transferInvoiceIsSubmitting"
-                />
-
-                <SecondaryButton
-                    v-if="editMode"
-                    :disabled="!!transferInvoiceErrors.transferInvoiceProducts"
-                    @click="cancelEditing"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
-                    :label="t('dialog.cancel')"
-                    :loading="transferInvoiceIsSubmitting"
-                />
-
-                <Button
-                    v-if="editMode"
-                    :disabled="!isChanged"
-                    icon="pi pi-save"
-                    @click="onSubmitTransferInvoice"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap"
-                    :label="t('buttons.save')"
-                    :loading="transferInvoiceIsSubmitting"
-                />
             </div>
         </template>
 

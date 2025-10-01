@@ -509,15 +509,16 @@ watch([() => kit.value], async () => {
     <Section
         :section-name="t('cards.orderInvoice')"
         back-route-name="warehouse-order-invoices"
+        :withoutButtons="isLoading"
     >
         <template #buttons>
-            <div v-if="!isLoading && !isAcceptedOrderInvoice" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
+            <div v-if="!isLoading && !isAcceptedOrderInvoice" class="flex sm:justify-end grow gap-2 sm:gap-4 sm:mt-4">
                 <Button
                     v-if="!editMode && isAdminOrCreatedBy(orderInvoiceStore.getOrderInvoice.createdBy.id)"
                     :disabled="!!orderInvoiceErrors.orderInvoiceProducts"
                     icon="pi pi-pencil"
                     @click="editMode = true"
-                    class="px-2 sm:px-5 whitespace-nowrap"
+                    class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.edit')"
                     :loading="orderInvoiceIsSubmitting"
                 />
@@ -525,7 +526,7 @@ watch([() => kit.value], async () => {
                     v-if="editMode"
                     :disabled="!!orderInvoiceErrors.orderInvoiceProducts"
                     @click="cancelEditing"
-                    class="px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
+                    class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
                     :label="t('dialog.cancel')"
                     :loading="orderInvoiceIsSubmitting"
                 />
@@ -534,49 +535,19 @@ watch([() => kit.value], async () => {
                     :disabled="!isChanged && !isPayment"
                     icon="pi pi-save"
                     @click="onSubmitOrderInvoice"
-                    class="px-2 sm:px-5 whitespace-nowrap"
+                    class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.save')"
                     :loading="orderInvoiceIsSubmitting"
                 />
             </div>
-            <div v-if="!isLoading && isAcceptedOrderInvoice" class="hidden sm:flex grow gap-2 sm:gap-4 justify-end mt-4">
+            <div v-if="!isLoading && isAcceptedOrderInvoice" class="flex sm:justify-end grow gap-2 sm:gap-4 sm:mt-4">
                 <Button
                     @click="router.push({
                         name: 'warehouse-add-return-invoices',
                         params: { id: orderInvoiceStore.getOrderInvoice.id }
                     })"
-                    class="px-2 sm:px-5 whitespace-nowrap"
+                    class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.newReturnInvoice')"
-                    :loading="orderInvoiceIsSubmitting"
-                />
-            </div>
-            <div class="sm:hidden flex grow gap-2 sm:gap-4">
-                <Button
-                    v-if="!editMode"
-                    :disabled="!!orderInvoiceErrors.orderInvoiceProducts"
-                    icon="pi pi-pencil"
-                    @click="editMode = true"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap"
-                    :label="t('buttons.edit')"
-                    :loading="orderInvoiceIsSubmitting"
-                />
-
-                <SecondaryButton
-                    v-if="editMode"
-                    :disabled="!!orderInvoiceErrors.orderInvoiceProducts"
-                    @click="cancelEditing"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap bg-surface-0! dark:bg-surface-800!"
-                    :label="t('dialog.cancel')"
-                    :loading="orderInvoiceIsSubmitting"
-                />
-
-                <Button
-                    v-if="editMode"
-                    :disabled="!isChanged && !isPayment"
-                    icon="pi pi-save"
-                    @click="onSubmitOrderInvoice"
-                    class="w-full px-2 sm:px-5 whitespace-nowrap"
-                    :label="t('buttons.save')"
                     :loading="orderInvoiceIsSubmitting"
                 />
             </div>
