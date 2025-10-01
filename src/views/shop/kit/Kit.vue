@@ -441,12 +441,6 @@ onMounted(async () => {
                         pt:footer="border-none dark:bg-surface-800"
                         pt:root="border border-surface-300 dark:border-surface-600/50"
                     >
-                        <Column field="id" :header="t('labels.id')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.id }}</p>
-                            </template>
-                        </Column>
                         <Column field="product" :header="t('labels.product')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
