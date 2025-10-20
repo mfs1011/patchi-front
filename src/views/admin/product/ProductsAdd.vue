@@ -44,6 +44,11 @@ const items = computed(() => [{ label: t('cards.products'), route: { name: 'prod
 const FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp'];
 
+const excludeOptions = [
+    { label: 'exclude', value: true },
+    { label: 'include', value: false }
+]
+
 const schema = computed(() => yup.object({
     qr: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     code: yup.string().required(t('errorMessages.codeRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
@@ -81,6 +86,7 @@ const { value: wholesalePrice } = useField('wholesalePrice');
 const { value: retailPrice } = useField('retailPrice');
 const { value: minQty } = useField('minQty');
 const { value: photo } = useField('photo' ); // null
+const { value: exclude } = useField('exclude');
 
 const setPhoto = event => {
     photo.value = event.target.files[0]
@@ -106,6 +112,10 @@ const onSubmit = handleSubmit(async values => {
 
     if (assembly.value) {
         payload.assembly = `/api/assemblies/${assembly.value}`
+    }
+
+    if (exclude.value) {
+        payload.exclude = values.exclude
     }
 
     try {
@@ -307,6 +317,16 @@ onMounted(async () => {
                             <Message class="min:h-5" size="small" severity="error" variant="simple">{{ errors.photo }}</Message>
                         </label>
 
+                        <div>
+                            <p class="block">...</p>
+                            <Select
+                                v-model="exclude"
+                                :options="excludeOptions"
+                                option-label="label"
+                                option-value="value"
+                                pt:root="w-full dark:bg-surface-700"
+                            />
+                        </div>
 
                         <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
                             <SecondaryButton type="button" :label="t('dialog.clear')" @click="reset" />

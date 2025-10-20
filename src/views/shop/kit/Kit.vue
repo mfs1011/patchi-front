@@ -492,7 +492,7 @@ onMounted(async () => {
                         <Column field="exclude" header="...">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.exclude ? 'exclude': 'include' }}</p>
+                                <p v-else>{{ data.product.exclude ? 'exclude': 'include' }}</p>
                             </template>
                         </Column>
                         <template #footer>

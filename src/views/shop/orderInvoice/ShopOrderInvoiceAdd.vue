@@ -25,7 +25,7 @@ import InputText from "@/volt/InputText.vue";
 import useDebouncedRef from "@/composables/useDebouncedRef.js";
 import {useAssemblyStore} from "@/stores/assembly.js";
 import {useCategoryStore} from "@/stores/category.js";
-import {useOrderInvoice} from "@/views/warehouse/orderInvoice/useOrderInvoice.js";
+import {useShopOrderInvoice} from "@/views/shop/orderInvoice/useShopOrderInvoice.js";
 import {useOrderInvoiceStore} from "@/stores/orderInvoice.js";
 import {useRouter} from "vue-router";
 import {usePaymentStore} from "@/stores/payment.js";
@@ -444,7 +444,7 @@ const {
     removeProduct,
     addKit,
     removeKit
-} = useOrderInvoice();
+} = useShopOrderInvoice();
 
 </script>
 
@@ -578,7 +578,7 @@ const {
                                                     showButtons
                                                     v-model.number="item.api.price"
                                                     class="max-w-24!"
-                                                    :min="item.ui.wholesalePrice"
+                                                    :min="item.ui.retailPrice"
                                                     size="small"
                                                     :minFractionDigits="1"
                                                     :maxFractionDigits="2"
@@ -621,7 +621,7 @@ const {
                                                     showButtons
                                                     v-model.number="item.api.price"
                                                     class="max-w-24!"
-                                                    :min="item.ui.wholesalePrice"
+                                                    :min="item.ui.retailPrice"
                                                     size="small"
                                                     :minFractionDigits="1"
                                                     :maxFractionDigits="2"
@@ -879,7 +879,7 @@ const {
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.price') }}:</p>
-                                                                <p class="font-semibold">{{ formatCurrency(product.wholesalePrice) }}$</p>
+                                                                <p class="font-semibold">{{ formatCurrency(product.retailPrice) }}$</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -937,7 +937,7 @@ const {
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.price') }}:</p>
-                                                                <p class="font-semibold">{{ formatCurrency(kit.wholesalePrice) }}$</p>
+                                                                <p class="font-semibold">{{ formatCurrency(kit.retailPrice) }}$</p>
                                                             </div>
                                                         </div>
                                                     </div>

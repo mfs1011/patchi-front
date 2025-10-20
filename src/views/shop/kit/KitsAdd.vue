@@ -76,11 +76,6 @@ const isChanged = computed(() => (
 const FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp'];
 
-const excludeOptions = [
-    { label: 'exclude', value: true },
-    { label: 'include', value: false }
-]
-
 const kitInfoSchema = computed(() => yup.object({
     qr: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     code: yup.string().required(t('errorMessages.codeRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
@@ -132,9 +127,7 @@ const {
     ...productFormCtx
 } = useForm({
     validationSchema: productSchema,
-    initialValues: {
-        exclude: false
-    }
+    initialValues: {}
 })
 
 const { value: seller } = useField('seller', undefined, { form: kitFormCtx });
@@ -151,7 +144,6 @@ const { value: photo } = useField('photo', undefined, { form: kitFormCtx } ); //
 const { value: kitProducts } = useField('kitProducts', undefined, { validateOnMount: true, form: kitFormCtx })
 const { value: product } = useField('product', undefined, { validateOnValueUpdate: false, form: productFormCtx });
 const { value: qty } = useField('qty', undefined, { form: productFormCtx });
-const { value: exclude } = useField('exclude', undefined, { form: productFormCtx });
 
 const sumPriceOfKitProducts = computed(() => {
     return kitProducts.value.length === 0 ? 0
@@ -173,8 +165,7 @@ const onSubmitKit = kitHandleSubmit(async values => {
         kitProducts: values.kitProducts.map(kitProduct => {
             const obj = {
                 product: `/api/products/${kitProduct.product.id}`,
-                qty: kitProduct.qty,
-                exclude: kitProduct.exclude
+                qty: kitProduct.qty
             };
 
             if (kitProduct.product.colorId) {
@@ -272,8 +263,7 @@ const clearProductForm = () => {
 const saveEditing = () => {
     const editedData = {
         product: product.value,
-        qty: qty.value,
-        exclude: exclude.value
+        qty: qty.value
     }
 
     kitProducts.value = kitProducts.value.map((kitProduct, index) => (
@@ -557,17 +547,6 @@ const confirmLeave = () => {
                                         :invalid="!!productErrors.qty"
                                     />
                                 </div>
-
-                                <div>
-                                    <p class="text-sm">...</p>
-                                    <Select
-                                        v-model="exclude"
-                                        :options="excludeOptions"
-                                        option-label="label"
-                                        option-value="value"
-                                        pt:root="w-full dark:bg-surface-700"
-                                    />
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -618,11 +597,6 @@ const confirmLeave = () => {
                         <Column field="qty" :header="t('labels.qty')">
                             <template #body="{ data }">
                                 <p>{{ data.qty }} {{t(`labels.${data.product.unit}`)}}</p>
-                            </template>
-                        </Column>
-                        <Column field="exclude" header="...">
-                            <template #body="{ data }">
-                                <p>{{ data.exclude ? 'exclude' : 'include' }}</p>
                             </template>
                         </Column>
                         <Column

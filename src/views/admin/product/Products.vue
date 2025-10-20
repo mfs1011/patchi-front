@@ -416,6 +416,12 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ formatCurrency(data.minQty) }} {{ t(`labels.${data.category.unit.name}`) }}</p>
                             </template>
                         </Column>
+                        <Column field="exclude" header="...">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <p v-else>{{ data.exclude ? 'exclude' : 'include' }}</p>
+                            </template>
+                        </Column>
                         <Column field="actions" :header="t('actions')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
