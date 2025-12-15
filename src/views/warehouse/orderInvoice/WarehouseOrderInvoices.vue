@@ -63,6 +63,9 @@ const home = computed(() => ({
 }));
 
 const items = computed(() => [{ label: t("cards.orderInvoices") }]);
+const isAdminAndWarehouseManager = computed(() => (
+    ['ROLE_ADMIN', 'ROLE_WAREHOUSE_MANAGER'].includes(userStore.getAboutMeFromToken?.role)
+))
 
 const clearFilters = () => {
     filters.value.location = null;
@@ -248,6 +251,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
+                    v-if="isAdminAndWarehouseManager"
                     @click="router.push({ name: 'warehouse-add-order-invoices' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >{{ t("buttons.newOrderInvoice") }}</Button>
@@ -261,6 +265,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
+                    v-if="isAdminAndWarehouseManager"
                     @click="router.push({ name: 'warehouse-add-order-invoices' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >{{ t("buttons.newOrderInvoice") }}</Button>

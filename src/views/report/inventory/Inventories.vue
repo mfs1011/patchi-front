@@ -22,6 +22,7 @@ import Select from "@/volt/Select.vue";
 import {useLocationStore} from "@/stores/location.js";
 import DatePicker from "@/volt/DatePicker.vue";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
+import {useUserStore} from "@/stores/user.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -44,6 +45,7 @@ const statuses = computed(() => [
 
 const inventoryStore = useInventoryStore()
 const locationStore = useLocationStore()
+const userStore = useUserStore();
 
 // computed
 const home = computed(() => ({
@@ -215,6 +217,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
+                    v-if="userStore.getAboutMeFromToken?.role === 'ROLE_ADMIN'"
                     @click="router.push({ name: 'add-inventory' })"
                     class="px-2 sm:px-5 whitespace-nowrap"
                 >
@@ -230,6 +233,7 @@ onBeforeRouteLeave(() => {
                     :label="t('buttons.filters')"
                 />
                 <Button
+                    v-if="userStore.getAboutMeFromToken?.role === 'ROLE_ADMIN'"
                     @click="router.push({ name: 'add-inventory' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >

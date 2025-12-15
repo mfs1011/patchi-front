@@ -108,6 +108,7 @@ export const routes = [
                     {
                         path: 'transfer-invoices',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_WAREHOUSE_MANAGER", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -162,6 +163,7 @@ export const routes = [
                     {
                         path: 'return-invoices',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_WAREHOUSE_MANAGER", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -180,6 +182,7 @@ export const routes = [
                     {
                         path: 'write-off-invoices',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_WAREHOUSE_MANAGER", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -258,6 +261,7 @@ export const routes = [
                     {
                         path: 'transfer-invoices',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_SELLER", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -312,6 +316,7 @@ export const routes = [
                     {
                         path: 'return-invoices',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_WAREHOUSE_MANAGER", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -333,7 +338,7 @@ export const routes = [
                 path: '/administration',
                 meta: { requiresAuth: true, roles: []},
                 component: BlankLayout,
-                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_PARTNER"]),
+                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                 children: [
                     {
                         path: '',
@@ -688,6 +693,7 @@ export const routes = [
                     },
                     {
                         path: 'inventories',
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -712,7 +718,8 @@ export const routes = [
                     {
                         path: 'seller_kpi',
                         name: 'seller_kpi',
-                        component: () => import('@/views/report/kpi/SellersKpi.vue')
+                        component: () => import('@/views/report/kpi/SellersKpi.vue'),
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                     },
                     {
                         path: 'abc',
@@ -722,12 +729,14 @@ export const routes = [
                     {
                         path: 'residual',
                         name: 'residual',
-                        component: () => import('@/views/report/residual/Residual.vue')
+                        component: () => import('@/views/report/residual/Residual.vue'),
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                     },
                     {
                         path: 'franchise_fee',
                         name: 'franchise_fee',
-                        component: () => import('@/views/report/franchiseFee/FranchiseFee.vue')
+                        component: () => import('@/views/report/franchiseFee/FranchiseFee.vue'),
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                     },
                 ]
             },
@@ -736,7 +745,7 @@ export const routes = [
                 name: 'logs',
                 meta: { requiresAuth: true, roles: []},
                 component: () => import('@/views/Logs.vue'),
-                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR", "ROLE_PARTNER"]),
+                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
             },
         ]
     },
