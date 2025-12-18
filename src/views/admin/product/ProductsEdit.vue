@@ -380,8 +380,6 @@ const confirmLeave = () => {
                                 v-if="!isLoading"
                                 v-model="retailPrice"
                                 fluid
-                                mode="currency"
-                                currency="USD"
                                 locale="en-US"
                                 showButtons
                                 :placeholder="t('placeholders.retailPrice')"

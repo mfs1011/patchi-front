@@ -319,6 +319,12 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ data.location.name }}</p>
                             </template>
                         </Column>
+                        <Column field="discount" :header="t('discount')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="sellerStore.getIsLoadingSellers"/>
+                                <p v-else>{{ data.discount }}%</p>
+                            </template>
+                        </Column>
                         <Column field="id" class="flex justify-end">
                             <template #header>
                                 <p class="font-semibold">{{ t('actions') }}</p>

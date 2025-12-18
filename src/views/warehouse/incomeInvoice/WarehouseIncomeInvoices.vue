@@ -167,8 +167,12 @@ const deleteIncomeInvoice = async () => {
 
         await incomeInvoiceStore.deleteIncomeInvoice(currentIncomeInvoiceId.value);
         toast.add({ severity: 'success', summary: t('toast.deleted', { name: t('incomeInvoice.nominativeCapitalize') }), life: 3000 })
-    } catch (err) {
-        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+    } catch (error) {
+        if (error.status === 412) {
+            toast.add({ severity: 'error', summary: t('toast.notEnough', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
     } finally {
         isDeleteLoading.value = false;
         deleteVisible.value = false;

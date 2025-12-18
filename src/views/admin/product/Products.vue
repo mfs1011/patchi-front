@@ -401,7 +401,7 @@ onBeforeRouteLeave(() => {
                         <Column field="retailPrice" :header="t('labels.retailPrice')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.retailPrice ? `${formatCurrency(data.retailPrice)}$` : '-' }}</p>
+                                <p v-else>{{ data.retailPrice ? `${formatCurrency(data.retailPrice)} ${t('soum')}` : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">

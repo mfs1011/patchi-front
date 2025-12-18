@@ -27,6 +27,8 @@
     "actions": "Actions",
     "active": "Active",
     "archive": "Archive",
+    "soum": "soum",
+    "discount": "Discount",
     "user": {
         "nominative": "user",
         "nominativeCapitalize": "User",
@@ -409,6 +411,7 @@
         "retailPrice": "Enter retail price...",
         "minQty": "Enter minimum quantity...",
         "kpiPercent": "Enter KPI percent...",
+        "discount": "Enter discount percent...",
         "date": "Enter date...",
         "notificationDay": "Enter number of days...",
         "qty": "Enter quantity...",

@@ -977,7 +977,8 @@ watch([() => kit.value], async () => {
 
                                 <DataTable
                                     v-else
-                                    :value="isLoading ? Array(10).fill({}) : editableData?.orderInvoiceKits"                                    scrollable
+                                    :value="isLoading ? Array(10).fill({}) : editableData?.orderInvoiceKits"
+                                    scrollable
                                     scroll-height="700px"
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
@@ -1047,7 +1048,8 @@ watch([() => kit.value], async () => {
 
                                 <DataTable
                                     v-else
-                                    :value="isLoading ? Array(10).fill({}) : editableData?.orderInvoicePrices"                                    scrollable
+                                    :value="isLoading ? Array(10).fill({}) : editableData?.orderInvoicePrices"
+                                    scrollable
                                     scroll-height="700px"
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"

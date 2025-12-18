@@ -16,6 +16,7 @@ import {useSellerStore} from "@/stores/seller.js";
 import {useRouter} from "vue-router";
 import {useLocationStore} from "@/stores/location.js";
 import {useToast} from "primevue/usetoast";
+import InputNumber from "@/volt/InputNumber.vue";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -47,12 +48,14 @@ const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
 const { value: name } = useField('name');
 const { value: telephone } = useField('telephone', undefined, { validateOnValueUpdate: false });
 const { value: shop } = useField('shop')
+const { value: discount } = useField('discount')
 
 const onSubmit = handleSubmit(async values => {
     const payload = {
         name: values.name,
         telephone: values.telephone.replace(/\D/g, ''),
-        location: `/api/locations/${values.shop}`
+        location: `/api/locations/${values.shop}`,
+        discount: values.discount
     };
 
     try {
@@ -142,6 +145,22 @@ onMounted(() => {
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.shop }}</Message>
                         </div>
+
+                        <label class="block">
+                            <span>{{ t('discount') }}</span>
+
+                            <InputNumber
+                                v-model="discount"
+                                fluid
+                                prefix="%"
+                                showButtons
+                                :placeholder="t('placeholders.discount')"
+                                size="large"
+                                :minFractionDigits="0"
+                                :maxFractionDigits="0"
+                                :max="100"
+                            />
+                        </label>
 
                         <div class="flex justify-end gap-2 mt-5">
                             <SecondaryButton type="button" :label="t('dialog.clear')" @click="resetForm" />

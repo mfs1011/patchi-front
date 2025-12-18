@@ -167,7 +167,7 @@ const onSubmitIncomeInvoice = incomeInvoiceHandleSubmit(async values => {
         if (error.status === 439) {
             toast.add({ severity: 'error', summary: t('toast.already_exists_error', { field: t('code.nominativeCapitalize') }), life: 3000 })
         } else if (error.status === 412) {
-            toast.add({ severity: 'error', summary: t('toast.notEnoughKit', { field: t('code.nominativeCapitalize') }), life: 3000 })
+            toast.add({ severity: 'error', summary: t('toast.notEnough', { field: t('code.nominativeCapitalize') }), life: 3000 })
         } else {
             toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
         }

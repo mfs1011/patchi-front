@@ -198,7 +198,7 @@ const addOrderInvoice = async (values) => {
 }
 
 const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
-    if (orderInvoiceProducts.value.length && totalPrice.value === totalPayments.value) {
+    if ((orderInvoiceProducts.value.length || orderInvoiceKits.value.length) && totalPrice.value === totalPayments.value) {
         await addOrderInvoice(values)
 
         const payload = {
@@ -549,7 +549,6 @@ const {
                                         :minDate="dateFrom"
                                         size="small"
                                     />
-
                                 </div>
                             </div>
                             </div>
