@@ -362,7 +362,9 @@ function editLocationQuantity(updatedLocationQuantity) {
 
     if (current.id) {
         payload.transferInvoiceProduct = current['@id']
-        const indexFromUpdatedData = updatedData.value.findIndex(data => data.transferInvoiceProduct['@id'] === payload.transferInvoiceProduct['@id'])
+        const indexFromUpdatedData = updatedData.value.findIndex(
+            data => data.transferInvoiceProduct === payload.transferInvoiceProduct
+        )
 
         if (indexFromUpdatedData !== -1) {
             updatedData.value[indexFromUpdatedData] = {
@@ -655,6 +657,7 @@ onMounted(async () => {
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <p class="text-sm">{{ t('labels.product') }}<span class="text-red-500"> *</span></p>
+                                        {{ locationQuantity }}
                                         <SearchSelect
                                             v-model="locationQuantity"
                                             :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: fromLocation.id, isZero: true})"
