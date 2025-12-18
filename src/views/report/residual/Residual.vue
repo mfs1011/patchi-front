@@ -314,7 +314,7 @@ watch(() => tabVal.value, () => {
                                     <Column field="retailPrice" :header="t('labels.retailPrice')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                            <p v-else>{{ formatCurrency(data.retailPrice) }}$</p>
+                                            <p v-else>{{ formatCurrency(data.retailPrice) }} {{ t('soum') }}</p>
                                         </template>
                                     </Column>
 

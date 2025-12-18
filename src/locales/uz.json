@@ -27,6 +27,8 @@
     "actions": "Amallar",
     "active": "Aktiv",
     "archive": "Arxiv",
+    "soum": "so'm",
+    "discount": "Chegirma",
     "user": {
         "nominative": "foydalanuvchi",
         "nominativeCapitalize": "Foydalanuvchi",
@@ -409,6 +411,7 @@
         "retailPrice": "Chakana narxni kiriting...",
         "minQty": "Eng kam miqdor kiriting...",
         "kpiPercent": "KPI foizni kiriting...",
+        "discount": "Chegirma foizni kiriting...",
         "date": "Sanani kiriting...",
         "notificationDay": "Kunni kiriting...",
         "qty": "Miqdor kiriting...",

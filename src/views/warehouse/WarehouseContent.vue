@@ -438,7 +438,7 @@ onBeforeRouteLeave(() => {
                                     <Column v-if="isAdmin" field="retailPrice" :header="t('labels.retailPrice')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
-                                            <p v-else>{{ formatCurrency(data.product.retailPrice) }}$</p>
+                                            <p v-else>{{ formatCurrency(data.product.retailPrice) }} {{ t('soum') }}</p>
                                         </template>
                                     </Column>
                                     <Column v-if="isAdmin" field="wholesalePrice" :header="t('labels.wholesalePrice')">
@@ -474,7 +474,7 @@ onBeforeRouteLeave(() => {
                                             <Column v-if="isAdmin">
                                                 <template #footer>
                                                     <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
-                                                    <p v-else class="font-semibold">{{ formatCurrency(locationQuantityStore.getLocationQuantities.totalRetailPrice) }}$</p>
+                                                    <p v-else class="font-semibold">{{ formatCurrency(locationQuantityStore.getLocationQuantities.totalRetailPrice) }} {{ t('soum') }}</p>
                                                 </template>
                                             </Column>
                                             <Column v-if="isAdmin">

@@ -33,10 +33,14 @@ import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {useUSDRateStore} from "@/stores/usdRate.js";
 import {useSellerStore} from "@/stores/seller.js";
 import {useShopOrderInvoiceValidation} from "@/views/shop/orderInvoice/useShopOrderInvoiceForm.js";
+import {useUserStore} from "@/stores/user.js";
+import DatePicker from "@/volt/DatePicker.vue";
+import {useInventoryStore} from "@/stores/inventory.js";
 
 const { t } = useI18n()
 const toast = useToast()
 const router = useRouter();
+const userStore = useUserStore();
 
 const {
     orderInvoiceHandleSubmit,
@@ -47,6 +51,7 @@ const {
     location,
     seller,
     customer,
+    createdAt,
     productHandleSubmit,
     productErrors,
     productIsSubmitting,
@@ -87,6 +92,7 @@ const assemblyStore = useAssemblyStore();
 const categoryStore = useCategoryStore();
 const paymentStore = usePaymentStore();
 const usdRateStore = useUSDRateStore();
+const inventoryStore = useInventoryStore();
 const tabVal = ref('products')
 const currentProductPage = ref(1)
 const currentKitPage = ref(1)
@@ -97,6 +103,7 @@ const availableProducts = ref([])
 const availableKits = ref([])
 const isEditing = ref(false)
 const currentPayment = ref({})
+const dateFrom = ref();
 
 const filters = ref({
     productCategory: null,
@@ -135,7 +142,7 @@ const totalPrice = computed(() => {
 
 const totalPayments = computed(() => {
     const total = orderInvoicePrices.value.reduce((sum, item) => {
-        const amount = item.payment.id === 1 ? item.amount : item.amount / usdRateStore.getUSDRate.rate
+        const amount = item.payment.id === 1 ? item.amount * usdRateStore.getUSDRate.rate : item.amount
         return sum + amount
     }, 0)
 
@@ -171,8 +178,12 @@ const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async values => {
 })
 
 const addOrderInvoice = async (values) => {
+    const date = new Date(values.createdAt);
+    date.setHours(date.getHours() + 5);
+
     const payload = {
         location: values.location['@id'],
+        createdAt: date,
         orderInvoiceProducts: orderInvoiceProducts.value.map(p => p.api),
         orderInvoiceKits: orderInvoiceKits.value.map(k => k.api),
     };
@@ -199,30 +210,43 @@ const addOrderInvoice = async (values) => {
 }
 
 const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
-    if (orderInvoiceProducts.value.length && totalPrice.value === totalPayments.value) {
-        await addOrderInvoice(values)
+    if (orderInvoiceProducts.value.length === 0 && orderInvoiceKits.value.length === 0) {
+        return
+    }
 
-        const payload = {
-            orderInvoicePrices: values.orderInvoicePrices.map(orderInvoicePrice => ({
-                payment: orderInvoicePrice.payment['@id'],
-                amount: orderInvoicePrice.amount,
-            }))
+    if (values.seller) {
+        const discount = Number(values.seller.discount)
+        const minAllowed = totalPrice.value - (totalPrice.value * discount / 100)
+        console.log(minAllowed)
+
+        if (totalPayments.value < minAllowed) {
+            return
         }
+    }
 
-        try {
-            await orderInvoiceStore.acceptOrderInvoice({id: orderInvoiceStore.getOrderInvoice.id, payment: payload})
-            paymentResetForm()
-            router.back()
+    await addOrderInvoice(values)
 
-        } catch (error) {
-            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
-        }
+    const payload = {
+        orderInvoicePrices: values.orderInvoicePrices.map(orderInvoicePrice => ({
+            payment: orderInvoicePrice.payment['@id'],
+            amount: orderInvoicePrice.amount,
+        }))
+    }
+
+    try {
+        await orderInvoiceStore.acceptOrderInvoice({id: orderInvoiceStore.getOrderInvoice.id, payment: payload})
+        paymentResetForm()
+        router.back()
+
+    } catch (error) {
+        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
     }
 })
 
 onMounted( () => {
     paymentStore.fetchPayments()
     usdRateStore.fetchLastUSDRate()
+    location.value = userStore.getAboutMe.locations[0]
 })
 
 watch([() => location.value], async () => {
@@ -231,9 +255,24 @@ watch([() => location.value], async () => {
     if (location.value) {
         orderInvoiceProducts.value = []
         orderInvoiceKits.value = []
+
+        await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
+
+        if (inventoryStore.getLastInventoryDateTo === null) {
+            dateFrom.value = null
+            createdAt.value = null
+        } else {
+            const date = new Date(inventoryStore.getLastInventoryDateTo);
+            date.setDate(date.getDate());
+            date.setMinutes(date.getMinutes() + 1);
+            dateFrom.value = date;
+            createdAt.value = date
+        }
     } else {
         availableProducts.value = [];
         availableKits.value = [];
+        dateFrom.value = null
+        createdAt.value = null
 
         return;
     }
@@ -486,7 +525,7 @@ const {
                         <template #content>
                             <div class="border-b border-surface-200 dark:border-surface-600/50">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-2 border-b border-surface-200 dark:border-surface-600/50 p-2 sm:p-4">
-                                <div>
+                                <div v-if="userStore.getAboutMeFromToken.role === 'ROLE_ADMIN'">
                                     <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
 
                                     <SearchSelect
@@ -504,7 +543,7 @@ const {
                                     />
                                 </div>
 
-                                <div v-if="location">
+                                <div v-if="location && userStore.getAboutMeFromToken.role === 'ROLE_SELLER'">
                                     <p class="text-sm">{{ t('labels.seller') }}</p>
 
                                     <SearchSelect
@@ -539,6 +578,23 @@ const {
                                         size="small"
                                     />
                                 </div>
+
+                                <div v-if="userStore.getAboutMeFromToken.role === 'ROLE_ADMIN'">
+                                    <p class="text-sm">{{ t('labels.createdAt') }}<span class="text-red-500"> *</span></p>
+
+                                    <DatePicker
+                                        v-model="createdAt"
+                                        dateFormat="dd.mm.yy"
+                                        showIcon
+                                        fluid
+                                        iconDisplay="input"
+                                        :placeholder="t('placeholders.date')"
+                                        show-button-bar
+                                        :invalid="!!orderInvoiceErrors.createdAt"
+                                        :minDate="dateFrom"
+                                        size="small"
+                                    />
+                                    </div>
                             </div>
                             </div>
 
@@ -574,19 +630,18 @@ const {
                                             <td>
                                                 <InputNumber
                                                     fluid
-                                                    prefix="$"
                                                     showButtons
                                                     v-model.number="item.api.price"
                                                     class="max-w-24!"
                                                     :min="item.ui.retailPrice"
                                                     size="small"
-                                                    :minFractionDigits="1"
-                                                    :maxFractionDigits="2"
+                                                    :minFractionDigits="0"
+                                                    :maxFractionDigits="0"
                                                     pt:incrementButton="w-6 ml-auto"
                                                     pt:decrementButton="w-6 ml-auto"
                                                 />
                                             </td>
-                                            <td class="text-sm">${{ formatCurrency(item.api.qty * item.api.price) }}</td>
+                                            <td class="text-sm">{{ formatCurrency(item.api.qty * item.api.price) }}</td>
                                             <td class="pr-4">
                                                 <Button
                                                     @click="removeProduct(item)"
@@ -644,7 +699,7 @@ const {
                                 </table>
 
                                 <div class="p-2 sm:p-4 border-t border-surface-200 dark:border-surface-600/50">
-                                    <p class="text-sm pb-4">{{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }}$</p>
+                                    <p class="text-sm pb-4">{{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }} {{ t('soum') }}</p>
                                     <Button
                                         size="small"
                                         @click="onSubmitOrderInvoice"
@@ -723,7 +778,7 @@ const {
                                     </div>
 
                                     <p class="text-sm pt-4">{{ t('labels.usdRate') }}: {{ formatCurrency(usdRateStore.getUSDRate.rate) }}</p>
-                                    <p class="text-sm pb-4">{{ t('labels.total') }}: {{ formatCurrency(totalPayments) }}$</p>
+                                    <p class="text-sm pb-4">{{ t('labels.total') }}: {{ formatCurrency(totalPayments) }} {{ t('soum') }}</p>
 
                                     <div class="flex justify-end">
                                         <Button
@@ -854,16 +909,8 @@ const {
                                                     <div class="flex justify-between w-full dark:text-surface-0">
                                                         <div class="w-full">
                                                             <div class="flex justify-between w-full">
-                                                                <p>{{ t('labels.title') }}:</p>
-                                                                <p class="font-semibold">{{ product.name }}</p>
-                                                            </div>
-                                                            <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.code') }}:</p>
                                                                 <p class="font-semibold">{{ product.code }}</p>
-                                                            </div>
-                                                            <div class="flex justify-between w-full">
-                                                                <p>{{ t('labels.color') }}:</p>
-                                                                <p class="font-semibold">{{ product.color || '-' }}</p>
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.category') }}:</p>
@@ -879,7 +926,7 @@ const {
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.price') }}:</p>
-                                                                <p class="font-semibold">{{ formatCurrency(product.retailPrice) }}$</p>
+                                                                <p class="font-semibold">{{ formatCurrency(product.retailPrice) }}</p>
                                                             </div>
                                                         </div>
                                                     </div>

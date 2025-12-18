@@ -594,7 +594,7 @@ const confirmLeave = () => {
                                     </Column>
                                     <Column field="retailPrice" :header="t('labels.retailPrice')">
                                         <template #body="{ data }">
-                                            <p>{{ (formatCurrency(data.locationQuantity?.product?.retailPrice) + '$') || '-' }}</p>
+                                            <p>{{ data.locationQuantity?.product?.retailPrice ? `${formatCurrency(data.locationQuantity?.product?.retailPrice)} ${t('soum')}` : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">

@@ -19,6 +19,7 @@ import Dialog from "@/volt/Dialog.vue";
 import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
 import {buildChangedPayload} from "@/helpers/payloadUtils.js";
+import InputNumber from "@/volt/InputNumber.vue";
 
 const toast = useToast();
 const { t } = useI18n()
@@ -58,6 +59,7 @@ const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
 const { value: name } = useField('name');
 const { value: telephone } = useField('telephone', undefined, { validateOnValueUpdate: false });
 const { value: location } = useField('location')
+const { value: discount } = useField('discount')
 
 const onSubmit = handleSubmit(async values => {
     const uriKeys = {
@@ -98,7 +100,8 @@ onMounted(async () => {
     initialValues.value = {
         name : sellerStore.getSeller.name,
         location : sellerStore.getSeller.location.id,
-        telephone: sellerStore.getSeller.telephone.replace(/\D/g, '')
+        telephone: sellerStore.getSeller.telephone.replace(/\D/g, ''),
+        discount: sellerStore.getSeller.discount
     }
 
     resetForm({
@@ -113,6 +116,7 @@ onMounted(async () => {
 const isChanged = computed(() => {
     if (name.value !== sellerStore.getSeller.name) return true
     if (telephone.value?.replace(/\D/g, '') !== sellerStore.getSeller.telephone) return true
+    if (discount.value !== sellerStore.getSeller.discount) return true
     return sellerStore.getSeller.location?.id !== location.value;
 })
 
@@ -211,6 +215,25 @@ const confirmLeave = () => {
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.location }}</Message>
                         </div>
+
+                        <label class="block">
+                            <span>{{ t('discount') }}</span><span class="text-red-500"> *</span>
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="25rem" v-if="isLoading"/>
+
+                            <InputNumber
+                                v-show="!isLoading"
+                                v-model="discount"
+                                fluid
+                                prefix="%"
+                                showButtons
+                                :placeholder="t('placeholders.discount')"
+                                size="large"
+                                :minFractionDigits="0"
+                                :maxFractionDigits="0"
+                                :max="100"
+                            />
+                        </label>
 
                         <div class="flex justify-end gap-2 mt-5">
                             <Skeleton height="2.7rem" width="6.5rem" v-if="isLoading"/>

@@ -807,7 +807,7 @@ onMounted(async () => {
                                     <Column field="retailPrice" :header="t('labels.retailPrice')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ (formatCurrency(data.locationQuantity?.product?.retailPrice) + '$') || '-' }}</p>
+                                            <p v-else>{{ data.locationQuantity?.product?.retailPrice ? `${formatCurrency(data.locationQuantity?.product?.retailPrice)} ${t('soum')}` : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">

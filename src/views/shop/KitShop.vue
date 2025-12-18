@@ -459,7 +459,7 @@ onMounted(async () => {
                         <Column field="retailPrice" :header="t('labels.retailPrice')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.product.retailPrice ? `${formatCurrency(data.product.retailPrice)}$` : '-' }}</p>
+                                <p v-else>{{ data.product.retailPrice ? `${formatCurrency(data.product.retailPrice)} ${t('soum')}` : '-' }}</p>
                             </template>
                         </Column>
                         <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
