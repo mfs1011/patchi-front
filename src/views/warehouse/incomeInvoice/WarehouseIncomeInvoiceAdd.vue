@@ -240,6 +240,10 @@ const saveEditing = async () => {
     isEditing.value = false
 }
 
+const reversedIncomeInvoiceProducts = computed(() => {
+    return [...incomeInvoiceProducts.value].reverse()
+})
+
 watch(location, async () => {
     if (location.value) {
         await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
@@ -545,12 +549,17 @@ const confirmLeave = () => {
             >
                 <template #content>
                     <DataTable
-                        :value="incomeInvoiceProducts"
+                        :value="reversedIncomeInvoiceProducts"
                         scrollable
                         scroll-height="700px"
                         pt:footer="border-none dark:bg-surface-800"
                         pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                     >
+                        <Column field="id" header="№">
+                            <template #body="{ index }">
+                                <p>{{ incomeInvoiceProducts.length - index }}</p>
+                            </template>
+                        </Column>
                         <Column field="product" :header="t('labels.product')">
                             <template #body="{ data }">
                                 <p>{{ data.product?.name }}</p>

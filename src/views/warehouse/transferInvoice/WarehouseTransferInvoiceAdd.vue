@@ -264,6 +264,14 @@ const saveEditingKit = async () => {
     isEditing.value = false
 }
 
+const reversedTransferInvoiceProducts = computed(() => {
+    return [...transferInvoiceProducts.value].reverse()
+})
+
+const reversedTransferInvoiceKits = computed(() => {
+    return [...transferInvoiceKits.value].reverse()
+})
+
 watch([() => fromLocation.value], async () => {
     if (fromLocation.value) {
         transferInvoiceProducts.value = []
@@ -538,7 +546,7 @@ const confirmLeave = () => {
 
                                 <DataTable
                                     v-else
-                                    :value="transferInvoiceProducts"
+                                    :value="reversedTransferInvoiceProducts"
                                     scrollable
                                     scroll-height="700px"
                                     pt:footer="border-none dark:bg-surface-800"
@@ -553,15 +561,20 @@ const confirmLeave = () => {
                                             <Column :header="t('actions')" :rowspan="2" :colspan="1" />
                                         </Row>
                                         <Row>
-                                            <Column field="kit" :header="t('labels.title')" />
+                                            <Column field="id" header="№" />
+                                            <Column field="title" :header="t('labels.title')" />
                                             <Column field="code" :header="t('labels.code')" />
-                                            <Column field="qr" :header="t('labels.color')" />
+                                            <Column field="color" :header="t('labels.color')" />
                                             <Column field="qr" :header="t('labels.qr')" />
-                                            <Column field="qr" :header="t('labels.costPrice')" />
-                                            <Column field="qr" :header="t('labels.wholesalePrice')" />
-                                            <Column field="qr" :header="t('labels.retailPrice')" />
+                                            <Column field="costPrice" :header="t('labels.costPrice')" />
+                                            <Column field="wholesalePrice" :header="t('labels.wholesalePrice')" />
                                         </Row>
                                     </ColumnGroup>
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ transferInvoiceProducts.length - index }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="product" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantity?.product?.name }}</p>
@@ -590,11 +603,6 @@ const confirmLeave = () => {
                                     <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
                                         <template #body="{ data }">
                                             <p>{{ (formatCurrency(data.locationQuantity?.product?.wholesalePrice) + '$') || '-' }}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
-                                        <template #body="{ data }">
-                                            <p>{{ data.locationQuantity?.product?.retailPrice ? `${formatCurrency(data.locationQuantity?.product?.retailPrice)} ${t('soum')}` : '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
@@ -646,7 +654,7 @@ const confirmLeave = () => {
 
                                 <DataTable
                                     v-else
-                                    :value="transferInvoiceKits"
+                                    :value="reversedTransferInvoiceKits"
                                     scrollable
                                     scroll-height="700px"
                                     pt:footer="border-none dark:bg-surface-800"
@@ -661,14 +669,19 @@ const confirmLeave = () => {
                                             <Column :header="t('actions')" :rowspan="2" :colspan="1" />
                                         </Row>
                                         <Row>
-                                            <Column field="kit" :header="t('labels.title')" />
+                                            <Column field="id" header="№" />
+                                            <Column field="title" :header="t('labels.title')" />
                                             <Column field="code" :header="t('labels.code')" />
                                             <Column field="qr" :header="t('labels.qr')" />
-                                            <Column field="qr" :header="t('labels.costPrice')" />
-                                            <Column field="qr" :header="t('labels.wholesalePrice')" />
-                                            <Column field="qr" :header="t('labels.retailPrice')" />
+                                            <Column field="costPrice" :header="t('labels.costPrice')" />
+                                            <Column field="wholesalePrice" :header="t('labels.wholesalePrice')" />
                                         </Row>
                                     </ColumnGroup>
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ transferInvoiceKits.length - index }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantityKit?.kit?.name }}</p>
@@ -692,11 +705,6 @@ const confirmLeave = () => {
                                     <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
                                         <template #body="{ data }">
                                             <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.wholesalePrice) + '$') || '-' }}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
-                                        <template #body="{ data }">
-                                            <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.retailPrice) + '$') || '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">
