@@ -563,7 +563,7 @@ onMounted(async () => {
                             <SearchSelect
                                 v-if="!isLoading"
                                 v-model="location"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query})"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.name"
