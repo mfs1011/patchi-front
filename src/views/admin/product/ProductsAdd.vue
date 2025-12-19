@@ -264,7 +264,7 @@ onMounted(async () => {
                         </div>
 
                         <div>
-                            <p>{{ t('labels.wholesalePrice') }}<span class="text-red-500"> *</span></p>
+                            <p>{{ t('priceInDollar') }}<span class="text-red-500"> *</span></p>
                             <InputNumber
                                 v-model="wholesalePrice"
                                 fluid
@@ -272,7 +272,7 @@ onMounted(async () => {
                                 currency="USD"
                                 locale="en-US"
                                 showButtons
-                                :placeholder="t('placeholders.wholesalePrice')"
+                                :placeholder="t('placeholders.price')"
                                 size="large"
                                 :minFractionDigits="1"
                                 :maxFractionDigits="2"
@@ -280,13 +280,13 @@ onMounted(async () => {
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.wholesalePrice }}</Message>
                         </div>
                         <div>
-                            <p>{{ t('labels.retailPrice') }}<span class="text-red-500"> *</span></p>
+                            <p>{{ t('priceInSoum') }}<span class="text-red-500"> *</span></p>
                             <InputNumber
                                 v-model="retailPrice"
                                 fluid
                                 locale="en-US"
                                 showButtons
-                                :placeholder="t('placeholders.retailPrice')"
+                                :placeholder="t('placeholders.price')"
                                 size="large"
                                 :minFractionDigits="1"
                                 :maxFractionDigits="2"

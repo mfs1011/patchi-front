@@ -567,7 +567,7 @@ const confirmLeave = () => {
                                             <Column field="color" :header="t('labels.color')" />
                                             <Column field="qr" :header="t('labels.qr')" />
                                             <Column field="costPrice" :header="t('labels.costPrice')" />
-                                            <Column field="wholesalePrice" :header="t('labels.wholesalePrice')" />
+                                            <Column field="wholesalePrice" :header="t('priceInDollar')" />
                                         </Row>
                                     </ColumnGroup>
                                     <Column field="id" header="№">
@@ -600,7 +600,7 @@ const confirmLeave = () => {
                                             <p>{{ (formatCurrency(data.locationQuantity?.product?.costPrice) + '$') || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                                    <Column field="wholesalePrice" :header="t('priceInDollar')">
                                         <template #body="{ data }">
                                             <p>{{ (formatCurrency(data.locationQuantity?.product?.wholesalePrice) + '$') || '-' }}</p>
                                         </template>
@@ -674,7 +674,7 @@ const confirmLeave = () => {
                                             <Column field="code" :header="t('labels.code')" />
                                             <Column field="qr" :header="t('labels.qr')" />
                                             <Column field="costPrice" :header="t('labels.costPrice')" />
-                                            <Column field="wholesalePrice" :header="t('labels.wholesalePrice')" />
+                                            <Column field="wholesalePrice" :header="t('priceInDollar')" />
                                         </Row>
                                     </ColumnGroup>
                                     <Column field="id" header="№">
@@ -702,7 +702,7 @@ const confirmLeave = () => {
                                             <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.costPrice) + '$') || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                                    <Column field="wholesalePrice" :header="t('priceInDollar')">
                                         <template #body="{ data }">
                                             <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.wholesalePrice) + '$') || '-' }}</p>
                                         </template>

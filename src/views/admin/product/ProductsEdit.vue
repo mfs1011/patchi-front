@@ -351,7 +351,7 @@ const confirmLeave = () => {
                         </div>
 
                         <div>
-                            <p>{{ t('labels.wholesalePrice') }}<span class="text-red-500"> *</span></p>
+                            <p>{{ t('priceInDollar') }}<span class="text-red-500"> *</span></p>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="3.1rem" width="22rem" v-if="isLoading"/>
 
@@ -363,7 +363,7 @@ const confirmLeave = () => {
                                 currency="USD"
                                 locale="en-US"
                                 showButtons
-                                :placeholder="t('placeholders.wholesalePrice')"
+                                :placeholder="t('placeholders.price')"
                                 size="large"
                                 :minFractionDigits="1"
                                 :maxFractionDigits="2"
@@ -372,7 +372,7 @@ const confirmLeave = () => {
                         </div>
 
                         <div>
-                            <p>{{ t('labels.retailPrice') }}<span class="text-red-500"> *</span></p>
+                            <p>{{ t('priceInSoum') }}<span class="text-red-500"> *</span></p>
                             <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="3.1rem" width="22rem" v-if="isLoading"/>
 
@@ -382,7 +382,7 @@ const confirmLeave = () => {
                                 fluid
                                 locale="en-US"
                                 showButtons
-                                :placeholder="t('placeholders.retailPrice')"
+                                :placeholder="t('placeholders.price')"
                                 size="large"
                                 :minFractionDigits="1"
                                 :maxFractionDigits="2"

@@ -812,7 +812,7 @@ onMounted(async () => {
                                             <p v-else>{{ data.locationQuantity?.product?.qr || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                                    <Column field="wholesalePrice" :header="t('priceInDollar')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ (formatCurrency(data.locationQuantity?.product?.wholesalePrice) + '$') || '-' }}</p>
@@ -890,7 +890,7 @@ onMounted(async () => {
                                             <p>{{ data.locationQuantityKit?.kit?.qr || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                                    <Column field="wholesalePrice" :header="t('priceInDollar')">
                                         <template #body="{ data }">
                                             <p>{{ (formatCurrency(data.locationQuantityKit?.kit?.wholesalePrice) + '$') || '-' }}</p>
                                         </template>

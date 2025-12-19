@@ -29,6 +29,8 @@
     "archive": "Архив",
     "soum": "сум",
     "discount": "Скидка",
+    "priceInSoum": "Цена в сумах",
+    "priceInDollar": "Цена в долларах",
     "user": {
         "nominative": "пользователь",
         "nominativeCapitalize": "Пользователь",

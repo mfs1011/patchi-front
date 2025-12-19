@@ -29,6 +29,8 @@
     "archive": "Arxiv",
     "soum": "so'm",
     "discount": "Chegirma",
+    "priceInSoum": "So'mdagi narxi",
+    "priceInDollar": "Dollardagi narxi",
     "user": {
         "nominative": "foydalanuvchi",
         "nominativeCapitalize": "Foydalanuvchi",

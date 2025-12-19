@@ -29,6 +29,8 @@
     "archive": "Archive",
     "soum": "soum",
     "discount": "Discount",
+    "priceInSoum": "Price in soums",
+    "priceInDollar": "Price in dollars",
     "user": {
         "nominative": "user",
         "nominativeCapitalize": "User",
