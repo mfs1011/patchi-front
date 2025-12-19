@@ -632,14 +632,13 @@ onMounted(async () => {
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         <div>
                             <p class="text-sm">{{ t('labels.product') }}<span class="text-red-500"> *</span></p>
-                            {{product}}
                             <SearchSelect
                                 v-model="product"
                                 :fetchFn="productStore.fetchProducts"
                                 :options="productStore.getProducts.models"
                                 :option-label="opt => `${opt?.name} | ${opt?.code}`"
-                                :option-value="opt => opt.id"
-                                :return-value="opt => opt.id"
+                                :option-value="opt => `${opt?.name} | ${opt?.code}`"
+                                :return-value="opt => opt"
                                 :search-value="opt => opt.name"
                                 :placeholder="t('placeholders.select.product')"
                                 :loading="productStore.getIsLoadingProducts"

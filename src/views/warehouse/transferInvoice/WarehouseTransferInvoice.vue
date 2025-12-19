@@ -433,7 +433,9 @@ function editLocationQuantityKit(updatedLocationQuantityKit) {
 
     if (current.id) {
         payload.transferInvoiceKit = current['@id']
-        const indexFromUpdatedData = updatedData.value.findIndex(data => data.transferInvoiceKit['@id'] === payload.transferInvoiceKit['@id'])
+        const indexFromUpdatedData = updatedData.value.findIndex(
+            data => data.transferInvoiceKit === payload.transferInvoiceKit
+        )
 
         if (indexFromUpdatedData !== -1) {
             updatedKitData.value[indexFromUpdatedData] = {
@@ -600,7 +602,7 @@ onMounted(async () => {
                             <SearchSelect
                                 v-if="!isLoading"
                                 v-model="fromLocation"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query })"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
@@ -657,7 +659,6 @@ onMounted(async () => {
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <p class="text-sm">{{ t('labels.product') }}<span class="text-red-500"> *</span></p>
-                                        {{ locationQuantity }}
                                         <SearchSelect
                                             v-model="locationQuantity"
                                             :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: fromLocation.id, isZero: true})"
@@ -829,12 +830,12 @@ onMounted(async () => {
                                             <div class="flex justify-end w-full">
                                                 <Skeleton height="2rem" v-if="isLoading"/>
                                                 <div v-else class="flex items-center gap-2">
-                                                    <Button
-                                                        @click="editLocationQuantityAction(data, index)"
-                                                        icon="pi pi-pencil"
-                                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
-                                                        size="small"
-                                                    />
+<!--                                                    <Button-->
+<!--                                                        @click="editLocationQuantityAction(data, index)"-->
+<!--                                                        icon="pi pi-pencil"-->
+<!--                                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"-->
+<!--                                                        size="small"-->
+<!--                                                    />-->
                                                     <Button
                                                         @click="deleteLocationQuantityAction(data)"
                                                         icon="pi pi-trash"
@@ -898,12 +899,12 @@ onMounted(async () => {
                                         <template #body="{ data, index }">
                                             <div class="flex justify-end w-full">
                                                 <div class="flex items-center gap-2">
-                                                    <Button
-                                                        @click="editLocationQuantityKitAction(data, index)"
-                                                        icon="pi pi-pencil"
-                                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
-                                                        size="small"
-                                                    />
+<!--                                                    <Button-->
+<!--                                                        @click="editLocationQuantityKitAction(data, index)"-->
+<!--                                                        icon="pi pi-pencil"-->
+<!--                                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"-->
+<!--                                                        size="small"-->
+<!--                                                    />-->
                                                     <Button
                                                         @click="deleteLocationQuantityKitAction(data)"
                                                         icon="pi pi-trash"

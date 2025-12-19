@@ -363,7 +363,9 @@ function editLocationQuantity(updatedLocationQuantity) {
 
     if (current.id) {
         payload.transferInvoiceProduct = current['@id']
-        const indexFromUpdatedData = updatedData.value.findIndex(data => data.transferInvoiceProduct['@id'] === payload.transferInvoiceProduct['@id'])
+        const indexFromUpdatedData = updatedData.value.findIndex(
+            data => data.transferInvoiceProduct === payload.transferInvoiceProduct
+        )
 
         if (indexFromUpdatedData !== -1) {
             updatedData.value[indexFromUpdatedData] = {
@@ -432,7 +434,9 @@ function editLocationQuantityKit(updatedLocationQuantityKit) {
 
     if (current.id) {
         payload.transferInvoiceKit = current['@id']
-        const indexFromUpdatedData = updatedData.value.findIndex(data => data.transferInvoiceKit['@id'] === payload.transferInvoiceKit['@id'])
+        const indexFromUpdatedData = updatedData.value.findIndex(
+            data => data.transferInvoiceKit === payload.transferInvoiceKit
+        )
 
         if (indexFromUpdatedData !== -1) {
             updatedKitData.value[indexFromUpdatedData] = {
@@ -599,7 +603,7 @@ onMounted(async () => {
                             <SearchSelect
                                 v-if="!isLoading"
                                 v-model="fromLocation"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: false })"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query })"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
