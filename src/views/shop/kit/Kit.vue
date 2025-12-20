@@ -373,7 +373,7 @@ onMounted(async () => {
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.wholesalePrice') }}<span class="text-red-500"> *</span></p>
+                            <p class="text-sm">{{ t('priceInDollar') }}<span class="text-red-500"> *</span></p>
                             <InputNumber
                                 v-model="wholesalePrice"
                                 fluid
@@ -381,7 +381,7 @@ onMounted(async () => {
                                 currency="USD"
                                 locale="en-US"
                                 showButtons
-                                :placeholder="t('placeholders.wholesalePrice')"
+                                :placeholder="t('placeholders.price')"
                                 :minFractionDigits="1"
                                 :maxFractionDigits="2"
                                 :invalid="!!kitErrors.wholesalePrice"
@@ -390,15 +390,13 @@ onMounted(async () => {
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.retailPrice') }}<span class="text-red-500"> *</span></p>
+                            <p class="text-sm">{{ t('priceInSoum') }}<span class="text-red-500"> *</span></p>
                             <InputNumber
                                 v-model="retailPrice"
                                 fluid
-                                mode="currency"
-                                currency="USD"
                                 locale="en-US"
                                 showButtons
-                                :placeholder="t('placeholders.retailPrice')"
+                                :placeholder="t('placeholders.price')"
                                 :minFractionDigits="1"
                                 :maxFractionDigits="2"
                                 :invalid="!!kitErrors.retailPrice"
@@ -477,13 +475,13 @@ onMounted(async () => {
                                 <p v-else>{{ formatCurrency(data.qty) }} {{ t(`labels.${data.product.category.unit.name}`) }}</p>
                             </template>
                         </Column>
-                        <Column field="retailPrice" :header="t('labels.retailPrice')">
+                        <Column field="retailPrice" :header="t('priceInSoum')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ data.product.retailPrice ? `${formatCurrency(data.product.retailPrice)} ${t('soum')}` : '-' }}</p>
                             </template>
                         </Column>
-                        <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                        <Column field="wholesalePrice" :header="t('priceInDollar')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ data.product.wholesalePrice ? `${formatCurrency(data.product.wholesalePrice)}$` : '-' }}</p>
@@ -496,7 +494,7 @@ onMounted(async () => {
                             </template>
                         </Column>
                         <template #footer>
-                            <div class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(sumPriceOfKitProducts) }} $</div>
+                            <div class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(sumPriceOfKitProducts) }} {{ t('soum') }}</div>
                         </template>
                     </DataTable>
                 </template>

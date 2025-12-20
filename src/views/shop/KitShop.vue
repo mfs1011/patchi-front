@@ -456,13 +456,13 @@ onMounted(async () => {
                                 <p v-else>{{ formatCurrency(data.qty) }} {{ t(`labels.${data.product.category.unit.name}`) }}</p>
                             </template>
                         </Column>
-                        <Column field="retailPrice" :header="t('labels.retailPrice')">
+                        <Column field="retailPrice" :header="t('priceInSoum')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ data.product.retailPrice ? `${formatCurrency(data.product.retailPrice)} ${t('soum')}` : '-' }}</p>
                             </template>
                         </Column>
-                        <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                        <Column field="wholesalePrice" :header="t('priceInDollar')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ data.product.wholesalePrice ? `${formatCurrency(data.product.wholesalePrice)}$` : '-' }}</p>

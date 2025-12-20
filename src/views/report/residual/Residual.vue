@@ -305,13 +305,13 @@ watch(() => tabVal.value, () => {
                                             <p v-else>{{ formatCurrency(data.costPrice) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                                    <Column field="wholesalePrice" :header="t('priceInDollar')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
                                             <p v-else>{{ formatCurrency(data.wholesalePrice) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
+                                    <Column field="retailPrice" :header="t('priceInSoum')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
                                             <p v-else>{{ formatCurrency(data.retailPrice) }} {{ t('soum') }}</p>
@@ -381,16 +381,16 @@ watch(() => tabVal.value, () => {
                                             <p v-else>{{ formatCurrency(data.costPrice) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column field="wholesalePrice" :header="t('labels.wholesalePrice')">
+                                    <Column field="wholesalePrice" :header="t('priceInDollar')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                             <p v-else>{{ formatCurrency(data.wholesalePrice) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column field="retailPrice" :header="t('labels.retailPrice')">
+                                    <Column field="retailPrice" :header="t('priceInSoum')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
-                                            <p v-else>{{ formatCurrency(data.retailPrice) }}$</p>
+                                            <p v-else>{{ formatCurrency(data.retailPrice) }} {{ t('soum') }}</p>
                                         </template>
                                     </Column>
                                     <Column field="id" style="width: 60px;">  <!-- Fixed width for the column -->

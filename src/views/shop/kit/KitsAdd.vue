@@ -444,7 +444,7 @@ const confirmLeave = () => {
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.wholesalePrice') }}<span class="text-red-500"> *</span></p>
+                            <p class="text-sm">{{ t('priceInDollar') }}<span class="text-red-500"> *</span></p>
                             <InputNumber
                                 v-model="wholesalePrice"
                                 fluid
@@ -452,7 +452,7 @@ const confirmLeave = () => {
                                 currency="USD"
                                 locale="en-US"
                                 showButtons
-                                :placeholder="t('placeholders.wholesalePrice')"
+                                :placeholder="t('placeholders.price')"
                                 :minFractionDigits="1"
                                 :maxFractionDigits="2"
                                 :invalid="!!kitErrors.wholesalePrice"
@@ -460,15 +460,13 @@ const confirmLeave = () => {
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.retailPrice') }}<span class="text-red-500"> *</span></p>
+                            <p class="text-sm">{{ t('priceInSoum') }}<span class="text-red-500"> *</span></p>
                             <InputNumber
                                 v-model="retailPrice"
                                 fluid
-                                mode="currency"
-                                currency="USD"
                                 locale="en-US"
                                 showButtons
-                                :placeholder="t('placeholders.retailPrice')"
+                                :placeholder="t('placeholders.price')"
                                 :minFractionDigits="1"
                                 :maxFractionDigits="2"
                                 :invalid="!!kitErrors.retailPrice"
@@ -589,9 +587,9 @@ const confirmLeave = () => {
                                 <p>{{ data.product?.color }}</p>
                             </template>
                         </Column>
-                        <Column field="retailPrice" :header="t('labels.retailPrice')">
+                        <Column field="retailPrice" :header="t('priceInSoum')">
                             <template #body="{ data }">
-                                <p>{{ data.product?.retailPrice }}$</p>
+                                <p>{{ formatCurrency(data.product?.retailPrice) }} {{t('soum')}}</p>
                             </template>
                         </Column>
                         <Column field="qty" :header="t('labels.qty')">

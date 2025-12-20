@@ -967,15 +967,11 @@ const {
                                                     <div class="flex justify-between w-full dark:text-surface-0">
                                                         <div class="w-full">
                                                             <div class="flex justify-between w-full">
-                                                                <p>{{ t('labels.title') }}:</p>
-                                                                <p class="font-semibold">{{ kit.name }}</p>
-                                                            </div>
-                                                            <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.code') }}:</p>
                                                                 <p class="font-semibold">{{ kit.code }}</p>
                                                             </div>
                                                             <div class="flex justify-between w-full">
-                                                                <p>{{ t('labels.Assembly') }}:</p>
+                                                                <p>{{ t('labels.collection') }}:</p>
                                                                 <p class="font-semibold">{{ kit.assembly || '-' }}</p>
                                                             </div>
                                                             <div class="flex justify-between w-full">
@@ -984,7 +980,7 @@ const {
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.price') }}:</p>
-                                                                <p class="font-semibold">{{ formatCurrency(kit.retailPrice) }}$</p>
+                                                                <p class="font-semibold">{{ formatCurrency(kit.retailPrice) }}</p>
                                                             </div>
                                                         </div>
                                                     </div>
