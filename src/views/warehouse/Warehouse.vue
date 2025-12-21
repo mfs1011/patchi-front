@@ -23,6 +23,10 @@ const cards = computed(() => {
             'warehouse-return-invoices',
             'warehouse-write-off-invoices',
         ],
+
+        ROLE_WAREHOUSE_MANAGER: [
+            'warehouse-write-off-invoices',
+        ],
     };
 
     const restrictedRoutes = roleRestrictions[userStore.getAboutMeFromToken.role] ?? [];

@@ -182,7 +182,7 @@ export const routes = [
                     {
                         path: 'write-off-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_WAREHOUSE_MANAGER", "ROLE_DIRECTOR"]),
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -316,7 +316,7 @@ export const routes = [
                     {
                         path: 'return-invoices',
                         meta: { requiresAuth: true, roles: []},
-                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_WAREHOUSE_MANAGER", "ROLE_DIRECTOR"]),
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_SELLER", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',

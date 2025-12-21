@@ -256,7 +256,9 @@ function editProduct(updatedProduct) {
 
     if (current.id) {
         payload.returnInvoiceProduct = current['@id']
-        const indexFromUpdatedData = updatedData.value.findIndex(data => data.returnInvoiceProduct['@id'] === payload.returnInvoiceProduct['@id'])
+        const indexFromUpdatedData = updatedData.value.findIndex(
+            data => data.returnInvoiceProduct === payload.returnInvoiceProduct
+        )
 
         if (indexFromUpdatedData !== -1) {
             updatedData.value[indexFromUpdatedData] = {
