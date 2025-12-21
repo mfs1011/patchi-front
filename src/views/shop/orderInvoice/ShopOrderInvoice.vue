@@ -15,7 +15,7 @@ import Button from "@/volt/Button.vue";
 import NoData from "@/components/UI/NoData.vue";
 import {useI18n} from "vue-i18n";
 import {useLocationStore} from "@/stores/location.js";
-import {formatCurrency} from "@/helpers/numberFormat.js";
+import {formatCurrency, formatDateTimeLocal} from "@/helpers/numberFormat.js";
 import {useToast} from "primevue/usetoast";
 import Tabs from "@/volt/Tabs.vue";
 import TabPanels from "@/volt/TabPanels.vue";
@@ -88,6 +88,9 @@ const {
 
 const apiData = ref(null);
 const editableData = ref(null);
+const currentProductIndex = ref(null);
+const currentKitIndex = ref(null);
+const currentPaymentIndex = ref(null);
 const currentDeleteProduct = ref(null);
 const currentDeleteKit = ref(null);
 const currentDeletePayment = ref(null);
@@ -97,6 +100,9 @@ const updatedData = ref([]);
 const deletedKitData = ref([]);
 const createdKitData = ref([]);
 const updatedKitData = ref([]);
+const deletedPriceData = ref([]);
+const createdPriceData = ref([]);
+const updatedPriceData = ref([]);
 const editMode = ref(false);
 const isLoading = ref(true);
 const deleteProductVisible = ref(false);
@@ -139,19 +145,41 @@ const isChanged = computed(() => (
     createdKitData.value.length ||
     updatedKitData.value.length ||
     deletedKitData.value.length ||
+    createdPriceData.value.length ||
+    updatedPriceData.value.length ||
+    deletedPriceData.value.length ||
     (orderInvoiceStore.getOrderInvoice.totalPrice === totalPayments.value) ||
     orderInvoiceStore.getOrderInvoice?.customer?.id !== customer.value?.id
 ));
 
-const isPayment = computed(() => (
-    (orderInvoiceStore.getOrderInvoice.status === 1) && (orderInvoiceStore.getOrderInvoice.totalPrice === totalPayments.value)
-));
+const totalPrice = computed(() => {
+    const productsTotal = editableData.value.orderInvoiceProducts.reduce((sum, item) => {
+        return sum + (item.qty * item.price)
+    }, 0)
+
+    const kitsTotal = editableData.value.orderInvoiceKits.reduce((sum, item) => {
+        return sum + (item.qty * item.price)
+    }, 0)
+
+    return productsTotal + kitsTotal
+})
+
+const isPayment = computed(() => {
+    if (orderInvoiceStore.getOrderInvoice.seller) {
+        const discount = Number(orderInvoiceStore.getOrderInvoice.seller.discount)
+        const minAllowed = totalPrice.value - (totalPrice.value * discount / 100)
+
+        return totalPayments.value >= minAllowed;
+    } else {
+        return true
+    }
+})
 
 const isAcceptedOrderInvoice = computed(() => orderInvoiceStore.getOrderInvoice.status === 2)
 
 const totalPayments = computed(() => {
     const total = editableData.value.orderInvoicePrices.reduce((sum, item) => {
-        const amount = item.payment.id === 1 ? item.amount : item.amount / usdRateStore.getUSDRate.rate
+        const amount = item.payment.id === 1 ? item.amount * usdRateStore.getUSDRate.rate : item.amount
         return sum + amount
     }, 0)
 
@@ -161,6 +189,18 @@ const totalPayments = computed(() => {
 // functions
 const onSubmitProduct = productHandleSubmit((values) => {
     addProduct(values)
+})
+
+const onEditProduct = productHandleSubmit((values) => {
+    editProduct(values)
+})
+
+const onEditKit = kitHandleSubmit((values) => {
+    editKit(values)
+})
+
+const onEditPayment = paymentHandleSubmit((values) => {
+    editPayment(values)
 })
 
 const onSubmitKit = kitHandleSubmit((values) => {
@@ -176,6 +216,7 @@ const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async (values) => {
 
     payload.orderInvoiceProducts = [...createdData.value, ...updatedData.value, ...deletedData.value]
     payload.orderInvoiceKits = [...createdKitData.value, ...updatedKitData.value, ...deletedKitData.value]
+    payload.orderInvoicePrices = [...createdPriceData.value, ...updatedPriceData.value, ...deletedPriceData.value]
 
     if (!payload.orderInvoiceProducts.length) {
         delete payload.orderInvoiceProducts
@@ -185,23 +226,16 @@ const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async (values) => {
         delete payload.orderInvoiceKits
     }
 
-    if (values.customer.id !== apiData.value.customer.id) {
+    if (!payload.orderInvoicePrices.length) {
+        delete payload.orderInvoicePrices
+    }
+
+    if (values.customer?.id !== apiData.value.customer?.id) {
         payload.customer = values.customer['@id']
     }
 
     try {
         await orderInvoiceStore.putOrderInvoice(payload, route.params.id)
-
-        if (editableData.value.orderInvoicePrices.length) {
-            const payment = {
-                orderInvoicePrices: editableData.value.orderInvoicePrices.map(orderInvoicePrice => ({
-                    payment: orderInvoicePrice.payment['@id'],
-                    amount: orderInvoicePrice.amount,
-                }))
-            }
-
-            await orderInvoiceStore.acceptOrderInvoice({id: orderInvoiceStore.getOrderInvoice.id, payment: payment})
-        }
 
         isEditing.value = false
         editMode.value = false
@@ -228,6 +262,9 @@ const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async (values) => {
         createdKitData.value = []
         deletedKitData.value = []
         updatedKitData.value = []
+        createdPriceData.value = []
+        deletedPriceData.value = []
+        updatedPriceData.value = []
     }
 })
 
@@ -263,21 +300,21 @@ function addProduct(newProduct) {
         return;
     }
 
-    const { productQty, productPrice, product } = newProduct;
+    const { qty, price, product } = newProduct;
 
     editableData.value.orderInvoiceProducts.push(
         {
             product: {id: product.id, name: product.name, code: product.code, category: {name: product.category, unit: {name: product.unit}}, assembly: {name: product.assembly}},
             color: product.color ? {name: product.color} : null,
-            qty: productQty,
-            price: productPrice
+            qty: qty,
+            price: price
         }
     );
 
-    const payload = {product: `/api/products/${product.id}`, qty: productQty, price: productPrice}
+    const payload = {product: `/api/products/${product.id}`, qty: qty, price: price}
 
     if (product.color) {
-        payload.color = `/api/colors/${product.colorId}`
+        payload.color = `/api/colors/${product.color.id}`
     }
 
     createdData.value.push(payload)
@@ -304,17 +341,17 @@ function addKit(newKit) {
         return;
     }
 
-    const { kitQty, kitPrice, kit } = newKit;
+    const { qty, price, kit } = newKit;
 
     editableData.value.orderInvoiceKits.push(
         {
             kit: {id: kit.id, name: kit.name, code: kit.code, assembly: {name: kit.assembly}},
-            qty: kitQty,
-            price: kitPrice
+            qty: qty,
+            price: price
         }
     );
 
-    createdKitData.value.push({ kit: `/api/kits/${kit.id}`, qty: kitQty, price: kitPrice})
+    createdKitData.value.push({ kit: `/api/kits/${kit.id}`, qty: qty, price: price})
 
     toast.add({
         severity: 'success',
@@ -341,6 +378,7 @@ function addPayment(newPayment) {
     const { amount, payment } = newPayment;
 
     editableData.value.orderInvoicePrices.push({payment: payment, amount: amount});
+    createdPriceData.value.push({ payment: `/api/payments/${payment.id}`, amount: amount})
 
     toast.add({
         severity: 'success',
@@ -349,6 +387,253 @@ function addPayment(newPayment) {
     })
 
     paymentResetForm();
+}
+
+function editProductAction(data, index) {
+    isEditing.value = true;
+    currentProductIndex.value = index
+    product.value = data.product;
+    productQty.value = data.qty;
+    productPrice.value = data.price;
+}
+
+function editProduct(updatedProduct) {
+    // Duplicate check
+    const exists = editableData.value.orderInvoiceProducts.some((p, i) => {
+        if (i === currentProductIndex.value) return false;
+    });
+
+
+    if (exists) {
+        toast.add({
+            severity: 'error',
+            summary: t('toast.already_added', { name: t('product.nominativeCapitalize') }),
+            life: 3000
+        })
+
+        return;
+    }
+
+    const current = editableData.value.orderInvoiceProducts[currentProductIndex.value];
+
+    const payload = {};
+
+    if (updatedProduct.product.id !== current.product.id) {
+        payload.product = updatedProduct.product
+    }
+
+    if (updatedProduct.qty !== current.qty) {
+        payload.qty = updatedProduct.qty
+    }
+
+    if (updatedProduct.price !== current.price) {
+        payload.price = updatedProduct.price
+    }
+
+    if (current.id) {
+        payload.orderInvoiceProduct = current['@id']
+        const indexFromUpdatedData = updatedData.value.findIndex(
+            data => data.orderInvoiceProduct === payload.orderInvoiceProduct
+        )
+
+        if (indexFromUpdatedData !== -1) {
+            updatedData.value[indexFromUpdatedData] = {
+                ...payload
+            }
+        } else {
+            updatedData.value.push(payload)
+        }
+
+        // API’dan kelgan
+        editableData.value.orderInvoiceProducts[currentProductIndex.value] = {
+            orderInvoiceProduct: current['@id'],
+            ...current,
+            ...payload,
+        };
+    } else {
+        // Yangi qo‘shilgan
+        editableData.value.orderInvoiceProducts[currentProductIndex.value] = {
+            ...current,
+            ...payload
+        };
+
+        const index = createdData.value.findIndex(p => (
+            p.product.id === current.product.id
+        ))
+
+        if (index !== -1) {
+            // Agar mavjud bo‘lsa yangilash
+            createdData.value[index] = { ...createdData.value[index], ...updatedProduct }
+        } else {
+            // Aks holda push qilish
+            createdData.value.push(updatedProduct)
+        }
+    }
+
+    clearProductForm()
+}
+
+function editKitAction(data, index) {
+    isEditing.value = true;
+    currentKitIndex.value = index
+    kit.value = data.kit;
+    kitQty.value = data.qty;
+    kitPrice.value = data.price;
+}
+
+function editKit(updatedKit) {
+    // Duplicate check
+    const exists = editableData.value.orderInvoiceKits.some((p, i) => {
+        if (i === currentKitIndex.value) return false;
+    });
+
+
+    if (exists) {
+        toast.add({
+            severity: 'error',
+            summary: t('toast.already_added', { name: t('kit.nominativeCapitalize') }),
+            life: 3000
+        })
+
+        return;
+    }
+
+    const current = editableData.value.orderInvoiceKits[currentKitIndex.value];
+
+    const payload = {};
+
+    if (updatedKit.kit.id !== current.kit.id) {
+        payload.kit = updatedKit.kit
+    }
+
+    if (updatedKit.qty !== current.qty) {
+        payload.qty = updatedKit.qty
+    }
+
+    if (updatedKit.price !== current.price) {
+        payload.price = updatedKit.price
+    }
+
+    if (current.id) {
+        payload.orderInvoiceKit = current['@id']
+        const indexFromUpdatedData = updatedKitData.value.findIndex(
+            data => data.orderInvoiceKit === payload.orderInvoiceKit
+        )
+
+        if (indexFromUpdatedData !== -1) {
+            updatedKitData.value[indexFromUpdatedData] = {
+                ...payload
+            }
+        } else {
+            updatedKitData.value.push(payload)
+        }
+
+        // API’dan kelgan
+        editableData.value.orderInvoiceKits[currentKitIndex.value] = {
+            orderInvoiceKit: current['@id'],
+            ...current,
+            ...payload,
+        };
+    } else {
+        // Yangi qo‘shilgan
+        editableData.value.orderInvoiceKits[currentKitIndex.value] = {
+            ...current,
+            ...payload
+        };
+
+        const index = createdKitData.value.findIndex(k => (
+            k.kit.id === current.kit.id
+        ))
+
+        if (index !== -1) {
+            // Agar mavjud bo‘lsa yangilash
+            createdKitData.value[index] = { ...createdKitData.value[index], ...updatedKit }
+        } else {
+            // Aks holda push qilish
+            createdKitData.value.push(updatedKit)
+        }
+    }
+
+    clearKitForm()
+}
+
+function editPaymentAction(data, index) {
+    isEditing.value = true;
+    currentPaymentIndex.value = index
+    payment.value = data.payment;
+    amount.value = data.amount;
+}
+
+function editPayment(updatedPayment) {
+    // Duplicate check
+    const exists = editableData.value.orderInvoicePrices.some((p, i) => {
+        if (i === currentPaymentIndex.value) return false;
+    });
+
+
+    if (exists) {
+        toast.add({
+            severity: 'error',
+            summary: t('toast.already_added', { name: t('payment.nominativeCapitalize') }),
+            life: 3000
+        })
+
+        return;
+    }
+
+    const current = editableData.value.orderInvoicePrices[currentPaymentIndex.value];
+
+    const payload = {};
+
+    if (updatedPayment.payment.id !== current.payment.id) {
+        payload.payment = updatedPayment.payment
+    }
+
+    if (updatedPayment.amount !== current.amount) {
+        payload.amount = updatedPayment.amount
+    }
+
+    if (current.id) {
+        payload.orderInvoicePrice = current['@id']
+        const indexFromUpdatedData = updatedPriceData.value.findIndex(
+            data => data.orderInvoicePrice === payload.orderInvoicePrice
+        )
+
+        if (indexFromUpdatedData !== -1) {
+            updatedPriceData.value[indexFromUpdatedData] = {
+                ...payload
+            }
+        } else {
+            updatedPriceData.value.push(payload)
+        }
+
+        // API’dan kelgan
+        editableData.value.orderInvoicePrices[currentPaymentIndex.value] = {
+            orderInvoicePrice: current['@id'],
+            ...current,
+            ...payload,
+        };
+    } else {
+        // Yangi qo‘shilgan
+        editableData.value.orderInvoicePrices[currentPaymentIndex.value] = {
+            ...current,
+            ...payload
+        };
+
+        const index = createdPriceData.value.findIndex(p => (
+            p.payment.id === current.payment.id
+        ))
+
+        if (index !== -1) {
+            // Agar mavjud bo‘lsa yangilash
+            createdPriceData.value[index] = { ...createdPriceData.value[index], ...updatedPayment }
+        } else {
+            // Aks holda push qilish
+            createdPriceData.value.push(updatedPayment)
+        }
+    }
+
+    clearPaymentForm()
 }
 
 function deleteProductAction(product) {
@@ -368,6 +653,7 @@ function deletePaymentAction(payment) {
 
 function deleteProduct() {
     const index = editableData.value.orderInvoiceProducts.findIndex(o => o.id === currentDeleteProduct.value.id);
+    const indexDelete = createdData.value.findIndex(o => o.id === currentDeleteProduct.value.id);
 
     if (index === -1) return;
 
@@ -375,22 +661,22 @@ function deleteProduct() {
 
     if (current.id) {
         // API’dan kelgan
-        editableData.value.orderInvoiceProducts.splice(index, 1);
-
         deletedData.value.push({
             orderInvoiceProduct: current["@id"],
             isDelete: true
         })
     } else {
         // Yangi qo‘shilgan
-        editableData.value.orderInvoiceProducts.splice(index, 1);
+        createdData.value.splice(indexDelete, 1);
     }
 
+    editableData.value.orderInvoiceProducts.splice(index, 1);
     deleteProductVisible.value = false
 }
 
 function deleteKit() {
     const index = editableData.value.orderInvoiceKits.findIndex(o => o.id === currentDeleteKit.value.id);
+    const indexDelete = createdKitData.value.findIndex(o => o.id === currentDeleteKit.value.id);
 
     if (index === -1) return;
 
@@ -398,22 +684,22 @@ function deleteKit() {
 
     if (current.id) {
         // API’dan kelgan
-        editableData.value.orderInvoiceKits.splice(index, 1);
-
         deletedKitData.value.push({
             orderInvoiceKit: current["@id"],
             isDelete: true
         })
     } else {
         // Yangi qo‘shilgan
-        editableData.value.orderInvoiceKits.splice(index, 1);
+        createdKitData.value.splice(indexDelete, 1);
     }
 
+    editableData.value.orderInvoiceKits.splice(index, 1);
     deleteKitVisible.value = false
 }
 
 function deletePayment() {
     const index = editableData.value.orderInvoicePrices.findIndex(o => o.id === currentDeletePayment.value.id);
+    const indexDelete = createdPriceData.value.findIndex(o => o.id === currentDeletePayment.value.id);
 
     if (index === -1) return;
 
@@ -421,12 +707,16 @@ function deletePayment() {
 
     if (current.id) {
         // API’dan kelgan
-        editableData.value.orderInvoicePrices.splice(index, 1);
+        deletedPriceData.value.push({
+            orderInvoicePrice: current["@id"],
+            isDelete: true
+        })
     } else {
         // Yangi qo‘shilgan
-        editableData.value.orderInvoicePrices.splice(index, 1);
+        createdPriceData.value.splice(indexDelete, 1);
     }
 
+    editableData.value.orderInvoicePrices.splice(index, 1);
     deletePaymentVisible.value = false
 }
 
@@ -451,12 +741,37 @@ const confirmLeave = () => {
     }
 }
 
+const totalReturns = (orderInvoiceQuantities) => {
+    return orderInvoiceQuantities?.reduce((total, item) => {
+        return total + item.returnQty
+    }, 0) || 0
+}
+
 onMounted(async () => {
     await orderInvoiceStore.fetchOrderInvoice(route.params.id);
     await usdRateStore.fetchLastUSDRate()
+    const usdRate = usdRateStore.getUSDRate.rate || 1;
 
     apiData.value = orderInvoiceStore.getOrderInvoice;
     editableData.value = JSON.parse(JSON.stringify(orderInvoiceStore.getOrderInvoice));
+
+    if (editableData.value?.orderInvoiceProducts) {
+        editableData.value.orderInvoiceProducts = editableData.value.orderInvoiceProducts.map(product => {
+            return {
+                ...product,
+                price: product.price * usdRate
+            };
+        });
+    }
+
+    if (editableData.value?.orderInvoiceKits) {
+        editableData.value.orderInvoiceKits = editableData.value.orderInvoiceKits.map(kit => {
+            return {
+                ...kit,
+                price: kit.price * usdRate
+            };
+        });
+    }
 
     setTimeout(() => {
         orderInvoiceResetForm({
@@ -476,14 +791,14 @@ onMounted(async () => {
 })
 
 watch([() => product.value], async () => {
-    if (product.value && product.value.wholesalePrice) {
-        productPrice.value = product.value.wholesalePrice
+    if (product.value && product.value.retailPrice) {
+        productPrice.value = product.value.retailPrice
     }
 });
 
 watch([() => kit.value], async () => {
-    if (kit.value && kit.value.wholesalePrice) {
-        kitPrice.value = kit.value.wholesalePrice
+    if (kit.value && kit.value.retailPrice) {
+        kitPrice.value = kit.value.retailPrice
     }
 });
 </script>
@@ -516,7 +831,7 @@ watch([() => kit.value], async () => {
         :withoutButtons="isLoading"
     >
         <template #buttons>
-            <div v-if="!isLoading && !isAcceptedOrderInvoice" class="flex sm:justify-end grow gap-2 sm:gap-4 sm:mt-4">
+            <div v-if="!isLoading" class="flex sm:justify-end grow gap-2 sm:gap-4 sm:mt-4">
                 <Button
                     v-if="!editMode && isAdminOrCreatedBy(orderInvoiceStore.getOrderInvoice.createdBy.id)"
                     :disabled="!!orderInvoiceErrors.orderInvoiceProducts"
@@ -543,13 +858,9 @@ watch([() => kit.value], async () => {
                     :label="t('buttons.save')"
                     :loading="orderInvoiceIsSubmitting"
                 />
-            </div>
-            <div v-if="!isLoading && isAcceptedOrderInvoice" class="flex sm:justify-end grow gap-2 sm:gap-4 sm:mt-4">
                 <Button
-                    @click="router.push({
-                            name: 'warehouse-add-return-invoices',
-                            params: { id: orderInvoiceStore.getOrderInvoice.id }
-                        })"
+                    v-if="isAcceptedOrderInvoice"
+                    @click="router.push({name: 'shop-add-return-invoices', params: { id: orderInvoiceStore.getOrderInvoice.id }})"
                     class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"
                     :label="t('buttons.newReturnInvoice')"
                     :loading="orderInvoiceIsSubmitting"
@@ -722,8 +1033,6 @@ watch([() => kit.value], async () => {
                                         <InputNumber
                                             v-model="productPrice"
                                             fluid
-                                            mode="currency"
-                                            currency="USD"
                                             locale="en-US"
                                             showButtons
                                             :placeholder="t('placeholders.price')"
@@ -737,6 +1046,7 @@ watch([() => kit.value], async () => {
                                 <div class="flex justify-end gap-2 mt-5 col-span-1 md:col-span-2">
                                     <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearProductForm" />
                                     <Button v-if="!isEditing" @click="onSubmitProduct" :label="t('buttons.add')" class="px-5" :loading="productIsSubmitting"/>
+                                    <Button v-else @click="onEditProduct" :label="t('buttons.edit')" class="px-5"/>
                                 </div>
                             </TabPanel>
 
@@ -788,8 +1098,6 @@ watch([() => kit.value], async () => {
                                         <InputNumber
                                             v-model="kitPrice"
                                             fluid
-                                            mode="currency"
-                                            currency="USD"
                                             locale="en-US"
                                             showButtons
                                             :placeholder="t('placeholders.price')"
@@ -854,12 +1162,13 @@ watch([() => kit.value], async () => {
 
                                 <div class="col-span-full flex items-center justify-between mt-5">
                                     <div class="font-medium">
-                                        {{ t('labels.totals') }}: {{ formatCurrency(orderInvoiceStore.getOrderInvoice.totalPrice) }} $
+                                        {{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }} {{ t('soum') }}
                                     </div>
 
                                     <div class="flex gap-2">
                                         <SecondaryButton type="button" :label="t('dialog.clear')" @click="clearPaymentForm" />
                                         <Button v-if="!isEditing" @click="onSubmitPayment" :label="t('buttons.add')" class="px-5" :loading="paymentIsSubmitting"/>
+                                        <Button v-else @click="onEditPayment" :label="t('buttons.edit')" class="px-5"/>
                                     </div>
                                 </div>
                             </TabPanel>
@@ -896,6 +1205,11 @@ watch([() => kit.value], async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ index + 1 }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="product" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
@@ -935,13 +1249,19 @@ watch([() => kit.value], async () => {
                                     <Column field="price" :header="t('labels.price')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ formatCurrency(data.price) }}$</p>
+                                            <p v-else>{{ formatCurrency(data.price) }} {{ t('soum') }}</p>
                                         </template>
                                     </Column>
                                     <Column field="total" :header="t('labels.total')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ formatCurrency(data.price * data.qty) }}$</p>
+                                            <p v-else>{{ formatCurrency(data.price * data.qty) }} {{ t('soum') }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="totalReturns" :header="t('labels.ReturnInvoice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ formatCurrency(totalReturns(data.orderInvoiceProductQuantities)) }} {{t(`labels.${data.product?.category?.unit?.name}`)}}</p>
                                         </template>
                                     </Column>
                                     <Column v-if="editMode" field="actions" :header="t('actions')">
@@ -949,6 +1269,12 @@ watch([() => kit.value], async () => {
                                             <div class="flex justify-end w-full">
                                                 <Skeleton height="2rem" v-if="isLoading"/>
                                                 <div v-else class="flex items-center gap-2">
+                                                    <Button
+                                                        @click="editProductAction(data, index)"
+                                                        icon="pi pi-pencil"
+                                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
+                                                        size="small"
+                                                    />
                                                     <Button
                                                         @click="deleteProductAction(data)"
                                                         icon="pi pi-trash"
@@ -961,7 +1287,7 @@ watch([() => kit.value], async () => {
                                     </Column>
                                     <template #footer>
                                         <Skeleton height="2rem" width="10rem" class="ml-auto" v-if="isLoading"/>
-                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(orderInvoiceStore.getOrderInvoice.totalPrice) }} $</div>
+                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }} {{ t('soum') }}</div>
                                     </template>
                                 </DataTable>
                             </TabPanel>
@@ -983,6 +1309,11 @@ watch([() => kit.value], async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ index + 1 }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.kit?.name }}</p>
@@ -1007,19 +1338,31 @@ watch([() => kit.value], async () => {
                                     <Column field="price" :header="t('labels.price')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ formatCurrency(data.price) }}$</p>
+                                            <p v-else>{{ formatCurrency(data.price) }} {{ t('soum') }}</p>
                                         </template>
                                     </Column>
                                     <Column field="total" :header="t('labels.total')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ formatCurrency(data.price * data.qty) }}$</p>
+                                            <p v-else>{{ formatCurrency(data.price * data.qty) }} {{ t('soum') }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="total" :header="t('labels.ReturnInvoice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ formatCurrency(totalReturns(data.orderInvoiceKitQuantities)) }} {{t(`labels.pcs`)}}</p>
                                         </template>
                                     </Column>
                                     <Column v-if="editMode" field="actions" :header="t('actions')">
                                         <template #body="{ data, index }">
                                             <div class="flex justify-end w-full">
                                                 <div class="flex items-center gap-2">
+                                                    <Button
+                                                        @click="editKitAction(data, index)"
+                                                        icon="pi pi-pencil"
+                                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
+                                                        size="small"
+                                                    />
                                                     <Button
                                                         @click="deleteKitAction(data)"
                                                         icon="pi pi-trash"
@@ -1032,7 +1375,7 @@ watch([() => kit.value], async () => {
                                     </Column>
                                     <template #footer>
                                         <Skeleton height="2rem" width="10rem" class="ml-auto" v-if="isLoading"/>
-                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(orderInvoiceStore.getOrderInvoice.totalPrice) }} $</div>
+                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }} {{ t('soum') }}</div>
                                     </template>
                                 </DataTable>
                             </TabPanel>
@@ -1054,6 +1397,11 @@ watch([() => kit.value], async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ index + 1 }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.payment?.name }}</p>
@@ -1075,6 +1423,12 @@ watch([() => kit.value], async () => {
                                             <div class="flex justify-end w-full">
                                                 <div class="flex items-center gap-2">
                                                     <Button
+                                                        @click="editPaymentAction(data, index)"
+                                                        icon="pi pi-pencil"
+                                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
+                                                        size="small"
+                                                    />
+                                                    <Button
                                                         @click="deletePaymentAction(data)"
                                                         icon="pi pi-trash"
                                                         pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"
@@ -1086,7 +1440,7 @@ watch([() => kit.value], async () => {
                                     </Column>
                                     <template #footer>
                                         <Skeleton height="2rem" width="10rem" class="ml-auto" v-if="isLoading"/>
-                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.usdRate') }}: {{ formatCurrency(Math.floor(usdRateStore.getUSDRate.rate)) }} | {{ t('labels.total') }}: {{ formatCurrency(totalPayments) }} $</div>
+                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.usdRate') }}: {{ formatCurrency(Math.floor(usdRateStore.getUSDRate.rate)) }} | {{ t('labels.total') }}: {{ formatCurrency(totalPayments) }} {{ t('soum') }}</div>
                                     </template>
                                 </DataTable>
                             </TabPanel>

@@ -196,6 +196,13 @@ const addOrderInvoice = async (values) => {
         payload.customer = values.customer['@id']
     }
 
+    if (values.orderInvoicePrices.length) {
+        payload.orderInvoicePrices = values.orderInvoicePrices.map(orderInvoicePrice => ({
+            payment: orderInvoicePrice.payment['@id'],
+            amount: orderInvoicePrice.amount,
+        }))
+    }
+
     try {
         await orderInvoiceStore.pushOrderInvoice(payload)
 
@@ -203,7 +210,8 @@ const addOrderInvoice = async (values) => {
         orderInvoiceResetForm()
         productResetForm()
         kitResetForm()
-
+        paymentResetForm()
+        router.back()
     } catch (error) {
         toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
     }
@@ -217,7 +225,6 @@ const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
     if (values.seller) {
         const discount = Number(values.seller.discount)
         const minAllowed = totalPrice.value - (totalPrice.value * discount / 100)
-        console.log(minAllowed)
 
         if (totalPayments.value < minAllowed) {
             return
@@ -225,22 +232,6 @@ const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
     }
 
     await addOrderInvoice(values)
-
-    const payload = {
-        orderInvoicePrices: values.orderInvoicePrices.map(orderInvoicePrice => ({
-            payment: orderInvoicePrice.payment['@id'],
-            amount: orderInvoicePrice.amount,
-        }))
-    }
-
-    try {
-        await orderInvoiceStore.acceptOrderInvoice({id: orderInvoiceStore.getOrderInvoice.id, payment: payload})
-        paymentResetForm()
-        router.back()
-
-    } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
-    }
 })
 
 onMounted( () => {
@@ -602,7 +593,7 @@ const {
                                 <table class="w-full">
                                     <thead>
                                         <tr class="sticky top-0 bg-surface-0 dark:bg-surface-800 z-20 border-b border-surface-200 dark:border-surface-600/50">
-                                            <th class="font-medium text-sm text-start pl-4 py-3">{{ t('labels.title') }} / {{ t('labels.color') }}</th>
+                                            <th class="font-medium text-sm text-start pl-4 py-3">{{ t('labels.code') }}</th>
                                             <th class="font-medium text-sm text-start">{{t('labels.amount')}}</th>
                                             <th class="font-medium text-sm text-start">{{t('labels.price')}}</th>
                                             <th class="font-medium text-sm text-start">{{t('labels.total')}}</th>
@@ -611,7 +602,7 @@ const {
                                     </thead>
                                     <tbody>
                                         <tr class="text-start" v-for="item of orderInvoiceProducts" :key="item.ui.id">
-                                            <td class="text-start text-sm pl-4 py-3">{{ item.ui.name }} / {{ item.ui.color || '-' }}</td>
+                                            <td class="text-start text-sm pl-4 py-3">{{ item.ui.code }}</td>
                                             <td>
                                                 <InputNumber
                                                     fluid
@@ -653,7 +644,7 @@ const {
                                             </td>
                                         </tr>
                                         <tr class="text-start" v-for="item of orderInvoiceKits" :key="item.ui.id">
-                                            <td class="text-start text-sm pl-4 py-2">{{ item.ui.name }} / {{ item.ui.color || '-' }}</td>
+                                            <td class="text-start text-sm pl-4 py-2">{{ item.ui.code }}</td>
                                             <td>
                                                 <InputNumber
                                                     fluid

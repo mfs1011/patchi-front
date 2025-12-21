@@ -274,7 +274,7 @@ function addProduct(newProduct) {
     const payload = {product: `/api/products/${product.id}`, qty: productQty, price: productPrice}
 
     if (product.color) {
-        payload.color = `/api/colors/${product.colorId}`
+        payload.color = `/api/colors/${product.color.id}`
     }
 
     createdData.value.push(payload)
@@ -446,6 +446,12 @@ const confirmLeave = () => {
     if (pendingNavigation.value) {
         pendingNavigation.value()
     }
+}
+
+const totalReturns = (orderInvoiceQuantities) => {
+    return orderInvoiceQuantities?.reduce((total, item) => {
+        return total + item.returnQty
+    }, 0)
 }
 
 onMounted(async () => {
@@ -872,6 +878,11 @@ watch([() => kit.value], async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ index + 1 }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="product" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
@@ -920,6 +931,12 @@ watch([() => kit.value], async () => {
                                             <p v-else>{{ formatCurrency(data.price * data.qty) }}$</p>
                                         </template>
                                     </Column>
+                                    <Column field="totalReturns" :header="t('labels.ReturnInvoice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ formatCurrency(totalReturns(data.orderInvoiceProductQuantities)) }} {{t(`labels.${data.product?.category?.unit?.name}`)}}</p>
+                                        </template>
+                                    </Column>
                                     <Column v-if="editMode" field="actions" :header="t('actions')">
                                         <template #body="{ data, index }">
                                             <div class="flex justify-end w-full">
@@ -958,6 +975,11 @@ watch([() => kit.value], async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ index + 1 }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.kit?.name }}</p>
@@ -989,6 +1011,12 @@ watch([() => kit.value], async () => {
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ formatCurrency(data.price * data.qty) }}$</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="total" :header="t('labels.ReturnInvoice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ formatCurrency(totalReturns(data.orderInvoiceKitQuantities)) }} {{t(`labels.pcs`)}}</p>
                                         </template>
                                     </Column>
                                     <Column v-if="editMode" field="actions" :header="t('actions')">
@@ -1028,6 +1056,11 @@ watch([() => kit.value], async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ index + 1 }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.payment?.name }}</p>
