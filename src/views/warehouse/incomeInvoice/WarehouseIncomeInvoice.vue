@@ -187,17 +187,17 @@ const clearProductForm = () => {
 
 function addProduct(newProduct) {
     const exists = editableData.value.incomeInvoiceProducts.some((p, i) => {
-        const sameProduct = p.product.id === updatedProduct.product.id;
+        const sameProduct = p.product.id === newProduct.product.id;
 
         // color faqat mavjud bo‘lsa taqqoslanadi
         const sameColor =
-            (!p.color && !updatedProduct.color) ||
-            (p.color?.id === updatedProduct.color?.id);
+            (!p.color && !newProduct.color) ||
+            (p.color?.id === newProduct.color?.id);
 
         // expiryDate faqat mavjud bo‘lsa taqqoslanadi
         const sameExpiry =
-            (!p.expiryDate && !updatedProduct.expiryDate) ||
-            (normalizeDate(p.expiryDate) === normalizeDate(updatedProduct.expiryDate));
+            (!p.expiryDate && !newProduct.expiryDate) ||
+            (normalizeDate(p.expiryDate) === normalizeDate(newProduct.expiryDate));
 
         return sameProduct && sameColor && sameExpiry;
     });

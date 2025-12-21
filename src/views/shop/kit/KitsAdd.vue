@@ -279,6 +279,10 @@ const setPhoto = event => {
     photoName.value = event.target.files[0].name
 }
 
+const reversedKitProducts = computed(() => {
+    return [...kitProducts.value].reverse()
+})
+
 watch(seller, async (newVal) => {
     isLocation.value = false
 
@@ -566,12 +570,17 @@ const confirmLeave = () => {
             >
                 <template #content>
                     <DataTable
-                        :value="kitProducts"
+                        :value="reversedKitProducts"
                         scrollable
                         scroll-height="700px"
                         pt:footer="border-none dark:bg-surface-800"
                         pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                     >
+                        <Column field="id" header="№">
+                            <template #body="{ index }">
+                                <p>{{ kitProducts.length - index }}</p>
+                            </template>
+                        </Column>
                         <Column field="product" :header="t('labels.product')">
                             <template #body="{ data }">
                                 <p>{{ data.product?.name }}</p>

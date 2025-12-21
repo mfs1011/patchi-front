@@ -557,7 +557,7 @@ const {
                                 <table class="w-full">
                                     <thead>
                                         <tr class="sticky top-0 bg-surface-0 dark:bg-surface-800 z-20 border-b border-surface-200 dark:border-surface-600/50">
-                                            <th class="font-medium text-sm text-start pl-4 py-3">{{ t('labels.title') }} / {{ t('labels.color') }}</th>
+                                            <th class="font-medium text-sm text-start pl-4 py-3">{{ t('labels.code') }}</th>
                                             <th class="font-medium text-sm text-start">{{t('labels.amount')}}</th>
                                             <th class="font-medium text-sm text-start">{{t('labels.price')}}</th>
                                             <th class="font-medium text-sm text-start">{{t('labels.total')}}</th>
@@ -566,7 +566,7 @@ const {
                                     </thead>
                                     <tbody>
                                         <tr class="text-start" v-for="item of orderInvoiceProducts" :key="item.ui.id">
-                                            <td class="text-start text-sm pl-4 py-3">{{ item.ui.name }} / {{ item.ui.color || '-' }}</td>
+                                            <td class="text-start text-sm pl-4 py-3">{{ item.ui.code }}</td>
                                             <td>
                                                 <InputNumber
                                                     fluid
@@ -609,7 +609,7 @@ const {
                                             </td>
                                         </tr>
                                         <tr class="text-start" v-for="item of orderInvoiceKits" :key="item.ui.id">
-                                            <td class="text-start text-sm pl-4 py-2">{{ item.ui.name }} / {{ item.ui.color || '-' }}</td>
+                                            <td class="text-start text-sm pl-4 py-2">{{ item.ui.code }}</td>
                                             <td>
                                                 <InputNumber
                                                     fluid

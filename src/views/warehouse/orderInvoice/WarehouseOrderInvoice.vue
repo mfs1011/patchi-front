@@ -274,7 +274,7 @@ function addProduct(newProduct) {
     const payload = {product: `/api/products/${product.id}`, qty: productQty, price: productPrice}
 
     if (product.color) {
-        payload.color = `/api/colors/${product.colorId}`
+        payload.color = `/api/colors/${product.color.id}`
     }
 
     createdData.value.push(payload)
@@ -449,7 +449,7 @@ const confirmLeave = () => {
 }
 
 const totalReturns = (orderInvoiceQuantities) => {
-    return orderInvoiceQuantities.reduce((total, item) => {
+    return orderInvoiceQuantities?.reduce((total, item) => {
         return total + item.returnQty
     }, 0)
 }
@@ -878,6 +878,11 @@ watch([() => kit.value], async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ index + 1 }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="product" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
@@ -970,6 +975,11 @@ watch([() => kit.value], async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ index + 1 }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.kit?.name }}</p>
@@ -1046,6 +1056,11 @@ watch([() => kit.value], async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ index + 1 }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.payment?.name }}</p>

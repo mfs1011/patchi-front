@@ -80,9 +80,9 @@ export const useOrderInvoiceStore = defineStore('orderInvoice', () => {
         }
     }
 
-    const acceptOrderInvoice = async data => {
+    const acceptOrderInvoice = async id => {
         try {
-            await authorizedClient.put(`/order_invoices/accepted/${data.id}`, data.payment)
+            await authorizedClient.put(`/order_invoices/accepted/${id}`, {})
         } catch (error) {
             throw error
         }
