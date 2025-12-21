@@ -448,6 +448,12 @@ const confirmLeave = () => {
     }
 }
 
+const totalReturns = (orderInvoiceQuantities) => {
+    return orderInvoiceQuantities.reduce((total, item) => {
+        return total + item.returnQty
+    }, 0)
+}
+
 onMounted(async () => {
     await orderInvoiceStore.fetchOrderInvoice(route.params.id);
     await usdRateStore.fetchLastUSDRate()
@@ -920,6 +926,12 @@ watch([() => kit.value], async () => {
                                             <p v-else>{{ formatCurrency(data.price * data.qty) }}$</p>
                                         </template>
                                     </Column>
+                                    <Column field="totalReturns" :header="t('labels.ReturnInvoice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ formatCurrency(totalReturns(data.orderInvoiceProductQuantities)) }} {{t(`labels.${data.product?.category?.unit?.name}`)}}</p>
+                                        </template>
+                                    </Column>
                                     <Column v-if="editMode" field="actions" :header="t('actions')">
                                         <template #body="{ data, index }">
                                             <div class="flex justify-end w-full">
@@ -989,6 +1001,12 @@ watch([() => kit.value], async () => {
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ formatCurrency(data.price * data.qty) }}$</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="total" :header="t('labels.ReturnInvoice')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ formatCurrency(totalReturns(data.orderInvoiceKitQuantities)) }} {{t(`labels.pcs`)}}</p>
                                         </template>
                                     </Column>
                                     <Column v-if="editMode" field="actions" :header="t('actions')">
