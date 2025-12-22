@@ -388,6 +388,7 @@ function editProductAction(data, index) {
 }
 
 function editProduct(updatedProduct) {
+    console.log('a')
     // Duplicate check
     const exists = editableData.value.orderInvoiceProducts.some((p, i) => {
         if (i === currentProductIndex.value) return false;

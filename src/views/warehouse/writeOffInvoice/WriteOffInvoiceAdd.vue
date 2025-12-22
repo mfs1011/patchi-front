@@ -261,6 +261,14 @@ const saveEditingKit = async () => {
     isEditing.value = false
 }
 
+const reversedWriteOffProducts = computed(() => {
+    return [...writeOffInvoiceProducts.value].reverse()
+})
+
+const reversedWriteOffKits = computed(() => {
+    return [...writeOffInvoiceKits.value].reverse()
+})
+
 onBeforeRouteLeave((to, from, next) => {
     if (isChanged.value) {
         showLeaveDialog.value = true
@@ -522,12 +530,17 @@ watch(location, async (newVal) => {
 
                                 <DataTable
                                     v-else
-                                    :value="writeOffInvoiceProducts"
+                                    :value="reversedWriteOffProducts"
                                     scrollable
                                     scroll-height="700px"
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ writeOffInvoiceProducts.length - index }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="product" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantity?.product?.name }}</p>
@@ -597,12 +610,17 @@ watch(location, async (newVal) => {
 
                                 <DataTable
                                     v-else
-                                    :value="writeOffInvoiceKits"
+                                    :value="reversedWriteOffKits"
                                     scrollable
                                     scroll-height="700px"
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ writeOffInvoiceKits.length - index }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantityKit?.kit?.name }}</p>

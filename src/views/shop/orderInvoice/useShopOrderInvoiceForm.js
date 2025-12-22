@@ -15,14 +15,46 @@ export function useShopOrderInvoiceValidation() {
     const productSchema = computed(() => yup.object({
         product: yup.object().required('Product is required'),
         color: yup.object().notRequired(),
-        qty: yup.number().required('Quantity is required'),
+        qty: yup
+            .number()
+            .required("Miqdor majburiy")
+            .moreThan(0, "Miqdor 0 dan katta bo‘lishi kerak")
+            .test(
+                "max-qty",
+                "Miqdor tanlangan lokatsiyadagi mavjud qty dan oshmasligi kerak",
+                function (value) {
+                    const { product } = this.parent;
+
+                    if (!product || typeof product.totalQty !== "number") {
+                        return true; // agar tanlanmagan bo‘lsa, boshqa xato chiqadi
+                    }
+
+                    return value <= product.totalQty;
+                }
+            ),
         price: yup.number().required('Price is required'),
     }));
 
     // Kit
     const kitSchema = computed(() => yup.object({
         kit: yup.object().required('Product is required'),
-        qty: yup.number().required('Quantity is required'),
+        qty: yup
+            .number()
+            .required("Miqdor majburiy")
+            .moreThan(0, "Miqdor 0 dan katta bo‘lishi kerak")
+            .test(
+                "max-qty",
+                "Miqdor tanlangan lokatsiyadagi mavjud qty dan oshmasligi kerak",
+                function (value) {
+                    const { kit } = this.parent;
+
+                    if (!kit || typeof kit.totalQty !== "number") {
+                        return true; // agar tanlanmagan bo‘lsa, boshqa xato chiqadi
+                    }
+
+                    return value <= kit.totalQty;
+                }
+            ),
         price: yup.number().required('Price is required'),
     }));
 

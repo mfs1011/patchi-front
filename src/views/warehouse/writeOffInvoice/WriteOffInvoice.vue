@@ -789,6 +789,11 @@ onMounted(async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ index + 1 }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="product" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
@@ -871,6 +876,11 @@ onMounted(async () => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50 grow"
                                 >
+                                    <Column field="id" header="№">
+                                        <template #body="{ index }">
+                                            <p>{{ index + 1 }}</p>
+                                        </template>
+                                    </Column>
                                     <Column field="kit" :header="t('labels.title')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantityKit?.kit?.name }}</p>

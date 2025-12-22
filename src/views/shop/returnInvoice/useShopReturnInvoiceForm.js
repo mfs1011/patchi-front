@@ -119,8 +119,10 @@ export function useReturnInvoiceValidation() {
     const { value: customer } = useField('customer', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: returnInvoiceFormCtx })
     const { value: createdAt } = useField('createdAt', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: returnInvoiceFormCtx })
     const { value: orderInvoiceProduct } = useField('orderInvoiceProduct', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: productFormCtx })
+    const { value: returnInvoiceProduct } = useField('returnInvoiceProduct', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: productFormCtx })
     const { value: returnInvoiceProducts } = useField('returnInvoiceProducts', undefined, { validateOnMount: true, form: returnInvoiceFormCtx })
     const { value: returnInvoiceKits } = useField('returnInvoiceKits', undefined, { validateOnValueUpdate: false, validateOnMount: true, form: returnInvoiceFormCtx })
+    const { value: returnInvoiceKit } = useField('returnInvoiceKit', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: kitFormCtx })
     const { value: orderInvoiceKit } = useField('orderInvoiceKit', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: kitFormCtx })
     const { value: qtyProduct } = useField('qtyProduct', undefined, { validateOnMount: false, form: productFormCtx });
     const { value: qtyKit } = useField('qtyKit', undefined, { validateOnMount: false, form: kitFormCtx });
@@ -136,7 +138,9 @@ export function useReturnInvoiceValidation() {
         customer,
         seller,
         createdAt,
+        returnInvoiceProduct,
         returnInvoiceProducts,
+        returnInvoiceKit,
         returnInvoiceKits,
 
         // Product form

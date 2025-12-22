@@ -16,7 +16,7 @@ export function useOrderInvoiceValidation() {
     // Product
     const productSchema = computed(() => yup.object({
         product: yup.object().required('Product is required'),
-        productQty: yup
+        qty: yup
             .number()
             .required("Miqdor majburiy")
             .moreThan(0, "Miqdor 0 dan katta bo‘lishi kerak")
@@ -32,13 +32,14 @@ export function useOrderInvoiceValidation() {
 
                     return value <= product.totalQty;
                 }
-            )
+            ),
+        price: yup.number().required('Price is required'),
     }));
 
     // Kit
     const kitSchema = computed(() => yup.object({
         kit: yup.object().required('Product is required'),
-        kitQty: yup
+        qty: yup
             .number()
             .required("Miqdor majburiy")
             .moreThan(0, "Miqdor 0 dan katta bo‘lishi kerak")
@@ -55,6 +56,7 @@ export function useOrderInvoiceValidation() {
                     return value <= kit.totalQty;
                 }
             ),
+        price: yup.number().required('Price is required'),
     }));
 
     // Payment
@@ -88,8 +90,7 @@ export function useOrderInvoiceValidation() {
     } = useForm({
         validationSchema: productSchema,
         initialValues: {
-            productQty: 0,
-            productPrice: 0
+            qty: 0
         }
     })
 
@@ -127,11 +128,11 @@ export function useOrderInvoiceValidation() {
     const { value: createdAt } = useField('createdAt', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
     const { value: product } = useField('product', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: productFormCtx })
     const { value: productColor } = useField('color', undefined, { validateOnMount: false, form: productFormCtx });
-    const { value: productQty } = useField('productQty', undefined, { validateOnMount: false, form: productFormCtx });
-    const { value: productPrice } = useField('productPrice', undefined, { validateOnMount: false, form: productFormCtx });
+    const { value: productQty } = useField('qty', undefined, { validateOnMount: false, form: productFormCtx });
+    const { value: productPrice } = useField('price', undefined, { validateOnMount: false, form: productFormCtx });
     const { value: kit } = useField('kit', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: kitFormCtx })
-    const { value: kitQty } = useField('kitQty', undefined, { validateOnMount: false, form: kitFormCtx });
-    const { value: kitPrice } = useField('kitPrice', undefined, { validateOnMount: false, form: kitFormCtx });
+    const { value: kitQty } = useField('qty', undefined, { validateOnMount: false, form: kitFormCtx });
+    const { value: kitPrice } = useField('price', undefined, { validateOnMount: false, form: kitFormCtx });
     const { value: orderInvoicePrices } = useField('orderInvoicePrices', undefined, { validateOnMount: true, form: orderInvoiceFormCtx })
     const { value: payment } = useField('payment', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: paymentFormCtx })
     const { value: amount } = useField('amount', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: paymentFormCtx })
