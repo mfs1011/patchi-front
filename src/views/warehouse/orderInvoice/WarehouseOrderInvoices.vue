@@ -40,7 +40,10 @@ const kitStore = useKitStore();
 const isVisibleSectionHeader = ref(false);
 const tabVal = ref('product');
 const deleteVisible = ref(false)
+const acceptVisible = ref(false)
 const isDeleteLoading = ref(false)
+const isAcceptLoading = ref(false)
+const currentOrderInvoiceIdForAccept = ref(null)
 const currentOrderInvoiceId = ref(null)
 
 const filters = ref({
@@ -181,6 +184,30 @@ watch(
 watch(tabVal, () => {
     filters.value.page = 1
 })
+
+const acceptAction = id => {
+    currentOrderInvoiceIdForAccept.value = id
+    acceptVisible.value = true
+}
+const acceptOrderInvoice = async () => {
+    isAcceptLoading.value = true;
+
+    try {
+        await orderInvoiceStore.acceptOrderInvoice(currentOrderInvoiceIdForAccept.value)
+        toast.add({ severity: 'success', summary: t('toast.accepted', { name: t('orderInvoice.nominativeCapitalize') }), life: 3000 })
+    } catch (error) {
+        if (error.status === 403) {
+            toast.add({ severity: 'error', summary: t('toast.accessDenied', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else if (error.status === 412) {
+            toast.add({ severity: 'error', summary: t('toast.notEnough', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
+    } finally {
+        isAcceptLoading.value = false;
+        acceptVisible.value = false;
+    }
+}
 
 const mercureUrl = (import.meta.env.VITE_MERCURE_URL)
 const eventSource = ref(null)
@@ -414,7 +441,7 @@ onBeforeRouteLeave(() => {
                                     v-else
                                     :class="{'text-yellow-500': data.status === 1, 'text-green-500': data.status === 2}"
                                 >
-                                    {{ data.status === 1 ? t('labels.unpaid') : t('labels.paid') }}
+                                    {{ t(data.status) }}
                                 </p>
                             </template>
                         </Column>
@@ -454,6 +481,13 @@ onBeforeRouteLeave(() => {
 
                                 <div v-else class="flex justify-end w-full">
                                     <div class="flex items-center gap-2">
+                                        <Button
+                                            v-if="data.status !== 2"
+                                            @click="acceptAction(data.id)"
+                                            icon="pi pi-check"
+                                            pt:root="rounded-full size-8! bg-teal-500 dark:bg-teal-500 enabled:hover:bg-teal-400 dark:enabled:hover:bg-teal-400 border-teal-500 dark:border-teal-500 enabled:hover:border-teal-400 dark:enabled:hover:border-teal-400 focus-visible:outline-teal-500 dark:focus-visible:outline-teal-500"
+                                            size="small"
+                                        />
                                         <Button
                                             @click="router.push({
                                                 name: 'warehouse-order-invoice',
@@ -520,6 +554,36 @@ onBeforeRouteLeave(() => {
                             :label="t('dialog.confirm')"
                             @click="deleteOrderInvoice"
                             :loading="isDeleteLoading"
+                            class="px-5"
+                        />
+                    </div>
+                </template>
+            </Dialog>
+
+            <!-- ACCEPT ORDER_INVOICE DIALOG -->
+            <Dialog
+                v-model:visible="acceptVisible"
+                modal
+                :closable="false"
+                class="sm:min-w-100 sm:w-fit w-9/10"
+                pt:root="px-2"
+            >
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.acceptConfirmation', { name: t('orderInvoice.accusative'), id: currentOrderInvoiceIdForAccept }) }}
+                </span>
+
+                <template #footer>
+                    <div class="flex justify-end gap-2">
+                        <SecondaryButton
+                            type="button"
+                            :label="t('dialog.cancel')"
+                            @click="acceptVisible = false"
+                        />
+                        <Button
+                            type="button"
+                            :label="t('dialog.confirm')"
+                            @click="acceptOrderInvoice"
+                            :loading="isAcceptLoading"
                             class="px-5"
                         />
                     </div>

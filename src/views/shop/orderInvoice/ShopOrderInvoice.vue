@@ -130,8 +130,8 @@ const exportCSV = () => {
 };
 
 const items = computed(() => [{ label: t("cards.orderInvoices"), route: { name: 'shop-order-invoices'} }, { label: t("cards.orderInvoice") }]);
-const isAdminOrCreatedBy = createdById => (
-    userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById
+const isAdminOrCreatedBy = createdById => (orderInvoiceStore.getOrderInvoice.status === 1 &&
+    (userStore.getAboutMe.role.name === 'ROLE_ADMIN' || userStore.getAboutMe.id === createdById)
 )
 const tabList = computed(() => [
     { value: 'products', label: t('cards.products')},
@@ -191,6 +191,14 @@ const onSubmitProduct = productHandleSubmit((values) => {
     addProduct(values)
 })
 
+const onSubmitKit = kitHandleSubmit((values) => {
+    addKit(values)
+})
+
+const onSubmitPayment = paymentHandleSubmit((values) => {
+    addPayment(values)
+})
+
 const onEditProduct = productHandleSubmit((values) => {
     editProduct(values)
 })
@@ -201,14 +209,6 @@ const onEditKit = kitHandleSubmit((values) => {
 
 const onEditPayment = paymentHandleSubmit((values) => {
     editPayment(values)
-})
-
-const onSubmitKit = kitHandleSubmit((values) => {
-    addKit(values)
-})
-
-const onSubmitPayment = paymentHandleSubmit((values) => {
-    addPayment(values)
 })
 
 const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async (values) => {
