@@ -468,7 +468,7 @@ onBeforeRouteLeave(() => {
                                     v-else
                                     :class="{'text-yellow-500': data.status === 1, 'text-green-500': data.status === 2}"
                                 >
-                                    {{ data.status === 1 ? t('labels.unpaid') : t('labels.paid') }}
+                                    {{ t(data.status) }}
                                 </p>
                             </template>
                         </Column>

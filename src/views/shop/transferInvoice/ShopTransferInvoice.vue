@@ -836,12 +836,12 @@ onMounted(async () => {
                                             <div class="flex justify-end w-full">
                                                 <Skeleton height="2rem" v-if="isLoading"/>
                                                 <div v-else class="flex items-center gap-2">
-                                                    <Button
-                                                        @click="editLocationQuantityAction(data, index)"
-                                                        icon="pi pi-pencil"
-                                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
-                                                        size="small"
-                                                    />
+<!--                                                    <Button-->
+<!--                                                        @click="editLocationQuantityAction(data, index)"-->
+<!--                                                        icon="pi pi-pencil"-->
+<!--                                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"-->
+<!--                                                        size="small"-->
+<!--                                                    />-->
                                                     <Button
                                                         @click="deleteLocationQuantityAction(data)"
                                                         icon="pi pi-trash"
@@ -910,12 +910,12 @@ onMounted(async () => {
                                         <template #body="{ data, index }">
                                             <div class="flex justify-end w-full">
                                                 <div class="flex items-center gap-2">
-                                                    <Button
-                                                        @click="editLocationQuantityKitAction(data, index)"
-                                                        icon="pi pi-pencil"
-                                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"
-                                                        size="small"
-                                                    />
+<!--                                                    <Button-->
+<!--                                                        @click="editLocationQuantityKitAction(data, index)"-->
+<!--                                                        icon="pi pi-pencil"-->
+<!--                                                        pt:root="rounded-full size-8! bg-amber-500 dark:bg-amber-500 enabled:hover:bg-amber-400 dark:enabled:hover:bg-amber-400 border-amber-500 dark:border-amber-500 enabled:hover:border-amber-400 dark:enabled:hover:border-amber-400 focus-visible:outline-amber-500 dark:focus-visible:outline-amber-500"-->
+<!--                                                        size="small"-->
+<!--                                                    />-->
                                                     <Button
                                                         @click="deleteLocationQuantityKitAction(data)"
                                                         icon="pi pi-trash"

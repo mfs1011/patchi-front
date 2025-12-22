@@ -184,6 +184,13 @@ const addOrderInvoice = async (values) => {
         orderInvoiceKits: orderInvoiceKits.value.map(k => k.api),
     };
 
+    if (values.orderInvoicePrices.length) {
+        payload.orderInvoicePrices = values.orderInvoicePrices.map(orderInvoicePrice => ({
+            payment: orderInvoicePrice.payment['@id'],
+            amount: orderInvoicePrice.amount,
+        }))
+    }
+
     try {
         await orderInvoiceStore.pushOrderInvoiceB2B(payload)
 
@@ -191,31 +198,20 @@ const addOrderInvoice = async (values) => {
         orderInvoiceResetForm()
         productResetForm()
         kitResetForm()
-
+        paymentResetForm()
+        router.back()
     } catch (error) {
-        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        if (error.status === 412) {
+            toast.add({ severity: 'error', summary: t('toast.notEnough', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
     }
 }
 
 const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
     if ((orderInvoiceProducts.value.length || orderInvoiceKits.value.length) && totalPrice.value === totalPayments.value) {
         await addOrderInvoice(values)
-
-        const payload = {
-            orderInvoicePrices: values.orderInvoicePrices.map(orderInvoicePrice => ({
-                payment: orderInvoicePrice.payment['@id'],
-                amount: orderInvoicePrice.amount,
-            }))
-        }
-
-        try {
-            await orderInvoiceStore.acceptOrderInvoice({id: orderInvoiceStore.getOrderInvoice.id, payment: payload})
-            paymentResetForm()
-            router.back()
-
-        } catch (error) {
-            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
-        }
     }
 })
 
