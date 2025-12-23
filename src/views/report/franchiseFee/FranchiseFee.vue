@@ -56,7 +56,7 @@ const exportCSV = () => {
     dt.value.exportCSV();
 };
 
-const items = computed(() => [{ label: t('cards.franchiseFee') }]);
+const items = computed(() => [{ label: t('labels.sales') }]);
 const tabList = computed(() => [
     { value: 'products', label: t('cards.products')},
     { value: 'kits', label: t('cards.kits')},

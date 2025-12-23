@@ -445,10 +445,10 @@ onBeforeRouteLeave(() => {
                                 </p>
                             </template>
                         </Column>
-                        <Column field="totalPrice" :header="t('labels.totalPrice')">
+                        <Column field="totalPrice" :header="t('labels.totalPayment')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="orderInvoiceStore.getIsLoadingOrderInvoices"/>
-                                <p v-else>{{ `${formatCurrency(data.totalPrice)}$` || '-' }}</p>
+                                <p v-else>{{ `${formatCurrency(Math.round(data.totalOrderInvoicePrice))}$` || '-' }}</p>
                             </template>
                         </Column>
                         <Column field="createdAt" :header="t('labels.createdAt')">
