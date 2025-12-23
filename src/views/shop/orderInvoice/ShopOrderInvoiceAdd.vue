@@ -173,7 +173,6 @@ const onSubmitPayment = paymentHandleSubmit(async values => {
 const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async values => {
     if (orderInvoiceProducts.value.length > 0 || orderInvoiceKits.value.length > 0) {
         await addOrderInvoice(values)
-        router.back()
     }
 })
 
