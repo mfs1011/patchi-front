@@ -861,16 +861,8 @@ const {
                                                     <div class="flex justify-between w-full dark:text-surface-0">
                                                         <div class="w-full">
                                                             <div class="flex justify-between w-full">
-                                                                <p>{{ t('labels.title') }}:</p>
-                                                                <p class="font-semibold">{{ product.name }}</p>
-                                                            </div>
-                                                            <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.code') }}:</p>
                                                                 <p class="font-semibold">{{ product.code }}</p>
-                                                            </div>
-                                                            <div class="flex justify-between w-full">
-                                                                <p>{{ t('labels.color') }}:</p>
-                                                                <p class="font-semibold">{{ product.color || '-' }}</p>
                                                             </div>
                                                             <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.category') }}:</p>
@@ -927,15 +919,11 @@ const {
                                                     <div class="flex justify-between w-full dark:text-surface-0">
                                                         <div class="w-full">
                                                             <div class="flex justify-between w-full">
-                                                                <p>{{ t('labels.title') }}:</p>
-                                                                <p class="font-semibold">{{ kit.name }}</p>
-                                                            </div>
-                                                            <div class="flex justify-between w-full">
                                                                 <p>{{ t('labels.code') }}:</p>
                                                                 <p class="font-semibold">{{ kit.code }}</p>
                                                             </div>
                                                             <div class="flex justify-between w-full">
-                                                                <p>{{ t('labels.Assembly') }}:</p>
+                                                                <p>{{ t('labels.collection') }}:</p>
                                                                 <p class="font-semibold">{{ kit.assembly || '-' }}</p>
                                                             </div>
                                                             <div class="flex justify-between w-full">

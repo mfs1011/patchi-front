@@ -405,7 +405,7 @@ onBeforeRouteLeave(() => {
                         <Column field="totalPrice" :header="t('labels.totalPrice')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="returnInvoiceStore.getIsLoadingReturnInvoices"/>
-                                <p v-else>{{ `${formatCurrency(data.totalPrice)}$` }}</p>
+                                <p v-else>{{ `${formatCurrency(Math.round(data.totalPrice))}$` }}</p>
                             </template>
                         </Column>
                         <Column field="createdAt" :header="t('labels.createdAt')">
@@ -467,7 +467,7 @@ onBeforeRouteLeave(() => {
                             <div v-else class="flex flex-wrap items-center justify-end gap-5">
                                 <p class="font-semibold">{{ t('labels.totals') }}:</p>
                                 <div>
-                                    <p class="font-semibold">{{ formatCurrency(returnInvoiceStore.getReturnInvoices.totalPrice) }}$</p>
+                                    <p class="font-semibold">{{ formatCurrency(Math.round(returnInvoiceStore.getReturnInvoices.totalPrice)) }}$</p>
                                 </div>
                                 <PaginatorComponent
                                     v-model="filters.page"

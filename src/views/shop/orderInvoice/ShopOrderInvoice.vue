@@ -15,7 +15,7 @@ import Button from "@/volt/Button.vue";
 import NoData from "@/components/UI/NoData.vue";
 import {useI18n} from "vue-i18n";
 import {useLocationStore} from "@/stores/location.js";
-import {formatCurrency, formatDateTimeLocal} from "@/helpers/numberFormat.js";
+import {formatCurrency} from "@/helpers/numberFormat.js";
 import {useToast} from "primevue/usetoast";
 import Tabs from "@/volt/Tabs.vue";
 import TabPanels from "@/volt/TabPanels.vue";
@@ -29,7 +29,6 @@ import {useProductStore} from "@/stores/product.js";
 import {useKitStore} from "@/stores/kit.js";
 import DatePicker from "@/volt/DatePicker.vue";
 import {usePaymentStore} from "@/stores/payment.js";
-import {useUSDRateStore} from "@/stores/usdRate.js";
 import {useSellerStore} from "@/stores/seller.js";
 import {useShopOrderInvoiceValidation} from "@/views/shop/orderInvoice/useShopOrderInvoiceForm.js";
 
@@ -38,7 +37,6 @@ const router = useRouter();
 const toast = useToast()
 const orderInvoiceStore = useOrderInvoiceStore();
 const paymentStore = usePaymentStore();
-const usdRateStore = useUSDRateStore();
 const userStore = useUserStore();
 const productStore = useProductStore();
 const kitStore = useKitStore();
@@ -161,7 +159,7 @@ const totalPrice = computed(() => {
         return sum + (item.qty * item.price)
     }, 0)
 
-    return productsTotal + kitsTotal
+    return Math.round(productsTotal + kitsTotal)
 })
 
 const isPayment = computed(() => {
@@ -179,11 +177,11 @@ const isAcceptedOrderInvoice = computed(() => orderInvoiceStore.getOrderInvoice.
 
 const totalPayments = computed(() => {
     const total = editableData.value.orderInvoicePrices.reduce((sum, item) => {
-        const amount = item.payment.id === 1 ? item.amount * usdRateStore.getUSDRate.rate : item.amount
+        const amount = item.payment.id === 1 ? item.amount * orderInvoiceStore.getOrderInvoice.usdRate : item.amount
         return sum + amount
     }, 0)
 
-    return Math.floor(total)
+    return Math.round(total)
 })
 
 // functions
@@ -749,8 +747,7 @@ const totalReturns = (orderInvoiceQuantities) => {
 
 onMounted(async () => {
     await orderInvoiceStore.fetchOrderInvoice(route.params.id);
-    await usdRateStore.fetchLastUSDRate()
-    const usdRate = usdRateStore.getUSDRate.rate || 1;
+    const usdRate = orderInvoiceStore.getOrderInvoice.usdRate
 
     apiData.value = orderInvoiceStore.getOrderInvoice;
     editableData.value = JSON.parse(JSON.stringify(orderInvoiceStore.getOrderInvoice));
@@ -1249,13 +1246,13 @@ watch([() => kit.value], async () => {
                                     <Column field="price" :header="t('labels.price')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ formatCurrency(data.price) }} {{ t('soum') }}</p>
+                                            <p v-else>{{ formatCurrency(Math.round(data.price)) }} {{ t('soum') }}</p>
                                         </template>
                                     </Column>
                                     <Column field="total" :header="t('labels.total')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ formatCurrency(data.price * data.qty) }} {{ t('soum') }}</p>
+                                            <p v-else>{{ formatCurrency(Math.round(data.price) * data.qty) }} {{ t('soum') }}</p>
                                         </template>
                                     </Column>
                                     <Column field="totalReturns" :header="t('labels.ReturnInvoice')">
@@ -1338,13 +1335,13 @@ watch([() => kit.value], async () => {
                                     <Column field="price" :header="t('labels.price')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ formatCurrency(data.price) }} {{ t('soum') }}</p>
+                                            <p v-else>{{ formatCurrency(Math.round(data.price)) }} {{ t('soum') }}</p>
                                         </template>
                                     </Column>
                                     <Column field="total" :header="t('labels.total')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ formatCurrency(data.price * data.qty) }} {{ t('soum') }}</p>
+                                            <p v-else>{{ formatCurrency(Math.round(data.price) * data.qty) }} {{ t('soum') }}</p>
                                         </template>
                                     </Column>
                                     <Column field="total" :header="t('labels.ReturnInvoice')">
@@ -1440,7 +1437,7 @@ watch([() => kit.value], async () => {
                                     </Column>
                                     <template #footer>
                                         <Skeleton height="2rem" width="10rem" class="ml-auto" v-if="isLoading"/>
-                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.usdRate') }}: {{ formatCurrency(Math.floor(usdRateStore.getUSDRate.rate)) }} | {{ t('labels.total') }}: {{ formatCurrency(totalPayments) }} {{ t('soum') }}</div>
+                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.usdRate') }}: {{ formatCurrency(Math.round(orderInvoiceStore.getOrderInvoice.usdRate)) }} | {{ t('labels.total') }}: {{ formatCurrency(totalPayments) }} {{ t('soum') }}</div>
                                     </template>
                                 </DataTable>
                             </TabPanel>

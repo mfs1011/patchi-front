@@ -30,14 +30,12 @@ import {useProductStore} from "@/stores/product.js";
 import {useKitStore} from "@/stores/kit.js";
 import DatePicker from "@/volt/DatePicker.vue";
 import {usePaymentStore} from "@/stores/payment.js";
-import {useUSDRateStore} from "@/stores/usdRate.js";
 
 const route = useRoute();
 const router = useRouter();
 const toast = useToast()
 const orderInvoiceStore = useOrderInvoiceStore();
 const paymentStore = usePaymentStore();
-const usdRateStore = useUSDRateStore();
 const userStore = useUserStore();
 const productStore = useProductStore();
 const kitStore = useKitStore();
@@ -162,18 +160,18 @@ const totalPrice = computed(() => {
         return sum + (item.qty * item.price)
     }, 0)
 
-    return productsTotal + kitsTotal
+    return Math.round(productsTotal + kitsTotal)
 })
 
 const isAcceptedOrderInvoice = computed(() => orderInvoiceStore.getOrderInvoice.status === 2)
 
 const totalPayments = computed(() => {
     const total = editableData.value.orderInvoicePrices.reduce((sum, item) => {
-        const amount = item.payment.id === 1 ? item.amount : item.amount / usdRateStore.getUSDRate.rate
+        const amount = item.payment.id === 1 ? item.amount : item.amount / orderInvoiceStore.getOrderInvoice.usdRate
         return sum + amount
     }, 0)
 
-    return Math.floor(total)
+    return Math.round(total)
 })
 
 // functions
@@ -740,7 +738,6 @@ const totalReturns = (orderInvoiceQuantities) => {
 
 onMounted(async () => {
     await orderInvoiceStore.fetchOrderInvoice(route.params.id);
-    await usdRateStore.fetchLastUSDRate()
 
     apiData.value = orderInvoiceStore.getOrderInvoice;
     editableData.value = JSON.parse(JSON.stringify(orderInvoiceStore.getOrderInvoice));
@@ -1117,7 +1114,7 @@ watch([() => kit.value], async () => {
 
                                 <div class="col-span-full flex items-center justify-between mt-5">
                                     <div class="font-medium">
-                                        {{ t('labels.totals') }}: {{ formatCurrency(orderInvoiceStore.getOrderInvoice.totalPrice) }} $
+                                        {{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }} $
                                     </div>
 
                                     <div class="flex gap-2">
@@ -1393,7 +1390,7 @@ watch([() => kit.value], async () => {
                                     </Column>
                                     <template #footer>
                                         <Skeleton height="2rem" width="10rem" class="ml-auto" v-if="isLoading"/>
-                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.usdRate') }}: {{ formatCurrency(Math.floor(usdRateStore.getUSDRate.rate)) }} | {{ t('labels.total') }}: {{ formatCurrency(totalPayments) }}$</div>
+                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.usdRate') }}: {{ formatCurrency(Math.round(orderInvoiceStore.getOrderInvoice.usdRate)) }} | {{ t('labels.total') }}: {{ formatCurrency(totalPayments) }}$</div>
                                     </template>
                                 </DataTable>
                             </TabPanel>

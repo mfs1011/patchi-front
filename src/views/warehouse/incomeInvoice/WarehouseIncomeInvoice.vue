@@ -700,7 +700,7 @@ onMounted(async () => {
                         </div>
 
                         <div class="block">
-                            <p class="text-sm">{{ t('labels.price') }}<span class="text-red-500"> *</span></p>
+                            <p class="text-sm">{{ t('labels.totalPrice') }}<span class="text-red-500"> *</span></p>
                             <InputNumber
                                 v-model="price"
                                 fluid
@@ -804,7 +804,7 @@ onMounted(async () => {
                                 <p v-else>{{ data.qty }} {{t(`labels.${data.product?.category.unit.name}`)}}</p>
                             </template>
                         </Column>
-                        <Column field="price" :header="t('labels.price')">
+                        <Column field="price" :header="t('labels.totalPrice')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ formatCurrency(data.price) }}$</p>

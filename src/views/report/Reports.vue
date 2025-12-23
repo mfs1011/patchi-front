@@ -13,15 +13,14 @@ const cards = computed(() => {
         { id: 2, name: t('cards.sellerKpi'), image: 'SalesTraffic.png', routeName: 'seller_kpi' },
         { id: 3, name: t('cards.abc'), image: 'TopProducts.png', routeName: 'abc' },
         { id: 4, name: t('cards.residualByDate'), image: 'WarehouseQuantity.png', routeName: 'residual' },
-        { id: 5, name: t('cards.franchiseFee'), image: 'Order.png', routeName: 'franchise_fee' },
+        { id: 5, name: t('labels.sales'), image: 'Order.png', routeName: 'franchise_fee' },
     ];
 
     const roleRestrictions = {
         ROLE_PARTNER: [
             'inventories',
             'seller_kpi',
-            'residual',
-            'franchise_fee'
+            'residual'
         ],
     };
 
