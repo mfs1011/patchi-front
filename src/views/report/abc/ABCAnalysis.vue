@@ -56,8 +56,8 @@ const oneMonthAgo = new Date();
 oneMonthAgo.setMonth(today.getMonth() - 1);
 
 const filters = ref({
-    'date-from': route.query['date-from'] || oneMonthAgo.toISOString(),
-    'date-to': route.query['date-to'] || today.toISOString(),
+    'date-from': route.query['date-from'] ? new Date(route.query['date-from']) : oneMonthAgo,
+    'date-to': route.query['date-to'] ? new Date(route.query['date-to']) : today,
 });
 
 watch(

@@ -63,7 +63,7 @@ const filters = ref({
     itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
     category: parseInt(route.query.category) || null,
     location: parseInt(route.query.location) || null,
-    'date-to': route.query['date-to'] || today.toISOString(),
+    'date-to': route.query['date-to'] ? new Date(route.query['date-to']) : today,
 });
 
 watch(

@@ -61,7 +61,6 @@ export function useShopOrderInvoiceValidation() {
     // Payment
     const paymentSchema = computed(() => yup.object({
         payment: yup.object().required('Payment is required'),
-        amount: yup.number().required('Amount is required').moreThan(0, "Miqdor 0 dan katta bo‘lishi kerak"),
     }));
 
     const {
