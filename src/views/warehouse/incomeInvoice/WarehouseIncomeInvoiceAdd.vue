@@ -246,17 +246,16 @@ const reversedIncomeInvoiceProducts = computed(() => {
 
 watch(location, async () => {
     if (location.value) {
+        createdAt.value = new Date()
         await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
 
         if (inventoryStore.getLastInventoryDateTo === null) {
             dateFrom.value = null
-            createdAt.value = null
         } else {
             const date = new Date(inventoryStore.getLastInventoryDateTo);
             date.setDate(date.getDate());
             date.setMinutes(date.getMinutes() + 1);
             dateFrom.value = date;
-            createdAt.value = date
         }
     } else {
         dateFrom.value = null

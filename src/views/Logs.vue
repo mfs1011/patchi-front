@@ -172,7 +172,7 @@ const debouncedFilter = useDebouncedRef(route.query.entityId || null, 500);
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
-    itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
+    itemsPerPage: parseInt(route.query["items-per-page"]) || 100,
     entityType: parseInt(route.query.entityType) || null,
     action: parseInt(route.query.action) || null,
     createdBy: parseInt(route.query.createdBy) || null,

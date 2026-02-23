@@ -78,7 +78,7 @@ const rollbackKit = async () => {
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
-    itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
+    itemsPerPage: parseInt(route.query["items-per-page"]) || 100,
     location: null,
     product: null,
     kit: null,

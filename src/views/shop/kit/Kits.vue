@@ -63,7 +63,7 @@ const debouncedName = useDebouncedRef(route.query['name'] || '',  500)
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
-    itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
+    itemsPerPage: parseInt(route.query["items-per-page"]) || 100,
     assembly: parseInt(route.query.assembly) || null,
     seller: parseInt(route.query.seller) || null,
     location: parseInt(route.query.location) || null,

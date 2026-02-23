@@ -58,7 +58,7 @@ const visiblePages = computed(() => {
             <Select
                 @change="current = 1"
                 v-model="itemsPerPage"
-                :options="[1, 5, 10, 15, 20, 25, 30, 40, 50, 75, 100,]"
+                :options="[10, 20, 50, 100]"
                 placeholder="Select a Country"
                 size="small"
                 class="w-fit"

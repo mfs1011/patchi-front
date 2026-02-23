@@ -245,18 +245,16 @@ watch([() => location.value], async () => {
     if (location.value) {
         orderInvoiceProducts.value = []
         orderInvoiceKits.value = []
-
+        createdAt.value = new Date()
         await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${location.value.id}`})
 
         if (inventoryStore.getLastInventoryDateTo === null) {
             dateFrom.value = null
-            createdAt.value = null
         } else {
             const date = new Date(inventoryStore.getLastInventoryDateTo);
             date.setDate(date.getDate());
             date.setMinutes(date.getMinutes() + 1);
             dateFrom.value = date;
-            createdAt.value = date
         }
     } else {
         availableProducts.value = [];
@@ -506,7 +504,7 @@ const {
     >
         <template #sectionBody>
             <div class="h-full xl:h-[calc(100dvh_-_170px)] grid grid-cols-12 gap-4 overflow-hidden lg:overflow-auto">
-                <div data-lol class="col-span-12 xl:col-span-5 2xl:col-span-4 h-full overflow-y-auto">
+                <div data-lol class="col-span-12 lg:col-span-5 2xl:col-span-4 h-full overflow-y-auto">
                     <Card
                         pt:root="sm:h-full overflow-hidden rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                         pt:body="p-0 h-full flex flex-col"
@@ -784,7 +782,7 @@ const {
                         </template>
                     </Card>
                 </div>
-                <div v-if="location" class="col-span-12 xl:col-span-7 2xl:col-span-8 sm:h-full overflow-y-auto">
+                <div v-if="location" class="col-span-12 lg:col-span-7 2xl:col-span-8 h-full overflow-y-auto">
                     <Card
                         pt:root="md:h-full overflow-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                         pt:body="p-0 grow"

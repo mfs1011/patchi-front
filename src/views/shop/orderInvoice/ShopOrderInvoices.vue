@@ -50,7 +50,7 @@ const currentOrderInvoiceId = ref(null)
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
-    itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
+    itemsPerPage: parseInt(route.query["items-per-page"]) || 100,
     location: route.query.location || null,
     seller: route.query.seller || null,
     customer: route.query.customer || null,
