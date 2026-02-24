@@ -28,6 +28,7 @@ import {useLocationQuantityStore} from "@/stores/locationQuantity.js";
 import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
 import {useUserStore} from "@/stores/user.js";
 import {exportTransferInvoice} from "@/helpers/xlsx.js";
+import Select from "@/volt/Select.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -496,6 +497,7 @@ const confirmLeave = () => {
 
 onMounted(async () => {
     await transferInvoiceStore.fetchTransferInvoice(route.params.id);
+    locationStore.fetchToLocations({page: 1, 'items-per-page': 100, toLocation: true })
 
     apiData.value = transferInvoiceStore.getTransferInvoice;
     editableData.value = JSON.parse(JSON.stringify(transferInvoiceStore.getTransferInvoice));
@@ -619,18 +621,14 @@ onMounted(async () => {
                             <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
 
-                            <SearchSelect
+                            <Select
                                 v-if="!isLoading"
                                 v-model="toLocation"
-                                :fetchFn="(query) => locationStore.fetchLocations({ ...query, toLocation: true })"
-                                :options="locationStore.getLocations.models"
-                                :option-label="opt => opt?.name"
-                                :option-value="opt => opt?.id"
-                                :return-value="opt => opt"
-                                :placeholder="t('placeholders.search.byLocation')"
-                                :loading="locationStore.getIsLoadingLocation"
-                                :total-items="locationStore.getLocations.totalItems"
-                                :disabled="!editMode"
+                                :options="locationStore.getToLocations.models"
+                                option-label="name"
+                                showClear
+                                :placeholder="t('placeholders.select.location')"
+                                pt:root="w-full dark:bg-surface-700"
                             />
                         </div>
                     </div>

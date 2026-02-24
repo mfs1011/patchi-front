@@ -1,7 +1,7 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
 import Card from "@/volt/Card.vue";
@@ -28,6 +28,7 @@ import ColumnGroup from "primevue/columngroup";
 import Row from "primevue/row";
 import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
 import {useTransferInvoiceValidation} from "@/views/warehouse/transferInvoice/useWarehouseTransferInvoiceForm.js";
+import Select from "@/volt/Select.vue";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -272,6 +273,11 @@ const reversedTransferInvoiceKits = computed(() => {
     return [...transferInvoiceKits.value].reverse()
 })
 
+onMounted(() => {
+    locationStore.fetchLocations({page: 1, 'items-per-page': 100, isWarehouse: true })
+    locationStore.fetchToLocations({page: 1, 'items-per-page': 100, toLocation: true })
+})
+
 watch([() => fromLocation.value], async () => {
     if (fromLocation.value) {
         transferInvoiceProducts.value = []
@@ -357,35 +363,25 @@ const confirmLeave = () => {
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         <div>
                             <p class="text-sm">{{ t('labels.fromLocation') }}<span class="text-red-500"> *</span></p>
-                            <SearchSelect
+                            <Select
                                 v-model="fromLocation"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
                                 :options="locationStore.getLocations.models"
-                                :option-label="opt => opt?.name"
-                                :option-value="opt => opt?.name"
-                                :return-value="opt => opt"
-                                :placeholder="t('placeholders.search.byLocation')"
-                                :loading="locationStore.getIsLoadingLocation"
-                                :total-items="locationStore.getLocations.totalItems"
-                                :invalid="!!transferInvoiceErrors.fromLocation"
-                                @update:model-value="() => toLocation = null"
+                                option-label="name"
+                                showClear
+                                :placeholder="t('placeholders.select.location')"
+                                pt:root="w-full dark:bg-surface-700"
                             />
                         </div>
 
                         <div>
                             <p class="text-sm">{{ t('labels.toLocation') }}<span class="text-red-500"> *</span></p>
-
-                            <SearchSelect
+                            <Select
                                 v-model="toLocation"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query, toLocation: true })"
-                                :options="locationStore.getLocations.models.filter(l => l.id !== fromLocation)"
-                                :option-label="opt => opt?.name"
-                                :option-value="opt => opt?.name"
-                                :return-value="opt => opt"
-                                :placeholder="t('placeholders.search.byLocation')"
-                                :loading="locationStore.getIsLoadingLocation"
-                                :total-items="locationStore.getLocations.totalItems - 1"
-                                :invalid="!!transferInvoiceErrors.toLocation"
+                                :options="locationStore.getToLocations.models.filter(l => l.id !== fromLocation?.id)"
+                                option-label="name"
+                                showClear
+                                :placeholder="t('placeholders.select.location')"
+                                pt:root="w-full dark:bg-surface-700"
                             />
                         </div>
                     </div>

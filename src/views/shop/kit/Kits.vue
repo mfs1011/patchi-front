@@ -170,6 +170,7 @@ function connectMercure() {
 }
 
 onMounted(async () => {
+    locationStore.fetchLocations({page: 1, 'items-per-page': 100 })
     connectMercure()
 })
 
@@ -291,16 +292,13 @@ onBeforeRouteLeave(() => {
                         :loading="sellerStore.getIsLoadingSellers"
                         :total-items="sellerStore.getSellers.totalItems"
                     />
-                    <SearchSelect
+                    <Select
                         v-model="filters.location"
-                        :fetchFn="locationStore.fetchLocations"
                         :options="locationStore.getLocations.models"
-                        :option-label="opt => opt?.name"
-                        :option-value="opt => opt?.id"
-                        :return-value="opt => opt?.id"
+                        option-label="name"
+                        option-value="id"
+                        showClear
                         :placeholder="t('placeholders.search.byLocation')"
-                        :loading="locationStore.getIsLoadingLocation"
-                        :total-items="locationStore.getLocations.totalItems"
                     />
                     <DatePicker
                         v-model.trim="filters['date-from']"

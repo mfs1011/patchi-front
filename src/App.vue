@@ -40,6 +40,9 @@ onMounted(() => {
                 userStore.refreshTokens()
                     .catch(() => userStore.logout())
             })
+    } else {
+        userStore.logout()
+        router.push({ name: 'login'})
     }
 
     isLoading.value = false

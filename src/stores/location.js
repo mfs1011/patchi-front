@@ -8,6 +8,10 @@ export const useLocationStore = defineStore('location', () => {
             models: [],
             totalItems: 0,
         },
+        toLocations: {
+            models: [],
+            totalItems: 0,
+        },
         location: {},
         isLoadingLocations: false
     })
@@ -37,6 +41,23 @@ export const useLocationStore = defineStore('location', () => {
             const { data } = await authorizedClient.get('/locations', { params });
             state.locations.models = data.member
             state.locations.totalItems = data.totalItems
+
+            return data
+        } catch (error) {
+            console.error(error)
+            throw error
+        } finally {
+            state.isLoadingLocations = false
+        }
+    }
+
+    const fetchToLocations = async (params = { page: 1 }) => {
+        try {
+            state.isLoadingLocations = true
+
+            const { data } = await authorizedClient.get('/locations', { params });
+            state.toLocations.models = data.member
+            state.toLocations.totalItems = data.totalItems
 
             return data
         } catch (error) {
@@ -79,10 +100,12 @@ export const useLocationStore = defineStore('location', () => {
         pushLocation,
         putLocation,
         fetchLocations,
+        fetchToLocations,
         fetchLocation,
         deleteLocation,
         restoreLocation,
         getLocations: computed(() => state.locations),
+        getToLocations: computed(() => state.toLocations),
         getLocation: computed(() => state.location),
         getIsLoadingLocation: computed(() => state.isLoadingLocations),
     }
