@@ -372,18 +372,15 @@ const confirmLeave = () => {
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         <div>
                             <p class="text-sm">{{ t('labels.Seller') }}<span class="text-red-500"> *</span></p>
-                            <SearchSelect
+                            <Select
                                 v-model="seller"
-                                :fetchFn="sellerStore.fetchSellers"
                                 :options="sellerStore.getSellers.models"
-                                :option-label="opt => opt?.name"
-                                :option-value="opt => opt?.id"
-                                :return-value="opt => opt"
+                                option-label="name"
                                 :placeholder="t('placeholders.select.seller')"
-                                :loading="sellerStore.getIsLoadingSellers"
-                                :total-items="sellerStore.getSellers.totalItems"
-                                :invalid="!!kitErrors.seller"
+                                showClear
+                                pt:root="w-full dark:bg-surface-700"
                             />
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ kitErrors.seller }}</Message>
                         </div>
 
                         <div>

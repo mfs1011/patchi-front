@@ -24,6 +24,7 @@ import {useUserStore} from "@/stores/user.js";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import Dialog from "@/volt/Dialog.vue";
 import {useInventoryStore} from "@/stores/inventory.js";
+import Select from "@/volt/Select.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -197,6 +198,7 @@ function connectMercure() {
 }
 
 onMounted(async () => {
+    locationStore.fetchLocations({page: 1, 'items-per-page': 100, isWarehouse: true })
     connectMercure()
 })
 
@@ -278,16 +280,13 @@ onBeforeRouteLeave(() => {
                 class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
             >
                 <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
-                    <SearchSelect
+                    <Select
                         v-model="filters.location"
-                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, isWarehouse: true})"
                         :options="locationStore.getLocations.models"
-                        :option-label="opt => opt?.name"
-                        :option-value="opt => opt?.id"
-                        :return-value="opt => opt?.id"
+                        option-label="name"
+                        option-value="id"
+                        showClear
                         :placeholder="t('placeholders.search.byLocation')"
-                        :loading="locationStore.getIsLoadingLocation"
-                        :total-items="locationStore.getLocations.totalItems"
                     />
                     <SearchSelect
                         v-model="filters.supplier"

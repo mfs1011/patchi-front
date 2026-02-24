@@ -214,9 +214,7 @@ async function firstFetchProduct(queryFilters) {
 }
 
 onMounted(() => {
-    if (!locationStore.getLocations.models.length) {
-        locationStore.fetchLocations({page: 1, 'items-per-page': 100, isWarehouse: false })
-    }
+    locationStore.fetchLocations({page: 1, 'items-per-page': 100, isWarehouse: false })
 
     if (!productsForSelect.value.length) {
         productStore.fetchProducts({ page: productSelectPage.value, 'items-per-page': 7, name: filters.value.product })
@@ -300,16 +298,13 @@ onBeforeRouteLeave(() => {
                 class="px-2 sm:px-4 transition-all overflow-hidden bg-surface-0 dark:bg-surface-800 rounded-lg"
             >
                 <div class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2 sm:gap-4 items-center">
-                    <SearchSelect
+                    <Select
                         v-model="filters.location"
-                        :fetchFn="(query) => locationStore.fetchLocations({ ...query, isWarehouse: false})"
                         :options="locationStore.getLocations.models"
-                        :option-label="opt => opt?.name"
-                        :option-value="opt => opt?.id"
-                        :return-value="opt => opt?.id"
+                        option-label="name"
+                        option-value="id"
+                        showClear
                         :placeholder="t('placeholders.search.byLocation')"
-                        :loading="locationStore.getIsLoadingLocation"
-                        :total-items="locationStore.getLocations.totalItems"
                     />
                     <SearchSelect
                         v-if="tabVal === 'product'"

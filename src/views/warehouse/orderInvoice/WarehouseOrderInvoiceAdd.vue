@@ -34,6 +34,7 @@ import {useRouter} from "vue-router";
 import {usePaymentStore} from "@/stores/payment.js";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {useUSDRateStore} from "@/stores/usdRate.js";
+import Select from "@/volt/Select.vue";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -217,6 +218,8 @@ const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
 onMounted( () => {
     paymentStore.fetchPayments()
     usdRateStore.fetchLastUSDRate()
+    categoryStore.fetchCategories()
+    assemblyStore.fetchAssemblies()
 })
 
 watch([() => location.value], async () => {
@@ -482,7 +485,7 @@ const {
     >
         <template #sectionBody>
             <div class="h-full xl:h-[calc(100dvh_-_170px)] grid grid-cols-12 gap-4 overflow-hidden lg:overflow-auto">
-                <div data-lol class="col-span-12 xl:col-span-5 2xl:col-span-4 h-full overflow-y-auto">
+                <div data-lol class="col-span-12 lg:col-span-5 2xl:col-span-4 h-full overflow-y-auto">
                     <Card
                         pt:root="sm:h-full overflow-hidden rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                         pt:body="p-0 h-full flex flex-col"
@@ -494,36 +497,26 @@ const {
                                 <div>
                                     <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
 
-                                    <SearchSelect
+                                    <Select
                                         v-model="location"
-                                        :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
                                         :options="locationStore.getLocations.models"
-                                        :option-label="opt => opt?.name"
-                                        :option-value="opt => opt?.id"
-                                        :return-value="opt => opt"
+                                        option-label="name"
+                                        showClear
                                         :placeholder="t('placeholders.select.location')"
-                                        :loading="locationStore.getIsLoadingLocation"
-                                        :total-items="locationStore.getLocations.totalItems"
-                                        :invalid="!!orderInvoiceErrors.location"
-                                        size="small"
+                                        pt:root="w-full dark:bg-surface-700"
                                     />
                                 </div>
 
                                 <div>
                                     <p class="text-sm">{{ t('labels.client') }}<span class="text-red-500"> *</span></p>
 
-                                    <SearchSelect
+                                    <Select
                                         v-model="customer"
-                                        :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': true })"
                                         :options="customerStore.getCustomers.models"
-                                        :option-label="opt => opt?.name"
-                                        :option-value="opt => opt?.id"
-                                        :return-value="opt => opt"
+                                        option-label="name"
+                                        showClear
                                         :placeholder="t('placeholders.select.customer')"
-                                        :loading="customerStore.getIsLoadingCustomers"
-                                        :total-items="customerStore.getCustomers.totalItems"
-                                        :invalid="!!orderInvoiceErrors.customer"
-                                        size="small"
+                                        pt:root="w-full dark:bg-surface-700"
                                     />
                                 </div>
 
@@ -540,7 +533,6 @@ const {
                                         show-button-bar
                                         :invalid="!!orderInvoiceErrors.createdAt"
                                         :minDate="dateFrom"
-                                        size="small"
                                     />
                                 </div>
                             </div>
@@ -686,24 +678,14 @@ const {
                                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                             <div>
                                                 <p class="text-sm">{{ t('labels.Payment') }}<span class="text-red-500"> *</span></p>
-                                                <SearchSelect
+                                                <Select
                                                     v-model="payment"
-                                                    :fetchFn="(query) => paymentStore.fetchPayments({...query})"
                                                     :options="paymentStore.getPayments.models"
-                                                    :option-label="opt => `${opt?.name} | ${opt?.paymentType?.name}`"
-                                                    :option-value="opt => `${opt?.name} | ${opt?.paymentType?.name}`"
-                                                    :return-value="opt => opt"
-                                                    :search-value="opt => opt.id"
-                                                    search-key="name"
-                                                    :placeholder="t('placeholders.select.product')"
-                                                    :loading="paymentStore.getIsLoadingPayments"
-                                                    :total-items="paymentStore.getPayments.totalItems"
-                                                    :invalid="!!paymentErrors.payment"
-                                                >
-                                                    <template v-if="paymentStore.getPayments.models.length" #header>
-                                                        <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.paymentType') }}</p>
-                                                    </template>
-                                                </SearchSelect>
+                                                    option-label="name"
+                                                    showClear
+                                                    :placeholder="t('placeholders.select.paymentType')"
+                                                    pt:root="w-full dark:bg-surface-700"
+                                                />
                                             </div>
 
                                             <div>
@@ -743,7 +725,7 @@ const {
                         </template>
                     </Card>
                 </div>
-                <div v-if="location" class="col-span-12 xl:col-span-7 2xl:col-span-8 sm:h-full overflow-y-auto">
+                <div v-if="location" class="col-span-12 lg:col-span-7 2xl:col-span-8 h-full overflow-y-auto">
                     <Card
                         pt:root="md:h-full overflow-auto rounded-lg border border-surface-300 dark:border-surface-700 cursor-pointer group dark:bg-surface-800 border dark:border-surface-600/50 transition-all shadow-none cursor-auto"
                         pt:body="p-0 grow"
@@ -762,35 +744,24 @@ const {
                                                 v-model="productNameDebounced"
                                                 class="w-full"
                                                 :placeholder="t('placeholders.search.byTitleAndQRAndCode')"
-                                                size="small"
                                             />
                                         </label>
                                     </div>
-                                    <SearchSelect
+                                    <Select
                                         v-model="filters.productCategory"
-                                        :fetchFn="categoryStore.fetchCategories"
                                         :options="categoryStore.getCategories.models"
-                                        :option-label="opt => opt?.name"
-                                        :option-value="opt => opt?.name"
-                                        :return-value="opt => opt.id"
+                                        option-label="name"
+                                        option-value="id"
+                                        showClear
                                         :placeholder="t('placeholders.search.byCategory')"
-                                        :loading="categoryStore.getIsLoadingCategory"
-                                        :total-items="categoryStore.getCategories.totalItems"
-                                        :invalid="!!orderInvoiceErrors.productCategory"
-                                        size="small"
                                     />
-                                    <SearchSelect
+                                    <Select
                                         v-model="filters.productAssembly"
-                                        :fetchFn="assemblyStore.fetchAssemblies"
                                         :options="assemblyStore.getAssemblies.models"
-                                        :option-label="opt => opt?.name"
-                                        :option-value="opt => opt?.name"
-                                        :return-value="opt => opt.id"
+                                        option-label="name"
+                                        option-value="id"
+                                        showClear
                                         :placeholder="t('placeholders.search.byAssembly')"
-                                        :loading="assemblyStore.getIsLoadingAssembly"
-                                        :total-items="assemblyStore.getAssemblies.totalItems"
-                                        :invalid="!!orderInvoiceErrors.productAssembly"
-                                        size="small"
                                     />
 
                                     <div class="flex justify-end">
@@ -806,22 +777,16 @@ const {
                                                 v-model="kitNameDebounced"
                                                 class="w-full"
                                                 :placeholder="t('placeholders.search.byTitleAndQRAndCode')"
-                                                size="small"
                                             />
                                         </label>
                                     </div>
-                                    <SearchSelect
+                                    <Select
                                         v-model="filters.kitAssembly"
-                                        :fetchFn="assemblyStore.fetchAssemblies"
                                         :options="assemblyStore.getAssemblies.models"
-                                        :option-label="opt => opt?.name"
-                                        :option-value="opt => opt?.name"
-                                        :return-value="opt => opt.id"
+                                        option-label="name"
+                                        option-value="id"
+                                        showClear
                                         :placeholder="t('placeholders.search.byAssembly')"
-                                        :loading="assemblyStore.getIsLoadingAssembly"
-                                        :total-items="assemblyStore.getAssemblies.totalItems"
-                                        :invalid="!!orderInvoiceErrors.kitAssembly"
-                                        size="small"
                                     />
 
                                     <div class="col-span-full xl:col-span-1 flex justify-end">

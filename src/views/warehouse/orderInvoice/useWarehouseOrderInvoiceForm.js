@@ -117,9 +117,6 @@ export function useOrderInvoiceValidation() {
         ...paymentFormCtx
     } = useForm({
         validationSchema: paymentSchema,
-        initialValues: {
-            amount: 0
-        }
     })
 
     const { value: location } = useField('location', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
