@@ -35,6 +35,7 @@ import {usePaymentStore} from "@/stores/payment.js";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {useUSDRateStore} from "@/stores/usdRate.js";
 import Select from "@/volt/Select.vue";
+import Textarea from "@/volt/Textarea.vue";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -48,6 +49,7 @@ const {
     orderInvoiceFormCtx,
     location,
     customer,
+    comment,
     createdAt,
     productHandleSubmit,
     productErrors,
@@ -179,6 +181,7 @@ const addOrderInvoice = async (values) => {
     const payload = {
         location: values.location['@id'],
         customer: values.customer['@id'],
+        comment: values.comment,
         createdAt: date,
         orderInvoiceProducts: orderInvoiceProducts.value.map(p => p.api),
         orderInvoiceKits: orderInvoiceKits.value.map(k => k.api),
@@ -210,7 +213,7 @@ const addOrderInvoice = async (values) => {
 }
 
 const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
-    if ((orderInvoiceProducts.value.length || orderInvoiceKits.value.length) && totalPrice.value === totalPayments.value) {
+    if (orderInvoiceProducts.value.length || orderInvoiceKits.value.length) {
         await addOrderInvoice(values)
     }
 })
@@ -691,7 +694,12 @@ const {
                                             <div>
                                                 <p class="text-sm">{{ t('labels.price') }}<span class="text-red-500"> *</span></p>
                                                 <InputNumber
-                                                    v-model="amount"
+                                                    :modelValue="amount"
+                                                    @update:modelValue="val => {
+                                                        if (typeof val === 'number' || val === null) {
+                                                            amount = val
+                                                        }
+                                                    }"
                                                     fluid
                                                     showButtons
                                                     :placeholder="t('placeholders.price')"
@@ -720,6 +728,17 @@ const {
                                             class="w-fit px-3! h-fit"
                                         />
                                     </div>
+
+                                    <label class="block mt-5">
+                                        <Textarea
+                                            v-model="comment"
+                                            rows="5"
+                                            class="resize-none"
+                                            size="small"
+                                            fluid
+                                            :placeholder="t('placeholders.comment')"
+                                        />
+                                    </label>
                                 </div>
                             </div>
                         </template>
