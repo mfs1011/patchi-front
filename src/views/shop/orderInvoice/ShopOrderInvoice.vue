@@ -898,7 +898,7 @@ watch([() => kit.value], async () => {
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
                                 :return-value="opt => opt"
-                                :placeholder="t('placeholders.search.byLocation')"
+                                :placeholder="t('placeholders.select.location')"
                                 :loading="locationStore.getIsLoadingLocation"
                                 :total-items="locationStore.getLocations.totalItems"
                                 disabled
@@ -918,7 +918,7 @@ watch([() => kit.value], async () => {
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
                                 :return-value="opt => opt"
-                                :placeholder="t('placeholders.search.bySeller')"
+                                :placeholder="t('placeholders.select.seller')"
                                 :loading="sellerStore.getIsLoadingSellers"
                                 :total-items="sellerStore.getSellers.totalItems"
                                 disabled
@@ -938,7 +938,7 @@ watch([() => kit.value], async () => {
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.id"
                                 :return-value="opt => opt"
-                                :placeholder="t('placeholders.search.byCustomer')"
+                                :placeholder="t('placeholders.select.customer')"
                                 :loading="customerStore.getIsLoadingCustomers"
                                 :total-items="customerStore.getCustomers.totalItems"
                                 :disabled="!editMode"

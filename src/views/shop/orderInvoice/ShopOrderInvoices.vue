@@ -489,16 +489,16 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ data.createdBy.name }}</p>
                             </template>
                         </Column>
-                        <Column field="updatedAt" :header="t('labels.updatedAt')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="orderInvoiceStore.getIsLoadingOrderInvoices"/>
-                                <p v-else>{{ data.updatedAt ? getFormattedDate(data.updatedAt) : '-' }}</p>
-                            </template>
-                        </Column>
                         <Column field="updatedBy" :header="t('labels.updatedBy')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="orderInvoiceStore.getIsLoadingOrderInvoices"/>
                                 <p v-else>{{ data.updatedBy?.name || '-' }}</p>
+                            </template>
+                        </Column>
+                        <Column field="comment" :header="t('labels.comment')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="orderInvoiceStore.getIsLoadingOrderInvoices"/>
+                                <p v-else class="max-h-20 border border-surface-300 dark:border-surface-700 rounded px-2 py-1 max-w-100 overflow-auto whitespace-break-spaces">{{ data.comment || '-' }}</p>
                             </template>
                         </Column>
                         <Column field="actions" :header="t('actions')">

@@ -121,6 +121,7 @@ export function useOrderInvoiceValidation() {
 
     const { value: location } = useField('location', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
     const { value: customer } = useField('customer', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
+    const { value: comment } = useField('comment', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
     const { value: createdAt } = useField('createdAt', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
     const { value: product } = useField('product', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: productFormCtx })
     const { value: productColor } = useField('color', undefined, { validateOnMount: false, form: productFormCtx });
@@ -142,6 +143,7 @@ export function useOrderInvoiceValidation() {
         orderInvoiceFormCtx,
         location,
         customer,
+        comment,
         createdAt,
 
         // Product form

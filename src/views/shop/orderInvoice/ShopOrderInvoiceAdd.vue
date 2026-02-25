@@ -37,6 +37,8 @@ import {useUserStore} from "@/stores/user.js";
 import DatePicker from "@/volt/DatePicker.vue";
 import {useInventoryStore} from "@/stores/inventory.js";
 import Select from "@/volt/Select.vue";
+import Textarea from "@/volt/Textarea.vue";
+import Message from "@/volt/Message.vue";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -52,6 +54,7 @@ const {
     location,
     seller,
     customer,
+    comment,
     createdAt,
     productHandleSubmit,
     productErrors,
@@ -183,6 +186,7 @@ const addOrderInvoice = async (values) => {
 
     const payload = {
         location: values.location['@id'],
+        comment: values.comment,
         createdAt: date,
         orderInvoiceProducts: orderInvoiceProducts.value.map(p => p.api),
         orderInvoiceKits: orderInvoiceKits.value.map(k => k.api),
@@ -729,7 +733,12 @@ const {
                                             <div>
                                                 <p class="text-sm">{{ t('labels.price') }}<span class="text-red-500"> *</span></p>
                                                 <InputNumber
-                                                    v-model="amount"
+                                                    :modelValue="amount"
+                                                    @update:modelValue="val => {
+                                                        if (typeof val === 'number' || val === null) {
+                                                            amount = val
+                                                        }
+                                                    }"
                                                     fluid
                                                     showButtons
                                                     :placeholder="t('placeholders.price')"
@@ -758,6 +767,17 @@ const {
                                             class="w-fit px-3! h-fit"
                                         />
                                     </div>
+
+                                    <label class="block mt-5">
+                                        <Textarea
+                                            v-model="comment"
+                                            rows="5"
+                                            class="resize-none"
+                                            size="small"
+                                            fluid
+                                            :placeholder="t('placeholders.comment')"
+                                        />
+                                    </label>
                                 </div>
                             </div>
                         </template>

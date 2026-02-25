@@ -42,7 +42,6 @@ onMounted(() => {
             })
     } else {
         userStore.logout()
-        router.push({ name: 'login'})
     }
 
     isLoading.value = false
