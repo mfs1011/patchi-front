@@ -1,7 +1,7 @@
 <script setup>
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Section from "@/components/UI/Section.vue";
-import {computed, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import Button from "@/volt/Button.vue";
 import Card from "@/volt/Card.vue";
@@ -26,6 +26,7 @@ import {useMediaObjectStore} from "@/stores/mediaObject.js";
 import {useKitStore} from "@/stores/kit.js";
 import Select from "@/volt/Select.vue";
 import {formatCurrency, formatDateTimeLocal} from "@/helpers/numberFormat.js";
+import {useUSDRateStore} from "@/stores/usdRate.js";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -35,6 +36,7 @@ const assemblyStore = useAssemblyStore();
 const sellerStore = useSellerStore();
 const mediaObjectStore = useMediaObjectStore();
 const kitStore = useKitStore();
+const usdRateStore = useUSDRateStore();
 const router = useRouter();
 const currentProduct = ref({})
 const deleteVisible = ref(false)
@@ -283,6 +285,8 @@ const reversedKitProducts = computed(() => {
     return [...kitProducts.value].reverse()
 })
 
+onMounted(() => usdRateStore.fetchLastUSDRate())
+
 watch(seller, async (newVal) => {
     isLocation.value = false
 
@@ -292,6 +296,17 @@ watch(seller, async (newVal) => {
 
         isLocation.value = true
     }
+})
+
+watch(retailPrice, (newValue) => {
+    if (!newValue) {
+        wholesalePrice.value = null
+        return
+    }
+
+    wholesalePrice.value = Number(
+        (newValue / usdRateStore.getUSDRate.rate).toFixed(1)
+    )
 })
 
 onBeforeRouteLeave((to, from, next) => {
