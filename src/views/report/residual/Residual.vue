@@ -269,16 +269,16 @@ watch(() => tabVal.value, () => {
                                             <p v-else>{{ data.product.id }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="name" :header="t('labels.name')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                            <p v-else>{{ data.product.name }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
                                             <p v-else>{{ data.product.code }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="title" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                            <p v-else>{{ data.product.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="category" :header="t('labels.category')">
@@ -357,16 +357,16 @@ watch(() => tabVal.value, () => {
                                             <p v-else>{{ data.kit.id }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="name" :header="t('labels.name')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
-                                            <p v-else>{{ data.kit.name }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                             <p v-else>{{ data.kit.code }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="title" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
+                                            <p v-else>{{ data.kit.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="amount" :header="t('labels.amount')">

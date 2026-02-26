@@ -515,8 +515,8 @@ const confirmLeave = () => {
                                 v-model="product"
                                 :fetchFn="(query) => productStore.fetchAvailableProducts({...query, location: seller.location.id })"
                                 :options="productStore.getAvailableProducts.models"
-                                :option-label="opt => `${opt?.name} | ${opt?.code} | ${opt?.color ?? '-'} | ${opt?.totalQty} ${t(`labels.${opt?.unit}`)}`"
-                                :option-value="opt => `${opt?.name} | ${opt?.code} | ${opt?.color ?? '-'} | ${opt?.totalQty} ${t(`labels.${opt?.unit}`)}`"
+                                :option-label="opt => `${opt?.code} | ${opt?.color ?? '-'} | ${opt?.totalQty} ${t(`labels.${opt?.unit}`)}`"
+                                :option-value="opt => `${opt?.code} | ${opt?.color ?? '-'} | ${opt?.totalQty} ${t(`labels.${opt?.unit}`)}`"
                                 :return-value="opt => opt"
                                 :placeholder="t('placeholders.select.product')"
                                 :loading="productStore.getIsLoadingProducts"
@@ -525,7 +525,7 @@ const confirmLeave = () => {
                             >
                                 <template #header>
                                     <div
-                                        class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} |
+                                        class="px-4 py-2 bg-surface-100 dark:bg-surface-900">
                                         {{t('labels.code') }} | {{t('labels.color') }} | {{t('labels.qty') }}
                                     </div>
                                 </template>
@@ -578,14 +578,14 @@ const confirmLeave = () => {
                                 <p>{{ kitProducts.length - index }}</p>
                             </template>
                         </Column>
-                        <Column field="product" :header="t('labels.product')">
-                            <template #body="{ data }">
-                                <p>{{ data.product?.name }}</p>
-                            </template>
-                        </Column>
                         <Column field="code" :header="t('labels.code')">
                             <template #body="{ data }">
                                 <p>{{ data.product?.code }}</p>
+                            </template>
+                        </Column>
+                        <Column field="product" :header="t('labels.title')">
+                            <template #body="{ data }">
+                                <p>{{ data.product?.name }}</p>
                             </template>
                         </Column>
                         <Column field="color" :header="t('labels.color')">
@@ -629,7 +629,7 @@ const confirmLeave = () => {
                             </template>
                         </Column>
                         <template #footer>
-                            <div class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(sumPriceOfKitProducts) }} $</div>
+                            <div class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(sumPriceOfKitProducts) }} {{ t('soum') }}</div>
                         </template>
                     </DataTable>
                 </template>

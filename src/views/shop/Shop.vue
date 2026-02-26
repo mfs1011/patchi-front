@@ -9,10 +9,10 @@ const userStore = useUserStore();
 
 const cards = computed(() => {
     const baseCards = [
-        { id: 1, name: t('cards.shopContent'), image: 'WarehouseQuantity.png', routeName: 'shop-content' },
-        { id: 2, name: t('cards.kits'), image: 'Kits.png', routeName: 'kits' },
-        { id: 3, name: t('cards.transferInvoices'), image: 'TransferInvoice.png', routeName: 'shop-transfer-invoices' },
-        { id: 4, name: t('cards.orderInvoices'), image: 'Order.png', routeName: 'shop-order-invoices' },
+        { id: 1, name: t('cards.orderInvoices'), image: 'Order.png', routeName: 'shop-order-invoices' },
+        { id: 2, name: t('cards.shopContent'), image: 'WarehouseQuantity.png', routeName: 'shop-content' },
+        { id: 3, name: t('cards.kits'), image: 'Kits.png', routeName: 'kits' },
+        { id: 4, name: t('cards.transferInvoices'), image: 'TransferInvoice.png', routeName: 'shop-transfer-invoices' },
         { id: 5, name: t('cards.returnInvoices'), image: 'Return.png', routeName: 'shop-return-invoices' },
     ];
 

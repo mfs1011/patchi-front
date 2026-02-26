@@ -157,8 +157,8 @@ onMounted(async () => {
 
     setTimeout(() => {
         location.value = inventoryStore.getInventory.location
-        dateFrom.value = inventoryStore.getInventory.dateFrom
-        dateTo.value = inventoryStore.getInventory.dateTo
+        dateFrom.value = inventoryStore.getInventory.dateFrom ? new Date(inventoryStore.getInventory.dateFrom) : null
+        dateTo.value = inventoryStore.getInventory.dateTo ? new Date(inventoryStore.getInventory.dateTo) : null
     })
 
     isLoading.value = false
@@ -344,16 +344,16 @@ const pushChanges = async () => {
                                             <p v-else>{{ data.id }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="name" :header="t('labels.name')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.locationQuantity?.product.name }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ data.locationQuantity?.product.code }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="title" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.locationQuantity?.product.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="color" :header="t('labels.color')">
@@ -560,16 +560,16 @@ const pushChanges = async () => {
                                             <p v-else>{{ data.id }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="name" :header="t('labels.name')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.locationQuantityKit?.kit.name }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ data.locationQuantityKit?.kit.code }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="title" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.locationQuantityKit?.kit.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="expiryDate" :header="t('labels.expiryDate')">

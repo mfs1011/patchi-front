@@ -736,8 +736,8 @@ onMounted(async () => {
                                             v-model="orderInvoiceProduct"
                                             :fetchFn="(query) => orderInvoiceProductStore.fetchOrderInvoiceProducts({...query, orderInvoice: returnInvoiceStore.getReturnInvoice.orderInvoice.id})"
                                             :options="orderInvoiceProductStore.getOrderInvoiceProducts.models"
-                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty - getReturnQtyProduct(opt)} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
-                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty - getReturnQtyProduct(opt)} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-label="opt => `${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty - getReturnQtyProduct(opt)} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-value="opt => `${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt?.qty - getReturnQtyProduct(opt)} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
                                             search-key="name"
@@ -747,7 +747,7 @@ onMounted(async () => {
                                             :invalid="!!productErrors.orderInvoiceProduct"
                                         >
                                             <template v-if="orderInvoiceProductStore.getOrderInvoiceProducts.models.length" #header>
-                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.qty') }}</p>
+                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.qty') }}</p>
                                             </template>
                                         </SearchSelect>
                                     </div>
@@ -861,16 +861,16 @@ onMounted(async () => {
                                             <p>{{ index + 1 }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="product" :header="t('labels.title')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.orderInvoiceProduct?.product?.name }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ data.orderInvoiceProduct?.product?.code || '-' }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="product" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.orderInvoiceProduct?.product?.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qr" :header="t('labels.qr')">

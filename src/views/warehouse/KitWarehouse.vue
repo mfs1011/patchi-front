@@ -313,7 +313,7 @@ onMounted(async () => {
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.name') }}<span class="text-red-500"> *</span></p>
+                            <p class="text-sm">{{ t('labels.title') }}<span class="text-red-500"> *</span></p>
 
                             <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
@@ -322,7 +322,7 @@ onMounted(async () => {
                                 v-if="!isLoading"
                                 v-model.trim="name"
                                 fluid
-                                :placeholder="t('placeholders.name')"
+                                :placeholder="t('placeholders.title')"
                                 :class="{ 'p-invalid': kitErrors.name }"
                                 :invalid="!!kitErrors.name"
                                 :disabled="!editMode"
@@ -420,16 +420,16 @@ onMounted(async () => {
                         pt:footer="border-none dark:bg-surface-800"
                         pt:root="border border-surface-300 dark:border-surface-600/50"
                     >
-                        <Column field="product" :header="t('labels.product')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.product.name }}</p>
-                            </template>
-                        </Column>
                         <Column field="code" :header="t('labels.code')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ data.product.code }}</p>
+                            </template>
+                        </Column>
+                        <Column field="product" :header="t('labels.title')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="isLoading"/>
+                                <p v-else>{{ data.product.name }}</p>
                             </template>
                         </Column>
                         <Column field="color" :header="t('labels.color')">
