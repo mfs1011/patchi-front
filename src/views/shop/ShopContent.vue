@@ -408,16 +408,16 @@ onBeforeRouteLeave(() => {
                                             <p v-else>{{ data.product.id }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="product" :header="t('labels.name')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
-                                            <p v-else>{{ data.product.name }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="product" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                             <p v-else>{{ data.product.code }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="product" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
+                                            <p v-else>{{ data.product.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="product" :header="t('labels.type')">
@@ -542,16 +542,16 @@ onBeforeRouteLeave(() => {
                                             <p v-else>{{ data.kit?.id }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="kit" :header="t('labels.name')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.kit?.name }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="kit" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                             <p v-else>{{ data.kit?.code }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="kit" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
+                                            <p v-else>{{ data.kit?.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="location" :header="t('labels.locations')">

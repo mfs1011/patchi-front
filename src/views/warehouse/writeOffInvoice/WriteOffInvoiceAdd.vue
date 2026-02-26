@@ -402,8 +402,8 @@ watch(location, async (newVal) => {
                                             v-model="locationQuantity"
                                             :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: location.id})"
                                             :options="locationQuantityStore.getLocationQuantities.models"
-                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
-                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-label="opt => `${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-value="opt => `${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
                                             search-key="id"
@@ -413,7 +413,7 @@ watch(location, async (newVal) => {
                                             :invalid="!!locationQuantityErrors.locationQuantity"
                                         >
                                             <template v-if="locationQuantityStore.getLocationQuantities.models.length" #header>
-                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
+                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
                                             </template>
                                         </SearchSelect>
                                     </div>
@@ -541,14 +541,14 @@ watch(location, async (newVal) => {
                                             <p>{{ writeOffInvoiceProducts.length - index }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="product" :header="t('labels.title')">
-                                        <template #body="{ data }">
-                                            <p>{{ data.locationQuantity?.product?.name }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantity?.product?.code || '-' }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="product" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <p>{{ data.locationQuantity?.product?.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="color" :header="t('labels.color')">

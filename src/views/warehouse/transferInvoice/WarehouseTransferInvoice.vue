@@ -661,8 +661,8 @@ onMounted(async () => {
                                             v-model="locationQuantity"
                                             :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: fromLocation.id, isZero: true})"
                                             :options="locationQuantityStore.getLocationQuantities.models"
-                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
-                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-label="opt => `${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-value="opt => `${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
                                             search-key="name"
@@ -672,7 +672,7 @@ onMounted(async () => {
                                             :invalid="!!locationQuantityErrors.locationQuantity"
                                         >
                                             <template v-if="locationQuantityStore.getLocationQuantities.models.length" #header>
-                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
+                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
                                             </template>
                                         </SearchSelect>
                                     </div>
@@ -786,16 +786,16 @@ onMounted(async () => {
                                             <p>{{ index + 1 }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="product" :header="t('labels.title')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.locationQuantity?.product?.name }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ data.locationQuantity?.product?.code || '-' }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="product" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.locationQuantity?.product?.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="color" :header="t('labels.color')">

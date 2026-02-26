@@ -444,16 +444,16 @@ onMounted(async () => {
                                 <p>{{ index + 1 }}</p>
                             </template>
                         </Column>
-                        <Column field="product" :header="t('labels.product')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.product.name }}</p>
-                            </template>
-                        </Column>
                         <Column field="code" :header="t('labels.code')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
                                 <p v-else>{{ data.product.code }}</p>
+                            </template>
+                        </Column>
+                        <Column field="product" :header="t('labels.title')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="isLoading"/>
+                                <p v-else>{{ data.product.name }}</p>
                             </template>
                         </Column>
                         <Column field="color" :header="t('labels.color')">

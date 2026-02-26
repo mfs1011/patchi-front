@@ -56,6 +56,11 @@ const baseUrl = computed(() => import.meta.env.VITE_APP_API_URL);
 const FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp'];
 
+const excludeOptions = [
+    { label: 'exclude', value: true },
+    { label: 'include', value: false }
+]
+
 const schema = computed(() => yup.object({
     qr: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     code: yup.string().required(t('errorMessages.codeRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
@@ -97,6 +102,7 @@ const { value: wholesalePrice } = useField('wholesalePrice');
 const { value: retailPrice } = useField('retailPrice');
 const { value: minQty } = useField('minQty');
 const { value: photo } = useField('photo'); // null
+const { value: exclude } = useField('exclude');
 
 
 const setPhoto = event => {
@@ -173,7 +179,8 @@ onMounted(async () => {
         wholesalePrice: productStore.getProduct.wholesalePrice,
         retailPrice :productStore.getProduct.retailPrice,
         minQty: productStore.getProduct.minQty,
-        assembly: productStore.getProduct.assembly
+        assembly: productStore.getProduct.assembly,
+        exclude: productStore.getProduct.exclude
     }
 
     photoPreview.value = productStore.getProduct.photo?.contentUrl
@@ -194,6 +201,7 @@ const isChanged = computed(() => {
     if (qr.value !== productStore.getProduct.qr) return true
     if (code.value !== productStore.getProduct.code) return true
     if (category.value !== productStore.getProduct.category.id) return true
+    if (exclude.value !== productStore.getProduct.exclude) return true
 
     if(productStore.getProduct.assembly) {
         if (assembly.value !== productStore.getProduct.assembly.id) return true
@@ -204,9 +212,8 @@ const isChanged = computed(() => {
     if (wholesalePrice.value !== productStore.getProduct.wholesalePrice) return true
     if (retailPrice.value !== productStore.getProduct.retailPrice) return true
     if (minQty.value !== productStore.getProduct.minQty) return true
-    if (photo.value) return true
 
-    return false
+    return !!photo.value;
 })
 
 
@@ -423,6 +430,17 @@ const confirmLeave = () => {
                             />
                             <Message class="min:h-5" size="small" severity="error" variant="simple">{{ errors.photo }}</Message>
                         </label>
+
+                        <div>
+                            <p class="block">...</p>
+                            <Select
+                                v-model="exclude"
+                                :options="excludeOptions"
+                                option-label="label"
+                                option-value="value"
+                                pt:root="w-full dark:bg-surface-700"
+                            />
+                        </div>
 
                         <div v-if="productStore.getProduct.photo?.contentUrl || isLoading" class="col-span-1 rounded">
                             <span>{{ t('labels.photoPreview') }}</span>

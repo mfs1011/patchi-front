@@ -348,16 +348,16 @@ onBeforeRouteLeave(() => {
                                 <div v-else> - </div>
                             </template>
                         </Column>
-                        <Column field="name" :header="t('labels.name')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.name }}</p>
-                            </template>
-                        </Column>
                         <Column field="code" :header="t('labels.code')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
                                 <p v-else>{{ data.code }}</p>
+                            </template>
+                        </Column>
+                        <Column field="title" :header="t('labels.title')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
+                                <p v-else>{{ data.name }}</p>
                             </template>
                         </Column>
                         <Column field="qr" :header="t('labels.qr')">

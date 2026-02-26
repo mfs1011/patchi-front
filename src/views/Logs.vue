@@ -452,8 +452,8 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Product'">
-                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
                                         <h6 v-if="data.oldData?.code">{{ t('labels.code') }}: <b>{{ data.oldData.code }}</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.title') }}: <b>{{ data.oldData.name }}</b></h6>
                                         <h6 v-if="data.oldData?.qr">{{ t('labels.qr') }}: <b>{{ data.oldData.qr }}</b></h6>
                                         <h6 v-if="data.oldData?.category">{{ t('labels.category') }}: <b>{{ data.oldData.category.name }}</b></h6>
                                         <h6 v-if="data.oldData?.assembly">{{ t('labels.collection') }}: <b>{{ data.oldData.assembly.name }}</b></h6>
@@ -462,15 +462,15 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.minQty !== undefined">{{ t('labels.minQty') }}: <b>{{ formatCurrency(data.oldData.minQty) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Location'">
-                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.title') }}: <b>{{ data.oldData.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Category'">
-                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.title') }}: <b>{{ data.oldData.name }}</b></h6>
                                         <h6 v-if="data.oldData?.categoryType">{{ t('labels.categoryType') }}: <b>{{ data.oldData.categoryType.name }}</b></h6>
                                         <h6 v-if="data.oldData?.unit">{{ t('labels.unit') }}: <b>{{ t(`labels.${data.oldData.unit.name}`) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Color'">
-                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.title') }}: <b>{{ data.oldData.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'OrderKpiPercent'">
                                         <h6 v-if="data.oldData?.kpiPercent !== undefined">{{ t('labels.kpiPercent') }}: <b>{{ data.oldData.kpiPercent }}%</b></h6>
@@ -485,11 +485,11 @@ onMounted(() => {
                                         <h6 v-if="data.oldData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.oldData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Payment'">
-                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.title') }}: <b>{{ data.oldData.name }}</b></h6>
                                         <h6 v-if="data.oldData?.paymentType">{{ t('labels.paymentType') }}: <b>{{ data.oldData.paymentType.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Assembly'">
-                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.title') }}: <b>{{ data.oldData.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Inventory'">
                                         <h6 v-if="data.oldData?.location">{{ t('labels.locations') }}: <b>{{ data.oldData.location.name }}</b></h6>
@@ -514,7 +514,7 @@ onMounted(() => {
                                     </div>
                                     <div v-if="data.entityType === 'Kit'">
                                         <h6 v-if="data.oldData?.seller">{{ t('labels.Seller') }}: <b>{{ data.oldData.seller.name }}</b></h6>
-                                        <h6 v-if="data.oldData?.name">{{ t('labels.name') }}: <b>{{ data.oldData.name }}</b></h6>
+                                        <h6 v-if="data.oldData?.name">{{ t('labels.title') }}: <b>{{ data.oldData.name }}</b></h6>
                                         <h6 v-if="data.oldData?.code">{{ t('labels.code') }}: <b>{{ data.oldData.code }}</b></h6>
                                         <h6 v-if="data.oldData?.qr">{{ t('labels.qr') }}: <b>{{ data.oldData.qr }}</b></h6>
                                         <h6 v-if="data.oldData?.assembly">{{ t('labels.collection') }}: <b>{{ data.oldData.assembly.name }}</b></h6>
@@ -590,8 +590,8 @@ onMounted(() => {
                                         <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Product'">
-                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
                                         <h6 v-if="data.newData?.code">{{ t('labels.code') }}: <b>{{ data.newData.code }}</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.title') }}: <b>{{ data.newData.name }}</b></h6>
                                         <h6 v-if="data.newData?.qr">{{ t('labels.qr') }}: <b>{{ data.newData.qr }}</b></h6>
                                         <h6 v-if="data.newData?.category">{{ t('labels.category') }}: <b>{{ data.newData.category.name }}</b></h6>
                                         <h6 v-if="data.newData?.assembly">{{ t('labels.collection') }}: <b>{{ data.newData.assembly.name }}</b></h6>
@@ -601,15 +601,15 @@ onMounted(() => {
                                         <h6 v-if="data.action === 'update' && data.newData?.photo">{{ t('labels.photo') }}: <b>{{ t('labels.imageUpdated') }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Location'">
-                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.title') }}: <b>{{ data.newData.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Category'">
-                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.title') }}: <b>{{ data.newData.name }}</b></h6>
                                         <h6 v-if="data.newData?.categoryType">{{ t('labels.categoryType') }}: <b>{{ data.newData.categoryType.name }}</b></h6>
                                         <h6 v-if="data.newData?.unit">{{ t('labels.unit') }}: <b>{{ t(`labels.${data.newData.unit.name}`) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Color'">
-                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.title') }}: <b>{{ data.newData.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'OrderKpiPercent'">
                                         <h6 v-if="data.newData?.kpiPercent !== undefined">{{ t('labels.kpiPercent') }}: <b>{{ data.newData.kpiPercent }}%</b></h6>
@@ -624,11 +624,11 @@ onMounted(() => {
                                         <h6 v-if="data.newData?.createdAt">{{ t('labels.createdAt') }}: <b>{{ getFormattedDate(data.newData.createdAt) }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Payment'">
-                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.title') }}: <b>{{ data.newData.name }}</b></h6>
                                         <h6 v-if="data.newData?.paymentType">{{ t('labels.paymentType') }}: <b>{{ data.newData.paymentType.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Assembly'">
-                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.title') }}: <b>{{ data.newData.name }}</b></h6>
                                     </div>
                                     <div v-if="data.entityType === 'Inventory'">
                                         <h6 v-if="data.newData?.location">{{ t('labels.locations') }}: <b>{{ data.newData.location.name }}</b></h6>
@@ -653,7 +653,7 @@ onMounted(() => {
                                     </div>
                                     <div v-if="data.entityType === 'Kit'">
                                         <h6 v-if="data.newData?.seller">{{ t('labels.Seller') }}: <b>{{ data.newData.seller.name }}</b></h6>
-                                        <h6 v-if="data.newData?.name">{{ t('labels.name') }}: <b>{{ data.newData.name }}</b></h6>
+                                        <h6 v-if="data.newData?.name">{{ t('labels.title') }}: <b>{{ data.newData.name }}</b></h6>
                                         <h6 v-if="data.newData?.code">{{ t('labels.code') }}: <b>{{ data.newData.code }}</b></h6>
                                         <h6 v-if="data.newData?.qr">{{ t('labels.qr') }}: <b>{{ data.newData.qr }}</b></h6>
                                         <h6 v-if="data.newData?.assembly">{{ t('labels.collection') }}: <b>{{ data.newData.assembly.name }}</b></h6>

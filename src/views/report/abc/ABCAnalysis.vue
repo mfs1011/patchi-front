@@ -240,7 +240,7 @@ onBeforeRouteLeave(() => {
                         <Column field="product" :header="t('labels.product')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="productStore.getIsLoadingProducts"/>
-                                <p v-else>{{ data.name }}</p>
+                                <p v-else>{{ data.code }}</p>
                             </template>
                         </Column>
                         <Column field="sales" :header="t('labels.sales')">

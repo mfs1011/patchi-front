@@ -636,8 +636,8 @@ onMounted(async () => {
                                 v-model="product"
                                 :fetchFn="productStore.fetchProducts"
                                 :options="productStore.getProducts.models"
-                                :option-label="opt => `${opt?.name} | ${opt?.code}`"
-                                :option-value="opt => `${opt?.name} | ${opt?.code}`"
+                                :option-label="opt => `${opt?.code} | ${opt?.name}`"
+                                :option-value="opt => `${opt?.code} | ${opt?.name}`"
                                 :return-value="opt => opt"
                                 :search-value="opt => opt.name"
                                 :placeholder="t('placeholders.select.product')"
@@ -646,7 +646,7 @@ onMounted(async () => {
                                 :invalid="!!productErrors.product"
                             >
                                 <template #header>
-                                    <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }}</div>
+                                    <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.code')}} | {{t('labels.title') }}</div>
                                 </template>
                             </SearchSelect>
                         </div>
@@ -783,7 +783,7 @@ onMounted(async () => {
                         <Column field="product" :header="t('labels.product')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="isLoading"/>
-                                <p v-else>{{ data.product?.name }}</p>
+                                <p v-else>{{ data.product?.code }}</p>
                             </template>
                         </Column>
                         <Column field="color" :header="t('labels.color')">

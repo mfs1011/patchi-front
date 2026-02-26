@@ -414,8 +414,8 @@ const confirmLeave = () => {
                                             v-model="locationQuantity"
                                             :fetchFn="(query) => locationQuantityStore.fetchLocationQuantities({...query, location: fromLocation.id})"
                                             :options="locationQuantityStore.getLocationQuantities.models"
-                                            :option-label="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
-                                            :option-value="opt => `${opt?.product?.name} | ${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-label="opt => `${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
+                                            :option-value="opt => `${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
                                             search-key="name"
@@ -425,7 +425,7 @@ const confirmLeave = () => {
                                             :invalid="!!locationQuantityErrors.locationQuantity"
                                         >
                                             <template v-if="locationQuantityStore.getLocationQuantities.models.length" #header>
-                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
+                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.code') }} | {{ t('labels.color') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
                                             </template>
                                         </SearchSelect>
                                     </div>
@@ -545,8 +545,8 @@ const confirmLeave = () => {
                                         </Row>
                                         <Row>
                                             <Column field="id" header="№" />
-                                            <Column field="title" :header="t('labels.title')" />
                                             <Column field="code" :header="t('labels.code')" />
+                                            <Column field="title" :header="t('labels.title')" />
                                             <Column field="color" :header="t('labels.color')" />
                                             <Column field="qr" :header="t('labels.qr')" />
                                             <Column field="costPrice" :header="t('labels.costPrice')" />
@@ -558,14 +558,14 @@ const confirmLeave = () => {
                                             <p>{{ transferInvoiceProducts.length - index }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="product" :header="t('labels.title')">
-                                        <template #body="{ data }">
-                                            <p>{{ data.locationQuantity?.product?.name }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <p>{{ data.locationQuantity?.product?.code || '-' }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="product" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <p>{{ data.locationQuantity?.product?.name }}</p>
                                         </template>
                                     </Column>
                                     <Column field="color" :header="t('labels.color')">
