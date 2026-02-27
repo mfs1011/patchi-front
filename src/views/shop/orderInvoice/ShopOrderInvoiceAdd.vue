@@ -755,8 +755,9 @@ const {
                                         </div>
                                     </div>
 
-                                    <p class="text-sm pt-4">{{ t('labels.usdRate') }}: {{ formatCurrency(usdRateStore.getUSDRate.rate) }}</p>
-                                    <p class="text-sm pb-4">{{ t('labels.total') }}: {{ formatCurrency(totalPayments) }} {{ t('soum') }}</p>
+                                    <p class="text-sm pt-4">{{ t('labels.usdRate') }}: {{ formatCurrency(Math.floor(usdRateStore.getUSDRate.rate)) }}</p>
+                                    <p class="text-sm pt-4">{{ t('labels.total') }}: {{ formatCurrency(totalPayments) }} {{ t('soum') }}</p>
+                                    <p class="text-sm pb-4">{{ t('difference') }}: {{ formatCurrency(totalPayments - totalPrice) }} {{ t('soum') }}</p>
 
                                     <div class="flex justify-end">
                                         <Button

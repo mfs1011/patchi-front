@@ -104,6 +104,12 @@ const isChanged = computed(() => (
     kitStore.getKit?.qty !== qty.value
 ));
 
+const canEdit = computed(() => {
+    const total = kitStore.getKit?.locationQuantityKits?.reduce((sum, item) => sum + item.qty, 0) || 0
+
+    return total > 0
+})
+
 const onSubmitIncomeInvoice = kitHandleSubmit(async values => {
     const payload = {};
 
@@ -234,7 +240,7 @@ onMounted(async () => {
         <template #buttons>
             <div class="flex sm:justify-end grow gap-2 sm:gap-4">
                 <Button
-                    v-if="!editMode"
+                    v-if="!editMode && canEdit"
                     icon="pi pi-pencil"
                     @click="editMode = true"
                     class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"

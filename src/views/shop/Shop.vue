@@ -21,6 +21,12 @@ const cards = computed(() => {
             'shop-transfer-invoices',
             'shop-return-invoices',
         ],
+        ROLE_COMPOSITION_CREATOR: [
+            'shop-order-invoices',
+            'shop-content',
+            'shop-transfer-invoices',
+            'shop-return-invoices'
+        ],
     };
 
     const restrictedRoutes = roleRestrictions[userStore.getAboutMeFromToken.role] ?? [];

@@ -52,6 +52,7 @@ const PRETTY_ROLE_NAMES = computed(() => ({
     ROLE_SELLER: t("roles.seller"),
     ROLE_DIRECTOR: t("roles.director"),
     ROLE_PARTNER: t("roles.partner"),
+    ROLE_COMPOSITION_CREATOR: t("roles.compositionCreator"),
 }));
 
 const getRolesList = computed(() =>

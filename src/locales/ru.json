@@ -31,6 +31,7 @@
     "discount": "Скидка",
     "priceInSoum": "Цена в сумах",
     "priceInDollar": "Цена в долларах",
+    "difference": "Разница",
     "user": {
         "nominative": "пользователь",
         "nominativeCapitalize": "Пользователь",
@@ -210,7 +211,8 @@
         "seller": "Продавец",
         "director": "Директор",
         "warehouseManager": "Кладовщик",
-        "partner": "Партнёр"
+        "partner": "Партнёр",
+        "compositionCreator": "Создатель композиции"
     },
     "labels": {
         "phoneNumber": "Номер телефона",

@@ -22,6 +22,7 @@ export const useKitStore = defineStore('kit', () => {
         },
         kit: {
             filteredKitProducts: [],
+            locationQuantityKits: []
         },
         isLoadingKits: false,
     })

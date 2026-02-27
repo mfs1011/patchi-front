@@ -64,7 +64,7 @@ const logout = () => {
                 </RouterButton>
 
                 <RouterButton
-                    v-if="userStore.getAboutMe.role?.name !== 'ROLE_SELLER'"
+                    v-if="userStore.getAboutMe.role?.name !== 'ROLE_SELLER' && userStore.getAboutMe.role?.name !== 'ROLE_COMPOSITION_CREATOR'"
                     @click="closeSidebar"
                     active-class="bg-primary dark:bg-green hover:bg-primary-emphasis text-surface-0 text-primary-contrast"
                     class="!w-full"
