@@ -53,7 +53,7 @@ const home = computed(() => ({
 
 const items = computed(() => [{ label: t("cards.kits") }]);
 const isAdminAndSeller = computed(() => (
-    ['ROLE_ADMIN', 'ROLE_SELLER'].includes(userStore.getAboutMeFromToken?.role)
+    ['ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_COMPOSITION_CREATOR'].includes(userStore.getAboutMeFromToken?.role)
 ))
 
 const baseUrl = computed(() => import.meta.env.VITE_APP_API_URL);
@@ -170,7 +170,7 @@ function connectMercure() {
 }
 
 onMounted(async () => {
-    locationStore.fetchLocations({page: 1, 'items-per-page': 100 })
+    locationStore.fetchLocations({page: 1, 'items-per-page': 100, isWarehouse: false })
     connectMercure()
 })
 
@@ -241,10 +241,10 @@ onBeforeRouteLeave(() => {
                 />
                 <Button
                     v-if="isAdminAndSeller"
-                    @click="router.push({ name: 'add-product' })"
+                    @click="router.push({ name: 'add-kit' })"
                     class="w-full px-2 sm:px-5 whitespace-nowrap"
                 >
-                    {{ t("buttons.newProduct") }}
+                    {{ t("buttons.newKit") }}
                 </Button>
             </div>
         </template>

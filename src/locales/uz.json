@@ -31,6 +31,7 @@
     "discount": "Chegirma",
     "priceInSoum": "So'mdagi narxi",
     "priceInDollar": "Dollardagi narxi",
+    "difference": "Farqi",
     "user": {
         "nominative": "foydalanuvchi",
         "nominativeCapitalize": "Foydalanuvchi",
@@ -210,7 +211,8 @@
         "seller": "Sotuvchi",
         "director": "Direktor",
         "warehouseManager": "Ombor mudiri",
-        "partner": "Hamkor"
+        "partner": "Hamkor",
+        "compositionCreator": "Kompozitsiya yaratuvchisi"
     },
     "labels": {
         "phoneNumber": "Telefon raqami",

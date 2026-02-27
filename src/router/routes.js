@@ -210,7 +210,7 @@ export const routes = [
                 path: '/shop',
                 meta: { requiresAuth: true, roles: []},
                 component: BlankLayout,
-                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_SELLER", "ROLE_DIRECTOR", "ROLE_PARTNER"]),
+                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_SELLER", "ROLE_DIRECTOR", "ROLE_PARTNER", "ROLE_COMPOSITION_CREATOR"]),
                 children: [
                     {
                         path: '',
