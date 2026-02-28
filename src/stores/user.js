@@ -138,11 +138,13 @@ export const useUserStore = defineStore('user', () => {
             totalItems: 0,
         },
         user: {
-            locations: []
+            locations: [],
+            devices: []
         },
         me: {
             locations: [],
-            roles: []
+            roles: [],
+            devices: []
         },
         isLoadingUsers: false,
     })

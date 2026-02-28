@@ -32,6 +32,7 @@
     "priceInSoum": "So'mdagi narxi",
     "priceInDollar": "Dollardagi narxi",
     "difference": "Farqi",
+    "activeDevices": "Faol qurilmalar",
     "user": {
         "nominative": "foydalanuvchi",
         "nominativeCapitalize": "Foydalanuvchi",
@@ -402,7 +403,8 @@
             "customer": "Mijozni tanlang",
             "product": "Mahsulotni tanlang",
             "kit": "Kompozitsiyani tanlang",
-            "color": "Rangni tanlang"
+            "color": "Rangni tanlang",
+            "device": "Qurilmani tanlang"
         },
         "shopName": "Do‘kon nomini kiriting...",
         "warehouseName": "Ombor nomini kiriting...",

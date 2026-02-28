@@ -32,6 +32,7 @@
     "priceInSoum": "Price in soums",
     "priceInDollar": "Price in dollars",
     "difference": "Difference",
+    "activeDevices": "Active devices",
     "user": {
         "nominative": "user",
         "nominativeCapitalize": "User",
@@ -404,7 +405,8 @@
             "customer": "Select customer",
             "product": "Select product",
             "kit": "Select composition",
-            "color": "Select color"
+            "color": "Select color",
+            "device": "Select device"
         },
         "supplierName": "Enter supplier name...",
         "colorName": "Enter color name...",
