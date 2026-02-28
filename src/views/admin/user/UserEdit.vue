@@ -88,6 +88,7 @@ const { handleSubmit, errors, isSubmitting, resetForm } = useForm({
     validationSchema: schema,
     initialValues: {
         warehouse: [],
+        devices: [],
         password: ''
     }
 })
@@ -98,6 +99,7 @@ const { value: password } = useField('password')
 const { value: role } = useField('role')
 const { value: warehouse } = useField('warehouse')
 const { value: shop } = useField('shop')
+const { value: devices } = useField('devices')
 
 const onSubmit = handleSubmit(async values => {
     const payload = {};
@@ -143,6 +145,14 @@ const onSubmit = handleSubmit(async values => {
         }
     }
 
+    if (role.value !== 1) {
+        if (devices.value.length !== userStore.getUser.devices.length) {
+            payload.devices = devices.value.map(id => ({
+                device: `/api/devices/${id}`
+            }));
+        }
+    }
+
     try {
         isConfirmLoading.value = true
         const response = await userStore.editUser(payload, userStore.getUser.id)
@@ -176,6 +186,7 @@ const isChanged = computed(() => {
     if (phoneNumber.value?.replace(/\D/g, '') !== userStore.getUser.username) return true
     if (role.value !== userStore.getUser.role?.id) return true
     if (password.value.trim() !== '') return true
+    if (devices.value.length !== userStore.getUser.devices.length) return true
     if (userStore.getUser.locations.length && userStore.getUser.locations[0].isWarehouse) {
         if (isChangedWarehouse.value) return true
     } else {
@@ -206,6 +217,10 @@ onMounted(async () => {
 
     if (userStore.getUser.role.name === 'ROLE_SELLER') {
         shop.value = userStore.getUser.locations.map(location => location.id)[0]
+    }
+
+    if (userStore.getUser.role.name !== 'ROLE_ADMIN') {
+        devices.value = userStore.getUser.devices.map(device => device.id)
     }
 })
 
@@ -375,6 +390,25 @@ const confirmLeave = () => {
                                 pt:root="w-full"
                             />
                             <Message class="h-5" size="small" severity="error" variant="simple">{{ errors.shop }}</Message>
+                        </div>
+
+                        <div v-if="role !== 1" class="mb-2 mt-1">
+                            <p>{{ t('activeDevices') }}</p>
+
+                            <Skeleton class="sm:hidden" height="3.1rem"  v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="3.1rem" width="26.8rem" v-if="isLoading"/>
+                            <MultiSelect
+                                v-else
+                                v-model="devices"
+                                :options="userStore.getUser.devices"
+                                :maxSelectedLabels="3"
+                                size="large"
+                                showClear
+                                pt:root="w-full"
+                                :placeholder="t('placeholders.select.device')"
+                                option-value="id"
+                                option-label="name"
+                            />
                         </div>
 
 

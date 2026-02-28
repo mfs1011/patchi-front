@@ -25,10 +25,29 @@ function connectMercure() {
 
             if(userStore.getAboutMe.deletedAt) {
                 userStore.logout()
-                router.push({ name: 'login'})
+            }
+
+            if (userStore.getAboutMe.role.id !== 1) {
+                let active = false
+
+                for (const device of userStore.getAboutMe.devices) {
+                    if (device.name === getDeviceInfo()) {
+                        active = true
+                    }
+                }
+
+                if (!active) {
+                    userStore.logout()
+                }
             }
         }
     })
+}
+
+function getDeviceInfo() {
+    const userAgent = navigator.userAgent;
+    const match = userAgent.match(/\((.*?)\)/);
+    return match ? match[1] : "Unknown device";
 }
 
 onMounted(() => {
