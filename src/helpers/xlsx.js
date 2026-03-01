@@ -2,6 +2,7 @@ import ExcelJS from 'exceljs'
 import i18n from '@/locales/i18n'
 import {useProductStore} from "@/stores/product.js";
 import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
+import {useLocationQuantityStore} from "@/stores/locationQuantity.js";
 
 export const exportInventory = async (products, kits, location, dateFrom, dateTo) => {
     // Создаем новую книгу и лист
@@ -457,7 +458,7 @@ export const exportAbcAnalysis = async () => {
     // Пример данных для таблицы
     const tableData = productStore.getABCProducts.models.map((item, index) => [
         index + 1,
-        item.name,
+        item.code,
         `${formatCurrency(item.ordersQty)} ${i18n.global.t(`labels.${item.unit}`)}`,
         `${formatCurrency(item.ordersPrice)} $`,
         `${formatCurrency(item.benefit)} $`,
@@ -1117,6 +1118,176 @@ export const exportKit = async (products, data = {}) => {
 
     const timestamp = formatDateForFilename()
     link.download = `${i18n.global.t('labels.kit')}_${timestamp}.xlsx`
+    link.click()
+}
+
+export const exportProductsRemainder = async (isWarehouse = false) => {
+    // Создаем новую книгу и лист
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet(i18n.global.t('cards.shopContent'))
+    const locationQuantityStore = useLocationQuantityStore()
+
+    setupPage(worksheet, 'landscape')
+
+    // Добавляем заголовки
+    worksheet.columns = [
+        { width: 6 }, // 1 id
+        { width: 14 }, // 2 code
+        { width: 36 }, // 3 name
+        { width: 16 }, // 4 type
+        { width: 16 }, // 5 Location
+        { width: 12 }, // 6 color
+        { width: 14 }, // 7 expiryDate
+        { width: 8 }, // 8.1 qty
+        { width: 8 }, // 8.2 qty
+        { width: 12 }, // 9 costPrice
+        { width: 18 }, // 10 uzsPrice
+        { width: 12 }, // 11 usdPrice
+    ]
+
+// ==========================
+// 1. Создаем 2 строки header
+// ==========================
+
+    const headerRow1 = worksheet.addRow([
+        '№',
+        i18n.global.t('labels.code'),
+        i18n.global.t('labels.title'),
+        i18n.global.t('labels.type'),
+        i18n.global.t('labels.Location'),
+        i18n.global.t('labels.Color'),
+        i18n.global.t('labels.expiryDate'),
+        i18n.global.t('labels.qty'),
+        '', // I1 пустая (будет merge)
+        `${i18n.global.t('labels.costPrice')} ($)`,
+        i18n.global.t('priceInSoum'),
+        i18n.global.t('priceInDollar'),
+    ])
+
+    const headerRow2 = worksheet.addRow([
+        '', '', '', '', '', '', '',
+        i18n.global.t('labels.pcs'),
+        i18n.global.t('labels.kg'),
+        '', '', '',
+    ])
+
+// ==========================
+// 2. Merge
+// ==========================
+
+// Вертикальные
+    ;['A','B','C','D','E','F','G','J','K','L'].forEach(col => {
+        worksheet.mergeCells(`${col}1:${col}2`)
+    })
+
+// Горизонтальный для qty
+    worksheet.mergeCells('H1:I1')
+
+// ==========================
+// 3. Форматируем обе строки
+// ==========================
+
+    formatHeaderRow(headerRow1)
+    formatHeaderRow(headerRow2)
+
+    function formatHeaderRow(row) {
+        row.eachCell((cell) => {
+            addBorder(cell)
+            fillFormat(cell, 'eaecef')
+            textFormat(cell, 'Tahoma', true, 10, '000000')
+            textAlignment(cell, 'center', 'middle', true)
+        })
+    }
+
+    // Пример данных для таблицы
+    const tableData = locationQuantityStore.getLocationQuantities.models.map((item, index) => [
+        index + 1,
+        item.product.code,
+        item.product.name,
+        item.product.category.categoryType.name,
+        item.location.name,
+        item.color?.name || '-',
+        item.expiryDate ? getFormattedDate(item.expiryDate) : '-',
+        item.product.category.unit.name === 'pcs' ? item.qty : '',
+        item.product.category.unit.name === 'kg' ? item.qty : '',
+        item.product?.costPrice,
+        item.product?.retailPrice,
+        item.product?.wholesalePrice,
+
+    ])
+
+    // Добавление данных в таблицу
+    tableData.forEach((rowData) => {
+        const row = worksheet.addRow(rowData)
+
+        row.eachCell((cell, colNumber) => {
+            addBorder(cell)
+            textFormat(cell, 'Tahoma', false, 11, '000000')
+
+            if ([1, 7].includes(colNumber)) {
+                textAlignment(cell, 'center', 'middle', false)
+            } else if ([2, 3, 4, 5, 6].includes(colNumber)) {
+                textAlignment(cell, 'left', 'middle', false)
+            } else if ([8, 9, 10, 11, 12].includes(colNumber)) {
+                textAlignment(cell, 'right', 'middle', false)
+                formatNumber(cell)
+            }
+        })
+    })
+
+    // Реализовываем футер
+    const rowNumber = tableData.length + 3
+    const footerRow = worksheet.getRow(rowNumber)
+
+    // footerTitle
+    const titleCell = footerRow.getCell(7)
+    titleCell.value = i18n.global.t('labels.totals')
+
+    // totalPcsCell
+    const totalPcsCell = footerRow.getCell(8)
+    totalPcsCell.value = { formula: `SUM(H3:H${tableData.length + 2})` }
+    formatNumber(totalPcsCell)
+
+    // totalKgCell
+    const totalKgCell = footerRow.getCell(9)
+    totalKgCell.value = { formula: `SUM(I3:I${tableData.length + 2})` }
+    formatNumber(totalKgCell)
+
+    // totalCostPriceCell
+    const totalCostPriceCell = footerRow.getCell(10)
+    totalCostPriceCell.value = { formula: `SUMPRODUCT(H3:H${tableData.length + 2}, J3:J${tableData.length + 2})+SUMPRODUCT(I3:I${tableData.length + 2}, J3:J${tableData.length + 2})` }
+    formatNumber(totalCostPriceCell)
+
+    // totalUzsPriceCell
+    const totalUzsPriceCell = footerRow.getCell(11)
+    totalUzsPriceCell.value = { formula: `SUMPRODUCT(H3:H${tableData.length + 2}, K3:K${tableData.length + 2})+SUMPRODUCT(I3:I${tableData.length + 2}, K3:K${tableData.length + 2})` }
+    formatNumber(totalUzsPriceCell)
+
+    // totalUsdPriceCell
+    const totalUsdPriceCell = footerRow.getCell(12)
+    totalUsdPriceCell.value = { formula: `SUMPRODUCT(H3:H${tableData.length + 2}, L3:L${tableData.length + 2})+SUMPRODUCT(I3:I${tableData.length + 2}, L3:L${tableData.length + 2})` }
+    formatNumber(totalUsdPriceCell)
+
+    for (let colNumber = 1; colNumber <= 12; colNumber++) {
+        const cell = footerRow.getCell(colNumber)
+        fillFormat(cell, 'e6e9ec')
+        addBorder(cell)
+        textAlignment(cell, 'right', 'middle', false)
+        textFormat(cell, 'Tahoma', true, 11, '000000')
+    }
+
+    // ******************************************************************************** //
+
+    // Генерация файла
+    const buffer = await workbook.xlsx.writeBuffer()
+
+    // Создание и скачивание файла
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+
+    const timestamp = formatDateForFilename()
+    link.download = `${i18n.global.t('cards.shopContent')}_${timestamp}.xlsx`
     link.click()
 }
 
