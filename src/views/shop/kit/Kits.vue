@@ -53,7 +53,7 @@ const home = computed(() => ({
 
 const items = computed(() => [{ label: t("cards.kits") }]);
 const isAdminAndSeller = computed(() => (
-    ['ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_COMPOSITION_CREATOR'].includes(userStore.getAboutMeFromToken?.role)
+    ['ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_COMPOSITION_CREATOR'].includes(userStore.getAboutMe.role.name)
 ))
 
 const baseUrl = computed(() => import.meta.env.VITE_APP_API_URL);

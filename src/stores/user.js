@@ -146,7 +146,9 @@ export const useUserStore = defineStore('user', () => {
             roles: [],
             devices: []
         },
-        isLoadingUsers: false,
+        decode: {},
+        isLoadingUsers: true,
+        isLoadingUser: true
     })
 
     const setTokens = (accessToken, refreshToken) => {
@@ -191,13 +193,23 @@ export const useUserStore = defineStore('user', () => {
             return data
         } catch (error) {
             throw error
+        } finally {
+            state.isLoadingUser = false
+        }
+    }
+
+    const decodeMe = async () => {
+        const token = localStorage.getItem('patchi_accessToken')
+
+        if (token) {
+            const payload = token.split('.')[1]
+            const decodePayload = atob(payload)
+            state.decode = JSON.parse(decodePayload)
         }
     }
 
     const fetchUsers = async (params = { page: 1 }) => {
         try {
-            state.isLoadingUsers = true
-
             const { data } = await authorizedClient.get('/users', { params })
             state.users.models = data.member
             state.users.totalItems = data.totalItems
@@ -283,13 +295,16 @@ export const useUserStore = defineStore('user', () => {
         refreshTokens,
         logout,
         fetchAboutMe,
+        decodeMe,
         isAuthorized,
         getAboutMe: computed(() => state.me),
+        getDecodeMe: computed(() => state.decode),
         getAboutMeFromToken: computed(() => JSON.parse(atob(localStorage.getItem('patchi_accessToken').split('.')[1]))),
         getAccessToken: computed(() => localStorage.getItem('patchi_accessToken')),
         getRefreshToken: computed(() => localStorage.getItem('patchi_refreshToken')),
         getUsers: computed(() => state.users),
         getUser: computed(() => state.user),
         getIsLoadingUsers: computed(() => state.isLoadingUsers),
+        getIsLoadingUser: computed(() => state.isLoadingUser),
     };
 });

@@ -71,7 +71,7 @@ const home = computed(() => ({
 
 const items = computed(() => [{ label: t("cards.orderInvoices") }]);
 const isAdminAndSeller = computed(() => (
-    ['ROLE_ADMIN', 'ROLE_SELLER'].includes(userStore.getAboutMeFromToken?.role)
+    ['ROLE_ADMIN', 'ROLE_SELLER'].includes(userStore.getAboutMe.role.name)
 ))
 
 const clearFilters = () => {

@@ -82,9 +82,10 @@ const filters = ref({
     location: null,
     product: null,
     kit: null,
-    'is-desc': null,
     'is-zero': null,
     expired: null,
+    'order-value': route.query['order-value'] || null,
+    'is-asc': route.query['is-asc'] || true
 });
 
 // computed
@@ -106,7 +107,12 @@ const tabList = computed(() => [
     { value: 'kit', label: t('labels.kit')},
 ])
 
-const isAdmin = computed(() => userStore.getAboutMeFromToken.role === 'ROLE_ADMIN')
+const isAdmin = computed(() => userStore.getAboutMe.role.name === 'ROLE_ADMIN')
+
+const changeOrderBy = (orderValue) => {
+    filters.value['order-value'] = orderValue
+    filters.value['is-asc'] = !filters.value['is-asc']
+}
 
 // watchers
 watch(
@@ -150,6 +156,14 @@ watch(
             queryFilter.expired = filters.value.expired;
         }
 
+        if (filters.value['order-value'] !== null) {
+            queryFilter['order-value'] = filters.value['order-value'];
+        }
+
+        if (filters.value['is-asc'] !== null) {
+            queryFilter['is-asc'] = filters.value['is-asc'];
+        }
+
         await updateQuery(router, queryFilter);
 
         if (tabVal.value === 'product') {
@@ -175,6 +189,10 @@ function connectMercure() {
 
     eventSource.value.addEventListener('message', async (event) => {
         const eventDataId = JSON.parse(event.data).eventId
+
+        if (eventDataId === 6) {
+            await locationQuantityStore.fetchLocationQuantity(route.query)
+        }
 
         if (eventDataId === 7) {
             await locationQuantityKitStore.fetchLocationQuantityKits(route.query)
@@ -323,15 +341,6 @@ onBeforeRouteLeave(() => {
                     />
 
                     <Select
-                        v-model="filters['is-desc']"
-                        :options="[{id: 1, value: true, name: t('desc')}, {id: 2, value: false, name: t('asc')}]"
-                        option-label="name"
-                        option-value="value"
-                        showClear
-                        :placeholder="t('placeholders.search.orderByExpiry')"
-                    />
-
-                    <Select
                         v-model="filters['is-zero']"
                         :options="[{id: 1, value: true, name: t('zero')}, {id: 2, value: false, name: t('notZero')}]"
                         option-label="name"
@@ -339,9 +348,6 @@ onBeforeRouteLeave(() => {
                         showClear
                         :placeholder="t('placeholders.search.byQty')"
                     />
-                    <div class="xl:col-span-3 flex justify-end">
-                        <Button @click="clearFilters" :label="t('clear')" icon="pi pi-trash" class="bg-surface-500 border-surface-500 enabled:hover:border-surface-400 enabled:hover:bg-surface-400 dark:bg-surface-500 dark:border-surface-500 dark:enabled:hover:border-surface-400 dark:enabled:hover:bg-surface-400 w-fit px-4"/>
-                    </div>
                 </div>
             </div>
         </template>
@@ -380,70 +386,213 @@ onBeforeRouteLeave(() => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50"
                                 >
-                                    <Column field="id" :header="t('labels.id')">
+                                    <Column field="id">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('id')"
+                                            >
+                                                {{ t('labels.id') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'id'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                             <p v-else>{{ data.product.id }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="product" :header="t('labels.code')">
+                                    <Column field="code">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('code')"
+                                            >
+                                                {{ t('labels.code') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'code'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                             <p v-else>{{ data.product.code }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="product" :header="t('labels.title')">
+                                    <Column field="title">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('name')"
+                                            >
+                                                {{ t('labels.title') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'name'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                             <p v-else>{{ data.product.name }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="product" :header="t('labels.type')">
+                                    <Column field="type">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('type')"
+                                            >
+                                                {{ t('labels.type') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'type'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                             <p v-else>{{ data.product.category.categoryType.name }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="location" :header="t('labels.locations')">
+                                    <Column field="location">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('location')"
+                                            >
+                                                {{ t('labels.locations') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'location'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                             <p v-else>{{ data.location.name }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="color" :header="t('labels.color')">
+                                    <Column field="color">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('color')"
+                                            >
+                                                {{ t('labels.color') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'color'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                             <p v-else>{{ data.color?.name || '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="expiryDate" :header="t('labels.expiryDate')">
+                                    <Column field="expiryDate">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('expiryDate')"
+                                            >
+                                                {{ t('labels.expiryDate') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'expiryDate'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                             <p v-else>{{ data.expiryDate ? getFormattedDate(data.expiryDate) : '-' }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="qty" :header="t('labels.qty')">
+                                    <Column field="qty">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('qty')"
+                                            >
+                                                {{ t('labels.qty') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'qty'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
                                             <p v-else>{{ formatCurrency(data.qty) }} {{ t(`labels.${data.product.category.unit.name}`) }}</p>
                                         </template>
                                     </Column>
-                                    <Column v-if="isAdmin" field="costPrice" :header="t('labels.costPrice')">
+                                    <Column v-if="isAdmin" field="costPrice">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('costPrice')"
+                                            >
+                                                {{ t('labels.costPrice') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'costPrice'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
-                                            <p v-else>{{ formatCurrency(data.product.costPrice) }}$</p>
+                                            <p v-else>{{ formatCurrency(data.product?.costPrice) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column v-if="isAdmin" field="retailPrice" :header="t('priceInSoum')">
+                                    <Column v-if="isAdmin" field="retailPrice">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('retailPrice')"
+                                            >
+                                                {{ t('priceInSoum') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'retailPrice'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
-                                            <p v-else>{{ formatCurrency(data.product.retailPrice) }} {{ t('soum') }}</p>
+                                            <p v-else>{{ formatCurrency(data.product?.retailPrice) }} {{ t('soum') }}</p>
                                         </template>
                                     </Column>
-                                    <Column v-if="isAdmin" field="wholesalePrice" :header="t('priceInDollar')">
+                                    <Column v-if="isAdmin" field="wholesalePrice">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('wholesalePrice')"
+                                            >
+                                                {{ t('priceInDollar') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'wholesalePrice'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityStore.getIsLoadingLocationQuantity"/>
-                                            <p v-else>{{ formatCurrency(data.product.wholesalePrice) }}$</p>
+                                            <p v-else>{{ formatCurrency(data.product?.wholesalePrice) }}$</p>
                                         </template>
                                     </Column>
 
@@ -514,55 +663,172 @@ onBeforeRouteLeave(() => {
                                     pt:footer="border-none dark:bg-surface-800"
                                     pt:root="border border-surface-300 dark:border-surface-600/50"
                                 >
-                                    <Column field="id" :header="t('labels.id')">
+                                    <Column field="id">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('id')"
+                                            >
+                                                {{ t('labels.id') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'id'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
-                                            <p v-else>{{ data.kit.id }}</p>
+                                            <p v-else>{{ data.kit?.id }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="kit" :header="t('labels.code')">
+                                    <Column field="kit">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('code')"
+                                            >
+                                                {{ t('labels.code') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'code'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                             <p v-else>{{ data.kit?.code }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="kit" :header="t('labels.title')">
+                                    <Column field="kit">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('name')"
+                                            >
+                                                {{ t('labels.title') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'name'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                             <p v-else>{{ data.kit?.name }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="location" :header="t('labels.locations')">
+                                    <Column field="location">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('location')"
+                                            >
+                                                {{ t('labels.locations') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'location'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                             <p v-else>{{ data.location?.name }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="expiryDate" :header="t('labels.expiryDate')">
+                                    <Column field="expiryDate">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('expiryDate')"
+                                            >
+                                                {{ t('labels.expiryDate') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'expiryDate'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                             <p v-else>{{ getFormattedDate(data.expiryDate) }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="qty" :header="t('labels.qty')">
+                                    <Column field="qty">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('qty')"
+                                            >
+                                                {{ t('labels.qty') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'qty'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                             <p v-else>{{ formatCurrency(data.qty) }} {{ t('labels.pcs')}}</p>
                                         </template>
                                     </Column>
-                                    <Column v-if="isAdmin" field="costPrice" :header="t('labels.costPrice')">
+                                    <Column v-if="isAdmin" field="costPrice">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('costPrice')"
+                                            >
+                                                {{ t('labels.costPrice') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'costPrice'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                             <p v-else>{{ formatCurrency(data.kit?.costPrice) }}$</p>
                                         </template>
                                     </Column>
-                                    <Column v-if="isAdmin" field="retailPrice" :header="t('priceInSoum')">
+                                    <Column v-if="isAdmin" field="retailPrice">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('retailPrice')"
+                                            >
+                                                {{ t('priceInSoum') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'retailPrice'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                             <p v-else>{{ formatCurrency(data.kit?.retailPrice) }} {{ t('soum') }}</p>
                                         </template>
                                     </Column>
-                                    <Column v-if="isAdmin" field="wholesalePrice" :header="t('priceInDollar')">
+                                    <Column v-if="isAdmin" field="wholesalePrice">
+                                        <template #header>
+                                            <div
+                                                class="cursor-pointer select-none flex items-center gap-2"
+                                                @click="changeOrderBy('wholesalePrice')"
+                                            >
+                                                {{ t('priceInDollar') }}
+                                                <i
+                                                    v-if="filters['order-value'] === 'wholesalePrice'"
+                                                    :class="filters['is-asc'] ? 'pi pi-sort-amount-down' : 'pi pi-sort-amount-up-alt'"
+                                                ></i>
+                                            </div>
+                                        </template>
+
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="locationQuantityKitStore.getIsLoadingLocationQuantityKit"/>
                                             <p v-else>{{ formatCurrency(data.kit?.wholesalePrice) }}$</p>
