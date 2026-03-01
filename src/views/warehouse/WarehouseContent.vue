@@ -32,6 +32,7 @@ import InputNumber from "@/volt/InputNumber.vue";
 import SecondaryButton from "@/volt/SecondaryButton.vue";
 import Dialog from "@/volt/Dialog.vue";
 import {useUserStore} from "@/stores/user.js";
+import {exportKitsRemainder, exportProductsRemainder} from "@/helpers/xlsx.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -96,7 +97,11 @@ const home = computed(() => ({
 
 const dt = ref();
 const exportCSV = () => {
-    dt.value.exportCSV();
+  if (tabVal.value === 'product') {
+    exportProductsRemainder(true)
+  } else if (tabVal.value === 'kit') {
+    exportKitsRemainder(true)
+  }
 };
 
 const items = computed(() => [{ label: t("cards.warehouseContent") }]);

@@ -102,7 +102,6 @@ const exportCSV = () => {
   } else if (tabVal.value === 'kit') {
     exportKitsRemainder()
   }
-
 };
 
 const items = computed(() => [{ label: t("cards.shopContent") }]);

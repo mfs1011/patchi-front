@@ -1125,7 +1125,7 @@ export const exportKit = async (products, data = {}) => {
 export const exportProductsRemainder = async (isWarehouse = false) => {
     // Создаем новую книгу и лист
     const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet(i18n.global.t('cards.shopContent'))
+    const worksheet = workbook.addWorksheet(i18n.global.t(isWarehouse ? 'cards.warehouseContent' : 'cards.shopContent'))
     const locationQuantityStore = useLocationQuantityStore()
 
     setupPage(worksheet, 'landscape')
@@ -1288,14 +1288,14 @@ export const exportProductsRemainder = async (isWarehouse = false) => {
     link.href = URL.createObjectURL(blob)
 
     const timestamp = formatDateForFilename()
-    link.download = `${i18n.global.t('cards.shopContent')}_${timestamp}.xlsx`
+    link.download = `${i18n.global.t(isWarehouse ? 'cards.warehouseContent' : 'cards.shopContent')}_${timestamp}.xlsx`
     link.click()
 }
 
 export const exportKitsRemainder = async (isWarehouse = false) => {
     // Создаем новую книгу и лист
     const workbook = new ExcelJS.Workbook()
-    const worksheet = workbook.addWorksheet(i18n.global.t('cards.shopContent'))
+    const worksheet = workbook.addWorksheet(i18n.global.t(isWarehouse ? 'cards.warehouseContent' : 'cards.shopContent'))
     const locationQuantityKitStore = useLocationQuantityKitStore()
 
     setupPage(worksheet, 'portrait')
@@ -1407,7 +1407,7 @@ export const exportKitsRemainder = async (isWarehouse = false) => {
     link.href = URL.createObjectURL(blob)
 
     const timestamp = formatDateForFilename()
-    link.download = `${i18n.global.t('cards.shopContent')}_${timestamp}.xlsx`
+    link.download = `${i18n.global.t(isWarehouse ? 'cards.warehouseContent' : 'cards.shopContent')}_${timestamp}.xlsx`
     link.click()
 }
 
