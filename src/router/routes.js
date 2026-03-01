@@ -22,7 +22,7 @@ const accessPageByRoles = (roles) => async (to, from, next) => {
     const userStore = useUserStore()
 
     try {
-        const userRole = userStore.getAboutMe.role?.name
+        const userRole = userStore.getDecodeMe.role
 
         if (roles.includes(userRole)) {
             next()

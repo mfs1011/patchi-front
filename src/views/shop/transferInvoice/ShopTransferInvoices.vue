@@ -70,7 +70,7 @@ const home = computed(() => ({
 
 const items = computed(() => [{ label: t("cards.transferInvoices") }]);
 const isAdminAndSeller = computed(() => (
-    ['ROLE_ADMIN', 'ROLE_SELLER'].includes(userStore.getAboutMeFromToken?.role)
+    ['ROLE_ADMIN', 'ROLE_SELLER'].includes(userStore.getAboutMe.role.name)
 ))
 
 const statuses = computed(() => [

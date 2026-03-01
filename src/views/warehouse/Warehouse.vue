@@ -29,7 +29,7 @@ const cards = computed(() => {
         ],
     };
 
-    const restrictedRoutes = roleRestrictions[userStore.getAboutMeFromToken.role] ?? [];
+    const restrictedRoutes = roleRestrictions[userStore.getAboutMe.role.name] ?? [];
 
     return baseCards.filter(
         card => !restrictedRoutes.includes(card.routeName)

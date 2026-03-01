@@ -53,6 +53,7 @@ const onSubmit = handleSubmit(async values => {
     try {
         await userStore.fetchToken({ username: values.phoneNumber.replace(/\D/g, ''), password: values.password, device: getDeviceInfo() })
         await userStore.fetchAboutMe()
+        await userStore.decodeMe()
 
         await router.push({ name: 'home' })
     } catch (error) {

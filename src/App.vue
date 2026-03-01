@@ -52,6 +52,7 @@ function getDeviceInfo() {
 
 onMounted(() => {
     connectMercure()
+    userStore.decodeMe()
 
     if (userStore.isAuthorized()) {
         userStore.fetchAboutMe()

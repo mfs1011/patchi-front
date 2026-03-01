@@ -8,7 +8,6 @@ import Card from "@/volt/Card.vue";
 import {useLocationStore} from "@/stores/location.js";
 import {useToast} from "primevue/usetoast";
 import InputNumber from "@/volt/InputNumber.vue";
-import SearchSelect from "@/components/UI/SearchSelect.vue";
 import {formatCurrency} from "@/helpers/numberFormat.js";
 import TabPanels from "@/volt/TabPanels.vue";
 import TabPanel from "@/volt/TabPanel.vue";
@@ -239,11 +238,11 @@ const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
 })
 
 onMounted( () => {
+    location.value = userStore.getAboutMe.locations[0]
     paymentStore.fetchPayments()
     usdRateStore.fetchLastUSDRate()
     categoryStore.fetchCategories()
     assemblyStore.fetchAssemblies()
-    location.value = userStore.getAboutMe.locations[0]
 
     if (location.value) {
         sellerStore.fetchSellers({location: location.value.id})
@@ -522,9 +521,9 @@ const {
                         pt:content="flex flex-col h-full"
                     >
                         <template #content>
-                            <div class="border-b border-surface-200 dark:border-surface-600/50">
+                            <div v-if="!userStore.getIsLoadingUser" class="border-b border-surface-200 dark:border-surface-600/50">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-2 border-b border-surface-200 dark:border-surface-600/50 p-2 sm:p-4">
-                                <div v-if="userStore.getAboutMeFromToken.role === 'ROLE_ADMIN'">
+                                <div v-if="userStore.getAboutMe.role.name === 'ROLE_ADMIN'">
                                     <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
 
                                     <Select
@@ -537,7 +536,7 @@ const {
                                     />
                                 </div>
 
-                                <div v-if="location && userStore.getAboutMeFromToken.role === 'ROLE_SELLER'">
+                                <div v-if="userStore.getAboutMe.role.name === 'ROLE_SELLER'">
                                     <p class="text-sm">{{ t('labels.seller') }}</p>
 
                                     <Select
@@ -563,7 +562,7 @@ const {
                                     />
                                 </div>
 
-                                <div v-if="userStore.getAboutMeFromToken.role === 'ROLE_ADMIN'">
+                                <div v-if="userStore.getAboutMe.role.name === 'ROLE_ADMIN'">
                                     <p class="text-sm">{{ t('labels.createdAt') }}<span class="text-red-500"> *</span></p>
 
                                     <DatePicker
