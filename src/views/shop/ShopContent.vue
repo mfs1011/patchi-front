@@ -32,7 +32,7 @@ import ColumnGroup from "primevue/columngroup";
 import SearchSelect from "@/components/UI/SearchSelect.vue";
 import Select from "@/volt/Select.vue";
 import {useUserStore} from "@/stores/user.js";
-import {exportProductsRemainder} from "@/helpers/xlsx.js";
+import {exportKitsRemainder, exportProductsRemainder} from "@/helpers/xlsx.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -97,7 +97,12 @@ const home = computed(() => ({
 
 const dt = ref();
 const exportCSV = () => {
-  exportProductsRemainder()
+  if (tabVal.value === 'product') {
+    exportProductsRemainder()
+  } else if (tabVal.value === 'kit') {
+    exportKitsRemainder()
+  }
+
 };
 
 const items = computed(() => [{ label: t("cards.shopContent") }]);
