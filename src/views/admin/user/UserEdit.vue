@@ -136,7 +136,7 @@ const onSubmit = handleSubmit(async values => {
     }
 
     if (role.value === 3) {
-        if (userStore.getUser.locations.length && userStore.getUser.locations[0].id !== values.shop) {
+        if (!userStore.getUser.locations.length || userStore.getUser.locations[0].id !== values.shop) {
             payload.locations = [
                 {
                     location: `/api/locations/${values.shop}`
