@@ -45,7 +45,7 @@ const debouncedFilter = useDebouncedRef(route.query.name || null, 500);
 
 const filters = ref({
     page: parseInt(route.query.page) || 1,
-    itemsPerPage: parseInt(route.query["items-per-page"]) || 10,
+    itemsPerPage: parseInt(route.query["items-per-page"]) || 100,
     isDelete: route.query['is-delete'] || false,
     categoryType: parseInt(route.query.categoryType) || null,
     unit: parseInt(route.query.unit) || null
