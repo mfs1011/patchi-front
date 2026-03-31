@@ -29,6 +29,7 @@ export function useKitValidation() {
 
     // Kit fields
     const { value: seller } = useField('seller', undefined, { form: kitFormCtx })
+    const { value: location } = useField('location', undefined, { form: kitFormCtx })
     const { value: qr } = useField('qr', undefined, { form: kitFormCtx })
     const { value: code } = useField('code', undefined, { form: kitFormCtx })
     const { value: name } = useField('name', undefined, { form: kitFormCtx })
@@ -44,6 +45,7 @@ export function useKitValidation() {
         kitResetForm,
         kitFormCtx,
         seller,
+        location,
         qr,
         code,
         name,

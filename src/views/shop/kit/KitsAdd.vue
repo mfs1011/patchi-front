@@ -27,6 +27,7 @@ import {useKitStore} from "@/stores/kit.js";
 import Select from "@/volt/Select.vue";
 import {formatCurrency, formatDateTimeLocal} from "@/helpers/numberFormat.js";
 import {useUSDRateStore} from "@/stores/usdRate.js";
+import {useLocationStore} from "@/stores/location.js";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -34,6 +35,7 @@ const toast = useToast()
 const productStore = useProductStore();
 const assemblyStore = useAssemblyStore();
 const sellerStore = useSellerStore();
+const locationStore = useLocationStore();
 const mediaObjectStore = useMediaObjectStore();
 const kitStore = useKitStore();
 const usdRateStore = useUSDRateStore();
@@ -59,7 +61,7 @@ const items = computed(() => [{ label: t('cards.kits'), route: { name: 'kits'} }
 
 const isChanged = computed(() => (
     !!seller.value ||
-    !!qr.value ||
+    !!location.value ||
     !!code.value ||
     !!name.value ||
     !!assembly.value ||
@@ -79,7 +81,6 @@ const FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const SUPPORTED_FORMATS = ['image/jpeg', 'image/png', 'image/webp'];
 
 const kitInfoSchema = computed(() => yup.object({
-    qr: yup.string().notRequired().max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     code: yup.string().required(t('errorMessages.codeRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     name: yup.string().required(t('errorMessages.titleRequired')).max(30 , t('errorMessages.nameMustBeMaxCharacters', { count: 30 })),
     wholesalePrice: yup.number().required(t('errorMessages.wholesalePriceRequired')),
@@ -133,7 +134,7 @@ const {
 })
 
 const { value: seller } = useField('seller', undefined, { form: kitFormCtx });
-const { value: qr } = useField('qr', undefined, { form: kitFormCtx });
+const { value: location } = useField('location', undefined, { form: kitFormCtx });
 const { value: code } = useField('code', undefined, { form: kitFormCtx });
 const { value: name } = useField('name', undefined, { form: kitFormCtx });
 const { value: assembly } = useField('assembly', undefined, { form: kitFormCtx }); // null
@@ -157,6 +158,7 @@ const sumPriceOfKitProducts = computed(() => {
 const onSubmitKit = kitHandleSubmit(async values => {
     const payload = {
         seller: values.seller['@id'],
+        location: values.location['@id'],
         code: values.code,
         name: values.name,
         wholesalePrice: values.wholesalePrice,
@@ -177,10 +179,6 @@ const onSubmitKit = kitHandleSubmit(async values => {
             return obj;
         })
     };
-
-    if (qr.value) {
-        payload.qr = values.qr
-    }
 
     if (assembly.value) {
         payload.assembly = values.assembly['@id']
@@ -285,13 +283,17 @@ const reversedKitProducts = computed(() => {
     return [...kitProducts.value].reverse()
 })
 
-onMounted(() => usdRateStore.fetchLastUSDRate())
+onMounted(() => {
+    sellerStore.fetchSellers()
+    locationStore.fetchLocations()
+    usdRateStore.fetchLastUSDRate()
+})
 
-watch(seller, async (newVal) => {
+watch(location, async (newVal) => {
     isLocation.value = false
 
     if (newVal) {
-        await productStore.fetchAvailableProducts({location: newVal.location.id })
+        await productStore.fetchAvailableProducts({location: newVal.id })
         kitProducts.value = []
 
         isLocation.value = true
@@ -399,14 +401,16 @@ const confirmLeave = () => {
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.qr') }}</p>
-                            <InputText
-                                v-model.trim="qr"
-                                fluid
-                                :placeholder="t('placeholders.qr')"
-                                :class="{ 'p-invalid': kitErrors.qr }"
+                            <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
+                            <Select
+                                v-model="location"
+                                :options="locationStore.getLocations.models"
+                                option-label="name"
+                                :placeholder="t('placeholders.select.location')"
+                                showClear
+                                pt:root="w-full dark:bg-surface-700"
                             />
-                            <Message class="h-5" size="small" severity="error" variant="simple">{{ kitErrors.qr }}</Message>
+                            <Message class="h-5" size="small" severity="error" variant="simple">{{ kitErrors.location }}</Message>
                         </div>
 
                         <div>
@@ -528,7 +532,7 @@ const confirmLeave = () => {
                             <p class="text-sm">{{ t('labels.product') }}<span class="text-red-500"> *</span></p>
                             <SearchSelect
                                 v-model="product"
-                                :fetchFn="(query) => productStore.fetchAvailableProducts({...query, location: seller.location.id })"
+                                :fetchFn="(query) => productStore.fetchAvailableProducts({...query, location: location.id })"
                                 :options="productStore.getAvailableProducts.models"
                                 :option-label="opt => `${opt?.code} | ${opt?.color ?? '-'} | ${opt?.totalQty} ${t(`labels.${opt?.unit}`)}`"
                                 :option-value="opt => `${opt?.code} | ${opt?.color ?? '-'} | ${opt?.totalQty} ${t(`labels.${opt?.unit}`)}`"

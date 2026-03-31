@@ -1005,10 +1005,10 @@ export const exportKit = async (products, data = {}) => {
 
     const title = [
         [i18n.global.t('labels.Seller'), data.seller.name],
-        [i18n.global.t('labels.qr'), data.qr],
+        [i18n.global.t('labels.location'), data.location.name],
         [i18n.global.t('labels.code'), data.code],
         [i18n.global.t('labels.title'), data.name],
-        [i18n.global.t('labels.collection'), data.assembly.name],
+        [i18n.global.t('labels.collection'), data.assembly?.name],
         [i18n.global.t('labels.wholesalePrice'), data.wholesalePrice],
         [i18n.global.t('labels.retailPrice'), data.retailPrice],
         [i18n.global.t('labels.qty'), data.qty],

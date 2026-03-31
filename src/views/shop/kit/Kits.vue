@@ -376,12 +376,6 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ data.code }}</p>
                             </template>
                         </Column>
-                        <Column field="qr" :header="t('labels.qr')">
-                            <template #body="{ data }">
-                                <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
-                                <p v-else>{{ data.qr || '-' }}</p>
-                            </template>
-                        </Column>
                         <Column field="collection" :header="t('labels.collection')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
@@ -397,7 +391,7 @@ onBeforeRouteLeave(() => {
                         <Column field="locations" :header="t('labels.locations')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
-                                <p v-else>{{ data.seller.location.name }}</p>
+                                <p v-else>{{ data.location?.name || '-' }}</p>
                             </template>
                         </Column>
                         <Column field="costPrice" :header="t('labels.costPrice')">

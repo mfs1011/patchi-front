@@ -23,6 +23,7 @@ import Dialog from "@/volt/Dialog.vue";
 import {useToast} from "primevue/usetoast";
 import {useUserStore} from "@/stores/user.js";
 import {exportKit} from "@/helpers/xlsx.js";
+import {useLocationStore} from "@/stores/location.js";
 
 const { t } = useI18n();
 const route = useRoute()
@@ -32,6 +33,7 @@ const isLoading = ref(true)
 
 const kitStore = useKitStore()
 const sellerStore = useSellerStore()
+const locationStore = useLocationStore()
 const assemblyStore = useAssemblyStore()
 const userStore = useUserStore()
 const editMode = ref(false);
@@ -47,6 +49,7 @@ const {
     kitResetForm,
     kitFormCtx,
     seller,
+    location,
     qr,
     code,
     name,
@@ -68,7 +71,7 @@ const exportCSV = () => {
         kitStore.getKit.filteredKitProducts,
         {
           seller: seller.value,
-          qr: qr.value,
+          location: location.value,
           code: code.value,
           name: name.value,
           assembly: assembly.value,
@@ -189,6 +192,7 @@ onMounted(async () => {
         kitResetForm({
             values: {
                 seller: kitStore.getKit.seller,
+                location: kitStore.getKit.location,
                 qr: kitStore.getKit.qr,
                 code: kitStore.getKit.code,
                 name: kitStore.getKit.name,
@@ -308,17 +312,24 @@ onMounted(async () => {
                         </div>
 
                         <div>
-                            <p class="text-sm">{{ t('labels.qr') }}</p>
+                            <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
 
                             <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
                             <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
 
-                            <InputText
+                            <SearchSelect
                                 v-if="!isLoading"
-                                v-model.trim="qr"
-                                fluid
-                                :placeholder="t('placeholders.qr')"
-                                :disabled="!editMode"
+                                v-model="location"
+                                :fetchFn="locationStore.fetchLocations"
+                                :options="locationStore.getLocations.models"
+                                :option-label="opt => opt?.name"
+                                :option-value="opt => opt?.name"
+                                :return-value="opt => opt"
+                                :placeholder="t('placeholders.select.location')"
+                                :loading="locationStore.getIsLoadingLocation"
+                                :total-items="locationStore.getLocations.totalItems"
+                                :invalid="!!kitErrors.location"
+                                :disabled="true"
                             />
                         </div>
 
