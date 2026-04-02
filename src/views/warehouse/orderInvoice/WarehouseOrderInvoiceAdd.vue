@@ -219,6 +219,8 @@ const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
 })
 
 onMounted( () => {
+    locationStore.fetchLocations({page: 1, 'items-per-page': 100, isWarehouse: true })
+    customerStore.fetchCustomers({page: 1, 'items-per-page': 100, 'is-b2b': true })
     paymentStore.fetchPayments()
     usdRateStore.fetchLastUSDRate()
     categoryStore.fetchCategories()
@@ -565,7 +567,7 @@ const {
                                                     :max="item.ui.totalQty"
                                                     size="small"
                                                     :minFractionDigits="1"
-                                                    :maxFractionDigits="2"
+                                                    :maxFractionDigits="3"
                                                     pt:incrementButton="w-6 ml-auto"
                                                     pt:decrementButton="w-6 ml-auto"
                                                 />

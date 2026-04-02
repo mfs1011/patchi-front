@@ -769,7 +769,7 @@ onMounted(async () => {
 
                     <DataTable
                         v-else
-                        :value="isLoading ? Array(10).fill({}) : editableData.incomeInvoiceProducts"
+                        :value="isLoading ? Array(10).fill({}) : editableData.incomeInvoiceProducts.filter(item => !item.product?.exclude)"
                         scrollable
                         scroll-height="700px"
                         pt:footer="border-none dark:bg-surface-800"
