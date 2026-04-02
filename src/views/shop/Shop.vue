@@ -18,6 +18,8 @@ const cards = computed(() => {
 
     const roleRestrictions = {
         ROLE_PARTNER: [
+            'shop-order-invoices',
+            'kits',
             'shop-transfer-invoices',
             'shop-return-invoices',
         ],

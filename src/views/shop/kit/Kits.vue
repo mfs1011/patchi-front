@@ -56,6 +56,10 @@ const isAdminAndSeller = computed(() => (
     ['ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_COMPOSITION_CREATOR'].includes(userStore.getAboutMe.role.name)
 ))
 
+const isSellerAndCreator = computed(() => (
+    ['ROLE_SELLER', 'ROLE_COMPOSITION_CREATOR'].includes(userStore.getAboutMe.role.name)
+))
+
 const baseUrl = computed(() => import.meta.env.VITE_APP_API_URL);
 const isVisibleSectionHeader = ref(false);
 const currentKit = ref();
@@ -394,7 +398,7 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ data.location?.name || '-' }}</p>
                             </template>
                         </Column>
-                        <Column field="costPrice" :header="t('labels.costPrice')">
+                        <Column v-if="!isSellerAndCreator" field="costPrice" :header="t('labels.costPrice')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="kitStore.getIsLoadingKits"/>
                                 <p
