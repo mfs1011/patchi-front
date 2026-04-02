@@ -41,6 +41,8 @@ const pendingNavigation = ref(false);
 const isEdited = ref(false);
 const showLeaveDialog = ref(false);
 const isConfirmLoading = ref(false);
+const deleteKitProductVisible = ref(false);
+const editableData = ref(null);
 
 const {
     kitHandleSubmit,
@@ -169,6 +171,33 @@ const onSubmitIncomeInvoice = kitHandleSubmit(async values => {
     }
 })
 
+function deleteKitProductAction(product) {
+    deleteKitProductVisible.value = true
+    currentDeleteLocationQuantityKit.value = product
+}
+
+function deleteKitProduct() {
+    const index = editableData.value.transferInvoiceProducts.findIndex(p => p.id === currentDeleteLocationQuantity.value.id);
+
+    if (index === -1) return;
+
+    const current = editableData.value.transferInvoiceProducts[index];
+
+    if (current.id) {
+        // API’dan kelgan
+        editableData.value.transferInvoiceProducts.splice(index, 1);
+
+        deletedData.value.push({
+            transferInvoiceProduct: current["@id"],
+            isDelete: true
+        })
+    } else {
+        // Yangi qo‘shilgan
+        editableData.value.transferInvoiceProducts.splice(index, 1);
+    }
+    deleteKitProductVisible.value = false
+}
+
 onBeforeRouteLeave((to, from, next) => {
     if (isChanged.value && !isEdited.value) {
         showLeaveDialog.value = true
@@ -187,6 +216,7 @@ const confirmLeave = () => {
 
 onMounted(async () => {
     await kitStore.fetchKit(route.params.id)
+    editableData.value = JSON.parse(JSON.stringify(kitStore.getKit));
 
     setTimeout(() => {
         kitResetForm({
@@ -437,7 +467,7 @@ onMounted(async () => {
                 </template>
             </Card>
 
-            <NoData v-if="!kitStore.getKit.filteredKitProducts.length && !isLoading" class="text-surface-400 mx-auto my-auto">
+            <NoData v-if="!editableData?.filteredKitProducts?.length && !isLoading" class="text-surface-400 mx-auto my-auto">
                 <p class="text-xl font-normal">{{ t("noResults") }}</p>
             </NoData>
 
@@ -451,7 +481,7 @@ onMounted(async () => {
                 <template #content>
                     <DataTable
                         ref="dt"
-                        :value="isLoading ?  Array(10).fill({}) : kitStore.getKit.filteredKitProducts"
+                        :value="isLoading ?  Array(10).fill({}) : editableData.filteredKitProducts"
                         scrollable
                         pt:footer="border-none dark:bg-surface-800"
                         pt:root="border border-surface-300 dark:border-surface-600/50"
@@ -515,12 +545,56 @@ onMounted(async () => {
                                 <p v-else>{{ data.product.exclude ? 'exclude': 'include' }}</p>
                             </template>
                         </Column>
+<!--                        <Column v-if="editMode" field="actions" :header="t('actions')">-->
+<!--                            <template #body="{ data, index }">-->
+<!--                                <div class="flex justify-end w-full">-->
+<!--                                    <div class="flex items-center gap-2">-->
+<!--                                        <Button-->
+<!--                                            @click="deleteKitProductAction(data)"-->
+<!--                                            icon="pi pi-trash"-->
+<!--                                            pt:root="rounded-full size-8! bg-red-500 dark:bg-red-500 enabled:hover:bg-red-400 dark:enabled:hover:bg-red-400 border-red-500 dark:border-red-500 enabled:hover:border-red-400 dark:enabled:hover:border-red-400 focus-visible:outline-red-500 dark:focus-visible:outline-red-500"-->
+<!--                                            size="small"-->
+<!--                                        />-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </template>-->
+<!--                        </Column>-->
                         <template #footer>
                             <div class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(sumPriceOfKitProducts) }} {{ t('soum') }}</div>
                         </template>
                     </DataTable>
                 </template>
             </Card>
+
+            <!-- DELETE KIT_PRODUCT DIALOG -->
+            <Dialog
+                v-model:visible="deleteKitProductVisible"
+                modal
+                :closable="false"
+                class="sm:min-w-100 sm:w-fit w-9/10"
+                pt:root="px-2"
+            >
+                <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
+                    {{ t('dialog.deleteConfirm', { name: t('product.accusative') }) }}
+                </span>
+
+                <template #footer>
+                    <div class="flex justify-end gap-2">
+                        <SecondaryButton
+                            type="button"
+                            :label="t('dialog.cancel')"
+                            @click="deleteKitProductVisible = false"
+                        />
+                        <Button
+                            type="button"
+                            :label="t('dialog.confirm')"
+                            @click="deleteKitProduct"
+                            :loading="isDeleteLocationQuantityLoading"
+                            class="px-5"
+                        />
+                    </div>
+                </template>
+            </Dialog>
 
             <!-- CANCEL CHANGES BEFORE LEAVE CURRENT ROUTE DIALOG -->
             <Dialog

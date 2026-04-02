@@ -971,7 +971,7 @@ watch([() => kit.value], async () => {
                                             showButtons
                                             :placeholder="t('placeholders.qty')"
                                             :minFractionDigits="1"
-                                            :maxFractionDigits="2"
+                                            :maxFractionDigits="3"
                                             :invalid="!!productErrors.productQty"
                                         />
                                     </div>
