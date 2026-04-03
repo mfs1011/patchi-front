@@ -769,7 +769,8 @@ onMounted(async () => {
 
                     <DataTable
                         v-else
-                        :value="isLoading ? Array(10).fill({}) : editableData.incomeInvoiceProducts.filter(item => !item.product?.exclude)"
+                        :value="isLoading ? Array(10).fill({}) : userStore.getAboutMe.role.name === 'ROLE_PARTNER' ?
+                        editableData.incomeInvoiceProducts.filter(item => !item.product?.exclude) : editableData.incomeInvoiceProducts"
                         scrollable
                         scroll-height="700px"
                         pt:footer="border-none dark:bg-surface-800"
