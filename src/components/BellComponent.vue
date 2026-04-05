@@ -53,11 +53,17 @@
                     </div>
 
                     <div v-if="filterProps.page < notificationStore.getNotifications.pagesCount" class="pb-2 pt-3 flex items-center justify-center">
-                        <div v-if="isLoading" class="flex">
-                            <BaseIcon icon="spinner" size="24px" class="text-gray-500 animate-spin shrink-0"/>
-                        </div>
-                        <button v-if="!isLoading" @click="nextPage" class="rounded-full ring-2 ring-gray-700 p-1 hover:opacity-80 transition-colors">
+                        <button @click="nextPage" class="rounded-full ring-2 ring-gray-700 p-1 hover:opacity-80 transition-colors">
                             <BaseIcon icon="plus" size="12px" class="text-gray-700"/>
+                        </button>
+                    </div>
+
+                    <div v-if="notificationStore.getNotifications.totalItems > 1" class="flex items-center justify-center pt-3">
+                        <button
+                            @click="readAll"
+                            class="rounded-full ring-2 ring-gray-700 px-4 py-1 hover:opacity-80 transition-colors"
+                        >
+                            {{ t("readAll") }}
                         </button>
                     </div>
                 </div>
@@ -114,7 +120,6 @@ const {t} = useI18n()
 const route = useRoute();
 const notificationStore = useNotificationStore()
 
-const isLoading = ref(false)
 const currentNotificationId = ref(null)
 const acceptVisible = ref(false)
 const isAcceptLoading = ref(false)
@@ -171,6 +176,10 @@ const nextPage = async () => {
     filterProps.page += 1;
     await notificationStore.fetchNotifications(filterProps);
     allNotifications.value.push(...notificationStore.getNotifications.models)
+};
+
+const readAll = async () => {
+    await notificationStore.acceptAllNotifications({})
 };
 
 onMounted(async() => {

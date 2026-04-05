@@ -33,6 +33,7 @@
     "priceInDollar": "Dollardagi narxi",
     "difference": "Farqi",
     "activeDevices": "Faol qurilmalar",
+    "readAll": "Barchasini o'qish",
     "user": {
         "nominative": "foydalanuvchi",
         "nominativeCapitalize": "Foydalanuvchi",

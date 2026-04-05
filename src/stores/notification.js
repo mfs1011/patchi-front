@@ -38,9 +38,20 @@ export const useNotificationStore = defineStore('notification', () => {
         }
     }
 
+    const acceptAllNotifications = async notifications => {
+        try {
+            const { data } = await authorizedClient.post('/notifications/accepted/all', notifications)
+
+            return data
+        } catch (error) {
+            throw error
+        }
+    }
+
     return {
         fetchNotifications,
         acceptNotification,
+        acceptAllNotifications,
         getNotifications: computed(() => state.notifications),
         getIsLoadingNotifications: computed(() => state.isLoadingNotifications),
     }

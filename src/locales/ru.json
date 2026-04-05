@@ -33,6 +33,7 @@
     "priceInDollar": "Цена в долларах",
     "difference": "Разница",
     "activeDevices": "Активные устройства",
+    "readAll": "Прочитать все",
     "user": {
         "nominative": "пользователь",
         "nominativeCapitalize": "Пользователь",

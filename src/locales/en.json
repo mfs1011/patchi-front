@@ -33,6 +33,7 @@
     "priceInDollar": "Price in dollars",
     "difference": "Difference",
     "activeDevices": "Active devices",
+    "readAll": "Read all",
     "user": {
         "nominative": "user",
         "nominativeCapitalize": "User",
