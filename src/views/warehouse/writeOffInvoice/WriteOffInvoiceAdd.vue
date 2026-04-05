@@ -406,7 +406,7 @@ watch(location, async (newVal) => {
                                             :option-value="opt => `${opt?.product?.code} | ${opt?.color?.name ?? '-'} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.${opt?.product?.category?.unit?.name}`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
-                                            search-key="id"
+                                            search-key="name"
                                             :placeholder="t('placeholders.select.product')"
                                             :loading="locationQuantityStore.getIsLoadingLocationQuantity"
                                             :total-items="locationQuantityStore.getLocationQuantities.totalItems"
@@ -458,27 +458,14 @@ watch(location, async (newVal) => {
                                             :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${getFormattedDate(opt?.expiryDate)} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
-                                            search-key="id"
+                                            search-key="name"
                                             :placeholder="t('placeholders.select.kit')"
                                             :loading="locationQuantityKitStore.getIsLoadingLocationQuantityKit"
                                             :total-items="locationQuantityKitStore.getLocationQuantityKits.totalItems"
                                             :invalid="!!locationQuantityKitErrors.locationQuantityKit"
                                         >
                                             <template v-if="locationQuantityKitStore.getLocationQuantityKits.models.length" #header>
-                                                <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900 grid grid-cols-4 gap-4">
-                                                    <div>{{t('labels.title')}}</div>
-                                                    <div>{{t('labels.code') }}</div>
-                                                    <div>{{t('labels.expiryDate')}}</div>
-                                                    <div>{{t('labels.qty')}}</div>
-                                                </div>
-                                            </template>
-                                            <template #option="{ option }">
-                                                <div class="grid grid-cols-4 w-full gap-4">
-                                                    <div>{{ option?.kit?.name }}</div>
-                                                    <div>{{ option?.kit?.code }}</div>
-                                                    <div>{{ getFormattedDate(option?.expiryDate) }}</div>
-                                                    <div>{{ formatCurrency(option?.qty) }} {{ t(`labels.pcs`) }}</div>
-                                                </div>
+                                                <p class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{ t('labels.title') }} | {{ t('labels.code') }} | {{ t('labels.expiryDate') }} | {{ t('labels.qty') }}</p>
                                             </template>
                                         </SearchSelect>
                                     </div>

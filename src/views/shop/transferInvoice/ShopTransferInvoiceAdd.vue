@@ -470,7 +470,7 @@ const confirmLeave = () => {
                                             :option-value="opt => `${opt?.kit?.name} | ${opt?.kit?.code} | ${opt.expiryDate ? getFormattedDate(opt?.expiryDate) : '-'} | ${opt?.qty} ${t(`labels.pcs`)}`"
                                             :return-value="opt => opt"
                                             :search-value="opt => opt.id"
-                                            search-key="id"
+                                            search-key="name"
                                             :placeholder="t('placeholders.select.kit')"
                                             :loading="locationQuantityKitStore.getIsLoadingLocationQuantityKit"
                                             :total-items="locationQuantityKitStore.getLocationQuantityKits.totalItems"
