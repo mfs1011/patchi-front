@@ -27,6 +27,7 @@ const cards = computed(() => {
 
         ROLE_WAREHOUSE_MANAGER: [
             'warehouse-write-off-invoices',
+            'warehouse-income-invoices',
         ],
     };
 

@@ -84,6 +84,7 @@ export const routes = [
                     {
                         path: 'income-invoices',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_PARTNER", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
