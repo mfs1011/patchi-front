@@ -111,6 +111,7 @@ const isEditing = ref(false);
 const pendingNavigation = ref(false);
 const isEdited = ref(false);
 const isConfirmLoading = ref(false);
+const isAcceptLoading = ref(false)
 const tabVal = ref('products')
 
 // computed
@@ -143,7 +144,6 @@ const isChanged = computed(() => (
     createdPriceData.value.length ||
     updatedPriceData.value.length ||
     deletedPriceData.value.length ||
-    (orderInvoiceStore.getOrderInvoice.totalPrice === totalPayments.value) ||
     orderInvoiceStore.getOrderInvoice?.customer?.id !== customer.value?.id
 ));
 
@@ -164,6 +164,25 @@ const totalPrice = computed(() => {
 })
 
 const isAcceptedOrderInvoice = computed(() => orderInvoiceStore.getOrderInvoice.status === 2)
+
+const acceptOrderInvoice = async () => {
+    isAcceptLoading.value = true;
+
+    try {
+        await orderInvoiceStore.acceptOrderInvoice(orderInvoiceStore.getOrderInvoice.id)
+        toast.add({ severity: 'success', summary: t('toast.accepted', { name: t('orderInvoice.nominativeCapitalize') }), life: 3000 })
+    } catch (error) {
+        if (error.status === 403) {
+            toast.add({ severity: 'error', summary: t('toast.accessDenied', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else if (error.status === 412) {
+            toast.add({ severity: 'error', summary: t('toast.notEnough', { field: t('code.nominativeCapitalize') }), life: 3000 })
+        } else {
+            toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+        }
+    } finally {
+        router.back()
+    }
+}
 
 const totalPayments = computed(() => {
     const total = editableData.value.orderInvoicePrices.reduce((sum, item) => {
@@ -1238,8 +1257,26 @@ watch([() => kit.value], async () => {
                                         </template>
                                     </Column>
                                     <template #footer>
-                                        <Skeleton height="2rem" width="10rem" class="ml-auto" v-if="isLoading"/>
-                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }}$</div>
+                                        <div class="flex justify-between items-center w-full">
+                                            <div>
+                                                <Skeleton height="2rem" width="10rem" v-if="isLoading"/>
+                                                <div v-else class="font-medium">
+                                                    {{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }}$
+                                                </div>
+                                            </div>
+
+                                            <!-- Save button -->
+                                            <div>
+                                                <Button
+                                                    class="px-2! sm:px-5! whitespace-nowrap"
+                                                    icon="pi pi-save"
+                                                    :label="t('buttons.saveAndExit')"
+                                                    @click="acceptOrderInvoice()"
+                                                    :loading="isAcceptLoading"
+                                                    :disabled="isAcceptedOrderInvoice"
+                                                />
+                                            </div>
+                                        </div>
                                     </template>
                                 </DataTable>
                             </TabPanel>
