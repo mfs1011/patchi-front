@@ -322,13 +322,17 @@ onBeforeRouteLeave(() => {
                         v-model="filters.kit"
                         :fetchFn="kitStore.fetchKits"
                         :options="kitStore.getKits.models"
-                        :option-label="opt => opt?.name"
-                        :option-value="opt => opt?.id"
+                        :option-label="opt => `${opt?.name} | ${opt?.code}`"
+                        :option-value="opt => `${opt?.name} | ${opt?.code}`"
                         :return-value="opt => opt?.id"
                         :placeholder="t('placeholders.search.byKit')"
                         :loading="kitStore.getIsLoadingKits"
                         :total-items="kitStore.getKits.totalItems"
-                    />
+                    >
+                        <template #header>
+                            <div class="px-4 py-2 bg-surface-100 dark:bg-surface-900">{{t('labels.title')}} | {{t('labels.code') }}</div>
+                        </template>
+                    </SearchSelect>
 
                     <Select
                         v-model="filters.expired"
