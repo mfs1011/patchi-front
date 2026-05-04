@@ -343,7 +343,7 @@ export const routes = [
                 path: '/administration',
                 meta: { requiresAuth: true, roles: []},
                 component: BlankLayout,
-                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
+                beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_SELLER", "ROLE_DIRECTOR"]),
                 children: [
                     {
                         path: '',
@@ -354,6 +354,7 @@ export const routes = [
                     {
                         path: 'users',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         component: BlankLayout,
                         children: [
                             {
@@ -379,6 +380,7 @@ export const routes = [
                     {
                         path: 'sellers',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         component: BlankLayout,
                         children: [
                             {
@@ -404,6 +406,7 @@ export const routes = [
                     {
                         path: 'corporate-clients',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -428,6 +431,7 @@ export const routes = [
                     {
                         path: 'boutique-clients',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_SELLER", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -452,6 +456,7 @@ export const routes = [
                     {
                         path: 'suppliers',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -476,6 +481,7 @@ export const routes = [
                     {
                         path: 'products',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -500,6 +506,7 @@ export const routes = [
                     {
                         path: 'warehouses',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -524,6 +531,7 @@ export const routes = [
                     {
                         path: 'shops',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -548,6 +556,7 @@ export const routes = [
                     {
                         path: 'categories',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -573,11 +582,13 @@ export const routes = [
                         path: 'currency-rates',
                         name: 'currency-rates',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         component: () => import('@/views/admin/CurrencyRates.vue')
                     },
                     {
                         path: 'colors',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -596,6 +607,7 @@ export const routes = [
                     {
                         path: 'kpi',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -620,6 +632,7 @@ export const routes = [
                     {
                         path: 'payments',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -644,6 +657,7 @@ export const routes = [
                     {
                         path: 'collections',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',
@@ -668,6 +682,7 @@ export const routes = [
                     {
                         path: 'expiry-date-notification-day',
                         meta: { requiresAuth: true, roles: []},
+                        beforeEnter: accessPageByRoles(["ROLE_ADMIN", "ROLE_DIRECTOR"]),
                         children: [
                             {
                                 path: '',

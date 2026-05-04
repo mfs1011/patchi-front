@@ -21,6 +21,8 @@ import SelectButton from "@/volt/SelectButton.vue";
 import {useToast} from "primevue/usetoast";
 import Skeleton from "@/volt/Skeleton.vue";
 import updateQuery from "@/helpers/updateQuery.js";
+import RouterButton from "@/components/UI/RouterButton.vue";
+import {useUserStore} from "@/stores/user.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -29,6 +31,7 @@ const toast = useToast();
 
 const customerStore = useCustomerStore()
 const locationStore = useLocationStore()
+const userStore = useUserStore()
 
 // refs
 const visible = ref({
@@ -294,7 +297,7 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ data.comment }}</p>
                             </template>
                         </Column>
-                        <Column field="id" class="flex justify-end">
+                        <Column field="id" class="flex justify-end" v-if="userStore.getAboutMe.role?.name === 'ROLE_ADMIN'">
                             <template #header>
                                 <p class="font-semibold">{{ t('actions') }}</p>
                             </template>
