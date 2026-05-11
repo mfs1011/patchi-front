@@ -37,7 +37,7 @@ import DatePicker from "@/volt/DatePicker.vue";
 import {useInventoryStore} from "@/stores/inventory.js";
 import Select from "@/volt/Select.vue";
 import Textarea from "@/volt/Textarea.vue";
-import Message from "@/volt/Message.vue";
+import SearchSelect from "@/components/UI/SearchSelect.vue";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -240,7 +240,6 @@ const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
 onMounted( () => {
     location.value = userStore.getAboutMe.locations[0]
     locationStore.fetchLocations({page: 1, 'items-per-page': 100, isWarehouse: false })
-    customerStore.fetchCustomers({page: 1, 'items-per-page': 100, 'is-b2b': false })
     paymentStore.fetchPayments()
     usdRateStore.fetchLastUSDRate()
     categoryStore.fetchCategories()
@@ -554,14 +553,19 @@ const {
                                 <div>
                                     <p class="text-sm">{{ t('labels.client') }}</p>
 
-                                    <Select
-                                        v-model="customer"
-                                        :options="customerStore.getCustomers.models"
-                                        option-label="name"
-                                        showClear
-                                        :placeholder="t('placeholders.select.customer')"
-                                        pt:root="w-full dark:bg-surface-700"
-                                    />
+                                     <SearchSelect
+                                         v-model="customer"
+                                         :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': false })"
+                                         :options="customerStore.getCustomers.models"
+                                         :option-label="opt => opt?.name"
+                                         :option-value="opt => opt?.id"
+                                         :return-value="opt => opt"
+                                         :placeholder="t('placeholders.select.customer')"
+                                         :loading="customerStore.getIsLoadingCustomers"
+                                         :total-items="customerStore.getCustomers.totalItems"
+                                         :invalid="!!orderInvoiceErrors.customer"
+                                         size="w-full dark:bg-surface-700"
+                                     />
                                 </div>
 
                                 <div v-if="userStore.getAboutMe.role.name === 'ROLE_ADMIN'">

@@ -220,7 +220,6 @@ const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
 
 onMounted( () => {
     locationStore.fetchLocations({page: 1, 'items-per-page': 100, isWarehouse: true })
-    customerStore.fetchCustomers({page: 1, 'items-per-page': 100, 'is-b2b': true })
     paymentStore.fetchPayments()
     usdRateStore.fetchLastUSDRate()
     categoryStore.fetchCategories()
@@ -513,15 +512,20 @@ const {
                                 </div>
 
                                 <div>
-                                    <p class="text-sm">{{ t('labels.client') }}<span class="text-red-500"> *</span></p>
+                                    <p class="text-sm">{{ t('labels.client') }}</p>
 
-                                    <Select
+                                    <SearchSelect
                                         v-model="customer"
+                                        :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': true })"
                                         :options="customerStore.getCustomers.models"
-                                        option-label="name"
-                                        showClear
+                                        :option-label="opt => opt?.name"
+                                        :option-value="opt => opt?.id"
+                                        :return-value="opt => opt"
                                         :placeholder="t('placeholders.select.customer')"
-                                        pt:root="w-full dark:bg-surface-700"
+                                        :loading="customerStore.getIsLoadingCustomers"
+                                        :total-items="customerStore.getCustomers.totalItems"
+                                        :invalid="!!orderInvoiceErrors.customer"
+                                        size="w-full dark:bg-surface-700"
                                     />
                                 </div>
 
