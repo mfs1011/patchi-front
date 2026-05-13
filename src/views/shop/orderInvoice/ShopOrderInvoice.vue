@@ -881,6 +881,13 @@ watch([() => kit.value], async () => {
                     :label="t('buttons.newReturnInvoice')"
                     :loading="orderInvoiceIsSubmitting"
                 />
+                <Button
+                    v-if="!isAcceptedOrderInvoice"
+                    @click="acceptOrderInvoice()"
+                    class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"
+                    :label="t('dialog.confirm')"
+                    :loading="isAcceptLoading"
+                />
             </div>
         </template>
 
@@ -1302,26 +1309,8 @@ watch([() => kit.value], async () => {
                                         </template>
                                     </Column>
                                     <template #footer>
-                                        <div class="flex justify-between items-center w-full">
-                                            <div>
-                                                <Skeleton height="2rem" width="10rem" v-if="isLoading"/>
-                                                <div v-else class="font-medium">
-                                                    {{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }} {{ t('soum') }}
-                                                </div>
-                                            </div>
-
-                                            <!-- Save button -->
-                                            <div>
-                                                <Button
-                                                    class="px-2! sm:px-5! whitespace-nowrap"
-                                                    icon="pi pi-save"
-                                                    :label="t('buttons.saveAndExit')"
-                                                    @click="acceptOrderInvoice()"
-                                                    :loading="isAcceptLoading"
-                                                    :disabled="isAcceptedOrderInvoice"
-                                                />
-                                            </div>
-                                        </div>
+                                        <Skeleton height="2rem" width="10rem" class="ml-auto" v-if="isLoading"/>
+                                        <div v-else class="mt-auto col-span-full flex justify-end font-medium">{{ t('labels.totals') }}: {{ formatCurrency(totalPrice) }} {{ t('soum') }}</div>
                                     </template>
                                 </DataTable>
                             </TabPanel>
