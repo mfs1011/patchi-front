@@ -228,8 +228,15 @@ const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
     if (values.seller) {
         const discount = Number(values.seller.discount)
         const minAllowed = totalPrice.value - (totalPrice.value * discount / 100)
+        const maxAllowed = totalPrice.value + (totalPrice.value * discount / 100)
 
         if (totalPayments.value < minAllowed) {
+            alert(`${t('paymentMinError')} ${formatCurrency(minAllowed.toFixed(2))} ${t('soum')}`)
+            return
+        }
+
+        if (totalPayments.value > maxAllowed) {
+            alert(`${t('paymentMaxError')} ${formatCurrency(maxAllowed.toFixed(2))} ${t('soum')}`)
             return
         }
     }
@@ -238,16 +245,19 @@ const onSubmitOrderInvoicePrice = orderInvoiceHandleSubmit(async values => {
 })
 
 onMounted( () => {
-    location.value = userStore.getAboutMe.locations[0]
+    userStore.fetchAboutMe()
+        .then(() => {
+            location.value = userStore.getAboutMe.locations[0]
+
+            if (location.value) {
+                sellerStore.fetchSellers({location: location.value.id})
+            }
+        })
     locationStore.fetchLocations({page: 1, 'items-per-page': 100, isWarehouse: false })
     paymentStore.fetchPayments()
     usdRateStore.fetchLastUSDRate()
     categoryStore.fetchCategories()
     assemblyStore.fetchAssemblies()
-
-    if (location.value) {
-        sellerStore.fetchSellers({location: location.value.id})
-    }
 })
 
 watch([() => location.value], async () => {

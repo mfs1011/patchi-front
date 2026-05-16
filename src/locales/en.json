@@ -34,6 +34,8 @@
     "difference": "Difference",
     "activeDevices": "Active devices",
     "readAll": "Read all",
+    "paymentMinError": "Payments are not sufficient! Minimum payment amount:",
+    "paymentMaxError": "Payments exceed the total price! Maximum payment amount:",
     "user": {
         "nominative": "user",
         "nominativeCapitalize": "User",

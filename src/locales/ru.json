@@ -34,6 +34,8 @@
     "difference": "Разница",
     "activeDevices": "Активные устройства",
     "readAll": "Прочитать все",
+    "paymentMinError": "Платежей недостаточно! Минимальная сумма оплаты:",
+    "paymentMaxError": "Платежи превышают общую сумму! Максимальная сумма оплаты:",
     "user": {
         "nominative": "пользователь",
         "nominativeCapitalize": "Пользователь",

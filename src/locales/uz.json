@@ -34,6 +34,8 @@
     "difference": "Farqi",
     "activeDevices": "Faol qurilmalar",
     "readAll": "Barchasini o'qish",
+    "paymentMinError": "To'lovlar yetarli emas! Minimal to'lov miqdori:",
+    "paymentMaxError": "To'lovlar umumiy narxdan oshib ketdi! Maksimal to'lov miqdori:",
     "user": {
         "nominative": "foydalanuvchi",
         "nominativeCapitalize": "Foydalanuvchi",

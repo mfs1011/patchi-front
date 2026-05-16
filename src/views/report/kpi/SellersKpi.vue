@@ -302,25 +302,25 @@ onBeforeRouteLeave(() => {
                         <Column field="dateFrom" :header="t('labels.forTheKit')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="sellerStore.getIsLoadingSellers"/>
-                                <p v-else>{{ formatCurrency(data.kitsKpi) }}$</p>
+                                <p v-else>{{ formatCurrency(Math.round(data.kitsKpi)) }}$</p>
                             </template>
                         </Column>
                         <Column field="dateFrom" :header="t('labels.forTheOrder')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="sellerStore.getIsLoadingSellers"/>
-                                <p v-else>{{ formatCurrency(data.orderInvoicesKpi) }}$</p>
+                                <p v-else>{{ formatCurrency(Math.round(data.orderInvoicesKpi)) }}$</p>
                             </template>
                         </Column>
                         <Column field="dateFrom" :header="t('labels.forTheCategory')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="sellerStore.getIsLoadingSellers"/>
-                                <p v-else>{{ formatCurrency(data.categoriesKpi) }}$</p>
+                                <p v-else>{{ formatCurrency(Math.round(data.categoriesKpi)) }}$</p>
                             </template>
                         </Column>
                         <Column field="dateFrom" :header="t('labels.total')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="sellerStore.getIsLoadingSellers"/>
-                                <p v-else>{{ formatCurrency(data.kitsKpi + data.orderInvoicesKpi + data.categoriesKpi) }}$</p>
+                                <p v-else>{{ formatCurrency(Math.round(data.kitsKpi + data.orderInvoicesKpi + data.categoriesKpi)) }}$</p>
                             </template>
                         </Column>
 

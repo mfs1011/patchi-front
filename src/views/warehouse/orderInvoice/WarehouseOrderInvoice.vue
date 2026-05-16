@@ -1194,30 +1194,6 @@ watch([() => kit.value], async () => {
                                             <p v-else>{{ data.product?.code }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="product" :header="t('labels.title')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.product?.name }}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="color" :header="t('labels.color')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.color?.name || '-' }}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="category" :header="t('labels.category')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.product?.category.name }}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="collection" :header="t('labels.collection')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.product?.assembly?.name || '-' }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="qty" :header="t('labels.qty')">
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
@@ -1234,6 +1210,30 @@ watch([() => kit.value], async () => {
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ formatCurrency(Math.round(data.price) * data.qty) }}$</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="product" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.product?.name }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="category" :header="t('labels.category')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.product?.category.name }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="collection" :header="t('labels.collection')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.product?.assembly?.name || '-' }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="color" :header="t('labels.color')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.color?.name || '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="totalReturns" :header="t('labels.ReturnInvoice')">
@@ -1291,20 +1291,9 @@ watch([() => kit.value], async () => {
                                             <p>{{ index + 1 }}</p>
                                         </template>
                                     </Column>
-                                    <Column field="kit" :header="t('labels.title')">
-                                        <template #body="{ data }">
-                                            <p>{{ data.kit?.name }}</p>
-                                        </template>
-                                    </Column>
                                     <Column field="code" :header="t('labels.code')">
                                         <template #body="{ data }">
                                             <p>{{ data.kit?.code }}</p>
-                                        </template>
-                                    </Column>
-                                    <Column field="collection" :header="t('labels.collection')">
-                                        <template #body="{ data }">
-                                            <Skeleton height="2rem" v-if="isLoading"/>
-                                            <p v-else>{{ data.kit?.assembly?.name || '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="qty" :header="t('labels.qty')">
@@ -1322,6 +1311,17 @@ watch([() => kit.value], async () => {
                                         <template #body="{ data }">
                                             <Skeleton height="2rem" v-if="isLoading"/>
                                             <p v-else>{{ formatCurrency(Math.round(data.price) * data.qty) }}$</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="kit" :header="t('labels.title')">
+                                        <template #body="{ data }">
+                                            <p>{{ data.kit?.name }}</p>
+                                        </template>
+                                    </Column>
+                                    <Column field="collection" :header="t('labels.collection')">
+                                        <template #body="{ data }">
+                                            <Skeleton height="2rem" v-if="isLoading"/>
+                                            <p v-else>{{ data.kit?.assembly?.name || '-' }}</p>
                                         </template>
                                     </Column>
                                     <Column field="total" :header="t('labels.ReturnInvoice')">
