@@ -30,6 +30,7 @@ import {useProductStore} from "@/stores/product.js";
 import {useKitStore} from "@/stores/kit.js";
 import DatePicker from "@/volt/DatePicker.vue";
 import {usePaymentStore} from "@/stores/payment.js";
+import {useInventoryStore} from "@/stores/inventory.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -41,6 +42,8 @@ const productStore = useProductStore();
 const kitStore = useKitStore();
 const locationStore = useLocationStore();
 const customerStore = useCustomerStore();
+const inventoryStore = useInventoryStore();
+const dateFrom = ref();
 const { t } = useI18n();
 const {
     orderInvoiceHandleSubmit,
@@ -144,11 +147,8 @@ const isChanged = computed(() => (
     createdPriceData.value.length ||
     updatedPriceData.value.length ||
     deletedPriceData.value.length ||
-    orderInvoiceStore.getOrderInvoice?.customer?.id !== customer.value?.id
-));
-
-const isPayment = computed(() => (
-    (orderInvoiceStore.getOrderInvoice.status === 1) && (orderInvoiceStore.getOrderInvoice.totalPrice === totalPayments.value)
+    orderInvoiceStore.getOrderInvoice?.customer?.id !== customer.value?.id ||
+    new Date(orderInvoiceStore.getOrderInvoice?.createdAt).toISOString() !== new Date(createdAt.value).toISOString()
 ));
 
 const totalPrice = computed(() => {
@@ -235,6 +235,12 @@ const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async (values) => {
 
     if (values.customer.id !== apiData.value.customer.id) {
         payload.customer = values.customer['@id']
+    }
+
+    if (values.createdAt !== apiData.value.createdAt) {
+        const date = new Date(values.createdAt);
+        date.setHours(date.getHours() + 5);
+        payload.createdAt = date
     }
 
     if (!payload.orderInvoicePrices.length) {
@@ -734,7 +740,7 @@ function cancelEditing() {
 }
 
 onBeforeRouteLeave((to, from, next) => {
-    if (isChanged.value && !isEdited.value && isPayment.value) {
+    if (isChanged.value && !isEdited.value) {
         showLeaveDialog.value = true
         pendingNavigation.value = next
     } else {
@@ -757,6 +763,17 @@ const totalReturns = (orderInvoiceQuantities) => {
 
 onMounted(async () => {
     await orderInvoiceStore.fetchOrderInvoice(route.params.id);
+
+    await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${orderInvoiceStore.getOrderInvoice.location.id}`})
+
+    if (inventoryStore.getLastInventoryDateTo === null) {
+        dateFrom.value = null
+    } else {
+        const date = new Date(inventoryStore.getLastInventoryDateTo);
+        date.setDate(date.getDate());
+        date.setMinutes(date.getMinutes() + 1);
+        dateFrom.value = date;
+    }
 
     apiData.value = orderInvoiceStore.getOrderInvoice;
     editableData.value = JSON.parse(JSON.stringify(orderInvoiceStore.getOrderInvoice));
@@ -838,7 +855,7 @@ watch([() => kit.value], async () => {
                 />
                 <Button
                     v-if="editMode"
-                    :disabled="!isChanged && !isPayment"
+                    :disabled="!isChanged"
                     icon="pi pi-save"
                     @click="onSubmitOrderInvoice"
                     class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"
@@ -939,7 +956,8 @@ watch([() => kit.value], async () => {
                                 :invalid="!!orderInvoiceErrors.createdAt"
                                 showTime
                                 hourFormat="24"
-                                disabled
+                                :minDate="dateFrom"
+                                :disabled="!editMode"
                             />
                         </div>
                     </div>

@@ -31,6 +31,7 @@ import DatePicker from "@/volt/DatePicker.vue";
 import {usePaymentStore} from "@/stores/payment.js";
 import {useSellerStore} from "@/stores/seller.js";
 import {useShopOrderInvoiceValidation} from "@/views/shop/orderInvoice/useShopOrderInvoiceForm.js";
+import {useInventoryStore} from "@/stores/inventory.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -43,6 +44,8 @@ const kitStore = useKitStore();
 const locationStore = useLocationStore();
 const sellerStore = useSellerStore();
 const customerStore = useCustomerStore();
+const inventoryStore = useInventoryStore();
+const dateFrom = ref();
 const { t } = useI18n();
 const {
     orderInvoiceHandleSubmit,
@@ -147,7 +150,8 @@ const isChanged = computed(() => (
     createdPriceData.value.length ||
     updatedPriceData.value.length ||
     deletedPriceData.value.length ||
-    orderInvoiceStore.getOrderInvoice?.customer?.id !== customer.value?.id
+    orderInvoiceStore.getOrderInvoice?.customer?.id !== customer.value?.id ||
+    new Date(orderInvoiceStore.getOrderInvoice?.createdAt).toISOString() !== new Date(createdAt.value).toISOString()
 ));
 
 const totalPrice = computed(() => {
@@ -160,17 +164,6 @@ const totalPrice = computed(() => {
     }, 0)
 
     return Math.round(productsTotal + kitsTotal)
-})
-
-const isPayment = computed(() => {
-    if (orderInvoiceStore.getOrderInvoice.seller) {
-        const discount = Number(orderInvoiceStore.getOrderInvoice.seller.discount)
-        const minAllowed = totalPrice.value - (totalPrice.value * discount / 100)
-
-        return totalPayments.value >= minAllowed;
-    } else {
-        return true
-    }
 })
 
 const isAcceptedOrderInvoice = computed(() => orderInvoiceStore.getOrderInvoice.status === 2)
@@ -249,6 +242,12 @@ const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async (values) => {
 
     if (values.customer?.id !== apiData.value.customer?.id) {
         payload.customer = values.customer['@id']
+    }
+
+    if (values.createdAt !== apiData.value.createdAt) {
+        const date = new Date(values.createdAt);
+        date.setHours(date.getHours() + 5);
+        payload.createdAt = date
     }
 
     try {
@@ -743,7 +742,7 @@ function cancelEditing() {
 }
 
 onBeforeRouteLeave((to, from, next) => {
-    if (isChanged.value && !isEdited.value && isPayment.value) {
+    if (isChanged.value && !isEdited.value) {
         showLeaveDialog.value = true
         pendingNavigation.value = next
     } else {
@@ -767,6 +766,17 @@ const totalReturns = (orderInvoiceQuantities) => {
 onMounted(async () => {
     await orderInvoiceStore.fetchOrderInvoice(route.params.id);
     const usdRate = orderInvoiceStore.getOrderInvoice.usdRate
+
+    await inventoryStore.fetchLastDateToByLocation({ location: `/api/locations/${orderInvoiceStore.getOrderInvoice.location.id}`})
+
+    if (inventoryStore.getLastInventoryDateTo === null) {
+        dateFrom.value = null
+    } else {
+        const date = new Date(inventoryStore.getLastInventoryDateTo);
+        date.setDate(date.getDate());
+        date.setMinutes(date.getMinutes() + 1);
+        dateFrom.value = date;
+    }
 
     apiData.value = orderInvoiceStore.getOrderInvoice;
     editableData.value = JSON.parse(JSON.stringify(orderInvoiceStore.getOrderInvoice));
@@ -867,7 +877,7 @@ watch([() => kit.value], async () => {
                 />
                 <Button
                     v-if="editMode"
-                    :disabled="!isChanged && !isPayment"
+                    :disabled="!isChanged"
                     icon="pi pi-save"
                     @click="onSubmitOrderInvoice"
                     class="w-full sm:w-fit sm:min-w-[145px] px-2 sm:px-5 whitespace-nowrap"
@@ -988,7 +998,8 @@ watch([() => kit.value], async () => {
                                 :invalid="!!orderInvoiceErrors.createdAt"
                                 showTime
                                 hourFormat="24"
-                                disabled
+                                :minDate="dateFrom"
+                                :disabled="!editMode"
                             />
                         </div>
                     </div>
