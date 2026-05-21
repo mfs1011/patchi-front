@@ -394,7 +394,7 @@ const confirmLeave = () => {
                                             showButtons
                                             :placeholder="t('placeholders.qty')"
                                             :minFractionDigits="1"
-                                            :maxFractionDigits="2"
+                                            :maxFractionDigits="3"
                                             :invalid="!!productErrors.qtyProduct"
                                         />
                                     </div>
@@ -445,7 +445,7 @@ const confirmLeave = () => {
                                             showButtons
                                             :placeholder="t('placeholders.qty')"
                                             :minFractionDigits="1"
-                                            :maxFractionDigits="2"
+                                            :maxFractionDigits="3"
                                             :invalid="!!kitErrors.qtyKit"
                                         />
                                     </div>
