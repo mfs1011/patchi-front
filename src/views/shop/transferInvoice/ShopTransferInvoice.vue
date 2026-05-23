@@ -686,7 +686,7 @@ onMounted(async () => {
                                             showButtons
                                             :placeholder="t('placeholders.qty')"
                                             :minFractionDigits="1"
-                                            :maxFractionDigits="2"
+                                            :maxFractionDigits="3"
                                             :invalid="!!locationQuantityErrors.qtyLocationQuantity"
                                         />
                                     </div>
@@ -737,7 +737,7 @@ onMounted(async () => {
                                             showButtons
                                             :placeholder="t('placeholders.qty')"
                                             :minFractionDigits="1"
-                                            :maxFractionDigits="2"
+                                            :maxFractionDigits="3"
                                             :invalid="!!locationQuantityKitErrors.qtyLocationQuantityKit"
                                         />
                                     </div>

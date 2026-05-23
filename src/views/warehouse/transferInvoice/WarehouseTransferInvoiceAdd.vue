@@ -439,7 +439,7 @@ const confirmLeave = () => {
                                             :placeholder="t('placeholders.qty')"
                                             :min="0"
                                             :minFractionDigits="1"
-                                            :maxFractionDigits="2"
+                                            :maxFractionDigits="3"
                                             :invalid="!!locationQuantityErrors.qtyLocationQuantity"
                                         />
                                     </div>
@@ -491,7 +491,7 @@ const confirmLeave = () => {
                                             :placeholder="t('placeholders.qty')"
                                             :min="0"
                                             :minFractionDigits="1"
-                                            :maxFractionDigits="2"
+                                            :maxFractionDigits="3"
                                             :invalid="!!locationQuantityKitErrors.qtyLocationQuantityKit"
                                         />
                                     </div>
