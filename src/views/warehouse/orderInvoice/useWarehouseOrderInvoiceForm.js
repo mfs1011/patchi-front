@@ -10,6 +10,7 @@ export function useOrderInvoiceValidation() {
     const orderInvoiceInfoSchema = computed(() => yup.object({
         location: yup.object().required('Location is required'),
         customer: yup.object().required('Location is required'),
+        comment: yup.string().max(255, t('errorMessages.maxCharacter', { count: 255 })).notRequired(),
         createdAt: yup.date().required(t('errorMessages.dateRequired')),
     }));
 
@@ -121,8 +122,8 @@ export function useOrderInvoiceValidation() {
 
     const { value: location } = useField('location', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
     const { value: customer } = useField('customer', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
-    const { value: comment } = useField('comment', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
-    const { value: createdAt } = useField('createdAt', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: orderInvoiceFormCtx })
+    const { value: comment } = useField('comment', undefined, { form: orderInvoiceFormCtx })
+    const { value: createdAt } = useField('createdAt', undefined, { form: orderInvoiceFormCtx })
     const { value: product } = useField('product', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: productFormCtx })
     const { value: productColor } = useField('color', undefined, { validateOnMount: false, form: productFormCtx });
     const { value: productQty } = useField('qty', undefined, { validateOnMount: false, form: productFormCtx });

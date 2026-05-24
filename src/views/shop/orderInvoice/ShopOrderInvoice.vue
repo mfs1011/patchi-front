@@ -32,6 +32,8 @@ import {usePaymentStore} from "@/stores/payment.js";
 import {useSellerStore} from "@/stores/seller.js";
 import {useShopOrderInvoiceValidation} from "@/views/shop/orderInvoice/useShopOrderInvoiceForm.js";
 import {useInventoryStore} from "@/stores/inventory.js";
+import InputText from "@/volt/InputText.vue";
+import Message from "@/volt/Message.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -56,6 +58,7 @@ const {
     location,
     seller,
     customer,
+    comment,
     createdAt,
     productHandleSubmit,
     productErrors,
@@ -150,7 +153,8 @@ const isChanged = computed(() => (
     createdPriceData.value.length ||
     updatedPriceData.value.length ||
     deletedPriceData.value.length ||
-    orderInvoiceStore.getOrderInvoice?.customer?.id !== customer.value?.id ||
+    (customer.value !== null && orderInvoiceStore.getOrderInvoice?.customer?.id !== customer.value?.id) ||
+    orderInvoiceStore.getOrderInvoice?.comment !== comment.value ||
     new Date(orderInvoiceStore.getOrderInvoice?.createdAt).toISOString() !== new Date(createdAt.value).toISOString()
 ));
 
@@ -240,11 +244,15 @@ const onSubmitOrderInvoice = orderInvoiceHandleSubmit(async (values) => {
         delete payload.orderInvoicePrices
     }
 
-    if (values.customer?.id !== apiData.value.customer?.id) {
+    if (values.customer !== null && values.customer?.id !== apiData.value.customer?.id) {
         payload.customer = values.customer['@id']
     }
 
-    if (values.createdAt !== apiData.value.createdAt) {
+    if (values.comment !== apiData.value.comment) {
+        payload.comment = values.comment
+    }
+
+    if (new Date(values.createdAt).toISOString() !== new Date(apiData.value.createdAt).toISOString()) {
         const date = new Date(values.createdAt);
         date.setHours(date.getHours() + 5);
         payload.createdAt = date
@@ -805,6 +813,7 @@ onMounted(async () => {
                 location: orderInvoiceStore.getOrderInvoice.location,
                 seller: orderInvoiceStore.getOrderInvoice.seller,
                 customer: orderInvoiceStore.getOrderInvoice.customer,
+                comment: orderInvoiceStore.getOrderInvoice.comment,
                 createdAt: new Date(orderInvoiceStore.getOrderInvoice.createdAt),
                 orderInvoiceProducts: orderInvoiceStore.getOrderInvoice.orderInvoiceProducts,
                 orderInvoiceKits: orderInvoiceStore.getOrderInvoice.orderInvoiceKits,
@@ -1001,6 +1010,24 @@ watch([() => kit.value], async () => {
                                 :minDate="dateFrom"
                                 :disabled="!editMode"
                             />
+                        </div>
+                        <div>
+                            <p class="text-sm">{{ t('labels.comment') }}</p>
+
+                            <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
+
+                            <InputText
+                                v-if="!isLoading"
+                                v-model.trim="comment"
+                                fluid
+                                :placeholder="t('placeholders.comment')"
+                                :class="{ 'p-invalid': orderInvoiceErrors.comment }"
+                                :invalid="!!orderInvoiceErrors.comment"
+                                :disabled="!editMode"
+                            />
+
+                            <Message class="h-fit mt-2" size="small" severity="error" variant="simple">{{ orderInvoiceErrors.comment }}</Message>
                         </div>
                     </div>
                 </template>

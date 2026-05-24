@@ -29,6 +29,8 @@ import Row from "primevue/row";
 import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
 import {useTransferInvoiceValidation} from "@/views/warehouse/transferInvoice/useWarehouseTransferInvoiceForm.js";
 import Select from "@/volt/Select.vue";
+import InputText from "@/volt/InputText.vue";
+import Message from "@/volt/Message.vue";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -39,6 +41,7 @@ const {
     transferInvoiceResetForm,
     fromLocation,
     toLocation,
+    comment,
     transferInvoiceProducts,
     transferInvoiceKits,
     locationQuantityHandleSubmit,
@@ -92,6 +95,7 @@ const tabList = computed(() => [
 const isChanged = computed(() => (
     !!fromLocation.value ||
     !!toLocation.value ||
+    !!comment.value ||
     !!transferInvoiceProducts.value.length ||
     !!transferInvoiceKits.value.length
 ))
@@ -107,6 +111,7 @@ const onSubmitTransferInvoice = transferInvoiceHandleSubmit(async values => {
     const payload = {
         fromLocation: values.fromLocation['@id'],
         toLocation: values.toLocation['@id'],
+        comment: values.comment,
         transferInvoiceProducts: values.transferInvoiceProducts.map(transferInvoiceProduct => ({
             locationQuantity: `api/location_quantities/${transferInvoiceProduct.locationQuantity.id}`,
             qty: transferInvoiceProduct.qtyLocationQuantity,
@@ -383,6 +388,19 @@ const confirmLeave = () => {
                                 :placeholder="t('placeholders.select.location')"
                                 pt:root="w-full dark:bg-surface-700"
                             />
+                        </div>
+
+                        <div>
+                            <p class="text-sm">{{ t('labels.comment') }}</p>
+                            <InputText
+                                v-model.trim="comment"
+                                fluid
+                                :placeholder="t('placeholders.comment')"
+                                :class="{ 'p-invalid': transferInvoiceErrors.comment }"
+                                :invalid="!!transferInvoiceErrors.comment"
+                            />
+
+                            <Message class="h-fit mt-2" size="small" severity="error" variant="simple">{{ transferInvoiceErrors.comment }}</Message>
                         </div>
                     </div>
                 </template>

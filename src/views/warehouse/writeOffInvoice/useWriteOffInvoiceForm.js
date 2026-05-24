@@ -12,6 +12,7 @@ export function useWriteOffInvoiceValidation() {
         yup
             .object({
                 location: yup.object().required("From location majburiy"),
+                comment: yup.string().max(255, t('errorMessages.maxCharacter', { count: 255 })).notRequired(),
                 writeOffInvoiceProducts: yup.array(),
                 writeOffInvoiceKits: yup.array(),
             })
@@ -113,6 +114,7 @@ export function useWriteOffInvoiceValidation() {
     })
 
     const { value: location } = useField('location', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: writeOffInvoiceFormCtx })
+    const { value: comment } = useField('comment', undefined, { form: writeOffInvoiceFormCtx })
     const { value: createdAt } = useField('createdAt', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: writeOffInvoiceFormCtx })
     const { value: writeOffInvoiceProducts } = useField('writeOffInvoiceProducts', undefined, { validateOnMount: true, form: writeOffInvoiceFormCtx })
     const { value: writeOffInvoiceKits } = useField('writeOffInvoiceKits', undefined, { validateOnValueUpdate: false, validateOnMount: true, form: writeOffInvoiceFormCtx })
@@ -129,6 +131,7 @@ export function useWriteOffInvoiceValidation() {
         writeOffInvoiceResetForm,
         writeOffInvoiceFormCtx,
         location,
+        comment,
         createdAt,
         writeOffInvoiceProducts,
         writeOffInvoiceKits,

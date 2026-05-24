@@ -27,6 +27,7 @@ import Dialog from "@/volt/Dialog.vue";
 import {useIncomeInvoiceStore} from "@/stores/incomeInvoice.js";
 import {useInventoryStore} from "@/stores/inventory.js";
 import {useIncomeInvoiceValidation} from "@/views/warehouse/incomeInvoice/useWarehouseIncomeInvoiceForm.js";
+import Message from "@/volt/Message.vue";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -398,6 +399,8 @@ const confirmLeave = () => {
                                 :class="{ 'p-invalid': incomeInvoiceErrors.comment }"
                                 :invalid="!!incomeInvoiceErrors.comment"
                             />
+
+                            <Message class="h-fit mt-2" size="small" severity="error" variant="simple">{{ incomeInvoiceErrors.comment }}</Message>
                         </div>
                     </div>
                 </template>

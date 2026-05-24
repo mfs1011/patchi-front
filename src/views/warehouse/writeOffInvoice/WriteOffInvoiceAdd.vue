@@ -28,6 +28,8 @@ import Row from "primevue/row";
 import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
 import {useWriteOffInvoiceStore} from "@/stores/writeOffInvoice.js";
 import {useWriteOffInvoiceValidation} from "@/views/warehouse/writeOffInvoice/useWriteOffInvoiceForm.js";
+import Message from "@/volt/Message.vue";
+import InputText from "@/volt/InputText.vue";
 
 const { t } = useI18n()
 const toast = useToast()
@@ -37,6 +39,7 @@ const {
     writeOffInvoiceIsSubmitting,
     writeOffInvoiceResetForm,
     location,
+    comment,
     createdAt,
     writeOffInvoiceProducts,
     writeOffInvoiceKits,
@@ -90,6 +93,7 @@ const tabList = computed(() => [
 
 const isChanged = computed(() => (
     !!location.value ||
+    !!comment.value ||
     !!writeOffInvoiceProducts.value.length ||
     !!writeOffInvoiceKits.value.length
 ))
@@ -103,6 +107,7 @@ const isSetAllData = computed(() => (
 const onSubmitWriteOffInvoice = writeOffInvoiceHandleSubmit(async values => {
     const payload = {
         location: values.location['@id'],
+        comment: values.comment,
         writeOffInvoiceProducts: values.writeOffInvoiceProducts.map(writeOffInvoiceProduct => ({
             locationQuantity: `api/location_quantities/${writeOffInvoiceProduct.locationQuantity.id}`,
             qty: writeOffInvoiceProduct.qtyLocationQuantity,
@@ -361,7 +366,7 @@ watch(location, async (newVal) => {
                             <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
                             <SearchSelect
                                 v-model="location"
-                                :fetchFn="(query) => locationStore.fetchLocations({...query, isWarehouse: true })"
+                                :fetchFn="(query) => locationStore.fetchLocations({...query })"
                                 :options="locationStore.getLocations.models"
                                 :option-label="opt => opt?.name"
                                 :option-value="opt => opt?.name"
@@ -371,6 +376,19 @@ watch(location, async (newVal) => {
                                 :total-items="locationStore.getLocations.totalItems"
                                 :invalid="!!writeOffInvoiceErrors.location"
                             />
+                        </div>
+
+                        <div>
+                            <p class="text-sm">{{ t('labels.comment') }}</p>
+                            <InputText
+                                v-model.trim="comment"
+                                fluid
+                                :placeholder="t('placeholders.comment')"
+                                :class="{ 'p-invalid': writeOffInvoiceErrors.comment }"
+                                :invalid="!!writeOffInvoiceErrors.comment"
+                            />
+
+                            <Message class="h-fit mt-2" size="small" severity="error" variant="simple">{{ writeOffInvoiceErrors.comment }}</Message>
                         </div>
                     </div>
                 </template>
@@ -427,7 +445,7 @@ watch(location, async (newVal) => {
                                             :placeholder="t('placeholders.qty')"
                                             :min="0"
                                             :minFractionDigits="1"
-                                            :maxFractionDigits="2"
+                                            :maxFractionDigits="3"
                                             :invalid="!!locationQuantityErrors.qtyLocationQuantity"
                                         />
                                     </div>
@@ -479,7 +497,7 @@ watch(location, async (newVal) => {
                                             :placeholder="t('placeholders.qty')"
                                             :min="0"
                                             :minFractionDigits="1"
-                                            :maxFractionDigits="2"
+                                            :maxFractionDigits="3"
                                             :invalid="!!locationQuantityKitErrors.qtyLocationQuantityKit"
                                         />
                                     </div>

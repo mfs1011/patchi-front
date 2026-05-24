@@ -490,6 +490,14 @@ onBeforeRouteLeave(() => {
                                 <p v-else>{{ data.updatedBy?.name || '-' }}</p>
                             </template>
                         </Column>
+                        <Column field="comment" :header="t('labels.comment')">
+                            <template #body="{ data }">
+                                <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>
+                                <p v-else class="max-h-20 border border-surface-300 dark:border-surface-700 rounded px-2 py-1 max-w-100 overflow-auto whitespace-break-spaces text-sm leading-tight">
+                                    {{ data.comment || '-' }}
+                                </p>
+                            </template>
+                        </Column>
                         <Column field="actions" :header="t('actions')">
                             <template #body="{ data }">
                                 <Skeleton height="2rem" v-if="transferInvoiceStore.getIsLoadingTransferInvoices"/>

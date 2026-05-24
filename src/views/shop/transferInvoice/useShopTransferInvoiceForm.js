@@ -32,6 +32,7 @@ export function useTransferInvoiceValidation() {
                         );
                 }),
 
+                comment: yup.string().max(255, t('errorMessages.maxCharacter', { count: 255 })).notRequired(),
                 transferInvoiceProducts: yup.array(),
                 transferInvoiceKits: yup.array(),
             })
@@ -134,6 +135,7 @@ export function useTransferInvoiceValidation() {
 
     const { value: fromLocation } = useField('fromLocation', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: transferInvoiceFormCtx })
     const { value: toLocation } = useField('toLocation', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: transferInvoiceFormCtx })
+    const { value: comment } = useField('comment', undefined, { form: transferInvoiceFormCtx })
     const { value: locationQuantity } = useField('locationQuantity', undefined, { validateOnMount: false, validateOnValueUpdate: false, form: locationQuantityFormCtx })
     const { value: transferInvoiceProducts } = useField('transferInvoiceProducts', undefined, { validateOnMount: true, form: transferInvoiceFormCtx })
     const { value: transferInvoiceKits } = useField('transferInvoiceKits', undefined, { validateOnValueUpdate: false, validateOnMount: true, form: transferInvoiceFormCtx })
@@ -150,6 +152,7 @@ export function useTransferInvoiceValidation() {
         transferInvoiceFormCtx,
         fromLocation,
         toLocation,
+        comment,
         transferInvoiceProducts,
         transferInvoiceKits,
 

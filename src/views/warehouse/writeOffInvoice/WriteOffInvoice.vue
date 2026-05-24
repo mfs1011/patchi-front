@@ -30,6 +30,8 @@ import {useWriteOffInvoiceValidation} from "@/views/warehouse/writeOffInvoice/us
 import DatePicker from "@/volt/DatePicker.vue";
 import {useInventoryStore} from "@/stores/inventory.js";
 import {exportWriteOffInvoice} from "@/helpers/xlsx.js";
+import Message from "@/volt/Message.vue";
+import InputText from "@/volt/InputText.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -47,6 +49,7 @@ const {
     writeOffInvoiceIsSubmitting,
     writeOffInvoiceResetForm,
     location,
+    comment,
     createdAt,
     locationQuantityHandleSubmit,
     locationQuantityErrors,
@@ -115,7 +118,8 @@ const isChanged = computed(() => (
     deletedData.value.length ||
     createdKitData.value.length ||
     updatedKitData.value.length ||
-    deletedKitData.value.length
+    deletedKitData.value.length ||
+    writeOffInvoiceStore.getWriteOffInvoice?.comment !== comment.value
 ));
 
 // functions
@@ -152,6 +156,10 @@ const onSubmitWriteOffInvoice = writeOffInvoiceHandleSubmit(async (values) => {
 
     payload.writeOffInvoiceProducts = [...createdData.value, ...updatedData.value, ...deletedData.value]
     payload.writeOffInvoiceKits = [...createdKitData.value, ...updatedKitData.value, ...deletedKitData.value]
+
+    if (values.comment !== apiData.value.comment) {
+        payload.comment = values.comment
+    }
 
     if (!payload.writeOffInvoiceProducts.length) {
         delete payload.writeOffInvoiceProducts
@@ -509,6 +517,7 @@ onMounted(async () => {
         writeOffInvoiceResetForm({
             values: {
                 location: writeOffInvoiceStore.getWriteOffInvoice.location,
+                comment: writeOffInvoiceStore.getWriteOffInvoice.comment,
                 createdAt: new Date(writeOffInvoiceStore.getWriteOffInvoice.createdAt),
                 writeOffInvoiceProducts: writeOffInvoiceStore.getWriteOffInvoice.writeOffInvoiceProducts,
                 writeOffInvoiceKits: writeOffInvoiceStore.getWriteOffInvoice.writeOffInvoiceKits
@@ -619,6 +628,25 @@ onMounted(async () => {
                         </div>
 
                         <div>
+                            <p class="text-sm">{{ t('labels.comment') }}</p>
+
+                            <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
+
+                            <InputText
+                                v-if="!isLoading"
+                                v-model.trim="comment"
+                                fluid
+                                :placeholder="t('placeholders.comment')"
+                                :class="{ 'p-invalid': writeOffInvoiceErrors.comment }"
+                                :invalid="!!writeOffInvoiceErrors.comment"
+                                :disabled="!editMode"
+                            />
+
+                            <Message class="h-fit mt-2" size="small" severity="error" variant="simple">{{ writeOffInvoiceErrors.comment }}</Message>
+                        </div>
+
+                        <div>
                             <p class="text-sm">{{ t('labels.createdAt') }}</p>
 
                             <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
@@ -693,7 +721,7 @@ onMounted(async () => {
                                             showButtons
                                             :placeholder="t('placeholders.qty')"
                                             :minFractionDigits="1"
-                                            :maxFractionDigits="2"
+                                            :maxFractionDigits="3"
                                             :invalid="!!locationQuantityErrors.qtyLocationQuantity"
                                         />
                                     </div>
@@ -744,7 +772,7 @@ onMounted(async () => {
                                             showButtons
                                             :placeholder="t('placeholders.qty')"
                                             :minFractionDigits="1"
-                                            :maxFractionDigits="2"
+                                            :maxFractionDigits="3"
                                             :invalid="!!locationQuantityKitErrors.qtyLocationQuantityKit"
                                         />
                                     </div>

@@ -29,6 +29,8 @@ import {useLocationQuantityKitStore} from "@/stores/locationQuantityKit.js";
 import {useUserStore} from "@/stores/user.js";
 import {exportTransferInvoice} from "@/helpers/xlsx.js";
 import Select from "@/volt/Select.vue";
+import Message from "@/volt/Message.vue";
+import InputText from "@/volt/InputText.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -46,6 +48,7 @@ const {
     transferInvoiceResetForm,
     fromLocation,
     toLocation,
+    comment,
     locationQuantityHandleSubmit,
     locationQuantityErrors,
     locationQuantityIsSubmitting,
@@ -114,7 +117,8 @@ const isChanged = computed(() => (
     updatedKitData.value.length ||
     deletedKitData.value.length ||
     transferInvoiceStore.getTransferInvoice?.fromLocation?.id !== fromLocation.value?.id ||
-    transferInvoiceStore.getTransferInvoice?.toLocation?.id !== toLocation.value?.id
+    transferInvoiceStore.getTransferInvoice?.toLocation?.id !== toLocation.value?.id ||
+    transferInvoiceStore.getTransferInvoice?.comment !== comment.value
 ));
 const isAcceptedTransferInvoice = computed(() => transferInvoiceStore.getTransferInvoice.status === 2)
 
@@ -167,6 +171,10 @@ const onSubmitTransferInvoice = transferInvoiceHandleSubmit(async (values) => {
 
     if (values.toLocation.id !== apiData.value.toLocation.id) {
         payload.toLocation = values.toLocation['@id']
+    }
+
+    if (values.comment !== apiData.value.comment) {
+        payload.comment = values.comment
     }
 
     try {
@@ -507,6 +515,7 @@ onMounted(async () => {
             values: {
                 fromLocation: transferInvoiceStore.getTransferInvoice.fromLocation,
                 toLocation: transferInvoiceStore.getTransferInvoice.toLocation,
+                comment: transferInvoiceStore.getTransferInvoice.comment,
                 transferInvoiceProducts: transferInvoiceStore.getTransferInvoice.transferInvoiceProducts,
                 transferInvoiceKits: transferInvoiceStore.getTransferInvoice.transferInvoiceKits
             }
@@ -630,6 +639,24 @@ onMounted(async () => {
                                 :placeholder="t('placeholders.select.location')"
                                 pt:root="w-full dark:bg-surface-700"
                             />
+                        </div>
+                        <div>
+                            <p class="text-sm">{{ t('labels.comment') }}</p>
+
+                            <Skeleton class="sm:hidden" height="2rem" v-if="isLoading"/>
+                            <Skeleton class="hidden sm:block" height="2.6rem" width="100%" v-if="isLoading"/>
+
+                            <InputText
+                                v-if="!isLoading"
+                                v-model.trim="comment"
+                                fluid
+                                :placeholder="t('placeholders.comment')"
+                                :class="{ 'p-invalid': transferInvoiceErrors.comment }"
+                                :invalid="!!transferInvoiceErrors.comment"
+                                :disabled="!editMode"
+                            />
+
+                            <Message class="h-fit mt-2" size="small" severity="error" variant="simple">{{ transferInvoiceErrors.comment }}</Message>
                         </div>
                     </div>
                 </template>
