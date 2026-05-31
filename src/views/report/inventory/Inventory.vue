@@ -3,7 +3,7 @@ import Section from "@/components/UI/Section.vue";
 import {useI18n} from "vue-i18n";
 import {computed, onMounted, ref} from "vue";
 import {useInventoryStore} from "@/stores/inventory.js";
-import {onBeforeRouteLeave, useRoute, useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import Breadcrumb from "@/volt/Breadcrumb.vue";
 import Skeleton from "@/volt/Skeleton.vue";
 import Card from "@/volt/Card.vue";
@@ -12,7 +12,7 @@ import Column from "primevue/column";
 import ColumnGroup from 'primevue/columngroup';
 import Row from "primevue/row"
 import DataTable from "@/volt/DataTable.vue";
-import {formatCurrency, getFormattedDate, getFormattedDateWithTime} from "@/helpers/numberFormat.js";
+import {formatCurrency, getFormattedDate} from "@/helpers/numberFormat.js";
 import Button from "@/volt/Button.vue";
 import Tab from "@/volt/Tab.vue";
 import TabPanel from "@/volt/TabPanel.vue";
@@ -20,8 +20,6 @@ import TabList from "@/volt/TabList.vue";
 import TabPanels from "@/volt/TabPanels.vue";
 import Tabs from "@/volt/Tabs.vue";
 import InputNumber from "@/volt/InputNumber.vue";
-import Dialog from "@/volt/Dialog.vue";
-import SecondaryButton from "@/volt/SecondaryButton.vue";
 import {STATUSES} from "@/helpers/constants.js";
 import {useToast} from "primevue/usetoast";
 import DatePicker from "@/volt/DatePicker.vue";
@@ -29,6 +27,8 @@ import SearchSelect from "@/components/UI/SearchSelect.vue";
 import {useLocationStore} from "@/stores/location.js";
 import {useField} from "vee-validate";
 import {exportInventory} from "@/helpers/xlsx.js";
+import {useInventoryProductStore} from "@/stores/inventoryProduct.js";
+import {useInventoryKitStore} from "@/stores/inventoryKit.js";
 
 const { t } = useI18n();
 const toast = useToast();
@@ -39,12 +39,11 @@ const isLoadingEdit = ref(false)
 const inventoryProducts = ref([])
 const inventoryKits = ref([])
 const tabVal = ref('products')
-const showLeaveDialog = ref(false)
-const isConfirmLoading = ref(false)
-const pendingNavigation = ref(false)
 const isSaved = ref(false)
 
 const inventoryStore = useInventoryStore()
+const inventoryProductStore = useInventoryProductStore()
+const inventoryKitStore = useInventoryKitStore()
 const locationStore = useLocationStore();
 
 const home = ref({
@@ -64,23 +63,23 @@ const tabList = computed(() => [
     { value: 'kits', label: t('cards.kits')},
 ])
 
-const changedInventoryProducts = computed(() =>
-    inventoryProducts.value
-        .filter(p => inventoryStore.getInventory.inventoryProducts.find(x => x.id === p.id)?.factQty !== p.factQty)
-        .map(p => ({
-            inventoryProduct: p['@id'],
-            factQty: p.factQty
-        }))
-);
-
-const changedInventoryKits = computed(() =>
-    inventoryKits.value
-        .filter(p => inventoryStore.getInventory.inventoryKits.find(x => x.id === p.id)?.factQty !== p.factQty)
-        .map(p => ({
-            inventoryKit: p['@id'],
-            factQty: p.factQty
-        }))
-);
+// const changedInventoryProducts = computed(() =>
+//     inventoryProducts.value
+//         .filter(p => inventoryStore.getInventory.inventoryProducts.find(x => x.id === p.id)?.factQty !== p.factQty)
+//         .map(p => ({
+//             inventoryProduct: p['@id'],
+//             factQty: p.factQty
+//         }))
+// );
+//
+// const changedInventoryKits = computed(() =>
+//     inventoryKits.value
+//         .filter(p => inventoryStore.getInventory.inventoryKits.find(x => x.id === p.id)?.factQty !== p.factQty)
+//         .map(p => ({
+//             inventoryKit: p['@id'],
+//             factQty: p.factQty
+//         }))
+// );
 
 const totalProductCurrentPrice = computed(() => inventoryProducts.value.reduce((total, current) => total + (current.costPrice * current.currentQty), 0))
 const totalProductFactPrice = computed(() => inventoryProducts.value.reduce((total, current) => total + (current.costPrice * current.factQty), 0))
@@ -153,7 +152,9 @@ const { value: dateTo } = useField('dateTo')
 onMounted(async () => {
     await inventoryStore.fetchInventory(route.params.id)
     inventoryProducts.value = JSON.parse(JSON.stringify(inventoryStore.getInventory.inventoryProducts))
+        .sort((a, b) => a.locationQuantity.product.code.localeCompare(b.locationQuantity.product.code))
     inventoryKits.value = JSON.parse(JSON.stringify(inventoryStore.getInventory.inventoryKits))
+        .sort((a, b) => a.locationQuantityKit.kit.code.localeCompare(b.locationQuantityKit.kit.code))
 
     setTimeout(() => {
         location.value = inventoryStore.getInventory.location
@@ -164,46 +165,70 @@ onMounted(async () => {
     isLoading.value = false
 })
 
-onBeforeRouteLeave((to, from, next) => {
-    if ((changedInventoryProducts.value.length || changedInventoryKits.value.length) && !isSaved.value) {
-        showLeaveDialog.value = true
-        pendingNavigation.value = next
-    } else {
-        next()
-    }
-})
+// const pushChanges = async () => {
+//     try {
+//         isLoadingEdit.value = true
+//         const payload = {};
+//
+//         if (changedInventoryProducts.value.length) {
+//             payload.inventoryProducts = changedInventoryProducts.value
+//         }
+//
+//         if (changedInventoryKits.value.length) {
+//             payload.inventoryKits = changedInventoryKits.value
+//         }
+//
+//         await inventoryStore.putInventory(payload, route.params.id)
+//
+//         toast.add({ severity: 'success', summary: t('toast.edited', { name: t('data.nominativeCapitalize') }), life: 3000 })
+//         isSaved.value = true
+//         router.back()
+//     } catch (err) {
+//         console.log(err)
+//     } finally {
+//         isLoadingEdit.value = false
+//     }
+// }
 
-const confirmLeave = () => {
-    showLeaveDialog.value = false
-    if (pendingNavigation.value) {
-        pendingNavigation.value()
+const pushChangeProduct = async (data) => {
+    if (data.factQty === null) {
+        data.factQty = 0
+    }
+
+    try {
+        await inventoryProductStore.putInventoryProduct({ factQty: data.factQty }, data.id)
+        toast.add({ severity: 'success', summary: t('toast.edited', { name: t('data.nominativeCapitalize') }), life: 3000 })
+    } catch (err) {
+        console.log(err)
+        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
     }
 }
 
-const pushChanges = async () => {
+const pushChangeKit = async (data) => {
+    if (data.factQty === null) {
+        data.factQty = 0
+    }
+
     try {
-        isLoadingEdit.value = true
-        const payload = {};
-
-        if (changedInventoryProducts.value.length) {
-            payload.inventoryProducts = changedInventoryProducts.value
-        }
-
-        if (changedInventoryKits.value.length) {
-            payload.inventoryKits = changedInventoryKits.value
-        }
-
-        await inventoryStore.putInventory(payload, route.params.id)
-
+        await inventoryKitStore.putInventoryKit({ factQty: data.factQty }, data.id)
         toast.add({ severity: 'success', summary: t('toast.edited', { name: t('data.nominativeCapitalize') }), life: 3000 })
-        isSaved.value = true
-        router.back()
     } catch (err) {
         console.log(err)
+        toast.add({ severity: 'error', summary: t('toast.internalServerError'), life: 3000 })
+    }
+}
+
+const acceptAction = async () => {
+    try {
+        isLoadingEdit.value = true;
+
+        await inventoryStore.putInventoryStatus({status: 2}, route.params.id);
+        toast.add({ severity: 'success', summary: t('toast.accepted', { name: t('inventory.nominativeCapitalize') }), life: 3000 })
+        router.back()
     } finally {
         isLoadingEdit.value = false
     }
-}
+};
 </script>
 
 <template>
@@ -405,13 +430,12 @@ const pushChanges = async () => {
                                             <InputNumber
                                                 v-else
                                                 fluid
-                                                :suffix="` ${t(`labels.${data.locationQuantity.product.category.unit.name}`)}`"
                                                 v-model.number="inventoryProducts[index].factQty"
-                                                :placeholder="t('placeholders.qty')"
                                                 class="min-w-26!"
                                                 :min="0"
                                                 :minFractionDigits="1"
                                                 :maxFractionDigits="2"
+                                                @blur="() => pushChangeProduct(data)"
                                             />
                                         </template>
                                     </Column>
@@ -521,13 +545,13 @@ const pushChanges = async () => {
                                         </Row>
                                     </ColumnGroup>
 
-                                    <template v-if="changedInventoryProducts.length || changedInventoryKits.length" #footer>
+                                    <template v-if="inventoryStore.getInventory.status === 1" #footer>
                                         <div>
                                             <Button
                                                 class="px-2! sm:px-5! whitespace-nowrap"
                                                 icon="pi pi-save"
-                                                :label="t('buttons.saveAndExit')"
-                                                @click="pushChanges"
+                                                :label="t('dialog.confirm')"
+                                                @click="acceptAction"
                                                 :loading="isLoadingEdit"
                                                 :disabled="isLoadingEdit"
                                             />
@@ -615,13 +639,12 @@ const pushChanges = async () => {
                                             <InputNumber
                                                 v-else
                                                 fluid
-                                                :suffix="` ${t('labels.pcs')}`"
                                                 v-model.number="inventoryKits[index].factQty"
-                                                :placeholder="t('placeholders.kpiPercent')"
                                                 class="min-w-26!"
                                                 :min="0"
                                                 :minFractionDigits="1"
                                                 :maxFractionDigits="2"
+                                                @blur="() => pushChangeKit(data)"
                                             />
                                         </template>
                                     </Column>
@@ -740,13 +763,13 @@ const pushChanges = async () => {
                                         </Row>
                                     </ColumnGroup>
 
-                                    <template v-if="changedInventoryKits.length || changedInventoryProducts.length" #footer>
+                                    <template v-if="inventoryStore.getInventory.status === 1" #footer>
                                         <div>
                                             <Button
                                                 class="px-2! sm:px-5! whitespace-nowrap"
                                                 icon="pi pi-save"
-                                                :label="t('buttons.saveAndExit')"
-                                                @click="pushChanges"
+                                                :label="t('dialog.confirm')"
+                                                @click="acceptAction"
                                                 :loading="isLoadingEdit"
                                                 :disabled="isLoadingEdit"
                                             />
@@ -758,31 +781,6 @@ const pushChanges = async () => {
                     </Tabs>
                 </template>
             </Card>
-            <!-- CANCEL CHANGES BEFORE LEAVE CURRENT ROUTE DIALOG -->
-            <Dialog
-                v-model:visible="showLeaveDialog"
-                modal
-                :closable="false"
-                class="sm:min-w-100 sm:w-fit w-9/10"
-                pt:root="px-2"
-            >
-            <span class="text-surface-500 dark:text-surface-400 block whitespace-nowrap">
-                {{ t('dialog.leaveFromEditMessage') }}
-            </span>
-
-                <template #footer>
-                    <div class="flex justify-end gap-2">
-                        <SecondaryButton type="button" :label="t('dialog.cancel')" @click="showLeaveDialog = false" />
-                        <Button
-                            type="button"
-                            :label="t('dialog.confirm')"
-                            @click="confirmLeave"
-                            class="px-5"
-                            :loading="isConfirmLoading"
-                        />
-                    </div>
-                </template>
-            </Dialog>
         </template>
     </Section>
 </template>
