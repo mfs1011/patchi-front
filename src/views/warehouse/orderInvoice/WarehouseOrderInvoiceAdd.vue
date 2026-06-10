@@ -497,41 +497,39 @@ const {
                     >
                         <template #content>
                             <div class="border-b border-surface-200 dark:border-surface-600/50">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-2 border-b border-surface-200 dark:border-surface-600/50 p-2 sm:p-4">
-                                <div>
-                                    <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
-
-                                    <Select
-                                        v-model="location"
-                                        :options="locationStore.getLocations.models"
-                                        option-label="name"
-                                        showClear
-                                        :placeholder="t('placeholders.select.location')"
-                                        pt:root="w-full dark:bg-surface-700"
-                                    />
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 border-b border-surface-200 dark:border-surface-600/50 p-2 sm:p-4">
+                                    <div>
+                                        <p class="text-sm">{{ t('labels.location') }}<span class="text-red-500"> *</span></p>
+                                        <Select
+                                            v-model="location"
+                                            :options="locationStore.getLocations.models"
+                                            option-label="name"
+                                            showClear
+                                            :placeholder="t('placeholders.select.location')"
+                                            pt:root="w-full dark:bg-surface-700"
+                                        />
+                                    </div>
+                                    <div>
+                                        <p class="text-sm">{{ t('labels.client') }}</p>
+                                        <SearchSelect
+                                            v-model="customer"
+                                            :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': true })"
+                                            :options="customerStore.getCustomers.models"
+                                            :option-label="opt => `${opt?.name} | ${opt?.telephone}`"
+                                            :option-value="opt => opt?.id"
+                                            :return-value="opt => opt"
+                                            :placeholder="t('placeholders.select.customer')"
+                                            :loading="customerStore.getIsLoadingCustomers"
+                                            :total-items="customerStore.getCustomers.totalItems"
+                                            :invalid="!!orderInvoiceErrors.customer"
+                                            size="w-full dark:bg-surface-700"
+                                        />
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <p class="text-sm">{{ t('labels.client') }}</p>
-
-                                    <SearchSelect
-                                        v-model="customer"
-                                        :fetchFn="(query) => customerStore.fetchCustomers({ ...query, 'is-b2b': true })"
-                                        :options="customerStore.getCustomers.models"
-                                        :option-label="opt => opt?.name"
-                                        :option-value="opt => opt?.id"
-                                        :return-value="opt => opt"
-                                        :placeholder="t('placeholders.select.customer')"
-                                        :loading="customerStore.getIsLoadingCustomers"
-                                        :total-items="customerStore.getCustomers.totalItems"
-                                        :invalid="!!orderInvoiceErrors.customer"
-                                        size="w-full dark:bg-surface-700"
-                                    />
-                                </div>
-
-                                <div>
+                                <!-- createdAt alohida pastki qatorda -->
+                                <div class="p-2 sm:p-4">
                                     <p class="text-sm">{{ t('labels.createdAt') }}<span class="text-red-500"> *</span></p>
-
                                     <DatePicker
                                         v-model="createdAt"
                                         dateFormat="dd.mm.yy"
@@ -544,7 +542,6 @@ const {
                                         :minDate="dateFrom"
                                     />
                                 </div>
-                            </div>
                             </div>
 
                             <div class="flex-1 overflow-auto">
